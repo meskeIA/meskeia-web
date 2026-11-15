@@ -4,10 +4,50 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './Espejo.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { formatNumber } from '@/lib';
+import { PREGUNTA_PRIVACIDAD } from './metadata';
+
+/**
+ * Por qué no se abrió la cámara, según el `name` del error de getUserMedia (hallazgo 4746: antes
+ * todo era «permiso denegado» y mandaba a la configuración a quien no tiene cámara o la tiene
+ * ocupada en una videollamada). Mismo criterio que prueba-camara (hallazgo 4429).
+ */
+type AvisoCamara = 'denegado' | 'sin-camara' | 'ocupada' | 'desconectada' | 'otro';
+
+const AVISOS: Record<AvisoCamara, { titulo: string; detalle: string }> = {
+  denegado: {
+    titulo: 'Permiso de cámara denegado',
+    detalle: 'Activa la cámara en la configuración del navegador',
+  },
+  'sin-camara': {
+    titulo: 'No se ha encontrado ninguna cámara',
+    detalle: 'Conecta una cámara web o abre el espejo en un dispositivo con cámara frontal.',
+  },
+  ocupada: {
+    titulo: 'La cámara está ocupada',
+    detalle: 'Otra aplicación la está usando (una videollamada, por ejemplo). Ciérrala e inténtalo de nuevo.',
+  },
+  desconectada: {
+    titulo: 'La cámara se ha desconectado',
+    detalle: 'Se retiró el permiso o el sistema dejó de dar imagen. Pulsa «Activar espejo» para volver a abrirla.',
+  },
+  otro: {
+    titulo: 'No se pudo abrir la cámara',
+    detalle: 'Comprueba que está conectada y que el navegador tiene permiso.',
+  },
+};
+
+function avisoDeError(error: unknown): AvisoCamara {
+  const nombre = error instanceof DOMException || error instanceof Error ? error.name : '';
+  if (nombre === 'NotAllowedError' || nombre === 'SecurityError') return 'denegado';
+  if (nombre === 'NotFoundError' || nombre === 'OverconstrainedError') return 'sin-camara';
+  if (nombre === 'NotReadableError' || nombre === 'AbortError') return 'ocupada';
+  return 'otro';
+}
 
 export default function EspejoPage() {
   const [activo, setActivo] = useState(false);
-  const [permisoCamara, setPermisoCamara] = useState<'granted' | 'denied' | 'prompt'>('prompt');
+  const [aviso, setAviso] = useState<AvisoCamara | null>(null);
   const [espejado, setEspejado] = useState(true);
   const [brillo, setBrillo] = useState(100);
   const [zoom, setZoom] = useState(1);
@@ -47,7 +87,17 @@ export default function EspejoPage() {
       }
 
       streamRef.current = stream;
-      setPermisoCamara('granted');
+      setAviso(null);
+
+      // Si la pista termina sola (permiso retirado, cámara desconectada), la app vuelve a
+      // «Activar espejo» y lo dice, en vez de quedarse con el vídeo muerto (hallazgo 4751)
+      stream.getVideoTracks().forEach((pista) => {
+        pista.addEventListener('ended', () => {
+          if (streamRef.current !== stream) return;
+          detenerCamara();
+          setAviso('desconectada');
+        });
+      });
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -57,7 +107,7 @@ export default function EspejoPage() {
     } catch (error) {
       if (generacion !== generacionRef.current) return;
       console.error('Error al acceder a la cámara:', error);
-      setPermisoCamara('denied');
+      setAviso(avisoDeError(error));
     } finally {
       if (generacion === generacionRef.current) abriendoRef.current = false;
     }
@@ -118,23 +168,15 @@ export default function EspejoPage() {
         ref={containerRef}
         className={`${styles.espejoContainer} ${pantallaCompleta ? styles.fullscreen : ''}`}
       >
+        {/* Hallazgo 4748: el recuadro decía «Pulsa para activar el espejo» y no hacía nada; en el
+            móvil llena la pantalla y deja el botón bajo el pliegue. Ahora es un botón. */}
         {!activo ? (
-          <div className={styles.espejoPlaceholder}>
-            {permisoCamara === 'denied' ? (
-              <>
-                <span className={styles.placeholderIcon} aria-hidden="true">🚫</span>
-                <p>Permiso de cámara denegado</p>
-                <p className={styles.placeholderSubtexto}>
-                  Activa la cámara en la configuración del navegador
-                </p>
-              </>
-            ) : (
-              <>
-                <span className={styles.placeholderIcon} aria-hidden="true">🪞</span>
-                <p>Pulsa para activar el espejo</p>
-              </>
-            )}
-          </div>
+          <button type="button" className={styles.espejoPlaceholder} onClick={iniciarCamara}>
+            <span className={styles.placeholderIcon} aria-hidden="true">{aviso ? '🚫' : '🪞'}</span>
+            <span className={styles.placeholderTexto}>
+              {aviso ? 'Pulsa para volver a intentarlo' : 'Pulsa para activar el espejo'}
+            </span>
+          </button>
         ) : null}
 
         <video
@@ -154,10 +196,17 @@ export default function EspejoPage() {
         {activo && pantallaCompleta && (
           <div className={styles.controlesFullscreen}>
             <button type="button" onClick={togglePantallaCompleta} className={styles.btnSalirFullscreen}>
-              ✕ Salir
+              <span aria-hidden="true">✕</span> Salir
             </button>
           </div>
         )}
+      </div>
+
+      {/* Por qué no se abrió la cámara (hallazgos 4746 y 4747): siempre montado para que el
+          lector anuncie el cambio; vacío, no ocupa sitio */}
+      <div className={styles.avisoCamara} role="alert">
+        <p className={styles.avisoTitulo}>{aviso ? AVISOS[aviso].titulo : ''}</p>
+        <p className={styles.avisoDetalle}>{aviso ? AVISOS[aviso].detalle : ''}</p>
       </div>
 
       {/* Botón principal */}
@@ -182,7 +231,8 @@ export default function EspejoPage() {
             onClick={() => setEspejado(!espejado)}
           >
             <span className={styles.controlIcono} aria-hidden="true">↔️</span>
-            <span className={styles.controlTexto}>{espejado ? 'Espejado' : 'Normal'}</span>
+            {/* Etiqueta fija: el estado lo dice aria-pressed (hallazgo 4755) */}
+            <span className={styles.controlTexto}>Espejado</span>
           </button>
 
           {/* Pantalla completa */}
@@ -201,7 +251,7 @@ export default function EspejoPage() {
       {activo && (
         <div className={styles.section}>
           <div className={styles.ajuste}>
-            <label htmlFor="brillo"><span aria-hidden="true">☀️</span> Brillo: {brillo}%</label>
+            <label htmlFor="brillo"><span aria-hidden="true">☀️</span> Brillo: {brillo}&nbsp;%</label>
             <input
               id="brillo"
               type="range"
@@ -214,7 +264,7 @@ export default function EspejoPage() {
           </div>
 
           <div className={styles.ajuste}>
-            <label htmlFor="zoom"><span aria-hidden="true">🔍</span> Zoom: {zoom}x</label>
+            <label htmlFor="zoom"><span aria-hidden="true">🔍</span> Zoom: {formatNumber(zoom, 1)}x</label>
             <input
               id="zoom"
               type="range"
@@ -405,28 +455,19 @@ export default function EspejoPage() {
             <li className={styles.faqItem}>
               <details>
                 <summary>¿Puedo usarlo con la cámara trasera?</summary>
+                {/* Hallazgo 4757: decía que con la trasera «la imagen no se invierte», y la app
+                    ni la pide ni distingue: invierte cualquier flujo */}
                 <p>
-                  La app está optimizada para la cámara frontal, que es la que permite
-                  verte a ti mismo de forma natural. La cámara trasera tiene un ángulo
-                  incómodo para este uso y la imagen no se invierte automáticamente,
-                  por lo que no reproducirá el efecto espejo.
+                  No. La app pide siempre la cámara frontal, la que te mira, y no tiene
+                  selector de cámara. Si el dispositivo solo tiene una cámara, usa esa.
                 </p>
               </details>
             </li>
             <li className={styles.faqItem}>
               <details>
-                <summary>¿Guarda alguna imagen o vídeo?</summary>
-                <p>
-                  No. El espejo digital muestra la imagen de la cámara en tiempo real
-                  pero no captura, almacena ni envía ninguna imagen o vídeo. Todo el
-                  procesamiento ocurre localmente en tu dispositivo, ya sea móvil
-                  (celular) u ordenador (computadora). Al cerrar la app
-                  o apagar la cámara, no queda ningún archivo guardado.
-                </p>
-                <p className={styles.faqTip}>
-                  La privacidad está garantizada: no hay servidor externo que reciba
-                  el vídeo de tu cámara.
-                </p>
+                {/* Una sola fuente con el FAQPage (hallazgo 4753) */}
+                <summary>{PREGUNTA_PRIVACIDAD.question}</summary>
+                <p>{PREGUNTA_PRIVACIDAD.answer}</p>
               </details>
             </li>
           </ul>
@@ -536,7 +577,7 @@ export default function EspejoPage() {
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
-              <h3>4 errores habituales al usar la cámara como espejo</h3>
+              <h3>3 errores habituales al usar la cámara como espejo</h3>
             </div>
             <ul className={styles.warningList}>
               <li>
@@ -556,12 +597,6 @@ export default function EspejoPage() {
                 denegaste el acceso, la app no funcionará aunque pulses el botón. Revisa
                 los permisos del sitio en el navegador y activa la cámara manualmente
                 antes de intentarlo de nuevo.
-              </li>
-              <li>
-                <strong>Usar la cámara trasera.</strong> El ángulo resulta muy incómodo
-                para verte a ti mismo y la imagen no se invierte automáticamente, por lo
-                que no reproduce el efecto espejo. Utiliza siempre la cámara frontal
-                para este propósito.
               </li>
             </ul>
           </div>

@@ -316,14 +316,12 @@ test.describe('Escritorio · el medio arranca de verdad, se ajusta y se libera',
     expect(await page.evaluate(() => [(window as unknown as Ventana).__conexiones, (window as unknown as Ventana).__grabadoras])).toEqual([0, 0]);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · si la pista termina sola (permiso revocado, cámara desconectada) la app sigue en «Apagar» sin avisar', async ({
+  test('HALLAZGO 4751 (REPARADO 15/11/2026) · si la pista termina sola (permiso revocado, cámara desconectada) la app vuelve a «Activar espejo» y avisa', async ({
     page,
     context,
   }) => {
     // Medido: con el espejo activo, context.clearPermissions() dispara «ended» en la pista; la app
-    // no escucha ese evento y se queda con «⏹️ Apagar», el vídeo muerto y ningún aviso.
-    // Esperado: volver a «Activar espejo» o avisar en un role="alert".
-    test.fail();
+    // no escuchaba ese evento y se quedaba con «⏹️ Apagar», el vídeo muerto y ningún aviso.
     await registrarAperturas(page);
     await arrancar(page);
     await context.clearPermissions();
@@ -335,14 +333,15 @@ test.describe('Escritorio · el medio arranca de verdad, se ajusta y se libera',
         { timeout: 5000 },
       )
       .toBe(true);
+    await expect(page.getByRole('alert').filter({ hasText: 'La cámara se ha desconectado' })).toHaveCount(1);
+    await expect(activar(page)).toBeVisible();
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · formato: «Zoom: 1.5x» y «Brillo: 120%», esperado «1,5x» y «120 %» con espacio duro', async ({
+  test('HALLAZGO 4754 (REPARADO 15/11/2026) · formato: «Zoom: 1,5x» y «Brillo: 120 %» con espacio duro', async ({
     page,
   }) => {
-    // CLAUDE.md global §2: coma decimal y el % separado por U+00A0. Hoy la etiqueta pinta
+    // CLAUDE.md global §2: coma decimal y el % separado por U+00A0. Antes la etiqueta pintaba
     // `{zoom}x` (1.5) y `{brillo}%`.
-    test.fail();
     await registrarAperturas(page);
     await arrancar(page);
     await sembrarValor(page, '#zoom', 1.5);
@@ -353,13 +352,12 @@ test.describe('Escritorio · el medio arranca de verdad, se ajusta y se libera',
     expect(brillo).toContain('Brillo: 120 %');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · el conmutador cambia de nombre con su estado («Espejado» → «Normal») y «✕ Salir» se lee con el ✕', async ({
+  test('HALLAZGO 4755 (REPARADO 15/11/2026) · el conmutador conserva su nombre al cambiar de estado y «Salir» se lee sin el ✕', async ({
     page,
   }) => {
-    // Un botón con aria-pressed no debe cambiar su etiqueta: hoy se lee «Normal, no presionado»,
+    // Un botón con aria-pressed no debe cambiar su etiqueta: se leía «Normal, no presionado»,
     // que suena a «el modo normal está desactivado» justo cuando está activo. Y el ✕ de «Salir»
-    // va sin aria-hidden (CLAUDE.md global §5).
-    test.fail();
+    // iba sin aria-hidden (CLAUDE.md global §5).
     await registrarAperturas(page);
     await arrancar(page);
     const antes = normalizar((await conmutador(page).textContent()) ?? '');
@@ -367,6 +365,7 @@ test.describe('Escritorio · el medio arranca de verdad, se ajusta y se libera',
     await expect(conmutador(page)).toHaveAttribute('aria-pressed', 'false');
     const despues = normalizar((await conmutador(page).textContent()) ?? '');
     expect(despues).toBe(antes);
+    await expect(conmutador(page)).toHaveAccessibleName('Espejado');
     await page.getByRole('button', { name: /Pantalla completa/ }).click();
     const salir = page.getByRole('button', { name: /Salir/ });
     await expect(salir).toBeVisible();
@@ -387,9 +386,8 @@ test.describe('Escritorio · rechazos', () => {
     await expect.poll(() => page.evaluate(() => (window as unknown as Ventana).__llamadas)).toBe(2);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · el aviso de permiso denegado no se anuncia: no está en un role="alert" ni aria-live', async ({ page }) => {
+  test('HALLAZGO 4747 (REPARADO 15/11/2026) · el aviso de permiso denegado se anuncia en un role="alert"', async ({ page }) => {
     // getByRole('alert') casa también con el anunciador de rutas de Next: se acota por el texto
-    test.fail();
     await camaraQueFalla(page, 'NotAllowedError', 'Permission denied');
     await abrir(page);
     await activar(page).click();
@@ -397,13 +395,12 @@ test.describe('Escritorio · rechazos', () => {
     await expect(page.getByRole('alert').filter({ hasText: AVISO_DENEGADO })).toHaveCount(1);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · sin cámara (NotFoundError) o con la cámara ocupada (NotReadableError) dice «Permiso de cámara denegado»', async ({
+  test('HALLAZGO 4746 (REPARADO 15/11/2026) · sin cámara (NotFoundError) avisa de que no hay cámara, no de un permiso denegado', async ({
     page,
   }) => {
-    // El catch de iniciarCamara pone permisoCamara = 'denied' con cualquier error. Quien no tiene
-    // webcam, o la tiene abierta en la videollamada (uso que la propia página propone), va a la
-    // configuración del navegador y allí el permiso ya está concedido.
-    test.fail();
+    // El catch de iniciarCamara ponía permisoCamara = 'denied' con cualquier error. Quien no tiene
+    // webcam, o la tiene abierta en la videollamada (uso que la propia página propone), iba a la
+    // configuración del navegador y allí el permiso ya estaba concedido. Ahora decide error.name.
     await camaraQueFalla(page, 'NotFoundError', 'Requested device not found');
     await abrir(page);
     await activar(page).click();
@@ -411,12 +408,12 @@ test.describe('Escritorio · rechazos', () => {
     const sinCamara = normalizar(await page.locator('body').innerText());
     expect(sinCamara).not.toContain(AVISO_DENEGADO);
     expect(sinCamara).toMatch(/no se (ha )?encontr|ninguna cámara|no hay (ninguna )?cámara/i);
+    await expect(page.getByRole('alert').filter({ hasText: 'No se ha encontrado ninguna cámara' })).toHaveCount(1);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO, el mismo) · con la cámara ocupada por otra app (NotReadableError «Could not start video source»)', async ({
+  test('HALLAZGO 4746 (REPARADO 15/11/2026, el mismo) · con la cámara ocupada por otra app (NotReadableError «Could not start video source»)', async ({
     page,
   }) => {
-    test.fail();
     await camaraQueFalla(page, 'NotReadableError', 'Could not start video source');
     await abrir(page);
     await activar(page).click();
@@ -428,8 +425,7 @@ test.describe('Escritorio · rechazos', () => {
 });
 
 test.describe('Textos y datos estructurados', () => {
-  test('HALLAZGO (15/11/2026, ABIERTO) · features del JSON-LD vacía (CLAUDE.md §1.ter pide 4-8)', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 4752 (REPARADO 15/11/2026) · features del JSON-LD con 4-8 características (CLAUDE.md §1.ter)', async ({ page }) => {
     await page.goto('/espejo/');
     const lista = await page.evaluate(() => {
       for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
@@ -440,38 +436,38 @@ test.describe('Textos y datos estructurados', () => {
     });
     expect(lista).not.toBeNull();
     expect((lista ?? []).length).toBeGreaterThanOrEqual(4);
+    expect((lista ?? []).length).toBeLessThanOrEqual(8);
+    expect(lista).toContain('Zoom de la imagen de 1x a 2x');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · el FAQPage manda a pellizcar o al zoom del navegador, y la app tiene su propio zoom de 1x a 2x', async ({
+  test('HALLAZGO 4749 (REPARADO 15/11/2026) · el FAQPage cita el zoom de la app (1x a 2x), no el pellizco ni el del navegador', async ({
     page,
   }) => {
-    test.fail();
     await page.goto('/espejo/');
     const faq = await faqJsonLd(page);
     const zoom = faq['¿Puedo ampliar o ajustar el zoom de la imagen?'] ?? '';
     // La página sí lo dice (guía, paso 3: «Usa el control de zoom»), y el deslizador #zoom va de 1 a 2
     expect(zoom.length).toBeGreaterThan(0);
     expect(zoom).not.toMatch(/pellizco|pinch|depende de las capacidades del navegador/i);
+    expect(zoom).toContain('de 1x a 2x');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · el FAQPage dice que es «especialmente útil» en ordenadores «donde no hay cámara orientada hacia el usuario»', async ({
+  test('HALLAZGO 4750 (REPARADO 15/11/2026) · el FAQPage ya no dice que es «especialmente útil» donde no hay cámara', async ({
     page,
   }) => {
-    // Sin cámara la app no muestra nada (y hoy además dice «Permiso de cámara denegado»)
-    test.fail();
+    // Sin cámara la app no muestra imagen
     await page.goto('/espejo/');
     const faq = await faqJsonLd(page);
     const situaciones = faq['¿Para qué situaciones es útil un espejo digital?'] ?? '';
     expect(situaciones.length).toBeGreaterThan(0);
     expect(situaciones).not.toContain('donde no hay cámara orientada hacia el usuario');
+    expect(situaciones).toContain('Necesita una cámara que te mire');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · «¿La cámara graba o guarda el vídeo?» (FAQPage) y «¿Guarda alguna imagen o vídeo?» (visible) se responden por separado', async ({
+  test('HALLAZGO 4753 (REPARADO 15/11/2026) · la pregunta de si se guarda la imagen es UNA, la misma en el FAQPage y en la FAQ visible', async ({
     page,
   }) => {
-    // La misma pregunta escrita dos veces con dos respuestas; la reparación es UNA constante
-    // (PREGUNTAS_FRECUENTES) que lean las dos FAQ.
-    test.fail();
+    // Estaba escrita dos veces con dos respuestas; ahora las dos FAQ leen PREGUNTA_PRIVACIDAD.
     await page.goto('/espejo/');
     const ld = await faqJsonLd(page);
     const visible = await faqVisible(page);
@@ -482,16 +478,17 @@ test.describe('Textos y datos estructurados', () => {
     expect(normalizar(visible[enVisible[0]] ?? '')).toContain(normalizar(ld[enLd[0]] ?? ''));
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · la página dice que con la trasera «la imagen no se invierte automáticamente», y la app invierte cualquier flujo', async ({
+  test('HALLAZGO 4757 (REPARADO 15/11/2026) · la página ya no dice que con la trasera «la imagen no se invierte»: la app pide siempre la frontal', async ({
     page,
   }) => {
     // page.tsx aplica scaleX(-1) sin mirar qué cámara llegó (no lee facingMode) y no tiene
     // selector de cámara: la respuesta a «¿Puedo usarlo con la cámara trasera?» es «no, la app
     // pide siempre la frontal», no una advertencia sobre la inversión.
-    test.fail();
     await page.goto('/espejo/');
     const texto = normalizar((await page.locator('body').textContent()) ?? '');
     expect(texto).not.toContain('no se invierte automáticamente');
+    const visible = await faqVisible(page);
+    expect(visible['¿Puedo usarlo con la cámara trasera?']).toContain('La app pide siempre la cámara frontal');
   });
 });
 
@@ -542,13 +539,11 @@ test.describe('Móvil (Pixel 7)', () => {
     expect(await pistasVivas(page)).toBe(0);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · tocar el recuadro «Pulsa para activar el espejo» no hace nada, y «Activar espejo» queda bajo el pliegue', async ({
+  test('HALLAZGO 4748 (REPARADO 15/11/2026) · tocar el recuadro «Pulsa para activar el espejo» abre la cámara', async ({
     page,
   }) => {
-    // El recuadro (392 × 697 px, cursor: pointer) llena la pantalla y no tiene onClick. Medido:
-    // 0 llamadas a getUserMedia tras tocarlo, y el botón empieza en y = 1038 con innerHeight 839.
-    // Esperado: que tocarlo abra la cámara, o que el botón de verdad quepa en la primera pantalla.
-    test.fail();
+    // El recuadro (392 × 697 px, cursor: pointer) llenaba la pantalla sin onClick: 0 llamadas a
+    // getUserMedia tras tocarlo, con el botón en y = 1038 e innerHeight 839. Ahora es un botón.
     await registrarAperturas(page);
     await abrir(page);
     await esperarPaginaAsentada(page);
@@ -559,12 +554,13 @@ test.describe('Móvil (Pixel 7)', () => {
     expect(llamadas > 0 || botonEnPantalla, `llamadas tras tocar el recuadro: ${llamadas}; botón en la primera pantalla: ${botonEnPantalla}`).toBe(
       true,
     );
+    expect(llamadas).toBe(1);
+    await expect(apagar(page)).toBeVisible();
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · los deslizadores de brillo y zoom miden 8 px de alto (pulgar de 20 px), por debajo de 24 px', async ({
+  test('HALLAZGO 4756 (REPARADO 15/11/2026) · los deslizadores de brillo y zoom miden al menos 24 px de alto', async ({
     page,
   }) => {
-    test.fail();
     await registrarAperturas(page);
     await arrancar(page, true);
     for (const id of ['#brillo', '#zoom']) {
