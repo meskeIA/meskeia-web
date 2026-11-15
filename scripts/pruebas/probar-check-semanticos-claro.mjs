@@ -59,6 +59,16 @@
  *  31. Un fondo blanco que solo está en @media print. Debe CALLAR.
  *  32. Otra clase del mismo elemento con fondo blanco fijo. Debe FALLAR.
  *  33. Una antecesora del DOM con fondo blanco fijo (el acta de generador-actas). Debe FALLAR.
+ *
+ * Y el literal sin variante oscura, que se pinta igual en los dos temas (cabo C0708, 15/11/2026).
+ * Desde aquí, los casos 9 y 20, que miden la pasada CLARA con un rojo que cumple en claro, llevan
+ * su variante oscura: sin ella su #b91c1c da 2,13:1 en oscuro, y fallarían por lo que no miden.
+ *  34. conjugador-verbos antes de b6c2923b2 (hallazgo 4425): .error en #dc2626 sin variante
+ *      oscura, 2,85:1 sobre la tarjeta. Debe FALLAR, y por esta pasada.
+ *  35. La misma hoja hoy. Debe CALLAR.
+ *  36-38. El literal sobre un fondo claro fijo, en un ::before a 3:1 y en @media print. Deben CALLAR.
+ *  39. El literal sobre un tinte translúcido, que en oscuro se compone sobre la tarjeta. Debe FALLAR.
+ *  40. Un selector con dos partes y variante oscura solo para una. Debe FALLAR.
  * Y la manera de dar verde sin mirar, que debe PLANTARLO:
  *
  *  16. Un árbol sin ningún `.module.css`.
@@ -81,6 +91,7 @@ const INTEGRALES = 'app/tabla-integrales/TablaIntegrales.module.css';
 const LIMITES = 'app/tabla-limites-notables/TablaLimitesNotables.module.css';
 const LIMITES_TSX = 'app/tabla-limites-notables/page.tsx';
 const CHECKLIST = 'app/checklist-coberturas-seguros/ChecklistCoberturasSeguro.module.css';
+const CONJUGADOR = 'app/conjugador-verbos/ConjugadorVerbos.module.css';
 
 const CASOS = [
   { n: 1, nombre: 'CASO DE ORIGEN · mi-ip antes de f9af2556', falla: true, css: deGit('f9af2556^', MI_IP) },
@@ -99,7 +110,7 @@ const CASOS = [
     n: 8, nombre: 'fondo oscuro en la regla o en una clase antecesora', falla: false,
     css: '.consola { background: #1a1a1a; }\n.consola .linea { color: #4ade80; }\n.terminal { background: #0d1117; color: #3fb950; }\n',
   },
-  { n: 9, nombre: 'un rojo que ya cumple y colores no semánticos', falla: false, css: '.a { color: #b91c1c; }\n.b { color: #999999; }\n.c { color: #7FB3D3; }\n' },
+  { n: 9, nombre: 'un rojo que ya cumple y colores no semánticos', falla: false, css: '.a { color: #b91c1c; }\n[data-theme=\'dark\'] .a { color: #fca5a5; }\n.b { color: #999999; }\n.c { color: #7FB3D3; }\n' },
   { n: 10, nombre: 'escape con razón', falla: false, css: '/* semanticos-ok: va sobre el lienzo oscuro que pinta el TSX */\n.marca { color: #ef4444; }\n' },
   { n: 11, nombre: 'viñeta ::before entre 3:1 y 4,5:1', falla: false, css: '.lista li::before { content: "•"; color: #e74c3c; }\n' },
   { n: 12, nombre: 'var(--error), token global sin variante de texto', falla: true, css: '.mensaje { color: var(--error); }\n' },
@@ -123,7 +134,7 @@ const CASOS = [
   },
   {
     n: 20, nombre: 'una pseudoclase del antecesor (.aviso:hover) no cuenta como su fondo', falla: false,
-    css: '.aviso:hover { background: rgba(224, 122, 31, 0.3); }\n.aviso strong { color: #B91C1C; }\n',
+    css: '.aviso:hover { background: rgba(224, 122, 31, 0.3); }\n.aviso strong { color: #B91C1C; }\n[data-theme=\'dark\'] .aviso strong { color: #FCA5A5; }\n',
   },
   // Cabo C0608 (04/11/2026): el tinte lo pone un antecesor que solo existe en el DOM. Caso de
   // origen, el hallazgo 3992 de tabla-limites-notables: .warningHeader y .warningList li strong en
@@ -162,6 +173,14 @@ const CASOS = [
   { n: 31, nombre: 'el fondo de @media print no se ve en pantalla', falla: false, css: '.marca { color: var(--verde-texto, #16a34a); }\n@media print {\n  .marca { background: white; }\n}\n' },
   { n: 32, nombre: 'la receta en una clase que comparte elemento con otra de fondo blanco fijo', falla: true, css: '.boton { background: #ffffff; }\n.boton.hecho { color: var(--verde-texto, #16a34a); }\n' },
   { n: 33, nombre: 'la receta dentro de una antecesora del DOM con fondo claro fijo', falla: true, css: '.papel { background: white; }\n.si { color: var(--verde-texto, var(--success)); }\n', tsx: 'export default function X() {\n  return (\n    <div className={styles.papel}>\n      <span className={styles.si}>Sí</span>\n    </div>\n  );\n}\n' },
+  // El literal sin variante oscura (cabo C0708, 15/11/2026): se pinta igual en los dos temas
+  { n: 34, nombre: 'CASO DE ORIGEN · conjugador-verbos antes de b6c2923b2 (hallazgo 4425, .error #dc2626)', falla: true, debeDecir: '(C0708)', css: deGit('b6c2923b2^', CONJUGADOR) },
+  { n: 35, nombre: 'CASO DE ORIGEN REPARADO · conjugador-verbos hoy', falla: false, css: fs.readFileSync(path.join(RAIZ, CONJUGADOR), 'utf8') },
+  { n: 36, nombre: 'el literal sobre un fondo claro fijo en los dos temas (insignia)', falla: false, css: '.badge { background: #fee2e2; color: #991b1b; }\n' },
+  { n: 37, nombre: 'el literal en un ::before, que llega a 3:1 sobre la tarjeta', falla: false, css: '.lista li::before { content: "✗"; color: #ef4444; }\n' },
+  { n: 38, nombre: 'el literal dentro de @media print, sobre papel', falla: false, css: '@media print {\n  .total { color: #c0392b; }\n}\n' },
+  { n: 39, nombre: 'el literal sobre un tinte translúcido, compuesto en oscuro sobre la tarjeta', falla: true, debeDecir: '(C0708)', css: '.aviso { background: rgba(220, 38, 38, 0.1); color: #b91c1c; }\n' },
+  { n: 40, nombre: 'dos partes de selector y variante oscura solo para una', falla: true, debeDecir: '(C0708)', css: '.a, .b { color: #b91c1c; }\n[data-theme=\'dark\'] .a { color: #fca5a5; }\n' },
 ];
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'semanticos-claro-'));
@@ -181,7 +200,8 @@ for (const c of CASOS) {
   }
   const r = ejecutar([f]);
   const fallo = r.status !== 0;
-  const bien = fallo === c.falla;
+  // Un caso que debe fallar por UNA pasada concreta: que falle por otra no prueba nada
+  const bien = fallo === c.falla && (!c.debeDecir || (r.stdout + r.stderr).includes(c.debeDecir));
   if (!bien) mal++;
   console.log(`${bien ? '✅' : '❌'} ${String(c.n).padStart(2)}. ${c.nombre} — ${fallo ? 'FALLA' : 'calla'}${bien ? '' : ` (debía ${c.falla ? 'fallar' : 'callar'})`}`);
   if (!bien) console.log((r.stdout + r.stderr).split('\n').slice(0, 8).map((l) => `      ${l}`).join('\n'));

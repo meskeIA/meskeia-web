@@ -50,6 +50,22 @@
  * generador-actas con una regla para el papel blanco del acta y escape en la general, y 1 falso
  * positivo con escape (visualizador-gps: «Tú» es hija del punto rojo, pero va debajo de él).
  *
+ * EL LITERAL SIN VARIANTE OSCURA (cabo C0708, 15/11/2026)
+ * ───────────────────────────────────────────────────────
+ * Un rojo, naranja, ámbar o verde LITERAL (`color: #dc2626`) que pasa en claro no lo tocó la
+ * campaña de C0296, y se pinta igual en oscuro. `analizarOscuro(css, { literales: true })` lo
+ * mide contra su fondo en oscuro (las mismas fuentes que la pasada de arriba) o, sin fondo,
+ * contra la tarjeta #2D2D2D, y rompe si su selector no redeclara `color` en oscuro y no llega al
+ * umbral. Caso de origen: el hallazgo 4425 del Inspector (conjugador-verbos, 11/11/2026), el
+ * aviso de error en #dc2626 a 2,97:1. Al nacer encendió 103 usos en 75 hojas: 102 pasaron a la
+ * receta en la campaña de C0708 (comprobadas con las tres pasadas por hoja) y 1 lleva escape
+ * (InfoBox, cuyo fondo lo elige el TSX con `styles[\`${type}Box\`]`). El censo del cabo daba 226
+ * contra los fondos planos; la diferencia es lo que este cálculo sí ve: fondos claros fijos,
+ * iconos a 3:1, texto grande, @media print, congeladas y portales.
+ * ⚠️ Mismo límite que la pasada de arriba: un fondo claro que pone otro componente o una clase
+ * dinámica no se ve, y la receta lo empeoraría. Si sospechas, mídelo por píxel con
+ * scripts/contraste-semanticos/medir-reserva-oscuro.mjs (la reserva es el literal de antes).
+ *
  * QUÉ NO JUZGA, Y POR QUÉ
  * ───────────────────────
  *   · El texto cuyo fondo es OSCURO: el de la propia regla o el de una clase antecesora del
@@ -400,8 +416,13 @@ const baseDeOscuro = (parte) =>
  * cuyo fondo sigue claro en ese tema —el de la regla, el de una clase antecesora del selector o
  * el de la antecesora en el DOM, sin variante oscura— necesita su propio color oscuro:
  * `[data-theme='dark'] .x { color: <el de antes> }`. Cada caso lleva `escape` si su línea lo lleva.
+ *
+ * Con `literales: true` mira en cambio el color semántico LITERAL (`color: #dc2626`, sin `var()`)
+ * cuyo selector no lo redeclara en oscuro (cabo C0708): ese literal se pinta igual en los dos
+ * temas, y se mide contra su fondo en oscuro o, si no tiene, contra la tarjeta #2D2D2D (el peor
+ * de la página y la tarjeta para un texto de luminancia media). Cada caso lleva `nuevo`, la receta.
  */
-export function analizarOscuro(css, { dom = null } = {}) {
+export function analizarOscuro(css, { dom = null, literales = false } = {}) {
   const bloques = parsearCss(css);
   const lineas = css.split('\n');
   const esOsc = (b) => b.contexto.oscuroMedia || RE_OSCURO.test(b.selector);
@@ -457,12 +478,23 @@ export function analizarOscuro(css, { dom = null } = {}) {
   for (const b of claros) {
     for (const d of b.decls) {
       if (!/^(color|-webkit-text-fill-color)$/.test(d.prop)) continue;
-      const mv = d.valor.match(/var\(\s*(--(rojo|naranja|ambar|verde)-texto)\s*,/);
-      if (!mv) continue;
+      let fam;
+      let hexTexto;
+      const valorLimpio = d.valor.replace(/\s*!important\s*$/i, '').trim();
+      if (literales) {
+        if (valorLimpio.includes('var(')) continue;
+        hexTexto = aHex(valorLimpio);
+        fam = hexTexto && familia(hexTexto);
+        if (!fam) continue;
+      } else {
+        const mv = d.valor.match(/var\(\s*(--(rojo|naranja|ambar|verde)-texto)\s*,/);
+        if (!mv) continue;
+        fam = mv[2];
+        hexTexto = FAMILIAS[fam].oscuro;
+      }
       const partes = b.selector.split(',').map((p) => p.trim());
       // Su variante oscura ya pone color: la receta no llega a pintarse en oscuro
       if (partes.every((p) => enOscuro.get(p)?.color)) continue;
-      const hexTexto = FAMILIAS[mv[2]].oscuro;
 
       const tam = b.decls.find((x) => x.prop === 'font-size')?.valor ?? '';
       const px = (m => m ? (m[2] === 'rem' || m[2] === 'em' ? +m[1] * 16 : +m[1]) : 0)(tam.match(/^([\d.]+)(px|rem|em)$/));
@@ -491,14 +523,20 @@ export function analizarOscuro(css, { dom = null } = {}) {
         }
         if (hex && (!peor || contraste(hexTexto, hex) < contraste(hexTexto, peor))) peor = hex;
       }
-      if (!peor) continue; // sin fondo propio: la página o la tarjeta oscuras, donde cumple
+      // Sin fondo propio: la página o la tarjeta oscuras, donde la receta cumple; el literal no
+      if (!peor && !literales) continue;
+      peor ??= BASE_OSCURA;
       const ratio = contraste(hexTexto, peor);
       if (ratio >= umbral) continue;
       const reserva = d.valor.match(/var\(\s*--[\w-]+\s*,\s*(.+)\)\s*(!important)?\s*$/)?.[1]?.trim() ?? '';
       const caso = {
-        linea: d.linea, selector: b.selector, valor: d.valor, fam: mv[2], fondo: peor,
+        linea: d.linea, selector: b.selector, valor: d.valor, fam, fondo: peor,
         ratio: Math.round(ratio * 100) / 100, umbral, reserva,
       };
+      if (literales) {
+        Object.assign(caso, { hex: hexTexto, desde: d.desde, hasta: d.hasta });
+        caso.nuevo = `var(${FAMILIAS[fam].token}, ${valorLimpio})${/!important\s*$/i.test(d.valor) ? ' !important' : ''}`;
+      }
       const esc = [lineas[d.linea - 1], lineas[d.linea - 2]].map((l) => l?.match(RE_ESCAPE)).find(Boolean);
       if (esc) caso.escape = esc[1]?.replace(/\*\/.*$/, '').trim() || '';
       casos.push(caso);
@@ -578,6 +616,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const sinRazon = [];
   const aparte = [];
   const enOscuro = [];
+  const literalOscuro = [];
   // Los TSX que importan cada hoja (C0608): del árbol, o del directorio de cada hoja suelta
   const indice = sueltas.length
     ? indiceTsx(RAIZ, [...new Set(hojas.map((h) => path.dirname(h)))], false)
@@ -596,6 +635,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       if (c.escape === '') sinRazon.push({ rel, ...c, oscuro: true });
       else if (!c.escape) enOscuro.push({ rel, ...c });
     }
+    for (const c of analizarOscuro(fs.readFileSync(h, 'utf8'), { dom, literales: true })) {
+      if (c.escape === '') sinRazon.push({ rel, ...c, oscuro: true });
+      else if (!c.escape) literalOscuro.push({ rel, ...c });
+    }
   }
   const linea = (c) => c.accion === 'sin-reserva'
     ? `   ${c.rel}:${c.linea}  ${c.selector}  ${c.valor}`
@@ -611,7 +654,14 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     console.error(`   Si solo sigue claro en una parte (un papel, una insignia): una regla para esa parte con su color.`);
     console.error(`   Falso positivo (el texto no va encima de ese fondo): «semanticos-ok: <razón>» en la línea del color.\n`);
   }
-  if (rompen.length || sinRazon.length || enOscuro.length) {
+  if (literalOscuro.length) {
+    console.error(`\n❌ check:semanticos-claro — color semántico LITERAL sin variante oscura, que en oscuro no llega a su umbral (C0708)`);
+    for (const c of literalOscuro) console.error(`   ${c.rel}:${c.linea}  ${c.selector}  ${c.valor} sobre ${c.fondo} = ${fmt(c.ratio)}:1 en oscuro (umbral ${fmt(c.umbral)})\n      → ${c.nuevo}`);
+    console.error(`\n   El literal se pinta igual en los dos temas. Receta: var(--x-texto, <el literal>), que en oscuro`);
+    console.error(`   vale un tono claro de su familia; o una regla [data-theme='dark'] con su propio color.`);
+    console.error(`   Falso positivo (su fondo real sigue claro en oscuro y lo pone el TSX): «semanticos-ok: <razón>».\n`);
+  }
+  if (rompen.length || sinRazon.length || enOscuro.length || literalOscuro.length) {
     if (rompen.length || sinRazon.length) console.error(`\n❌ check:semanticos-claro — texto rojo, naranja, ámbar o verde que no se lee en el tema claro`);
     for (const c of rompen) console.error(`${linea(c)}\n      → ${c.accion === 'sin-reserva' ? 'falta la reserva: la receta lleva detrás el color de antes (C0296)' : c.nuevo}`);
     for (const c of sinRazon) console.error(`${linea(c)}\n      → el escape semanticos-ok necesita su razón`);
@@ -620,5 +670,5 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     console.error(`   Falso positivo (el fondo real es oscuro y lo pone el TSX): «semanticos-ok: <razón>».\n`);
     process.exit(1);
   }
-  console.log(`✅ check:semanticos-claro — ${hojas.length} hojas, ningún texto semántico por debajo de su umbral en claro ni receta sobre fondo claro en oscuro${aparte.length ? ` (${aparte.length} no juzgados: --todo)` : ''}`);
+  console.log(`✅ check:semanticos-claro — ${hojas.length} hojas, ningún texto semántico por debajo de su umbral en claro, ni receta sobre fondo claro ni literal sin variante en oscuro${aparte.length ? ` (${aparte.length} no juzgados: --todo)` : ''}`);
 }
