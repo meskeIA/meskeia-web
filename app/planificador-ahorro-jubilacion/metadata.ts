@@ -63,6 +63,14 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// Cabo C0570 (15/11/2026): el JSON-LD daba una tasa de reemplazo del 74 % sin fuente y la visible solo
+// el ejemplo. Cifra de la OCDE, Pensions at a Glance 2023, ficha de España (p. 5): tasa de reemplazo
+// bruta del 80,4 % (neta 86,5 %) para el salario medio, carrera completa desde los 22 años en 2022 y
+// jubilación a los 65; media de la OCDE para el mismo perfil, 50,7 %. La proyección ya aplica las
+// reglas legisladas, así que no se añade que «podría reducirse».
+export const RESPUESTA_FAQ_BRECHA =
+  'Es la diferencia entre tu sueldo y tu pensión pública futura: si cobras 3.000 € al mes y tu pensión será de 1.800 €, la brecha es de 1.200 € al mes. En España la pensión pública cubre una parte del sueldo mayor que en la mayoría de países: según la OCDE (Pensions at a Glance 2023), quien cobre el salario medio y cotice una carrera completa, de los 22 a los 65 años, recibiría el 80,4\u00A0% de su sueldo bruto, frente al 50,7\u00A0% de media en la OCDE. Es una proyección: con una carrera más corta, lagunas de cotización o un sueldo por encima de la base máxima, la brecha es mayor, y por eso conviene calcular tu caso.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -88,7 +96,7 @@ export const faqJsonLd = {
       name: '¿Qué es la brecha de jubilación?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La brecha de jubilación es la diferencia entre el último salario activo y la pensión pública estimada. En España, la tasa de reemplazo (pensión como porcentaje del salario) es aproximadamente del 74%, una de las más altas de la OCDE. Sin embargo, con las reformas de sostenibilidad en marcha, esta tasa podría reducirse en las próximas décadas, haciendo más importante el ahorro complementario.',
+        text: RESPUESTA_FAQ_BRECHA,
       },
     },
     {

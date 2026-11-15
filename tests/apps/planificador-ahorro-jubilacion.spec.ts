@@ -76,3 +76,24 @@ test.describe('planificador-ahorro-jubilacion · cabo C0019', () => {
     await expect(ahorro).toContainText('450,00');
   });
 });
+
+test('C0570 · la FAQ de la brecha dice lo mismo en la página y en el FAQPage, con la tasa de la OCDE', async ({ page }) => {
+  // El FAQPage daba una tasa de reemplazo del 74 % sin fuente. OCDE, Pensions at a Glance 2023,
+  // ficha de España (p. 5): 80,4 % bruta para el salario medio con carrera completa; media de la
+  // OCDE, 50,7 %. Una sola constante, RESPUESTA_FAQ_BRECHA, para las dos FAQ (15/11/2026).
+  await page.goto(RUTA);
+  const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).map(
+    (t) => JSON.parse(t) as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] },
+  );
+  const faq = ld.find((x) => x['@type'] === 'FAQPage');
+  const enLd = faq?.mainEntity?.find((q) => q.name === '¿Qué es la brecha de jubilación?')?.acceptedAnswer.text;
+  const visible = await page
+    .locator('strong', { hasText: '¿Qué es la brecha de jubilación?' })
+    .locator('xpath=following-sibling::p[1]')
+    .textContent();
+  expect(enLd).toBeTruthy();
+  expect(visible).toBe(enLd);
+  expect(enLd).toContain('80,4 % de su sueldo bruto');
+  expect(enLd).toContain('50,7 %');
+  expect(enLd).not.toContain('74');
+});

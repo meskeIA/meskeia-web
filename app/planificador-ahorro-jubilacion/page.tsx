@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import styles from './PlanificadorAhorroJubilacion.module.css';
+import { RESPUESTA_FAQ_BRECHA } from './metadata';
 import {
   MeskeiaLogo,
   Footer,
@@ -603,7 +604,7 @@ export default function PlanificadorAhorroJubilacionPage() {
           <ul className={styles.faqList}>
             <li className={styles.faqItem}>
               <strong>¿Qué es la brecha de jubilación?</strong>
-              <p>La diferencia entre tu sueldo actual y tu pensión futura. Si cobras 3.000 €/mes y tu pensión será 1.800 €, la brecha es 1.200 €/mes.</p>
+              <p>{RESPUESTA_FAQ_BRECHA}</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Es mejor plan de pensiones o fondos de inversión?</strong>
