@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -25,6 +25,10 @@ interface ZonaFC {
   fcMin: number;
   fcMax: number;
   color: string;
+  /** Color de la zona como TEXTO en tema claro (≥ 4,5:1 sobre blanco; hallazgo 4804). */
+  texto: string;
+  /** Color de la zona como TEXTO en tema oscuro (≥ 4,5:1 sobre el fondo oscuro). */
+  textoOscuro: string;
   descripcion: string;
   beneficios: string;
   cuandoUsarla: string;
@@ -41,7 +45,7 @@ const ZONAS_DEF = [
     numero: 1,
     nombre: 'Recuperación Activa',
     pctMin: 50, pctMax: 60,
-    color: '#48A9A6',
+    color: '#48A9A6', texto: '#1F6E6B', textoOscuro: '#6FCFCB',
     descripcion: 'Muy baja intensidad. Conversación fácil. Sin sensación de esfuerzo.',
     beneficios: 'Mejora la circulación, acelera la recuperación muscular, quema principalmente grasas.',
     cuandoUsarla: 'Días de recuperación, calentamiento y vuelta a la calma, principiantes.',
@@ -50,7 +54,7 @@ const ZONAS_DEF = [
     numero: 2,
     nombre: 'Resistencia Base',
     pctMin: 60, pctMax: 70,
-    color: '#27AE60',
+    color: '#27AE60', texto: '#1B7A43', textoOscuro: '#5FD38E',
     descripcion: 'Intensidad ligera. Puedes mantener una conversación cómoda.',
     beneficios: 'Desarrolla el motor aeróbico, eficiencia cardiaca, quema de grasa con alto porcentaje lipídico.',
     cuandoUsarla: 'Rodajes largos, fondo aeróbico, sesiones largas de baja intensidad (ciclismo, carrera, natación).',
@@ -59,7 +63,7 @@ const ZONAS_DEF = [
     numero: 3,
     nombre: 'Aeróbico Medio',
     pctMin: 70, pctMax: 80,
-    color: '#F39C12',
+    color: '#F39C12', texto: '#8F5600', textoOscuro: '#F7B54A',
     descripcion: 'Intensidad moderada. Conversación posible pero limitada. Respiración más profunda.',
     beneficios: 'Mejora el VO₂max, capacidad aeróbica, umbral de lactato. Zona de "tempo".',
     cuandoUsarla: 'Rodajes a ritmo medio, entrenos de tempo, ciclismo a ritmo sostenido.',
@@ -68,7 +72,7 @@ const ZONAS_DEF = [
     numero: 4,
     nombre: 'Umbral Anaeróbico',
     pctMin: 80, pctMax: 90,
-    color: '#E07B39',
+    color: '#E07B39', texto: '#A34A10', textoOscuro: '#F0A070',
     descripcion: 'Alta intensidad. Difícil mantener conversación. Sensación de esfuerzo considerable.',
     beneficios: 'Eleva el umbral anaeróbico, mejora la tolerancia al lactato, aumenta la velocidad máxima sostenible.',
     cuandoUsarla: 'Intervalos, tempo runs, series largas. Limitada a segmentos cortos en sesiones.',
@@ -77,7 +81,7 @@ const ZONAS_DEF = [
     numero: 5,
     nombre: 'Máximo / VO₂max',
     pctMin: 90, pctMax: 100,
-    color: '#E74C3C',
+    color: '#E74C3C', texto: '#B83227', textoOscuro: '#F48B80',
     descripcion: 'Intensidad máxima. Respiración muy agitada. Solo sostenible segundos o pocos minutos.',
     beneficios: 'Maximiza el VO₂max, potencia anaeróbica, velocidad pico. Adaptaciones neuromusculares.',
     cuandoUsarla: 'Sprints, intervalos cortos de alta intensidad (HIIT). Solo para deportistas con base sólida.',
@@ -91,18 +95,20 @@ const ZONAS_DEF = [
 function calcularZonas(edad: number, fcRep: number, metodo: Metodo): { fcMax: number; zonas: ZonaFC[] } {
   const fcMax = 220 - edad;
 
-  const zonas: ZonaFC[] = ZONAS_DEF.map(z => {
-    let fcMin: number, fcMax2: number;
-    if (metodo === 'karvonen') {
-      const fcReserva = fcMax - fcRep;
-      fcMin = Math.round(fcRep + (z.pctMin / 100) * fcReserva);
-      fcMax2 = Math.round(fcRep + (z.pctMax / 100) * fcReserva);
-    } else {
-      fcMin = Math.round((z.pctMin / 100) * fcMax);
-      fcMax2 = Math.round((z.pctMax / 100) * fcMax);
-    }
-    return { ...z, fcMin, fcMax: fcMax2 };
-  });
+  // Límite de un porcentaje, en enteros: p·base/100 es exacto (12250/100 = 122,5), mientras que
+  // (70/100)·175 daba 122,49999999999999 y Math.round lo bajaba a 122 (hallazgo 4794).
+  const limite = (pct: number): number =>
+    metodo === 'karvonen'
+      ? fcRep + Math.round((pct * (fcMax - fcRep)) / 100)
+      : Math.round((pct * fcMax) / 100);
+
+  // Cada zona empieza un latido después de donde acaba la anterior: un límite no puede estar en
+  // dos zonas (hallazgo 4795, misma convención que calculadora-potencia-ciclismo, hallazgo 244).
+  const zonas: ZonaFC[] = ZONAS_DEF.map((z, i) => ({
+    ...z,
+    fcMin: limite(z.pctMin) + (i === 0 ? 0 : 1),
+    fcMax: limite(z.pctMax),
+  }));
 
   return { fcMax, zonas };
 }
@@ -116,10 +122,16 @@ export default function CalculadoraZonasEntrenamientoPage() {
   const [fcRep, setFcRep] = useState(60);
   const [metodo, setMetodo] = useState<Metodo>('simple');
   const [calculado, setCalculado] = useState(false);
+  const refResultado = useRef<HTMLDivElement>(null);
 
   const { fcMax, zonas } = calcularZonas(edad, fcRep, metodo);
 
   const calcular = () => setCalculado(true);
+
+  // El resultado aparece debajo del botón: el foco va a él para que el lector lo lea (hallazgo 4805)
+  useEffect(() => {
+    if (calculado) refResultado.current?.focus();
+  }, [calculado]);
 
   return (
     <div className={styles.container}>
@@ -156,9 +168,10 @@ export default function CalculadoraZonasEntrenamientoPage() {
                 />
                 <span className={styles.inputUnidad}>años</span>
               </div>
+              {/* Duplica el campo para el ratón: fuera del lector Y del orden de tabulación (hallazgo 4805) */}
               <input type="range" min={15} max={80} value={edad}
                 onChange={e => { setEdad(Number(e.target.value)); setCalculado(false); }}
-                className={styles.slider} aria-hidden="true" />
+                className={styles.slider} aria-hidden="true" tabIndex={-1} />
             </div>
 
             <div className={styles.inputGroup}>
@@ -178,7 +191,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
               </div>
               <input type="range" min={40} max={100} value={fcRep}
                 onChange={e => { setFcRep(Number(e.target.value)); setCalculado(false); }}
-                className={styles.slider} aria-hidden="true" />
+                className={styles.slider} aria-hidden="true" tabIndex={-1} />
               <p className={styles.inputTip}>
                 Mídela por la mañana antes de levantarte, en reposo absoluto.
               </p>
@@ -195,7 +208,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
                 aria-pressed={metodo === 'simple'}
               >
                 <strong>Fórmula simple</strong>
-                <span>FCmáx = 220 − edad</span>
+                <span>FCmáx = 220 − edad (Fox, 1971)</span>
               </button>
               <button
                 type="button"
@@ -219,7 +232,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
         {/* ── Resultados ── */}
         {calculado && (
           <div className={styles.resultados}>
-            <div className={styles.fcMaxBadge}>
+            <div className={styles.fcMaxBadge} ref={refResultado} tabIndex={-1}>
               <span className={styles.fcMaxLabel}>Tu FCmáx estimada</span>
               <span className={styles.fcMaxValor}>{fcMax} ppm</span>
               <span className={styles.fcMaxSub}>Fórmula: 220 − {edad} años</span>
@@ -227,15 +240,20 @@ export default function CalculadoraZonasEntrenamientoPage() {
 
             <div className={styles.zonasWrapper}>
               {zonas.map(z => (
-                <div key={z.numero} className={styles.zonaCard}>
+                <div
+                  key={z.numero}
+                  className={styles.zonaCard}
+                  style={{ '--zona-texto': z.texto, '--zona-texto-oscuro': z.textoOscuro } as CSSProperties}
+                >
+                  {/* Texto oscuro sobre el color de la zona: el blanco daba 2,2-3,8:1 (hallazgo 4804) */}
                   <div className={styles.zonaHeader} style={{ backgroundColor: z.color }}>
                     <span className={styles.zonaNumero}>Z{z.numero}</span>
                     <span className={styles.zonaNombre}>{z.nombre}</span>
-                    <span className={styles.zonaPct}>{z.pctMin}–{z.pctMax}%</span>
+                    <span className={styles.zonaPct}>{z.pctMin}–{z.pctMax}&nbsp;%</span>
                   </div>
                   <div className={styles.zonaBody}>
                     <div className={styles.zonaFc}>
-                      <span className={styles.zonaFcValor} style={{ color: z.color }}>
+                      <span className={`${styles.zonaFcValor} ${styles.colorZona}`}>
                         {z.fcMin} – {z.fcMax} ppm
                       </span>
                     </div>
@@ -279,6 +297,15 @@ export default function CalculadoraZonasEntrenamientoPage() {
           </div>
         )}
 
+        {/* Hallazgo 4799: fuera de la guía plegada y visible sin calcular. La ficha técnica del
+            bisoprolol (CIMA-AEMPS) dice que «reduce la frecuencia cardiaca»: con él, 220 − edad
+            sobrestima la FC que se puede alcanzar y las zonas empujan a forzar. */}
+        <p className={styles.avisoMedicacion} role="note">
+          <strong>Si tomas medicación que modifica el pulso</strong> (por ejemplo, betabloqueantes) o
+          tienes una enfermedad cardíaca, estas zonas calculadas por fórmula no te sirven: consulta a
+          tu médico antes de entrenar por pulsaciones.
+        </p>
+
         <DisclaimerCard variant="medical" severity="high" collapsible={false} />
 
         {/* ── Sección educativa ── */}
@@ -297,31 +324,30 @@ export default function CalculadoraZonasEntrenamientoPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td><strong style={{color:'var(--secondary-texto)'}}>Z1 — Recuperación</strong></td>
-                    <td>50–60%</td><td>Muy ligero</td>
-                    <td>Quema de grasas, circulación</td><td>Recuperación, principiantes</td>
-                  </tr>
-                  <tr>
-                    <td><strong style={{color:'#27AE60'}}>Z2 — Resistencia base</strong></td>
-                    <td>60–70%</td><td>Cómodo</td>
-                    <td>Motor aeróbico, eficiencia</td><td>Fondo, larga distancia</td>
-                  </tr>
-                  <tr>
-                    <td><strong style={{color:'#F39C12'}}>Z3 — Aeróbico medio</strong></td>
-                    <td>70–80%</td><td>Moderado</td>
-                    <td>VO₂max, umbral lactato</td><td>Ritmo medio, tempo</td>
-                  </tr>
-                  <tr>
-                    <td><strong style={{color:'#E07B39'}}>Z4 — Umbral anaeróbico</strong></td>
-                    <td>80–90%</td><td>Duro</td>
-                    <td>Tolerancia al lactato</td><td>Competición, intervalos</td>
-                  </tr>
-                  <tr>
-                    <td><strong style={{color:'#E74C3C'}}>Z5 — Máximo</strong></td>
-                    <td>90–100%</td><td>Máximo</td>
-                    <td>Potencia, velocidad pico</td><td>Sprints, HIIT</td>
-                  </tr>
+                  {/* Cada nombre en el color de texto de su zona, con variante oscura (hallazgo 4804) */}
+                  {[
+                    { nombre: 'Z1 — Recuperación', sensacion: 'Muy ligero', beneficio: 'Quema de grasas, circulación', objetivo: 'Recuperación, principiantes' },
+                    { nombre: 'Z2 — Resistencia base', sensacion: 'Cómodo', beneficio: 'Motor aeróbico, eficiencia', objetivo: 'Fondo, larga distancia' },
+                    { nombre: 'Z3 — Aeróbico medio', sensacion: 'Moderado', beneficio: 'VO₂max, umbral lactato', objetivo: 'Ritmo medio, tempo' },
+                    { nombre: 'Z4 — Umbral anaeróbico', sensacion: 'Duro', beneficio: 'Tolerancia al lactato', objetivo: 'Competición, intervalos' },
+                    { nombre: 'Z5 — Máximo', sensacion: 'Máximo', beneficio: 'Potencia, velocidad pico', objetivo: 'Sprints, HIIT' },
+                  ].map((fila, i) => {
+                    const z = ZONAS_DEF[i];
+                    return (
+                      <tr key={fila.nombre}>
+                        <td>
+                          <strong
+                            className={styles.colorZona}
+                            style={{ '--zona-texto': z.texto, '--zona-texto-oscuro': z.textoOscuro } as CSSProperties}
+                          >
+                            {fila.nombre}
+                          </strong>
+                        </td>
+                        <td>{z.pctMin}–{z.pctMax}&nbsp;%</td><td>{fila.sensacion}</td>
+                        <td>{fila.beneficio}</td><td>{fila.objetivo}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -336,7 +362,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
                   <h3>Fórmula simple (220−edad)</h3>
                 </div>
                 <p className={styles.escenarioTip}>
-                  Rápida y universalmente usada. Sirve para la mayoría de deportistas recreativos. Subestima la FCmáx en personas muy entrenadas y la sobreestima en sedentarios. Desviación típica: ±10–12 ppm.
+                  Rápida y la más extendida (Fox, Naughton y Haskell, 1971). Sirve como punto de partida para la mayoría de deportistas recreativos. Su error depende sobre todo de la edad: Tanaka (2001) no lo encontró ligado al sexo ni a la actividad física habitual, y con su fórmula (208 − 0,7 × edad) la de 220 − edad da más pulsaciones por debajo de los 40 años y menos por encima. Desviación típica: ±10–12 ppm.
                 </p>
               </div>
               <div className={styles.escenarioCard}>
@@ -345,7 +371,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
                   <h3>Fórmula de Karvonen</h3>
                 </div>
                 <p className={styles.escenarioTip}>
-                  Usa la "FC de reserva" (FCmáx − FC reposo) para ajustar las zonas según tu condición cardiovascular. Una persona con FC reposo baja (atleta) obtendrá zonas más altas que otra de la misma edad más sedentaria. Más precisa para uso real.
+                  Usa la "FC de reserva" (FCmáx − FC reposo) para ajustar las zonas según tu condición cardiovascular. Para una misma persona da zonas más altas que la fórmula simple, porque parte de la FC en reposo. A igual edad, quien tiene la FC en reposo más baja obtiene zonas algo más bajas: su margen de trabajo (la FC de reserva) es más amplio y empieza más abajo.
                 </p>
               </div>
               <div className={styles.escenarioCard}>
@@ -354,7 +380,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
                   <h3>Cómo medir la FC en reposo</h3>
                 </div>
                 <p className={styles.escenarioTip}>
-                  Justo al despertar, antes de levantarte, pon dos dedos en la muñeca o cuello y cuenta las pulsaciones durante 60 segundos. Hazlo 3 días seguidos y haz la media. Deportistas de resistencia: 35–50 ppm. Adulto sano: 60–80 ppm. Sedentario: 80–100 ppm.
+                  Justo al despertar, antes de levantarte, pon dos dedos en la muñeca o cuello y cuenta las pulsaciones durante 60 segundos. Hazlo 3 días seguidos y haz la media. Deportistas de resistencia: 35–50 ppm. En la mayoría de adultos: 60–80 ppm.
                 </p>
               </div>
               <div className={styles.escenarioCard}>
@@ -363,7 +389,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
                   <h3>Limitación de la fórmula 220−edad</h3>
                 </div>
                 <p className={styles.escenarioTip}>
-                  La fórmula 220−edad es una media estadística de los años 70, revisada en 2001. Alternativas más precisas: FCmáx = 208 − 0,7 × edad (Tanaka, 2001) o FCmáx = 211 − 0,64 × edad (Gulati, mujeres). La única forma exacta es hacer una prueba de esfuerzo máxima.
+                  La fórmula 220−edad la propusieron Fox, Naughton y Haskell en 1971 y Tanaka la revisó en 2001. Alternativa más precisa: FCmáx = 208 − 0,7 × edad (Tanaka, 2001). La única forma exacta es hacer una prueba de esfuerzo máxima.
                 </p>
               </div>
             </div>
@@ -375,20 +401,20 @@ export default function CalculadoraZonasEntrenamientoPage() {
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">❓</span> ¿Cuánto tiempo debería pasar en cada zona?</h4>
                 <p>
-                  Depende del objetivo. Para salud general: 70–80% del tiempo en Z1–Z2 y 20–30% en Z3–Z4. Para rendimiento deportivo: la pirámide de polarización (80% baja intensidad / 20% alta) ha demostrado ser más eficaz que el "entrenamiento en zona media" para la mayoría de deportes de resistencia.
+                  Depende del objetivo. Para salud general: 70–80&nbsp;% del tiempo en Z1–Z2 y 20–30&nbsp;% en Z3–Z4. Para rendimiento en deportes de resistencia, varios autores proponen una distribución polarizada: la mayor parte del tiempo a baja intensidad, una parte pequeña a alta y poco tiempo en la zona media. No es lo mismo que la distribución piramidal, en la que el tiempo va bajando de Z1 a Z5 pasando por la zona media. La comparación entre las dos sigue abierta.
                 </p>
                 <p className={styles.faqTip}><span aria-hidden="true">💡</span> El error más común de los amateurs es entrenar demasiado en Z3 — "demasiado duro para adaptarse, demasiado fácil para mejorar".</p>
               </div>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">❓</span> ¿A qué zona corresponde caminar?</h4>
                 <p>
-                  Caminar a paso normal suele situarse en Z1–Z2 (50–70% FCmáx) para la mayoría de adultos. Caminar rápido o en subida puede llegar a Z2–Z3. Aunque la FC absoluta parezca baja, para personas sedentarias o mayores puede ser suficiente estímulo aeróbico.
+                  Caminar a paso normal suele situarse en Z1–Z2 (50–70&nbsp;% FCmáx) para la mayoría de adultos. Caminar rápido o en subida puede llegar a Z2–Z3. Aunque la FC absoluta parezca baja, para personas sedentarias o mayores puede ser suficiente estímulo aeróbico.
                 </p>
               </div>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">❓</span> ¿Es cierto que la Z2 quema más grasa que la Z4?</h4>
                 <p>
-                  En términos de porcentaje de energía procedente de grasas, sí: Z2 usa ~70% grasas / 30% carbohidratos. Z4 usa ~20% grasas / 80% carbohidratos. Pero en total de calorías quemadas, Z4 gana. Para pérdida de peso, la zona importa menos que el déficit calórico total diario.
+                  En términos de porcentaje de energía procedente de grasas, sí: Z2 usa ~70&nbsp;% grasas / 30&nbsp;% carbohidratos. Z4 usa ~20&nbsp;% grasas / 80&nbsp;% carbohidratos. Pero en total de calorías quemadas, Z4 gana. Para pérdida de peso, la zona importa menos que el déficit calórico total diario.
                 </p>
               </div>
               <div className={styles.faqItem}>
@@ -421,7 +447,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
                 <div className={styles.stepNumber}>3</div>
                 <div className={styles.stepContent}>
                   <h4>Entrena la mayoría del tiempo en Z2</h4>
-                  <p>Si tu objetivo es salud general o preparar una prueba de resistencia, el 70–80% de tus sesiones deberían estar en Z2. Es la zona donde más se desarrolla el motor aeróbico sin fatiga excesiva.</p>
+                  <p>Si tu objetivo es salud general o preparar una prueba de resistencia, el 70–80&nbsp;% de tus sesiones deberían estar en Z2. Es la zona donde más se desarrolla el motor aeróbico sin fatiga excesiva.</p>
                 </div>
               </div>
               <div className={styles.step}>
@@ -473,7 +499,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
               <h3>Errores Frecuentes al Entrenar por Zonas</h3>
             </div>
             <ul className={styles.warningList}>
-              <li><strong><span aria-hidden="true">❌</span> Confiar solo en la sensación sin pulsómetro:</strong> La percepción del esfuerzo es muy subjetiva y variable. Un pulsómetro de pecho proporciona datos objetivos para respetar las zonas.</li>
+              <li><strong><span aria-hidden="true">❌</span> Fiarse de una sola referencia:</strong> La sensación de esfuerzo cambia con el cansancio, el calor o el sueño. Contrastarla con el pulso, medido con dos dedos o con un pulsómetro (el de pecho es el más fiable), da una lectura más estable; sin pulsómetro, la prueba de la conversación de cada zona también sirve.</li>
               <li><strong><span aria-hidden="true">❌</span> Entrenar siempre en Z3 ("la zona gris"):</strong> Demasiado dura para recuperarse bien, demasiado fácil para generar adaptaciones de alta intensidad. El error más habitual en corredores populares.</li>
               <li><strong><span aria-hidden="true">❌</span> Aplicar las zonas de carrera al ciclismo o la natación sin ajuste:</strong> La FC en bici suele ser 5–10 ppm inferior para el mismo esfuerzo percibido. Ajusta mentalmente si cambias de deporte.</li>
               <li><strong><span aria-hidden="true">❌</span> No recalcular las zonas al mejorar:</strong> Con el entrenamiento, la FC en reposo baja y la condición mejora. Las zonas calculadas hace 6 meses pueden estar ya obsoletas.</li>

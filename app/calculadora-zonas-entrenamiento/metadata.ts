@@ -45,12 +45,13 @@ export const jsonLd = generateWebAppSchema({
     'Calcula tus 5 zonas de frecuencia cardíaca para entrenar con precisión: desde la zona de recuperación activa hasta la zona de potencia máxima. Usa la fórmula simple (220−edad) o la fórmula de Karvonen (con FC en reposo) para resultados más precisos.',
   url: 'https://meskeia.com/calculadora-zonas-entrenamiento/',
   features: [
-    '5 zonas de frecuencia cardíaca personalizadas por edad',
-    'Fórmula simple (220−edad) y fórmula de Karvonen con FC en reposo',
-    'Rango de pulsaciones y % de FCmáx para cada zona',
-    'Descripción detallada de qué trabaja cada zona y cuándo usarla',
-    'Tabla de aplicación por objetivo: pérdida de peso, resistencia, rendimiento',
-    'Gratuito, sin registro, en español',
+    // Hallazgo 4801: se retira «Tabla de aplicación por objetivo: pérdida de peso…», que la app no tiene
+    'FCmáx estimada (220 − edad) con la fórmula a la vista',
+    'Cinco zonas en pulsaciones por % de FCmáx o por Karvonen (FC de reserva)',
+    'Nota con la fórmula de Karvonen aplicada a tus datos',
+    'Qué trabaja cada zona, sus beneficios y cuándo usarla',
+    'Tabla resumen de las 5 zonas con sensación y objetivo',
+    'Cómo medir la FC en reposo',
   ],
 });
 
@@ -63,7 +64,7 @@ export const faqJsonLd = {
       name: '¿Qué son las zonas de entrenamiento y cuántas hay?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las zonas de entrenamiento son rangos de frecuencia cardíaca que corresponden a distintas intensidades de esfuerzo. El modelo más extendido divide el esfuerzo en 5 zonas: Zona 1 (recuperación activa, <60% FCmáx), Zona 2 (resistencia aeróbica base, 60-70%), Zona 3 (ritmo aeróbico, 70-80%), Zona 4 (umbral anaeróbico, 80-90%) y Zona 5 (potencia máxima, >90%). Cada zona estimula adaptaciones fisiológicas distintas.',
+        text: 'Las zonas de entrenamiento son rangos de frecuencia cardíaca que corresponden a distintas intensidades de esfuerzo. El modelo más extendido divide el esfuerzo en 5 zonas: Zona 1 (recuperación activa, <60 % FCmáx), Zona 2 (resistencia aeróbica base, 60-70 %), Zona 3 (ritmo aeróbico, 70-80 %), Zona 4 (umbral anaeróbico, 80-90 %) y Zona 5 (potencia máxima, >90 %). Cada zona estimula adaptaciones fisiológicas distintas.',
       },
     },
     {
@@ -79,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve entrenar en la Zona 2?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La Zona 2 (60-70% de la FCmáx) es la base del entrenamiento aeróbico de resistencia. Mejora la capacidad mitocondrial, incrementa la eficiencia en el uso de grasas como combustible y desarrolla la base cardiovascular necesaria para rendir en intensidades más altas. La mayoría de los planes de running, ciclismo y triatlón destinan entre el 70 y el 80% del volumen semanal a esta zona.',
+        text: 'La Zona 2 (60-70 % de la FCmáx) es la base del entrenamiento aeróbico de resistencia. Mejora la capacidad mitocondrial, incrementa la eficiencia en el uso de grasas como combustible y desarrolla la base cardiovascular necesaria para rendir en intensidades más altas. La mayoría de los planes de running, ciclismo y triatlón destinan entre el 70 y el 80 % del volumen semanal a esta zona.',
       },
     },
     {
@@ -87,7 +88,7 @@ export const faqJsonLd = {
       name: '¿Cómo medir mi frecuencia cardíaca en reposo para usar la fórmula de Karvonen?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La forma más precisa es medirla justo al despertar, antes de levantarse de la cama, durante 60 segundos completos. Puedes usar el pulso en la muñeca (arteria radial), en el cuello (arteria carótida) o un pulsómetro. Repite la medición tres días consecutivos y promedia los valores. Una FCr típica en adultos sedentarios ronda los 60-80 ppm; en deportistas entrenados puede bajar de 40 ppm.',
+        text: 'La forma más precisa es medirla justo al despertar, antes de levantarse de la cama, durante 60 segundos completos. Puedes usar el pulso en la muñeca (arteria radial), en el cuello (arteria carótida) o un pulsómetro. Repite la medición tres días consecutivos y promedia los valores. En la mayoría de adultos la FCr está entre 60 y 80 ppm; en deportistas entrenados puede bajar de 40 ppm.',
       },
     },
     {

@@ -57,9 +57,10 @@ import { contrasteSobreFondoReal } from './_contraste';
  * RESULTADO: los tres casos cuadran con la app salvo el redondeo del 70 % a los 45 y 55 años
  * (HALLAZGO 1). Las zonas comparten su límite (HALLAZGO 2).
  *
- * HALLAZGOS ABIERTOS (15/11/2026) — van con test.fail(): cuando se reparen, el caso «pasará»,
- * Playwright lo marcará como fallo inesperado, y entonces se quita el test.fail() y se escribe
- * REPARADO en su comentario.
+ * HALLAZGOS (15/11/2026) — los doce REPARADOS el mismo día por /reparar (hallazgos 4794-4805).
+ * Desde el 2 cada zona empieza un latido después del límite de la anterior, así que los casos
+ * 1-3 de arriba llevan ya los mínimos con +1. El 4 se resolvió retirando la fórmula mal
+ * atribuida (la fuente de Gulati no se pudo consultar en la sesión).
  *   1. 0,7 en coma flotante: a los 45 años el 70 % de 175 (122,5) sale 122, y a los 55 el de 165
  *      (115,5) sale 115, mientras a los 35 el 70 % de 185 (129,5) sí sube a 130.
  *   2. El límite superior de cada zona es el inferior de la siguiente: 108 ppm está en Z1 y en Z2.
@@ -150,28 +151,29 @@ test.describe('calculadora-zonas-entrenamiento — FCmáx, zonas y contenido', (
     const simple = await calcularZonas(page, '40', '60', 'simple');
     await expect(page.getByText('180 ppm', { exact: true })).toBeVisible();
     await expect(page.getByText(/^Fórmula: 220 − 40 años$/)).toBeVisible();
-    expect(simple).toEqual([[90, 108], [108, 126], [126, 144], [144, 162], [162, 180]]);
+    // Desde el hallazgo 4795 cada zona empieza un latido después del límite de la anterior
+    expect(simple).toEqual([[90, 108], [109, 126], [127, 144], [145, 162], [163, 180]]);
 
     await elegirMetodo(page, 'karvonen');
     await calcular(page);
-    expect(await leerZonas(page)).toEqual([[120, 132], [132, 144], [144, 156], [156, 168], [168, 180]]);
+    expect(await leerZonas(page)).toEqual([[120, 132], [133, 144], [145, 156], [157, 168], [169, 180]]);
     await expect(page.getByText(/= 60 \+ % × 120$/)).toBeVisible();
   });
 
   test('CASO 2 (límite) — 80 años con reposo 100 y 15 años con reposo 40', async ({ page }) => {
     expect(await calcularZonas(page, '80', '100', 'karvonen')).toEqual([
-      [120, 124], [124, 128], [128, 132], [132, 136], [136, 140],
+      [120, 124], [125, 128], [129, 132], [133, 136], [137, 140],
     ]);
     await expect(page.getByText('140 ppm', { exact: true })).toBeVisible();
 
     // 122,5 · 155,5 · 188,5: las medias suben
     expect(await calcularZonas(page, '15', '40', 'karvonen')).toEqual([
-      [123, 139], [139, 156], [156, 172], [172, 189], [189, 205],
+      [123, 139], [140, 156], [157, 172], [173, 189], [190, 205],
     ]);
     await elegirMetodo(page, 'simple');
     await calcular(page);
     // 102,5 · 143,5 · 184,5
-    expect(await leerZonas(page)).toEqual([[103, 123], [123, 144], [144, 164], [164, 185], [185, 205]]);
+    expect(await leerZonas(page)).toEqual([[103, 123], [124, 144], [145, 164], [165, 185], [186, 205]]);
   });
 
   test('CASO 3 (rechazo) — edad 0, edad 200, letras y FC de reposo 150', async ({ page }) => {
@@ -199,7 +201,7 @@ test.describe('calculadora-zonas-entrenamiento — FCmáx, zonas y contenido', (
     await elegirMetodo(page, 'karvonen');
     await calcular(page);
     await expect(page.getByText(/= 100 \+ % × 80$/)).toBeVisible();
-    expect(await leerZonas(page)).toEqual([[140, 148], [148, 156], [156, 164], [164, 172], [172, 180]]);
+    expect(await leerZonas(page)).toEqual([[140, 148], [149, 156], [157, 164], [165, 172], [173, 180]]);
   });
 
   test('aviso médico de nivel 2 visible al cargar, fuera de la guía plegada', async ({ page }) => {
@@ -209,81 +211,84 @@ test.describe('calculadora-zonas-entrenamiento — FCmáx, zonas y contenido', (
     await expect(page.getByRole('button', { name: /Ver guía educativa/ })).toHaveAttribute('aria-expanded', 'false');
   });
 
-  test('HALLAZGO 1 (15/11/2026, ABIERTO) — el 70 % de 175 (122,5) sale 122 y el de 165 (115,5) sale 115', async ({ page }) => {
-    // (70/100)·175 = 122,49999999999999 en coma flotante → Math.round da 122. A los 35 años el 70 %
-    // de 185 (129,5) sí sube a 130: el mismo medio redondea distinto según la edad.
-    test.fail();
+  test('HALLAZGO 1 (4794, REPARADO 15/11/2026) — el 70 % de 175 (122,5) sube a 123 y el de 165 (115,5) a 116', async ({ page }) => {
+    // (70/100)·175 = 122,49999999999999 en coma flotante → Math.round daba 122. Ahora se calcula
+    // 70·175/100 = 122,5 exacto, que sube como sube a los 35 años el 70 % de 185 (129,5 → 130).
     const z45 = await calcularZonas(page, '45', '60', 'simple');
-    // Vale con cualquier convención de límites: el del 70 % es 123 (Z3 empieza en 123 o 124)
     expect(z45[2][0]).toBeGreaterThanOrEqual(123);
     expect(z45[1][1]).toBeLessThanOrEqual(123);
+    expect(z45).toEqual([[88, 105], [106, 123], [124, 140], [141, 158], [159, 175]]);
     const z55 = await calcularZonas(page, '55', '60', 'simple');
     expect(z55[2][0]).toBeGreaterThanOrEqual(116);
+    expect(z55).toEqual([[83, 99], [100, 116], [117, 132], [133, 149], [150, 165]]);
   });
 
-  test('HALLAZGO 2 (15/11/2026, ABIERTO) — cada límite está en dos zonas (108 ppm es Z1 y Z2)', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 2 (4795, REPARADO 15/11/2026) — ningún límite está en dos zonas (Z2 empieza en 109)', async ({ page }) => {
     const zonas = await calcularZonas(page, '40', '60', 'simple');
     for (let i = 1; i < zonas.length; i++) {
       expect(zonas[i][0] - zonas[i - 1][1], `Z${i + 1} empieza un lpm después de donde acaba Z${i}`).toBe(1);
     }
   });
 
-  test('HALLAZGO 3 (15/11/2026, ABIERTO) — «FC reposo baja (atleta) obtendrá zonas más altas»: la app da lo contrario', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 3 (4796, REPARADO 15/11/2026) — la guía ya no dice que la FC de reposo baja da zonas más altas', async ({ page }) => {
     // Karvonen: límite = p·FCmáx + (1 − p)·FCrep, que CRECE con la FC de reposo.
     const atleta = await calcularZonas(page, '40', '45', 'karvonen');
-    expect(atleta[1]).toEqual([126, 140]); // 45 + 0,6·135 = 126 · 45 + 0,7·135 = 139,5 → 140
+    expect(atleta[1]).toEqual([127, 140]); // 45 + 0,6·135 = 126 (+1, empieza tras Z1) · 45 + 94,5 → 140
     const sedentario = await calcularZonas(page, '40', '75', 'karvonen');
-    expect(sedentario[1]).toEqual([138, 149]); // 75 + 0,6·105 = 138 · 75 + 0,7·105 = 148,5 → 149
-    const afirma = /FC reposo baja \(atleta\) obtendrá zonas más altas/.test(await textoDePagina(page));
+    expect(sedentario[1]).toEqual([139, 149]); // 75 + 0,6·105 = 138 (+1) · 75 + 73,5 → 149
+    const texto = await textoDePagina(page);
+    const afirma = /FC reposo baja \(atleta\) obtendrá zonas más altas/.test(texto);
     expect(!afirma || atleta[1][0] > sedentario[1][0], 'la guía afirma lo contrario de lo que calcula').toBe(true);
+    expect(texto).toContain('quien tiene la FC en reposo más baja obtiene zonas algo más bajas');
   });
 
-  test('HALLAZGO 4 (15/11/2026, ABIERTO) — «211 − 0,64 × edad» atribuida a Gulati para mujeres', async ({ page }) => {
-    test.fail();
-    expect(await textoDePagina(page)).not.toMatch(/211\s*−\s*0,64\s*×\s*edad\s*\(Gulati/);
+  test('HALLAZGO 4 (4797, REPARADO 15/11/2026) — ya no atribuye «211 − 0,64 × edad» a Gulati', async ({ page }) => {
+    // No se pudo cotejar la fuente en la sesión: se retira la fórmula mal atribuida y queda Tanaka.
+    const texto = await textoDePagina(page);
+    expect(texto).not.toMatch(/211\s*−\s*0,64\s*×\s*edad\s*\(Gulati/);
+    expect(texto).toContain('Alternativa más precisa: FCmáx = 208 − 0,7 × edad (Tanaka, 2001)');
   });
 
-  test('HALLAZGO 5 (15/11/2026, ABIERTO) — el sesgo de 220 − edad atribuido al entrenamiento, no a la edad', async ({ page }) => {
-    test.fail();
-    expect(await textoDePagina(page)).not.toMatch(
-      /Subestima la FCmáx en personas muy entrenadas y la sobreestima en sedentarios/,
-    );
+  test('HALLAZGO 5 (4798, REPARADO 15/11/2026) — el sesgo de 220 − edad se atribuye a la edad, con su origen', async ({ page }) => {
+    const texto = await textoDePagina(page);
+    expect(texto).not.toMatch(/Subestima la FCmáx en personas muy entrenadas y la sobreestima en sedentarios/);
+    expect(texto).toContain('Su error depende sobre todo de la edad');
+    expect(texto).toContain('Fox, Naughton y Haskell');
   });
 
-  test('HALLAZGO 6 (15/11/2026, ABIERTO) — ningún aviso para quien toma betabloqueantes o tiene una cardiopatía', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 6 (4799, REPARADO 15/11/2026) — aviso visible para quien toma betabloqueantes o tiene una cardiopatía', async ({ page }) => {
     expect(await textoDePagina(page)).toMatch(/betabloque|medicaci[oó]n|medicamento|f[aá]rmaco/i);
+    // Fuera de la guía plegada: visible al cargar
+    await expect(page.getByRole('note').filter({ hasText: 'betabloqueantes' })).toBeVisible();
   });
 
-  test('HALLAZGO 7 (15/11/2026, ABIERTO) — FC de reposo del sedentario: 60-80 en el FAQPage, 80–100 en la página', async ({ page }) => {
-    test.fail();
-    const faq = (await jsonLd(page)).find((b) => b['@type'] === 'FAQPage');
-    const enFaq = JSON.stringify(faq).match(/sedentarios ronda los (\d+)-(\d+) ppm/);
-    const enPagina = (await textoDePagina(page)).match(/Sedentario: (\d+)–(\d+) ppm/);
-    if (enFaq && enPagina) {
-      expect([enFaq[1], enFaq[2]]).toEqual([enPagina[1], enPagina[2]]);
-    }
+  test('HALLAZGO 7 (4800, REPARADO 15/11/2026) — la misma FC de reposo en el FAQPage y en la página', async ({ page }) => {
+    const faq = JSON.stringify((await jsonLd(page)).find((b) => b['@type'] === 'FAQPage'));
+    const texto = await textoDePagina(page);
+    expect(faq).toContain('En la mayoría de adultos la FCr está entre 60 y 80 ppm');
+    expect(texto).toContain('En la mayoría de adultos: 60–80 ppm');
+    expect(faq).not.toMatch(/sedentarios ronda/);
+    expect(texto).not.toMatch(/Sedentario: 80–100/);
   });
 
-  test('HALLAZGO 8 (15/11/2026, ABIERTO) — features promete una tabla por objetivo con «pérdida de peso»', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 8 (4801, REPARADO 15/11/2026) — features ya no promete una tabla por objetivo con «pérdida de peso»', async ({ page }) => {
     const app = (await jsonLd(page)).find((b) => b['@type'] === 'WebApplication');
     const features = JSON.stringify(app?.featureList ?? app?.features ?? '');
     const tablas = (await page.locator('table').allTextContents()).join(' ');
     expect(!/pérdida de peso/.test(features) || /pérdida de peso/i.test(tablas)).toBe(true);
+    expect(features).toContain('Tabla resumen de las 5 zonas con sensación y objetivo');
   });
 
-  test('HALLAZGO 9 (15/11/2026, ABIERTO) — «ha demostrado» y entrenar sin pulsómetro de pecho como «error»', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 9 (4802, REPARADO 15/11/2026) — sin «ha demostrado» y sin el pulsómetro de pecho como obligación', async ({ page }) => {
     const texto = await textoDePagina(page);
     expect(texto).not.toMatch(/ha demostrado ser más eficaz/);
     expect(texto).not.toMatch(/Confiar solo en la sensación sin pulsómetro/);
+    expect(texto).toContain('varios autores proponen una distribución polarizada');
   });
 
-  test('HALLAZGO 10 (15/11/2026, ABIERTO) — el % de cada zona va pegado al número', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 10 (4803, REPARADO 15/11/2026) — el % va separado del número, también en la guía y el FAQPage', async ({ page }) => {
+    expect(await textoDePagina(page)).not.toMatch(/\d%/);
+    expect(JSON.stringify((await jsonLd(page)).find((b) => b['@type'] === 'FAQPage'))).not.toMatch(/\d%/);
     await calcularZonas(page, '40', '60', 'simple');
     const mod = await selectorDelModulo(page.getByText('Recuperación Activa', { exact: true }), 'zonaNombre');
     const porcentajes = await page.locator(`${mod}[class$="_zonaPct"]`).allTextContents();
@@ -291,8 +296,7 @@ test.describe('calculadora-zonas-entrenamiento — FCmáx, zonas y contenido', (
     for (const p of porcentajes) expect(p).toMatch(/^\d+–\d+ %$/);
   });
 
-  test('HALLAZGO 11 (15/11/2026, ABIERTO) — contraste de la cabecera y de la cifra de cada zona (tema claro)', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 11 (4804, REPARADO 15/11/2026) — contraste de la cabecera y de la cifra de cada zona (tema claro)', async ({ page }) => {
     await calcularZonas(page, '40', '60', 'simple');
     const nombres = ['Recuperación Activa', 'Resistencia Base', 'Aeróbico Medio', 'Umbral Anaeróbico', 'Máximo / VO₂max'];
     const cifras = page.getByText(CIFRA_ZONA);
@@ -309,8 +313,7 @@ test.describe('calculadora-zonas-entrenamiento — FCmáx, zonas y contenido', (
     expect(peor, medidas.join(' | ')).toBeGreaterThanOrEqual(1);
   });
 
-  test('HALLAZGO 12 (15/11/2026, ABIERTO) — deslizadores ocultos al lector pero enfocables; el resultado no se anuncia', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 12 (4805, REPARADO 15/11/2026) — deslizadores fuera del tabulador; el foco va al resultado', async ({ page }) => {
     const deslizadores = await page.evaluate(() =>
       Array.from(document.querySelectorAll('input[type="range"]')).map((r) => ({
         ariaHidden: r.getAttribute('aria-hidden'),

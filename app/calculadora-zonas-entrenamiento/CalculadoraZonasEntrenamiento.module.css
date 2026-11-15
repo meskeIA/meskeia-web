@@ -139,11 +139,30 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.6rem 1rem;
-  color: #fff;
+  /* Texto casi negro sobre el color de la zona, igual en los dos temas: 4,6-8:1. El blanco
+     daba 2,2-3,8:1 (hallazgo 4804) */
+  color: #111;
 }
 .zonaNumero { font-size: 0.9rem; font-weight: 800; min-width: 24px; }
 .zonaNombre { font-size: 0.9rem; font-weight: 700; flex: 1; }
-.zonaPct { font-size: 0.82rem; font-weight: 600; opacity: 0.9; }
+.zonaPct { font-size: 0.82rem; font-weight: 600; }
+
+/* Color de la zona como texto: --zona-texto y --zona-texto-oscuro llegan del TSX (ZONAS_DEF) */
+.colorZona { color: var(--zona-texto, var(--text-primary)); }
+[data-theme='dark'] .colorZona { color: var(--zona-texto-oscuro, var(--text-primary)); }
+
+/* Aviso de medicación y cardiopatía (hallazgo 4799), fuera de la guía plegada */
+.avisoMedicacion {
+  margin: 1rem 0;
+  padding: 0.8rem 1rem;
+  border-left: 4px solid #c0621a;
+  background: rgba(224, 123, 57, 0.08);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+[data-theme='dark'] .avisoMedicacion { background: rgba(224, 123, 57, 0.14); border-left-color: #e09060; }
 .zonaBody { padding: 0.9rem 1rem; }
 
 .zonaFc { margin-bottom: 0.5rem; }
