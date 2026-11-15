@@ -1,5 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { esperarPaginaAsentada } from './apps/_hidratacion';
 
 /**
  * Testing de Accesibilidad con Playwright + axe-core
@@ -128,7 +129,9 @@ APPS.forEach(({ name, url, interactions }) => {
 
     test('debe permitir navegación completa por teclado', async ({ page }) => {
       await page.goto(url);
-      await page.waitForLoadState('networkidle');
+      // Hidratada y con los efectos de montaje ya corridos: un autofocus que llegue después
+      // movería el foco en mitad del bucle (C0736, 13/11/2026).
+      await esperarPaginaAsentada(page);
       await congelarAnimaciones(page);
 
       // Obtener todos los elementos interactivos de LA PÁGINA.
@@ -160,11 +163,14 @@ APPS.forEach(({ name, url, interactions }) => {
         if (isFocusable) {
           focusableCount++;
 
-          // Dar focus al elemento
-          await element.focus();
-
-          // Verificar que tiene focus
-          const hasFocus = await element.evaluate(el => el === document.activeElement);
+          // Enfocar y comprobar en el MISMO evaluate: lo que se mide es que el elemento
+          // admite el foco. Con element.focus() y otro evaluate después quedaban dos idas y
+          // vueltas en medio, y con 8 workers cabía un efecto de la app que movía el foco:
+          // falló una vez en la batería de C0723 y pasó 9 de 9 aislado (C0736).
+          const hasFocus = await element.evaluate(el => {
+            (el as HTMLElement).focus();
+            return el === document.activeElement;
+          });
           expect(hasFocus).toBeTruthy();
         }
       }
