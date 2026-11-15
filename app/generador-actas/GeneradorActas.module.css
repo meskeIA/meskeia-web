@@ -522,13 +522,24 @@
 }
 
 .presente {
+  /* semanticos-ok: dentro del acta, papel blanco en los dos temas, manda .actaDocument .presente */
   color: var(--verde-texto, var(--success));
   font-weight: 500;
 }
 
 .ausente {
+  /* semanticos-ok: dentro del acta, papel blanco en los dos temas, manda .actaDocument .ausente */
   color: var(--rojo-texto, var(--error));
   font-weight: 500;
+}
+
+/* El acta es papel blanco en los dos temas: ahí la receta, que en oscuro es un tono claro, no sirve (C0681) */
+.actaDocument .presente {
+  color: #136E35;
+}
+
+.actaDocument .ausente {
+  color: #B91C1C;
 }
 
 .btnRemove {

@@ -856,12 +856,12 @@ test.describe('CAMBIO 12/11/2026 · lo tocado desde la validación del 01/10/202
     expect(errores).toEqual([]);
   });
 
-  test('la viñeta de las listas de aviso usa --ambar-texto en claro y la reserva #f9a825 en oscuro', async ({ page }) => {
-    // 791e5a41 (C0296): globals.css declara --ambar-texto: #8A5A00 en claro e `initial` en oscuro,
-    // donde manda la reserva. Contraste calculado con la fórmula WCAG sobre los fondos medidos en
-    // navegador: en claro, #8A5A00 da 5,43:1 sobre #F5F5F5 y 5,58:1 sobre #FFF8E1; en oscuro,
-    // #F9A825 da 6,69:1 sobre #303030 y 5,51:1 sobre el tinte ámbar al 10 % de la caja de aviso.
-    // Todos por encima del 3:1 que el candado pide a un `::before`.
+  test('la viñeta de las listas de aviso usa --ambar-texto en los dos temas', async ({ page }) => {
+    // 791e5a41 (C0296): globals.css declara --ambar-texto: #8A5A00 en claro; en oscuro, desde C0681
+    // (15/11/2026), #FCD34D (antes `initial`, y mandaba la reserva #F9A825). Contraste calculado con
+    // la fórmula WCAG sobre los fondos medidos en navegador: en claro, #8A5A00 da 5,43:1 sobre
+    // #F5F5F5 y 5,58:1 sobre #FFF8E1; en oscuro, #FCD34D da 9,15:1 sobre #303030 y 7,53:1 sobre el
+    // tinte ámbar al 10 % de la caja de aviso (#443C2F). Todos por encima del 3:1 de un `::before`.
     const vinetas = () =>
       page.evaluate(() =>
         Array.from(document.querySelectorAll('ul[class*="warningList"] > li:first-child')).map(
@@ -871,7 +871,7 @@ test.describe('CAMBIO 12/11/2026 · lo tocado desde la validación del 01/10/202
     expect(await vinetas()).toEqual(['rgb(138, 90, 0)', 'rgb(138, 90, 0)']);
     await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    await expect.poll(vinetas).toEqual(['rgb(249, 168, 37)', 'rgb(249, 168, 37)']);
+    await expect.poll(vinetas).toEqual(['rgb(252, 211, 77)', 'rgb(252, 211, 77)']);
   });
 
   test('las relacionadas llegan del layout: las 4 de app-relations, en el HTML servido y sin 404', async ({ page, request }) => {

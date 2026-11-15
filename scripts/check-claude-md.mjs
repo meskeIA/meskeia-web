@@ -309,7 +309,7 @@ const OBLIGACIONES = [
   ]],
   ['Candado del texto semántico en claro', [
     'npm run check:semanticos-claro', 'rompe', 'texto rojo, naranja, ámbar o verde',
-    'var(--rojo-texto, <color de antes>)', 'solo existen en claro, en oscuro manda la reserva',
+    'var(--rojo-texto, <color de antes>)', 'sigue claro en oscuro',
     'Rompe también sin reserva', 'No ve un fondo oscuro que pone el TSX',
   ]],
   ['Candado del blanco sobre fondo semántico', [

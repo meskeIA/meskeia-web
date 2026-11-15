@@ -317,7 +317,8 @@
   border: none;
   border-radius: 6px;
   background: #fee2e2;
-  color: var(--rojo-texto, #ef4444);
+  /* Fondo claro fijo en los dos temas: color fijo, no la receta, que en oscuro es un tono claro (C0681) */
+  color: #B91C1C;
   font-size: 1.2rem;
   cursor: pointer;
   display: flex;

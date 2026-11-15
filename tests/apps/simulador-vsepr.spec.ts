@@ -1047,8 +1047,9 @@ test.describe('simulador-vsepr · testigo 2415: el dibujo cuadra con los desliza
  *     1,93:1, por debajo hasta del 3:1).
  *   meskeia.com oscuro · #3FA5D1 sobre --bg-card #2d2d2d 4,93:1 (el margen más corto de todos) ·
  *     #93c5fd sobre #14532d 5,05:1 y sobre #1e3a5f 6,38:1 · blanco sobre #26718F 5,47:1 (el
- *     -boton es igual en los dos temas) · ✓ #5ABDB9 6,17:1 · ✗ en la RESERVA #f59e0b, porque
- *     --ambar-texto vale `initial` en oscuro, sobre #2d1b00 7,71:1.
+ *     -boton es igual en los dos temas) · ✓ #5ABDB9 6,17:1 · ✗ en --ambar-texto del oscuro,
+ *     #FCD34D, sobre #2d1b00 11,48:1 (hasta C0681, 15/11/2026, el token valía `initial` y
+ *     mandaba la reserva #f59e0b, 7,71:1).
  *   stemum.com claro · #6B21A8 sobre blanco 8,72:1 y sobre #eff6ff 8,01:1 · blanco sobre #6B21A8
  *     8,72:1 · ✓ #8B3BD1 5,76:1 · ✗ igual que en meskeia.com.
  *   stemum.com oscuro · #C99BF5 sobre #2d2d2d 6,22:1 · el acento, el mismo #93c5fd (el override
@@ -1211,7 +1212,7 @@ function escenarios(): Escenario[] {
         fila('«Tip» de la FAQ', TIP, 4, '#3fa5d1', 4.93),
         fila('número de los pasos (blanco)', PASO, 5, '#ffffff', 5.47),
         fila('✓ de los consejos (texto grande)', CONSEJO, 6, '#5abdb9', 6.17, 3),
-        fila('✗ de los errores frecuentes (la reserva)', ASPA, 6, '#f59e0b', 7.71, 4.5, '::before'),
+        fila('✗ de los errores frecuentes (--ambar-texto del oscuro)', ASPA, 6, '#fcd34d', 11.48, 4.5, '::before'),
       ],
       hover: { fondo: 'rgb(38, 113, 143)', ratio: 5.47 },
     },
@@ -1243,7 +1244,7 @@ function escenarios(): Escenario[] {
         fila('«Tip» de la FAQ', TIP, 4, '#c99bf5', 6.22),
         fila('número de los pasos (blanco)', PASO, 5, '#ffffff', 8.72),
         fila('✓ de los consejos (texto grande)', CONSEJO, 6, '#be8af3', 5.32, 3),
-        fila('✗ de los errores frecuentes (la reserva)', ASPA, 6, '#f59e0b', 7.71, 4.5, '::before'),
+        fila('✗ de los errores frecuentes (--ambar-texto del oscuro)', ASPA, 6, '#fcd34d', 11.48, 4.5, '::before'),
       ],
       hover: { fondo: 'rgb(107, 33, 168)', ratio: 8.72 },
     },

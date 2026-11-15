@@ -488,9 +488,10 @@ valor se decide midiendo contra el fondo REAL.
 `npm run check:semanticos-claro` — **rompe** si un `.module.css` pinta texto rojo, naranja, ámbar o
 verde (literal, token del módulo o `var(--error)`) por debajo de 4,5:1 en claro (3:1 si es grande o
 `::before`) contra el fondo de su regla o, sin él, el blanco. Receta:
-**`var(--rojo-texto, <color de antes>)`**, igual con `--naranja-`, `--ambar-` y `--verde-texto`:
-solo existen en claro, en oscuro manda la reserva. Rompe también sin reserva. ⚠️ No ve un fondo
-oscuro que pone el TSX: lo mide el píxel.
+**`var(--rojo-texto, <color de antes>)`**, igual con `--naranja-`, `--ambar-` y `--verde-texto`,
+que en oscuro valen un tono claro. Rompe también sin reserva, y si la receta va sobre un fondo que
+**sigue claro en oscuro** (insignia o papel fijos): ahí, color fijo. ⚠️ No ve un fondo oscuro que
+pone el TSX: lo mide el píxel.
 
 ### Candado del blanco sobre fondo semántico
 

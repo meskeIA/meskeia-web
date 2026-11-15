@@ -254,7 +254,8 @@
   display: inline-block;
   padding: 0.2rem 0.75rem;
   background: #fed7d7;
-  color: var(--rojo-texto, #c53030);
+  /* Fondo claro fijo en los dos temas: color fijo, no la receta, que en oscuro es un tono claro (C0681) */
+  color: #B91C1C;
   border-radius: 999px;
   font-size: 0.8rem;
   font-weight: 600;

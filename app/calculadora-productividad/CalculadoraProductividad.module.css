@@ -130,7 +130,8 @@
 
 .clearButton:hover {
   background: #fee;
-  color: var(--rojo-texto, #e74c3c);
+  /* Fondo claro fijo en los dos temas: color fijo, no la receta, que en oscuro es un tono claro (C0681) */
+  color: #B91C1C;
   border-color: #e74c3c;
 }
 

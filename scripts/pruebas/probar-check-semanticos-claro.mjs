@@ -51,6 +51,14 @@
  *  25. El texto dentro de una caja con tinte, con className compuesto y un `>` en una flecha
  *      del atributo. Debe FALLAR.
  *
+ * Y la pasada OSCURA, donde la receta es un tono claro (cabo C0681, 15/11/2026):
+ *  26. checklist-coberturas-seguros en 9d9b12e0a: insignias con fondo claro fijo. Debe FALLAR.
+ *  27. La misma, reparada con color fijo. Debe CALLAR.
+ *  28. Un tinte translúcido, que en oscuro se compone sobre la tarjeta. Debe CALLAR.
+ *  29-30. Fondo claro con variante oscura, o con color propio en oscuro. Deben CALLAR.
+ *  31. Un fondo blanco que solo está en @media print. Debe CALLAR.
+ *  32. Otra clase del mismo elemento con fondo blanco fijo. Debe FALLAR.
+ *  33. Una antecesora del DOM con fondo blanco fijo (el acta de generador-actas). Debe FALLAR.
  * Y la manera de dar verde sin mirar, que debe PLANTARLO:
  *
  *  16. Un árbol sin ningún `.module.css`.
@@ -72,6 +80,7 @@ const ADAPT = 'app/adaptacion-hogar/AdaptacionHogar.module.css';
 const INTEGRALES = 'app/tabla-integrales/TablaIntegrales.module.css';
 const LIMITES = 'app/tabla-limites-notables/TablaLimitesNotables.module.css';
 const LIMITES_TSX = 'app/tabla-limites-notables/page.tsx';
+const CHECKLIST = 'app/checklist-coberturas-seguros/ChecklistCoberturasSeguro.module.css';
 
 const CASOS = [
   { n: 1, nombre: 'CASO DE ORIGEN · mi-ip antes de f9af2556', falla: true, css: deGit('f9af2556^', MI_IP) },
@@ -144,6 +153,15 @@ const CASOS = [
     css: '.caja { background: rgba(220, 38, 38, 0.12); }\n.titulo { color: #dc2626; }\n',
     tsx: 'export default function X({ a }: { a: boolean }) {\n  return (\n    <section className={`${styles.caja} ${a ? styles.otra : \'\'}`} onClick={() => a > false}>\n      {a && <h3 className={styles.titulo}>Aviso</h3>}\n    </section>\n  );\n}\n',
   },
+  // La pasada OSCURA (cabo C0681, 15/11/2026): en oscuro la receta es un tono claro
+  { n: 26, nombre: 'CASO DE ORIGEN · checklist-coberturas-seguros antes de C0681 (insignias #fee2e2 y #fef3c7 fijas)', falla: true, css: deGit('9d9b12e0a', CHECKLIST) },
+  { n: 27, nombre: 'CASO DE ORIGEN REPARADO · checklist-coberturas-seguros con color fijo', falla: false, css: fs.readFileSync(path.join(RAIZ, CHECKLIST), 'utf8') },
+  { n: 28, nombre: 'la receta sobre un tinte translúcido: en oscuro se compone sobre la tarjeta', falla: false, css: '.aviso { background: rgba(239, 68, 68, 0.12); color: var(--rojo-texto, #dc2626); }\n' },
+  { n: 29, nombre: 'la receta sobre un fondo claro con su variante oscura', falla: false, css: '.chip { background: #fee2e2; color: var(--rojo-texto, #dc2626); }\n[data-theme=\'dark\'] .chip { background: #4a1d1d; }\n' },
+  { n: 30, nombre: 'la receta sobre un fondo claro, con color propio en oscuro', falla: false, css: '.chip { background: #fee2e2; color: var(--rojo-texto, #dc2626); }\n[data-theme=\'dark\'] .chip { color: #991b1b; }\n' },
+  { n: 31, nombre: 'el fondo de @media print no se ve en pantalla', falla: false, css: '.marca { color: var(--verde-texto, #16a34a); }\n@media print {\n  .marca { background: white; }\n}\n' },
+  { n: 32, nombre: 'la receta en una clase que comparte elemento con otra de fondo blanco fijo', falla: true, css: '.boton { background: #ffffff; }\n.boton.hecho { color: var(--verde-texto, #16a34a); }\n' },
+  { n: 33, nombre: 'la receta dentro de una antecesora del DOM con fondo claro fijo', falla: true, css: '.papel { background: white; }\n.si { color: var(--verde-texto, var(--success)); }\n', tsx: 'export default function X() {\n  return (\n    <div className={styles.papel}>\n      <span className={styles.si}>Sí</span>\n    </div>\n  );\n}\n' },
 ];
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'semanticos-claro-'));

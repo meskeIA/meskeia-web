@@ -28,9 +28,9 @@
   /* ── Texto SEMÁNTICO en claro (cabo C0296, 31/10/2026) ──────────────────
      El rojo, naranja, ámbar y verde que los módulos escriben como texto (#ef4444,
      #f59e0b, #27ae60…) no llegaban a 4,5:1 sobre blanco: 1.062 reglas en 478 hojas.
-     Se usan SIEMPRE con el color de antes como reserva —var(--rojo-texto, #ef4444)—
-     porque en oscuro valen `initial` (abajo) y manda la reserva: el oscuro se queda
-     como estaba. El porqué y el candado, en scripts/check-semanticos-claro.mjs.
+     Se usan con el color de antes como reserva —var(--rojo-texto, #ef4444)— y en oscuro
+     valen el tono claro de su familia (abajo, C0681). El porqué y el candado, en
+     scripts/check-semanticos-claro.mjs.
      Cada uno, en el peor de blanco, #FAFAFA, #F5F5F5 y el tinte al 20 % de su color: */
   --rojo-texto: #B91C1C;         /* 6,47:1 sobre blanco · 4,99 sobre su tinte */
   --naranja-texto: #B93E0B;      /* 5,59 · 4,56 */
@@ -140,13 +140,19 @@
   --primary-boton: #26718F;
   --secondary-boton: #327874;
 
-  /* Los semánticos de texto NO existen en oscuro: `initial` hace que su var() tome la
-     reserva, que es el color que cada módulo tenía antes (C0296). Un tono pastel aquí
-     iría encima de los tintes claros que dos de cada tres módulos no cambian en oscuro. */
-  --rojo-texto: initial;
-  --naranja-texto: initial;
-  --ambar-texto: initial;
-  --verde-texto: initial;
+  /* Los semánticos de texto en oscuro: el tono claro de cada familia, los mismos que
+     --danger/--success/--warning del oscuro (C0226). Hasta el 15/11/2026 valían `initial`
+     y mandaba la reserva, el color de antes de cada módulo, que en oscuro no se había
+     medido: 455 usos bajo 4,5:1 (C0681). Medido por píxel en las 531 rutas con la receta,
+     en oscuro y con lo colapsado abierto: 841 textos, 398 pasan a cumplir y ninguno deja
+     de hacerlo. El riesgo que motivó `initial` —un tono claro sobre un tinte claro que no
+     cambia en oscuro— eran 18 reglas, reparadas a mano y vigiladas por la pasada oscura de
+     check:semanticos-claro. Peor caso de cada uno, sobre #383838 (el fondo oscuro plano
+     más claro del sitio): */
+  --rojo-texto: #FCA5A5;         /* 6,18:1 · 7,26 sobre la tarjeta #2D2D2D */
+  --naranja-texto: #FDBA74;      /* 6,95 · 8,17 */
+  --ambar-texto: #FCD34D;        /* 8,13 · 9,55 */
+  --verde-texto: #86EFAC;        /* 8,35 · 9,81 */
 
   /* Textos invertidos */
   --text-primary: #E8E8E8;

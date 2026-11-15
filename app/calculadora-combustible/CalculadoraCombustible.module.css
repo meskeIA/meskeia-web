@@ -225,7 +225,8 @@
 
 .eficienciaBadge.normal {
   background: #FBBF24;
-  color: var(--naranja-texto, #92400E);
+  /* Fondo claro fijo en los dos temas: color fijo, no la receta, que en oscuro es un tono claro (C0681) */
+  color: #78350F;
 }
 
 .eficienciaBadge.alto {
@@ -312,7 +313,8 @@
 
 .escalaBarra.normal {
   background: #FBBF24;
-  color: var(--naranja-texto, #92400E);
+  /* Fondo claro fijo en los dos temas: color fijo, no la receta, que en oscuro es un tono claro (C0681) */
+  color: #78350F;
 }
 
 .escalaBarra.alto {

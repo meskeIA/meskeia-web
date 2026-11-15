@@ -7,6 +7,10 @@
  *   node scripts/contraste-semanticos/censo-reserva-oscuro.mjs            resumen
  *   node scripts/contraste-semanticos/censo-reserva-oscuro.mjs --detalle  cada uso que falla
  *
+ * ⚠️ Histórico desde el 15/11/2026: globals da ya a los cuatro tokens un valor en oscuro (C0681,
+ * medido por píxel con medir-reserva-oscuro.mjs) y la reserva no se pinta en ese tema. Lo que
+ * sigue describe el estado que este censo midió.
+ *
  * En oscuro globals pone los cuatro tokens `-texto` a `initial`, así que manda la reserva X: el
  * color de antes de la receta, que la campaña del claro no midió en oscuro. Ningún candado lo
  * mira: `check:semanticos-claro` solo juzga el claro y `check:token-oscuro` solo los semánticos

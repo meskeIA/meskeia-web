@@ -26,15 +26,29 @@
  * 4,5:1, o 3:1 si la misma regla declara texto grande (≥ 24 px, o ≥ 18,66 px en negrita) o es
  * un `::before`/`::after`/`::marker` (iconos y viñetas: no-texto, WCAG 1.4.11).
  *
- * La receta es un token de TEXTO por familia, como `--primary-texto` de C0070, que existe SOLO
- * en el tema claro: `--rojo-texto`, `--naranja-texto`, `--ambar-texto` y `--verde-texto`, y se
- * escribe con el color de antes como reserva: `color: var(--rojo-texto, #ef4444)`. En oscuro
- * globals los deja en `initial`, la reserva manda y la app se ve exactamente como antes. Por
- * qué no llevan un valor del oscuro, como `--primary-texto`: dos de cada tres hojas pintan
- * algún tinte claro que no cambia en oscuro, y un rojo pastel encima de un rosa fijo da
- * 1,3:1; el oscuro de los semánticos es C0226 (check:token-oscuro). Por eso el candado rompe
- * también con un token de éstos SIN reserva: en oscuro el color caería a lo heredado.
- * `familia()` y `analizarHoja()` se exportan: los usó la campaña.
+ * La receta es un token de TEXTO por familia, como `--primary-texto` de C0070: `--rojo-texto`,
+ * `--naranja-texto`, `--ambar-texto` y `--verde-texto`, escrito con el color de antes como
+ * reserva: `color: var(--rojo-texto, #ef4444)`. Rompe también con un token de éstos SIN reserva
+ * (se escribió cuando el oscuro la necesitaba, abajo; se mantiene porque deja escrito el color
+ * que se sustituyó). `familia()` y `analizarHoja()` se exportan: los usó la campaña.
+ *
+ * LA PASADA OSCURA (cabo C0681, 15/11/2026)
+ * ─────────────────────────────────────────
+ * Hasta el 15/11/2026 globals ponía los cuatro tokens a `initial` en oscuro y mandaba la
+ * reserva: el color de antes de cada módulo, que en oscuro nadie había medido (455 usos bajo
+ * 4,5:1 en el censo scripts/contraste-semanticos/censo-reserva-oscuro.mjs). Se eligió `initial`
+ * porque un tono claro encima de un tinte claro que no cambia en oscuro da 1,3:1. Medido por
+ * píxel (scripts/contraste-semanticos/medir-reserva-oscuro.mjs, 531 rutas): de 841 textos que
+ * pinta la receta en oscuro, 398 pasan a cumplir con un valor oscuro y ninguno deja de hacerlo.
+ * Ahora valen FAMILIAS[x].oscuro, y `analizarOscuro()` rompe con la receta sobre un fondo que
+ * SIGUE CLARO en oscuro: el de la regla, el de otra clase del mismo elemento, el de una clase
+ * antecesora del selector o el de la antecesora en el DOM, sin variante oscura y sin que la
+ * regla redeclare `color` en oscuro. Lo translúcido se compone sobre la tarjeta oscura y lo de
+ * `@media print` no cuenta. Al nacer encendió 18 reglas en 13 hojas, en el mismo commit: 12 con
+ * color fijo sobre su fondo fijo (insignias, hovers), las 3 de analizador-densidad-seo con la
+ * barra separada de la cifra (ponían la cifra del tono de su propio fondo), las 2 de
+ * generador-actas con una regla para el papel blanco del acta y escape en la general, y 1 falso
+ * positivo con escape (visualizador-gps: «Tú» es hija del punto rojo, pero va debajo de él).
  *
  * QUÉ NO JUZGA, Y POR QUÉ
  * ───────────────────────
@@ -84,10 +98,10 @@ const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 /** Los cuatro tokens de texto con su valor (≥ 4,5:1 sobre blanco, #FAFAFA, #F5F5F5 y el tinte
  *  al 20 % de su familia). Los mismos que `app/globals.css`. */
 export const FAMILIAS = {
-  rojo: { token: '--rojo-texto', claro: '#B91C1C' },
-  naranja: { token: '--naranja-texto', claro: '#B93E0B' },
-  ambar: { token: '--ambar-texto', claro: '#8A5A00' },
-  verde: { token: '--verde-texto', claro: '#136E35' },
+  rojo: { token: '--rojo-texto', claro: '#B91C1C', oscuro: '#FCA5A5' },
+  naranja: { token: '--naranja-texto', claro: '#B93E0B', oscuro: '#FDBA74' },
+  ambar: { token: '--ambar-texto', claro: '#8A5A00', oscuro: '#FCD34D' },
+  verde: { token: '--verde-texto', claro: '#136E35', oscuro: '#86EFAC' },
 };
 
 /** Valores del claro de los tokens de globals que pueden aparecer como `var()`. */
@@ -130,20 +144,24 @@ export function familia(hex) {
 
 const aHex6 = (r, g, b) => `#${[r, g, b].map((x) => Math.round(x).toString(16).padStart(2, '0')).join('')}`;
 const canales = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
-const sobreBlanco = (hex, a) => aHex6(...canales(hex).map((c) => c * a + 255 * (1 - a)));
+const sobre = (hex, a, base = '#ffffff') => aHex6(...canales(hex).map((c, i) => c * a + canales(base)[i] * (1 - a)));
 
-/** Resuelve un valor de fondo a { hex } o { tipo } ('degradado', 'otro', 'transparente'). */
-function resolverFondo(valor, tokens) {
+/**
+ * Resuelve un valor de fondo a { hex } o { tipo } ('degradado', 'otro', 'transparente'). Lo
+ * translúcido se compone sobre `base` (blanco en claro; la tarjeta oscura en la pasada oscura),
+ * y los tokens de globals se leen de `globales`.
+ */
+function resolverFondo(valor, tokens, base = '#ffffff', globales = GLOBALES) {
   let v = valor.trim().toLowerCase().replace(/\s*!important$/, '');
   if (/^(transparent|none|inherit|initial|unset)$/.test(v)) return { tipo: 'transparente' };
   const mv = v.match(/^var\(\s*(--[\w-]+)\s*(?:,\s*([^)]+))?\)$/);
-  if (mv) v = tokens[mv[1]] ?? GLOBALES[mv[1]] ?? (mv[2] ? mv[2].trim() : null) ?? '';
+  if (mv) v = tokens[mv[1]] ?? globales[mv[1]] ?? (mv[2] ? mv[2].trim() : null) ?? '';
   // color-mix(in srgb, A p%, B): el tinte de las insignias de Coquinum (214 fondos así); con
-  // `transparent` como B es A al p % sobre blanco
+  // `transparent` como B es A al p % sobre la base
   const mx = v.match(/^color-mix\(\s*in\s+srgb\s*,\s*(.+?)\s+([\d.]+)%\s*,\s*(.+)\)$/);
   if (mx) {
-    const a = resolverFondo(mx[1], tokens);
-    const b = mx[3].trim() === 'transparent' ? { hex: '#ffffff' } : resolverFondo(mx[3], tokens);
+    const a = resolverFondo(mx[1], tokens, base, globales);
+    const b = mx[3].trim() === 'transparent' ? { hex: base } : resolverFondo(mx[3], tokens, base, globales);
     if (!a.hex || !b.hex) return { tipo: 'otro' };
     const p = +mx[2] / 100;
     const [ca, cb] = [canales(a.hex), canales(b.hex)];
@@ -151,8 +169,8 @@ function resolverFondo(valor, tokens) {
   }
   if (/gradient\(/.test(v)) {
     const colores = [...v.matchAll(/#[0-9a-f]{3,6}\b|rgba?\([^)]*\)|var\(\s*--[\w-]+\s*\)/g)].map((m) => {
-      const x = m[0].startsWith('var(') ? tokens[m[0].slice(4, -1).trim()] ?? GLOBALES[m[0].slice(4, -1).trim()] : m[0];
-      return x ? resolverFondo(x, tokens) : null;
+      const x = m[0].startsWith('var(') ? tokens[m[0].slice(4, -1).trim()] ?? globales[m[0].slice(4, -1).trim()] : m[0];
+      return x ? resolverFondo(x, tokens, base, globales) : null;
     });
     if (colores.length && colores.every((c) => c?.hex && luminancia(c.hex) < LUM_OSCURO)) return { hex: colores[0].hex };
     return { tipo: 'degradado' };
@@ -162,7 +180,7 @@ function resolverFondo(valor, tokens) {
   if (m) {
     const a = m[4] === undefined ? 1 : m[4].endsWith('%') ? parseFloat(m[4]) / 100 : +m[4];
     if (a === 0) return { tipo: 'transparente' };
-    return { hex: sobreBlanco(aHex6(+m[1], +m[2], +m[3]), a) };
+    return { hex: sobre(aHex6(+m[1], +m[2], +m[3]), a, base) };
   }
   const h = aHex(v.split(/\s+/)[0] ?? '');
   return h ? { hex: h } : { tipo: 'otro' };
@@ -359,6 +377,136 @@ export function analizarHoja(css, { dom = null } = {}) {
   return casos;
 }
 
+// ─── La pasada OSCURA de la receta (cabo C0681, 15/11/2026) ──────────────────
+
+/** Valores del oscuro de los tokens de globals que pueden aparecer como `var()` en un fondo. */
+const GLOBALES_OSCURO = {
+  ...GLOBALES,
+  '--error': '#ef5350', '--success': '#66bb6a', '--warning': '#ffa726',
+  '--bg-card': '#2d2d2d', '--bg-primary': '#1a1a1a', '--hover': '#383838', '--border': '#404040',
+  '--primary': '#3fa5d1', '--secondary': '#5abdb9',
+  ...Object.fromEntries(Object.values(FAMILIAS).map((f) => [f.token, f.oscuro.toLowerCase()])),
+};
+/** Lo translúcido en oscuro se compone sobre la tarjeta, #2D2D2D (el peor de los dos fondos). */
+const BASE_OSCURA = '#2d2d2d';
+
+/** `[data-theme='dark'] .x`, `:global([data-theme="dark"]) .x` o `.x` dentro de una media oscura → `.x`. */
+const baseDeOscuro = (parte) =>
+  parte.replace(/:global\(\s*(\[data-theme\s*=\s*["']?dark["']?\s*\])\s*\)/i, '$1').replace(RE_OSCURO, '').replace(/\s+/g, ' ').trim();
+
+/**
+ * Los textos pintados con la receta `var(--x-texto, X)` que en OSCURO quedarían sobre un fondo
+ * claro. En oscuro los cuatro tokens valen un tono claro (FAMILIAS[x].oscuro), así que una regla
+ * cuyo fondo sigue claro en ese tema —el de la regla, el de una clase antecesora del selector o
+ * el de la antecesora en el DOM, sin variante oscura— necesita su propio color oscuro:
+ * `[data-theme='dark'] .x { color: <el de antes> }`. Cada caso lleva `escape` si su línea lo lleva.
+ */
+export function analizarOscuro(css, { dom = null } = {}) {
+  const bloques = parsearCss(css);
+  const lineas = css.split('\n');
+  const esOsc = (b) => b.contexto.oscuroMedia || RE_OSCURO.test(b.selector);
+  const enPantalla = bloques.filter((b) => !b.contexto.impresion);
+  const claros = enPantalla.filter((b) => !esOsc(b));
+  const oscuros = enPantalla.filter(esOsc);
+
+  // Tokens del módulo en oscuro: su valor del claro, pisado por el que redeclare un bloque oscuro
+  const tokens = {};
+  for (const b of claros) for (const d of b.decls) if (d.prop.startsWith('--')) tokens[d.prop] ??= d.valor.trim();
+  for (const b of oscuros) for (const d of b.decls) if (d.prop.startsWith('--')) tokens[d.prop] = d.valor.trim();
+  for (const [k, v] of Object.entries(tokens)) {
+    const mv = v.match(/^var\(\s*(--[\w-]+)\s*\)$/);
+    tokens[k] = mv ? tokens[mv[1]] ?? GLOBALES_OSCURO[mv[1]] ?? v : v;
+  }
+
+  // Lo que los bloques oscuros redeclaran, por selector base: fondo y color
+  const enOscuro = new Map();
+  for (const b of oscuros) {
+    for (const p of b.selector.split(',')) {
+      const k = baseDeOscuro(p);
+      const e = enOscuro.get(k) ?? {};
+      const f = ultimoFondo(b.decls);
+      if (f) e.fondo = f.valor;
+      if (b.decls.some((d) => /^(color|-webkit-text-fill-color)$/.test(d.prop))) e.color = true;
+      enOscuro.set(k, e);
+    }
+  }
+  const resolver = (valor) => resolverFondo(valor, tokens, BASE_OSCURA, GLOBALES_OSCURO);
+  /** El fondo de una parte de selector en oscuro: el de su variante oscura o, si no la tiene, el del claro. */
+  const fondoDe = (parte, declsClaro) => {
+    const osc = enOscuro.get(parte.trim())?.fondo;
+    if (osc) return resolver(osc);
+    const f = declsClaro && ultimoFondo(declsClaro);
+    return f ? resolver(f.valor) : null;
+  };
+
+  // El fondo en oscuro de cada clase en su regla BASE (`.clase` a secas), como fondoDeClase del claro
+  const fondoDeClase = new Map();
+  for (const b of claros) {
+    for (const p of b.selector.split(',')) {
+      if (!/^\.[\w-]+$/.test(p.trim())) continue;
+      const r = fondoDe(p, b.decls);
+      if (r?.hex) fondoDeClase.set(p.trim(), r.hex);
+    }
+  }
+  for (const [k, e] of enOscuro) if (/^\.[\w-]+$/.test(k) && e.fondo && !fondoDeClase.has(k)) {
+    const r = resolver(e.fondo);
+    if (r.hex) fondoDeClase.set(k, r.hex);
+  }
+
+  const casos = [];
+  for (const b of claros) {
+    for (const d of b.decls) {
+      if (!/^(color|-webkit-text-fill-color)$/.test(d.prop)) continue;
+      const mv = d.valor.match(/var\(\s*(--(rojo|naranja|ambar|verde)-texto)\s*,/);
+      if (!mv) continue;
+      const partes = b.selector.split(',').map((p) => p.trim());
+      // Su variante oscura ya pone color: la receta no llega a pintarse en oscuro
+      if (partes.every((p) => enOscuro.get(p)?.color)) continue;
+      const hexTexto = FAMILIAS[mv[2]].oscuro;
+
+      const tam = b.decls.find((x) => x.prop === 'font-size')?.valor ?? '';
+      const px = (m => m ? (m[2] === 'rem' || m[2] === 'em' ? +m[1] * 16 : +m[1]) : 0)(tam.match(/^([\d.]+)(px|rem|em)$/));
+      const negrita = /^(bold|bolder|[6-9]00)$/.test(b.decls.find((x) => x.prop === 'font-weight')?.valor.trim() ?? '');
+      const pseudo = /::?(before|after|marker)\b/.test(b.selector);
+      const umbral = px >= 24 || (px >= 18.66 && negrita) || pseudo ? 3 : 4.5;
+
+      let peor = null;
+      for (const p of partes) {
+        if (enOscuro.get(p)?.color) continue;
+        const propio = fondoDe(p, b.decls);
+        let hex = propio?.hex ?? null;
+        if (!propio) {
+          const comps = compuestos(p);
+          // Primero las otras clases del MISMO elemento (`.stepButton.stepCompleted` hereda a la
+          // vista el fondo de `.stepButton`); después las antecesoras del selector y las del DOM
+          const mismo = (comps.at(-1) ?? '').replace(/:.*$/, '');
+          hex = [mismo, ...comps.slice(0, -1).reverse()].flatMap((c) => clasesDe(c)).map((k) => fondoDeClase.get(k)).find(Boolean) ?? null;
+          if (!hex && dom) {
+            const k = comps.slice().reverse().flatMap((c) => clasesDe(c)).find((c) => dom.has(c));
+            for (const lista of k ? dom.get(k) : []) {
+              const h = lista.map((a) => fondoDeClase.get(a)).find(Boolean);
+              if (h && (!hex || contraste(hexTexto, h) < contraste(hexTexto, hex))) hex = h;
+            }
+          }
+        }
+        if (hex && (!peor || contraste(hexTexto, hex) < contraste(hexTexto, peor))) peor = hex;
+      }
+      if (!peor) continue; // sin fondo propio: la página o la tarjeta oscuras, donde cumple
+      const ratio = contraste(hexTexto, peor);
+      if (ratio >= umbral) continue;
+      const reserva = d.valor.match(/var\(\s*--[\w-]+\s*,\s*(.+)\)\s*(!important)?\s*$/)?.[1]?.trim() ?? '';
+      const caso = {
+        linea: d.linea, selector: b.selector, valor: d.valor, fam: mv[2], fondo: peor,
+        ratio: Math.round(ratio * 100) / 100, umbral, reserva,
+      };
+      const esc = [lineas[d.linea - 1], lineas[d.linea - 2]].map((l) => l?.match(RE_ESCAPE)).find(Boolean);
+      if (esc) caso.escape = esc[1]?.replace(/\*\/.*$/, '').trim() || '';
+      casos.push(caso);
+    }
+  }
+  return casos;
+}
+
 // ─── Ejecución directa ────────────────────────────────────────────────────────
 
 function recorrer(dir, acc = []) {
@@ -429,6 +577,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const rompen = [];
   const sinRazon = [];
   const aparte = [];
+  const enOscuro = [];
   // Los TSX que importan cada hoja (C0608): del árbol, o del directorio de cada hoja suelta
   const indice = sueltas.length
     ? indiceTsx(RAIZ, [...new Set(hojas.map((h) => path.dirname(h)))], false)
@@ -443,6 +592,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       else if (c.accion === 'aparte') aparte.push({ rel, ...c });
       else rompen.push({ rel, ...c });
     }
+    for (const c of analizarOscuro(fs.readFileSync(h, 'utf8'), { dom })) {
+      if (c.escape === '') sinRazon.push({ rel, ...c, oscuro: true });
+      else if (!c.escape) enOscuro.push({ rel, ...c });
+    }
   }
   const linea = (c) => c.accion === 'sin-reserva'
     ? `   ${c.rel}:${c.linea}  ${c.selector}  ${c.valor}`
@@ -451,14 +604,21 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     console.log(`\nNo juzgados (${aparte.length}): el fondo no es claro o no se sabe leer`);
     for (const c of aparte) console.log(`${linea(c)} · ${c.motivo}`);
   }
-  if (rompen.length || sinRazon.length) {
-    console.error(`\n❌ check:semanticos-claro — texto rojo, naranja, ámbar o verde que no se lee en el tema claro`);
-    for (const c of rompen) console.error(`${linea(c)}\n      → ${c.accion === 'sin-reserva' ? 'falta la reserva: en oscuro este token no existe' : c.nuevo}`);
+  if (enOscuro.length) {
+    console.error(`\n❌ check:semanticos-claro — la receta, que en oscuro es un tono claro, sobre un fondo que sigue claro en oscuro (C0681)`);
+    for (const c of enOscuro) console.error(`   ${c.rel}:${c.linea}  ${c.selector}  ${c.valor} sobre ${c.fondo} = ${fmt(c.ratio)}:1 en oscuro (umbral ${fmt(c.umbral)})`);
+    console.error(`\n   Si el fondo es claro y fijo en los dos temas: un color fijo que cumpla sobre él, no la receta.`);
+    console.error(`   Si solo sigue claro en una parte (un papel, una insignia): una regla para esa parte con su color.`);
+    console.error(`   Falso positivo (el texto no va encima de ese fondo): «semanticos-ok: <razón>» en la línea del color.\n`);
+  }
+  if (rompen.length || sinRazon.length || enOscuro.length) {
+    if (rompen.length || sinRazon.length) console.error(`\n❌ check:semanticos-claro — texto rojo, naranja, ámbar o verde que no se lee en el tema claro`);
+    for (const c of rompen) console.error(`${linea(c)}\n      → ${c.accion === 'sin-reserva' ? 'falta la reserva: la receta lleva detrás el color de antes (C0296)' : c.nuevo}`);
     for (const c of sinRazon) console.error(`${linea(c)}\n      → el escape semanticos-ok necesita su razón`);
     console.error(`\n   Receta: var(--rojo-texto, <color de antes>), y lo mismo con --naranja-texto, --ambar-texto`);
-    console.error(`   y --verde-texto. Solo existen en claro: en oscuro manda la reserva (C0296).`);
+    console.error(`   y --verde-texto. En oscuro valen un tono claro de su familia (C0681).`);
     console.error(`   Falso positivo (el fondo real es oscuro y lo pone el TSX): «semanticos-ok: <razón>».\n`);
     process.exit(1);
   }
-  console.log(`✅ check:semanticos-claro — ${hojas.length} hojas, ningún texto semántico por debajo de su umbral en claro${aparte.length ? ` (${aparte.length} no juzgados: --todo)` : ''}`);
+  console.log(`✅ check:semanticos-claro — ${hojas.length} hojas, ningún texto semántico por debajo de su umbral en claro ni receta sobre fondo claro en oscuro${aparte.length ? ` (${aparte.length} no juzgados: --todo)` : ''}`);
 }

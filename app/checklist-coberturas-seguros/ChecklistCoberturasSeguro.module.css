@@ -541,7 +541,8 @@
   font-size: 0.8rem;
   font-weight: 600;
   background: #fee2e2;
-  color: var(--rojo-texto, #dc2626);
+  /* Fondo claro fijo en los dos temas: color fijo, no la receta, que en oscuro es un tono claro (C0681) */
+  color: #B91C1C;
 }
 
 .badgeYes {
@@ -551,7 +552,8 @@
   font-size: 0.8rem;
   font-weight: 600;
   background: #fef3c7;
-  color: var(--ambar-texto, #d97706);
+  /* Fondo claro fijo en los dos temas: color fijo, no la receta, que en oscuro es un tono claro (C0681) */
+  color: #8A5A00;
 }
 
 .badgeNo {

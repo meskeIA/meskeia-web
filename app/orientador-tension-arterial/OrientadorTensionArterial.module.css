@@ -634,7 +634,8 @@
 
 .btnEliminar:hover {
   background: #fee2e2;
-  color: var(--rojo-texto, #DC2626);
+  /* Fondo claro fijo en los dos temas: color fijo, no la receta, que en oscuro es un tono claro (C0681) */
+  color: #B91C1C;
 }
 
 .btnEliminar:focus-visible {

@@ -182,7 +182,12 @@ export function parsearCss(css) {
         const preludio = crudo.trim();
         const pos = inicio + (crudo.length - crudo.trimStart().length);
         if (preludio.startsWith('@')) {
-          const ctx = { ...contexto, oscuroMedia: contexto.oscuroMedia || /prefers-color-scheme\s*:\s*dark/i.test(preludio) };
+          const ctx = {
+            ...contexto,
+            oscuroMedia: contexto.oscuroMedia || /prefers-color-scheme\s*:\s*dark/i.test(preludio),
+            // Lo de `@media print` no se ve en pantalla (lo lee la pasada oscura de check:semanticos-claro)
+            impresion: contexto.impresion || /^@media\b[^{]*\bprint\b/i.test(preludio),
+          };
           i = cuerpo(i + 1, null, selectorPadre, ctx);
         } else {
           const propio = preludio.replace(/\s+/g, ' ');

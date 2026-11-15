@@ -1334,9 +1334,10 @@ test.describe('cabo C0610 · las líneas a/b del lienzo y sus letras', () => {
     page,
   }) => {
     // colorLimite sale de getComputedStyle(canvas) en cada repintado (el MutationObserver de
-    // data-theme). ESPERADO a mano: claro → --naranja-texto #B93E0B (globals.css) · oscuro → el
-    // token es `initial` y queda la reserva #E07A1F · otra vez claro → #B93E0B. Si el valor se
-    // leyera una sola vez al montar, la vuelta al claro se quedaría en el naranja del oscuro.
+    // data-theme). ESPERADO a mano: claro → --naranja-texto #B93E0B (globals.css) · oscuro →
+    // --naranja-texto del oscuro, #FDBA74 (C0681; hasta el 15/11/2026 era `initial` y quedaba la
+    // reserva #E07A1F) · otra vez claro → #B93E0B. Si el valor se leyera una sola vez al montar,
+    // la vuelta al claro se quedaría en el naranja del oscuro.
     test.setTimeout(60_000);
     await abrirC0367(page, RUTA, 'light');
     const vistos: string[] = [];
@@ -1346,7 +1347,7 @@ test.describe('cabo C0610 · las líneas a/b del lienzo y sus letras', () => {
       const { limites } = await lienzoC0610(page);
       vistos.push(`${tema} ${hexC0367(limites[0].letra.color)}`);
     }
-    expect(vistos).toEqual(['light #b93e0b', 'dark #e07a1f', 'light #b93e0b']);
+    expect(vistos).toEqual(['light #b93e0b', 'dark #fdba74', 'light #b93e0b']);
   });
 });
 

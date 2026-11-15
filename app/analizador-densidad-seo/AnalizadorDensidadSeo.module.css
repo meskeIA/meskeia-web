@@ -326,19 +326,32 @@
   min-width: 50px;
 }
 
-/* Density Colors */
-.densityLow {
+/* Colores de densidad. El fondo pinta la barra y el indicador de la guía; el color, la cifra.
+   Juntos en el mismo elemento dejaban la cifra del mismo tono que su propio fondo (C0681). */
+.wordBar.densityLow,
+.guideIndicator.densityLow {
   background: var(--warning);
+}
+
+.wordDensity.densityLow {
   color: var(--ambar-texto, var(--warning));
 }
 
-.densityOptimal {
+.wordBar.densityOptimal,
+.guideIndicator.densityOptimal {
   background: var(--success);
+}
+
+.wordDensity.densityOptimal {
   color: var(--verde-texto, var(--success));
 }
 
-.densityHigh {
+.wordBar.densityHigh,
+.guideIndicator.densityHigh {
   background: var(--error);
+}
+
+.wordDensity.densityHigh {
   color: var(--rojo-texto, var(--error));
 }
 

@@ -104,7 +104,8 @@
   border-radius: 6px;
   margin-left: 0.4rem;
 }
-.exotermica  { background: #fef2f2; color: var(--rojo-texto, #dc2626); }
+/* Fondo claro fijo en los dos temas: color fijo, no la receta, que en oscuro es un tono claro (C0681) */
+.exotermica  { background: #fef2f2; color: #B91C1C; }
 .endotermica { background: #eff6ff; color: #1d4ed8; }
 .variable    { background: #f3f4f6; color: #6b7280; }
 
