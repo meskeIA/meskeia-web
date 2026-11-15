@@ -69,8 +69,7 @@
 
 .medicalTitle {
   font-weight: 600;
-  /* semanticos-ok: va sobre el #FEF7F7 fijo de .medicalBox, que InfoBox.tsx elige con styles[`${type}Box`] y el candado no ve; la receta lo aclararía en oscuro sobre casi blanco (C0708) */
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
   margin-bottom: 0.75rem;
   display: flex;
   align-items: center;
@@ -104,4 +103,26 @@
 .boxContent h4 {
   color: var(--text-primary);
   margin: 1rem 0 0.5rem 0;
+}
+
+/* Tema oscuro (cabo C0772). Las cuatro cajas no tenían variante y seguían casi blancas en
+   oscuro: el --text-secondary del contenido (#B0B0B0) se quedaba en ~2:1 y, desde que los tokens
+   de texto semántico valen un tono claro en oscuro (C0681), el título de la caja de éxito en
+   1,37:1 (medido por píxel en /contacto/). El candado no lo veía: InfoBox.tsx elige la clase con
+   styles[`${type}Box`]. Un tinte oscuro de cada familia; en el peor, título 5,3:1 (info, con
+   --primary-texto #3FA5D1) y contenido 6,6:1. */
+[data-theme='dark'] .successBox {
+  background: #1F2D26;
+}
+
+[data-theme='dark'] .infoBox {
+  background: #1F2B33;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #302A1C;
+}
+
+[data-theme='dark'] .medicalBox {
+  background: #352325;
 }
