@@ -3,7 +3,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './NombradorCompuestosOrganicos.module.css';
-import { RESPUESTA_FAQ_HEXAN_2_OL } from './metadata';
+import { RESPUESTA_FAQ_HEXAN_2_OL, RESPUESTA_FAQ_NUMERAR } from './metadata';
 import {
   MeskeiaLogo,
   Footer,
@@ -307,7 +307,7 @@ function elegirNumeracion(e: Estructura): Numeracion {
     // Criterio 4 — desempate por orden alfabético
     const ordenados = (inv: boolean) =>
       e.sustituyentes
-        .map((s) => ({ alfa: SUST_POR_ID[s.id].alfabetica, l: loc(s.pos, inv) }))
+        .map((s) => ({ alfa: SUST_POR_ID[s.id].alfabetica, nombre: SUST_POR_ID[s.id].nombre, l: loc(s.pos, inv) }))
         .sort((a, b) => (a.alfa === b.alfa ? a.l - b.l : a.alfa.localeCompare(b.alfa)));
     const listaD = ordenados(false);
     const listaI = ordenados(true);
@@ -315,9 +315,12 @@ function elegirNumeracion(e: Estructura): Numeracion {
       if (listaD[i].l !== listaI[i].l) {
         const inv = listaI[i].l < listaD[i].l;
         const ganador = inv ? listaI[i] : listaD[i];
+        // Hallazgo 4767: los alquilos llevan «-o» al nombrarlos sueltos (metil → metilo); los
+        // halógenos y el nitro ya terminan en «o» (bromo, no «bromoo»).
+        const nombreSuelto = ganador.nombre.endsWith('il') ? `${ganador.nombre}o` : ganador.nombre;
         return {
           invertida: inv,
-          motivo: `Los dos sentidos dan los mismos localizadores, así que decide el orden alfabético: el ${ganador.alfa}o recibe el número más bajo.`,
+          motivo: `Los dos sentidos dan los mismos localizadores, así que decide el orden alfabético: el ${nombreSuelto} recibe el número más bajo.`,
         };
       }
     }
@@ -334,7 +337,7 @@ function elegirNumeracion(e: Estructura): Numeracion {
 // ═══════════════════════════════════════════════════════════════════════
 
 /** Bloque de prefijos ya ordenado alfabéticamente: "4-etil-2,3-dimetil" */
-function construirPrefijos(susts: { id: SustId; loc: number }[]): string {
+function construirPrefijos(susts: { id: SustId; loc: number }[], sinLocalizador = false): string {
   if (susts.length === 0) return '';
 
   const grupos = new Map<SustId, number[]>();
@@ -350,12 +353,25 @@ function construirPrefijos(susts: { id: SustId; loc: number }[]): string {
       const mult = MULTIPLICADORES[ordenados.length] ?? '';
       return {
         alfa: info.alfabetica,
-        texto: `${ordenados.join(',')}-${mult}${info.nombre}`,
+        texto: sinLocalizador ? `${mult}${info.nombre}` : `${ordenados.join(',')}-${mult}${info.nombre}`,
       };
     })
     .sort((a, b) => a.alfa.localeCompare(b.alfa));
 
-  return bloques.map((b) => b.texto).join('-');
+  return bloques.map((b) => b.texto).join(sinLocalizador ? '' : '-');
+}
+
+/**
+ * Hallazgo 4758: la IUPAC omite los localizadores cuando no hay otra posición posible (regla
+ * P-14.3.4.2 de las recomendaciones de 2013): con un carbono, siempre (metanol, clorometano,
+ * diclorometano); con dos, si solo hay un grupo en toda la molécula (etanol, etanamina,
+ * cloroetano). Con dos grupos en el etano sí hace falta (2-cloroetanol, 1,2-dicloroetano).
+ */
+function omiteLocalizadores(e: Estructura): boolean {
+  if (e.n === 1) return true;
+  if (e.n !== 2) return false;
+  const grupos = (e.funcion !== 'alcano' ? 1 : 0) + e.sustituyentes.length;
+  return grupos <= 1;
 }
 
 function construirNombre(e: Estructura, invertida: boolean): { nombre: string; clasico: string | null } {
@@ -363,8 +379,9 @@ function construirNombre(e: Estructura, invertida: boolean): { nombre: string; c
   const locInsat = (pos: number) => (invertida ? e.n - pos : pos);
 
   const raiz = RAICES[e.n - 1];
+  const omite = omiteLocalizadores(e);
   const susts = e.sustituyentes.map((s) => ({ id: s.id, loc: loc(s.pos) }));
-  const prefijos = construirPrefijos(susts);
+  const prefijos = construirPrefijos(susts, omite);
   const locFuncion = loc(e.posFuncion);
   const locIns = locInsat(e.posInsat);
 
@@ -381,18 +398,19 @@ function construirNombre(e: Estructura, invertida: boolean): { nombre: string; c
   let nombre: string;
   let clasico: string | null = null;
 
+  // Sin localizador no hay forma clásica distinta: «etanol» es la única (no «1-etanol»).
   switch (e.funcion) {
     case 'alcohol':
-      nombre = `${cuerpo}-${locFuncion}-ol`;
-      if (e.insaturacion === 'ninguna') clasico = `${locFuncion}-${raiz}anol`;
+      nombre = omite ? `${cuerpo}ol` : `${cuerpo}-${locFuncion}-ol`;
+      if (e.insaturacion === 'ninguna' && !omite) clasico = `${locFuncion}-${raiz}anol`;
       break;
     case 'cetona':
       nombre = `${cuerpo}-${locFuncion}-ona`;
       if (e.insaturacion === 'ninguna') clasico = `${locFuncion}-${raiz}anona`;
       break;
     case 'amina':
-      nombre = `${cuerpo}-${locFuncion}-amina`;
-      if (e.insaturacion === 'ninguna') clasico = `${locFuncion}-${raiz}anamina`;
+      nombre = omite ? `${cuerpo}amina` : `${cuerpo}-${locFuncion}-amina`;
+      if (e.insaturacion === 'ninguna' && !omite) clasico = `${locFuncion}-${raiz}anamina`;
       break;
     case 'aldehido':
       nombre = `${cuerpo}al`;
@@ -414,7 +432,12 @@ function construirNombre(e: Estructura, invertida: boolean): { nombre: string; c
       break;
   }
 
-  const conPrefijos = (base: string) => (prefijos ? `${prefijos}${base}` : base);
+  // Hallazgo 4763: si la base empieza por un localizador (forma clásica «2-hexanol»), los
+  // prefijos se separan con guion: «4-metil-2-hexanol», no «4-metil2-hexanol».
+  const conPrefijos = (base: string) => {
+    if (!prefijos) return base;
+    return /^\d/.test(base) ? `${prefijos}-${base}` : `${prefijos}${base}`;
+  };
   const conArticulo = (base: string) => (e.funcion === 'acido' ? `ácido ${base}` : base);
 
   return {
@@ -530,7 +553,33 @@ function formulaSemidesarrollada(e: Estructura, invertida: boolean): string {
 // MOTOR 5 — ORQUESTADOR
 // ═══════════════════════════════════════════════════════════════════════
 
-const ALQUILOS: SustId[] = ['metil', 'etil', 'propil', 'isopropil', 'butil', 'terc-butil'];
+/**
+ * Carbonos seguidos que aporta cada alquilo desde el punto de unión (su rama más larga):
+ * isopropilo y terc-butilo se ramifican en el primer carbono, así que solo alargan 2.
+ */
+const LARGO_RAMA: Partial<Record<SustId, number>> = {
+  metil: 1, etil: 2, propil: 3, isopropil: 2, butil: 4, 'terc-butil': 2,
+};
+
+const AVISO_CADENA =
+  'Hay un sustituyente con carbonos que alarga la cadena principal: recorriendo la molécula por él salen más carbonos seguidos que por la cadena que has dibujado. En una molécula real ese nombre no sería el correcto: la cadena principal es siempre la más larga.';
+
+/**
+ * Hallazgo 4761: un alquilo de k carbonos en la posición p alarga la cadena si k supera el
+ * tramo que sustituiría (p − 1 por la izquierda, n − p por la derecha). El tramo que se cambia
+ * no puede llevarse el carbono del grupo funcional: la cadena principal tiene que contenerlo.
+ * Antes solo se miraban C1 y Cn, y «2-etilbutano» (3-metilpentano) pasaba sin aviso.
+ */
+function cadenaMasLargaPorRama(e: Estructura): boolean {
+  return e.sustituyentes.some((s) => {
+    const k = LARGO_RAMA[s.id];
+    if (!k) return false;
+    const conFuncion = e.funcion !== 'alcano';
+    const izquierdaLibre = !conFuncion || e.posFuncion >= s.pos;
+    const derechaLibre = !conFuncion || e.posFuncion <= s.pos;
+    return (izquierdaLibre && k > s.pos - 1) || (derechaLibre && k > e.n - s.pos);
+  });
+}
 
 function nombrar(e: Estructura): Resultado | null {
   if (validar(e).length > 0) return null;
@@ -540,14 +589,8 @@ function nombrar(e: Estructura): Resultado | null {
   const atomos = calcularAtomos(e);
   const avisos: string[] = [];
 
-  // Un radical con carbonos en un extremo delata que la cadena principal no era la más larga
-  const enExtremo = e.sustituyentes.some(
-    (s) => ALQUILOS.includes(s.id) && (s.pos === 1 || s.pos === e.n),
-  );
-  if (enExtremo) {
-    avisos.push(
-      'Hay un sustituyente con carbonos en un extremo de la cadena. En una molécula real eso alarga la cadena principal en vez de ramificarla, así que ese nombre no sería el correcto: la cadena principal es siempre la más larga.',
-    );
+  if (cadenaMasLargaPorRama(e)) {
+    avisos.push(AVISO_CADENA);
   }
 
   const localizadores = Array.from({ length: e.n }, (_, k) => (invertida ? e.n - k : k + 1));
@@ -615,13 +658,21 @@ function interpretarNombre(entrada: string): ResultadoParser {
 
   // Los sustituyentes se extraen ANTES de buscar la raíz y se retiran del texto:
   // si no, el «met» de «metil» se confundiría con la raíz de un solo carbono.
-  const sustituyentes: Sustituyente[] = [];
+  // Hallazgo 4762: un prefijo sin localizador («clorometano», «metilpropano») ya no se descarta
+  // en silencio: se recoge con su multiplicador y se sitúa después, si solo cabe en un sitio.
+  const MULT: Record<string, number> = { di: 2, tri: 3, tetra: 4, penta: 5 };
+  const conLocalizador: { id: SustId; posiciones: number[] }[] = [];
+  const sinLocalizador: { id: SustId; veces: number }[] = [];
   const nombresSust = SUSTITUYENTES.map((s) => s.nombre).join('|');
-  const patronSust = new RegExp(`(\\d+(?:,\\d+)*)-(?:di|tri|tetra|penta)?(${nombresSust})`, 'g');
+  const patronSust = new RegExp(`(?:(\\d+(?:,\\d+)*)-)?(di|tri|tetra|penta)?(${nombresSust})`, 'g');
   Array.from(cuerpo.matchAll(patronSust)).forEach((coincidencia) => {
-    const posiciones = coincidencia[1].split(',').map(Number);
-    const info = SUSTITUYENTES.find((s) => s.nombre === coincidencia[2]);
-    if (info) posiciones.forEach((p) => sustituyentes.push({ id: info.id, pos: p }));
+    const info = SUSTITUYENTES.find((s) => s.nombre === coincidencia[3]);
+    if (!info) return;
+    if (coincidencia[1]) {
+      conLocalizador.push({ id: info.id, posiciones: coincidencia[1].split(',').map(Number) });
+    } else {
+      sinLocalizador.push({ id: info.id, veces: coincidencia[2] ? MULT[coincidencia[2]] : 1 });
+    }
   });
   const cuerpoLimpio = cuerpo.replace(patronSust, '');
 
@@ -630,10 +681,14 @@ function interpretarNombre(entrada: string): ResultadoParser {
   const modernoLoc = cuerpoLimpio.match(/-(\d+)-(ol|ona|amina)$/);
   if (modernoLoc) posFuncion = Number(modernoLoc[1]);
 
-  // Raíz de la cadena principal: se prueba de la más larga a la más corta
+  // Hallazgo 4760: la raíz va al PRINCIPIO de lo que queda tras quitar los prefijos y el
+  // localizador clásico. Buscada con includes(), el «non» de «etaNONitrilo» ganaba al «et».
+  const delante = cuerpoLimpio.match(/^[-\d,]*/)?.[0] ?? '';
+  const posicionRaiz = delante.length;
+  const resto = cuerpoLimpio.slice(posicionRaiz);
   const raizEncontrada = RAICES.map((raiz, idx) => ({ raiz, n: idx + 1 }))
     .sort((a, b) => b.raiz.length - a.raiz.length)
-    .find(({ raiz }) => cuerpoLimpio.includes(raiz));
+    .find(({ raiz }) => resto.startsWith(raiz));
 
   if (!raizEncontrada) {
     return {
@@ -642,34 +697,84 @@ function interpretarNombre(entrada: string): ResultadoParser {
     };
   }
   const n = raizEncontrada.n;
-  const posicionRaiz = cuerpoLimpio.indexOf(raizEncontrada.raiz);
+  const locClasico = delante.match(/(\d+)-$/);
 
   // Insaturación: infijo -en- o -in- justo detrás de la raíz
   let insaturacion: InsatId = 'ninguna';
   let posInsat = 1;
-  const trasRaiz = cuerpoLimpio.slice(posicionRaiz + raizEncontrada.raiz.length);
+  const trasRaiz = resto.slice(raizEncontrada.raiz.length);
   const insat = trasRaiz.match(/^-?(\d+)?-?(en|in)/);
   if (insat) {
     insaturacion = insat[2] === 'en' ? 'doble' : 'triple';
-    posInsat = insat[1] ? Number(insat[1]) : 1;
+    if (insat[1]) posInsat = Number(insat[1]);
+    // Hallazgo 4759: forma clásica de un hidrocarburo, «2-penteno»: el localizador va delante
+    else if (funcion === 'alcano' && locClasico) posInsat = Number(locClasico[1]);
   }
 
   // Localizador clásico, delante de la raíz: 2-hexanol
-  if (!modernoLoc && funcion !== 'alcano') {
-    const clasico = cuerpoLimpio.slice(0, posicionRaiz).match(/(\d+)-$/);
-    if (clasico) posFuncion = Number(clasico[1]);
+  let funcionConLocalizador = Boolean(modernoLoc);
+  if (!modernoLoc && funcion !== 'alcano' && locClasico) {
+    posFuncion = Number(locClasico[1]);
+    funcionConLocalizador = true;
+  }
+
+  // Hallazgo 4765: «propanona», «butanona»: con 3 o 4 carbonos la cetona solo cabe en el C2
+  if (funcion === 'cetona' && !funcionConLocalizador) {
+    if (n === 3 || n === 4) posFuncion = 2;
+    else if (n > 4) {
+      return {
+        estructura: null,
+        error: `Falta el localizador de la cetona: con ${n} carbonos el C=O puede ir en varias posiciones (por ejemplo, ${raizEncontrada.raiz}an-2-ona).`,
+      };
+    }
   }
 
   // Los grupos terminales van siempre en el carbono 1
   if (FUNCION_POR_ID[funcion].terminal) posFuncion = 1;
 
+  // Localizadores que no caben en la cadena: se rechazan, no se recortan
+  if (posFuncion < 1 || posFuncion > n) {
+    return { estructura: null, error: `El localizador ${posFuncion} no existe en una cadena de ${n} carbonos.` };
+  }
+  if (insaturacion !== 'ninguna' && n >= 2 && (posInsat < 1 || posInsat > n - 1)) {
+    return {
+      estructura: null,
+      error: `El enlace múltiple no puede empezar en el carbono ${posInsat} de una cadena de ${n} carbonos.`,
+    };
+  }
+
+  const sustituyentes: Sustituyente[] = [];
+  for (const { id, posiciones } of conLocalizador) {
+    const fuera = posiciones.find((p) => p < 1 || p > n);
+    if (fuera !== undefined) {
+      return { estructura: null, error: `El localizador ${fuera} no existe en una cadena de ${n} carbonos.` };
+    }
+    posiciones.forEach((p) => sustituyentes.push({ id, pos: p }));
+  }
+
+  // Sin localizador solo se acepta lo que no admite otra posición: todo en el C1 con 1 o 2
+  // carbonos, o un alquilo único en el C2 del propano («metilpropano» = 2-metilpropano).
+  for (const { id, veces } of sinLocalizador) {
+    let pos: number | null = null;
+    if (n <= 2) pos = 1;
+    else if (n === 3 && veces === 1 && LARGO_RAMA[id] && funcion === 'alcano' && insaturacion === 'ninguna'
+      && sinLocalizador.length === 1 && conLocalizador.length === 0) pos = 2;
+    if (pos === null) {
+      return {
+        estructura: null,
+        error: `Falta el localizador de «${SUST_POR_ID[id].nombre}»: indica en qué carbono va (por ejemplo, 2-${SUST_POR_ID[id].nombre}…).`,
+      };
+    }
+    for (let k = 0; k < veces; k += 1) sustituyentes.push({ id, pos });
+  }
+
   const estructura: Estructura = {
     n,
     funcion,
-    posFuncion: Math.min(Math.max(posFuncion, 1), n),
+    posFuncion,
     insaturacion: n < 2 ? 'ninguna' : insaturacion,
     posInsat: Math.min(Math.max(posInsat, 1), Math.max(1, n - 1)),
-    sustituyentes: sustituyentes.filter((s) => s.pos >= 1 && s.pos <= n),
+    sustituyentes,
   };
 
   const errores = validar(estructura);
@@ -783,6 +888,10 @@ export default function NombradorCompuestosOrganicosPage() {
     return introducido === canonico || introducido === clasico;
   }, [resultadoInterpretado, nombreEntrada]);
 
+  // Hallazgo 4761: un nombre con la numeración coherente pero con una cadena principal que no es
+  // la más larga («2-etilbutano») no está bien formulado.
+  const cadenaMal = resultadoInterpretado?.avisos.includes(AVISO_CADENA) ?? false;
+
   const actualizar = (cambios: Partial<Estructura>) => {
     setEstructura((previa) => {
       const siguiente: Estructura = { ...previa, ...cambios };
@@ -800,15 +909,16 @@ export default function NombradorCompuestosOrganicosPage() {
     });
   };
 
+  // Hallazgo 4764: mientras el carbono tenga hidrógenos libres, otro clic añade otro igual
+  // (2,2-dimetilpropano, 1,1,1-tricloroetano); cuando ya no cabe ninguno más, el clic los quita.
+  // Sin ninguno de ese tipo, se añade siempre, para que la validación explique si no cabe.
   const alternarSustituyente = (pos: number) => {
     setEstructura((previa) => {
-      const indice = previa.sustituyentes.findIndex(
-        (s) => s.pos === pos && s.id === sustSeleccionado,
-      );
-      if (indice >= 0) {
+      const yaLleva = previa.sustituyentes.some((s) => s.pos === pos && s.id === sustSeleccionado);
+      if (yaLleva && hidrogenosEn(previa, pos) <= 0) {
         return {
           ...previa,
-          sustituyentes: previa.sustituyentes.filter((_, idx) => idx !== indice),
+          sustituyentes: previa.sustituyentes.filter((s) => !(s.pos === pos && s.id === sustSeleccionado)),
         };
       }
       return { ...previa, sustituyentes: [...previa.sustituyentes, { id: sustSeleccionado, pos }] };
@@ -963,7 +1073,9 @@ export default function NombradorCompuestosOrganicosPage() {
 
             <h2 className={styles.panelTitulo}>4. Sustituyentes</h2>
             <p className={styles.notaCampo}>
-              Elige un sustituyente y pulsa sobre el carbono donde va. Vuelve a pulsar para quitarlo.
+              Elige un sustituyente y pulsa sobre el carbono donde va. Si el carbono aún tiene
+              hidrógenos libres, otro clic añade otro igual (2,2-dimetil…); cuando ya no cabe
+              ninguno más, el siguiente clic los quita.
             </p>
             <div className={styles.chipsGrid}>
               {SUSTITUYENTES.map((s) => (
@@ -1014,7 +1126,7 @@ export default function NombradorCompuestosOrganicosPage() {
                         <button
                           type="button"
                           className={`${styles.carbono} ${esGrupo ? styles.carbonoGrupo : ''}`}
-                          aria-pressed={esGrupo}
+                          aria-pressed={susts.some((s) => s.id === sustSeleccionado)}
                           onClick={() => alternarSustituyente(pos)}
                           aria-label={`Carbono ${pos} del dibujo: añadir o quitar ${sustSeleccionado}`}
                         >
@@ -1176,7 +1288,13 @@ export default function NombradorCompuestosOrganicosPage() {
 
           {resultadoInterpretado && interpretacion.estructura && (
             <div className={styles.interpretacionResultado} aria-live="polite">
-              {nombreCoincide ? (
+              {nombreCoincide && cadenaMal ? (
+                <p className={styles.veredictoMal}>
+                  <span aria-hidden="true">✏️</span> La numeración es coherente, pero la cadena
+                  principal elegida no es la más larga, así que el nombre no es el correcto: hay que
+                  volver a buscar la cadena y nombrar desde ella.
+                </p>
+              ) : nombreCoincide ? (
                 <p className={styles.veredictoOk}>
                   <span aria-hidden="true">✅</span> El nombre está bien formulado.
                 </p>
@@ -1192,7 +1310,7 @@ export default function NombradorCompuestosOrganicosPage() {
                 <div className={styles.formulaCard}>
                   <span className={styles.formulaLabel}>Cadena principal</span>
                   <span className={styles.formulaValorPequena}>
-                    {interpretacion.estructura.n} carbonos ({RAICES[interpretacion.estructura.n - 1]}-)
+                    {`${interpretacion.estructura.n} ${interpretacion.estructura.n === 1 ? 'carbono' : 'carbonos'} (${RAICES[interpretacion.estructura.n - 1]}-)`}
                   </span>
                 </div>
                 <div className={styles.formulaCard}>
@@ -1240,7 +1358,7 @@ export default function NombradorCompuestosOrganicosPage() {
             <h3>Sí cubre</h3>
             <ul>
               <li>Cadenas abiertas de 1 a 12 carbonos</li>
-              <li>Un grupo funcional principal de los ocho más frecuentes</li>
+              <li>Un grupo funcional principal de los siete más frecuentes</li>
               <li>Un doble o un triple enlace</li>
               <li>Sustituyentes alquilo, halógenos, fenilo y nitro</li>
             </ul>
@@ -1434,10 +1552,7 @@ export default function NombradorCompuestosOrganicosPage() {
             <div className={styles.faqItem}>
               <p className={styles.faqQuestion}>¿Por dónde empiezo a numerar?</p>
               <p className={styles.faqAnswer}>
-                Por el extremo que dé el número más bajo al grupo funcional principal. Si no hay
-                grupo funcional, manda la insaturación. Si tampoco la hay, gana el conjunto de
-                localizadores de sustituyentes más bajo, comparado uno a uno. Y si sigue el empate,
-                decide el orden alfabético.
+                {RESPUESTA_FAQ_NUMERAR}
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -1456,13 +1571,14 @@ export default function NombradorCompuestosOrganicosPage() {
             </div>
             <div className={styles.faqItem}>
               <p className={styles.faqQuestion}>
-                ¿Por qué avisa cuando pongo un sustituyente en el extremo?
+                ¿Por qué avisa de que la cadena principal no es la más larga?
               </p>
               <p className={styles.faqAnswer}>
-                Porque un radical con carbonos colgando del primer o del último carbono alarga la
-                cadena en lugar de ramificarla. Si puedes recorrer más carbonos seguidos, esa es la
-                cadena principal. Es el origen del clásico «2-etilbutano», que en realidad es
-                3-metilpentano.
+                Porque un radical con carbonos puede alargar la cadena en lugar de ramificarla: si
+                cuelga más cerca de un extremo que su propio número de carbonos, recorrer la molécula
+                por él da más carbonos seguidos, y esa es la cadena principal. Pasa siempre con un
+                alquilo en el primer o el último carbono, y también con un etilo en el segundo: es el
+                origen del clásico «2-etilbutano», que en realidad es 3-metilpentano.
               </p>
             </div>
             <div className={styles.faqItem}>

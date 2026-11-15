@@ -18,9 +18,10 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor, sembrarValorAcot
  * «decan-2-one», 180 «propan-2-one».
  * Fórmulas, contando enlaces a mano (4 por carbono).
  *
- * Los casos «HALLAZGO (15/11/2026, ABIERTO)» llevan test.fail(): afirman lo correcto y hoy fallan.
- * Cuando se reparen pasarán, test.fail() los pondrá en rojo y habrá que quitarlo y cambiar
- * «ABIERTO» por «REPARADO».
+ * Los casos «HALLAZGO (15/11/2026, REPARADO)» fallaban en la inspección y se repararon el mismo
+ * día en /reparar (hallazgos 4758-4770): ya no llevan test.fail(). Se añadieron comprobaciones de
+ * control para lo que la reparación no debía romper (2-cloroetanol sigue con localizador, el
+ * tercer clic en un carbono lleno quita los sustituyentes, «pentanona» pide el localizador).
  * ════════════════════════════════════════════════════════════════════════════════════════════ */
 
 const RUTA = '/nombrador-compuestos-organicos/';
@@ -176,12 +177,11 @@ test.describe('Hallazgos de nomenclatura (inspector 15/11/2026)', () => {
     await cargar(page);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · escribe el localizador 1 que la IUPAC omite: «etan-1-ol», «metan-1-ol», «1-clorometano», y corrige «etanol»', async ({ page }) => {
+  test('HALLAZGO (15/11/2026, REPARADO) · escribe el localizador 1 que la IUPAC omite: «etan-1-ol», «metan-1-ol», «1-clorometano», y corrige «etanol»', async ({ page }) => {
     // PubChem (NLM): CID 702 «ethanol», 887 «methanol», 6327 «chloromethane», 6341 «ethanamine».
     // Con 1 o 2 carbonos y un solo sustituyente no hay otra posición: el localizador no se escribe.
     // Hoy: «etan-1-ol» (y forma clásica «1-etanol»), «metan-1-ol», «1-clorometano», y el corrector
     // responde a «etanol» que «el nombre correcto es etan-1-ol».
-    test.fail();
     await sembrarValor(page, LONGITUD, 2);
     await expect.soft(nombreIupac(page), '2 C con OH').toHaveText('etanol', RAPIDO);
     await sembrarValor(page, LONGITUD, 1);
@@ -196,9 +196,16 @@ test.describe('Hallazgos de nomenclatura (inspector 15/11/2026)', () => {
       await interpretar(page, nombre);
       await expect.soft(respuesta(page), nombre).toContainText(BIEN, RAPIDO);
     }
+    // Control: con dos grupos en el etano el localizador sí hace falta (P-14.3.4.2 solo lo omite
+    // cuando hay un único grupo): 2-cloroetan-1-ol, y el de un carbono con dos cloros, sin números.
+    await interpretar(page, '2-cloroetan-1-ol');
+    await expect(respuesta(page)).toContainText(BIEN);
+    await interpretar(page, 'diclorometano');
+    await expect(respuesta(page)).toContainText(BIEN);
+    await expect(tarjeta(respuesta(page), 'Fórmula molecular')).toHaveText('CH₂Cl₂');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · «2-penteno», la forma clásica que la propia app da al pent-2-eno, se «corrige» a pent-1-eno', async ({ page }) => {
+  test('HALLAZGO (15/11/2026, REPARADO) · «2-penteno», la forma clásica que la propia app da al pent-2-eno, se «corrige» a pent-1-eno', async ({ page }) => {
     // 5 C con el doble enlace entre C2 y C3: pent-2-eno, y la app muestra como forma clásica
     // «2-penteno». El corrector lee el localizador clásico delante de la raíz solo para los grupos
     // funcionales (2-hexanol), no para el infijo -en-/-in-: hoy «2-penteno» → «el nombre correcto
@@ -209,8 +216,6 @@ test.describe('Hallazgos de nomenclatura (inspector 15/11/2026)', () => {
     await pulsar(page, 'C2–C3');
     await expect(nombreIupac(page)).toHaveText('pent-2-eno');
     await expect(clasico(page)).toHaveText('2-penteno');
-
-    test.fail();
     await abrirInterpretar(page);
     await interpretar(page, '2-penteno');
     await expect.soft(tarjeta(respuesta(page), 'Fórmula semidesarrollada'), '2-penteno').toHaveText('CH₃—CH=CH—CH₂—CH₃', RAPIDO);
@@ -219,13 +224,12 @@ test.describe('Hallazgos de nomenclatura (inspector 15/11/2026)', () => {
     await expect.soft(tarjeta(respuesta(page), 'Fórmula semidesarrollada'), '2-buteno').toHaveText('CH₃—CH=CH—CH₃', RAPIDO);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · la raíz se busca como subcadena: «etanonitrilo» y «decanonitrilo» salen nonanonitrilo, «2-decanona» da error', async ({ page }) => {
+  test('HALLAZGO (15/11/2026, REPARADO) · la raíz se busca como subcadena: «etanonitrilo» y «decanonitrilo» salen nonanonitrilo, «2-decanona» da error', async ({ page }) => {
     // «etanonitrilo» y «decanonitrilo» contienen «non» (eta-NON-itrilo), que se prueba antes que
     // «et» y «dec». Esperado: etanonitrilo = CH₃—C≡N, 2 C, C₂H₃N; decanonitrilo = 10 C, C₁₀H₁₉N
     // (H = 0 + 8·2 + 3); 2-decanona = decan-2-ona en forma clásica (PubChem CID 12741), C₁₀H₂₀O.
     // Hoy: las dos primeras «el nombre correcto es nonanonitrilo» (9 C, C₉H₁₇N) y la tercera
     // «Una cetona no puede estar en un carbono terminal».
-    test.fail();
     await abrirInterpretar(page);
     await interpretar(page, 'etanonitrilo');
     await expect.soft(tarjeta(respuesta(page), 'Cadena principal'), 'etanonitrilo').toHaveText('2 carbonos (et-)', RAPIDO);
@@ -238,13 +242,12 @@ test.describe('Hallazgos de nomenclatura (inspector 15/11/2026)', () => {
     await expect.soft(tarjeta(respuesta(page), 'Fórmula molecular'), '2-decanona').toHaveText('C₁₀H₂₀O', RAPIDO);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · «2-etilbutano» sale bien formulado, y la propia FAQ lo pone de ejemplo de nombre mal elegido', async ({ page }) => {
+  test('HALLAZGO (15/11/2026, REPARADO) · «2-etilbutano» sale bien formulado, y la propia FAQ lo pone de ejemplo de nombre mal elegido', async ({ page }) => {
     // FAQ de la app: «¿Por qué está mal el nombre 2-etilbutano? … la cadena principal es un pentano
     // y el nombre correcto es 3-metilpentano». IUPAC (Brief Guide §6 f.1): la cadena con más
     // átomos manda. El etilo en el C2 de un butano da 5 C seguidos. El aviso de la app solo mira
     // los extremos (C1 y Cn), así que no salta. Hoy: constructor «2-etilbutano» sin aviso, y el
     // corrector «✅ El nombre está bien formulado».
-    test.fail();
     await sembrarValor(page, LONGITUD, 4);
     await pulsar(page, 'Ninguno (hidrocarburo)');
     await pulsar(page, 'etil');
@@ -256,15 +259,18 @@ test.describe('Hallazgos de nomenclatura (inspector 15/11/2026)', () => {
     await abrirInterpretar(page);
     await interpretar(page, '2-etilbutano');
     await expect.soft(respuesta(page), '2-etilbutano').not.toContainText(BIEN, RAPIDO);
+    // Control: el nombre correcto pasa sin aviso.
+    await interpretar(page, '3-metilpentano');
+    await expect(respuesta(page)).toContainText(BIEN);
+    await expect(respuesta(page)).not.toContainText('cadena principal');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · lo que el corrector no entiende lo descarta en silencio: «clorometano» → metano, «metilpropano» → propano', async ({ page }) => {
+  test('HALLAZGO (15/11/2026, REPARADO) · lo que el corrector no entiende lo descarta en silencio: «clorometano» → metano, «metilpropano» → propano', async ({ page }) => {
     // El patrón de sustituyentes exige localizador: sin él, el prefijo se ignora; un localizador
     // que no cabe en la cadena se filtra; el del sufijo se recorta a n. Y aun así responde «Se
     // entiende a qué molécula te refieres». Esperado: clorometano CH₃Cl (PubChem CID 6327);
     // metilpropano = 2-metilpropano C₄H₁₀ (CID 6360); «7-metilhexano» y «pentan-6-ol» no tienen
     // ese carbono: se rechazan. Hoy: metano (CH₄), propano (C₃H₈), hexano y pentan-1-ol.
-    test.fail();
     await abrirInterpretar(page);
     await interpretar(page, 'clorometano');
     await expect.soft(tarjeta(respuesta(page), 'Fórmula molecular'), 'clorometano').toHaveText('CH₃Cl', RAPIDO);
@@ -276,21 +282,20 @@ test.describe('Hallazgos de nomenclatura (inspector 15/11/2026)', () => {
     await expect.soft(errorInterpretacion(page), 'pentan-6-ol').toBeVisible(RAPIDO);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · la forma clásica con sustituyentes pierde el guion («4-metil2-hexanol») y el corrector rechaza la bien escrita', async ({ page }) => {
+  test('HALLAZGO (15/11/2026, REPARADO) · la forma clásica con sustituyentes pierde el guion («4-metil2-hexanol») y el corrector rechaza la bien escrita', async ({ page }) => {
     // Forma clásica de 4-metilhexan-2-ol: 4-metil-2-hexanol (los localizadores se separan de las
     // letras con guion). Hoy: «4-metil2-hexanol», y el corrector responde a «4-metil-2-hexanol»
     // que «el nombre correcto es 4-metilhexan-2-ol», mientras da por bueno «2-hexanol».
     await pulsar(page, 'metil');
     await carbono(page, 3);
     await expect(nombreIupac(page)).toHaveText('4-metilhexan-2-ol');
-    test.fail();
     await expect.soft(clasico(page)).toHaveText('4-metil-2-hexanol', RAPIDO);
     await abrirInterpretar(page);
     await interpretar(page, '4-metil-2-hexanol');
     await expect.soft(respuesta(page)).toContainText(BIEN, RAPIDO);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · el constructor no deja poner dos sustituyentes iguales en un carbono: 2,2-dimetilpropano no se puede montar', async ({ page }) => {
+  test('HALLAZGO (15/11/2026, REPARADO) · el constructor no deja poner dos sustituyentes iguales en un carbono: 2,2-dimetilpropano no se puede montar', async ({ page }) => {
     // El C2 del propano tiene dos H libres. Pulsarlo dos veces con «metil» debería dar
     // 2,2-dimetilpropano (C₅H₁₂), que el corrector sí entiende; hoy el segundo clic QUITA el
     // primero y queda «propano». Tampoco 2,2,4-trimetilpentano ni 1,1,1-tricloroetano.
@@ -299,20 +304,27 @@ test.describe('Hallazgos de nomenclatura (inspector 15/11/2026)', () => {
     await pulsar(page, 'metil');
     await carbono(page, 2);
     await expect(nombreIupac(page)).toHaveText('2-metilpropano');
-    test.fail();
     await carbono(page, 2);
     await expect(nombreIupac(page)).toHaveText('2,2-dimetilpropano', RAPIDO);
+    await expect(tarjeta(resultado(page), 'Fórmula molecular')).toHaveText('C₅H₁₂');
+    // Control: el C2 ya no tiene hidrógenos libres; el tercer clic quita los dos metilos.
+    await carbono(page, 2);
+    await expect(nombreIupac(page)).toHaveText('propano');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · «propanona» da «Una cetona no puede estar en un carbono terminal»', async ({ page }) => {
+  test('HALLAZGO (15/11/2026, REPARADO) · «propanona» da «Una cetona no puede estar en un carbono terminal»', async ({ page }) => {
     // Con 3 C la única cetona posible es la del C2 (propan-2-ona, PubChem CID 180). El corrector
     // toma el C1 por defecto y acusa al alumno de algo que no escribió. Esperado: que la entienda
     // (y, si exige el localizador, que corrija a propan-2-ona). Igual «butanona».
-    test.fail();
     await abrirInterpretar(page);
     await interpretar(page, 'propanona');
     await expect.soft(errorInterpretacion(page)).toHaveCount(0, RAPIDO);
     await expect.soft(tarjeta(respuesta(page), 'Fórmula molecular')).toHaveText('C₃H₆O', RAPIDO);
+    await interpretar(page, 'butanona');
+    await expect(tarjeta(respuesta(page), 'Fórmula molecular')).toHaveText('C₄H₈O');
+    // Control: con 5 carbonos el C=O cabe en el C2 o en el C3: sin localizador se pide.
+    await interpretar(page, 'pentanona');
+    await expect(errorInterpretacion(page)).toContainText('Falta el localizador de la cetona');
   });
 });
 
@@ -321,7 +333,7 @@ test.describe('Textos y accesibilidad (inspector 15/11/2026)', () => {
     await cargar(page);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · aria-pressed de los carbonos marca el del grupo funcional, no si lleva el sustituyente', async ({ page }) => {
+  test('HALLAZGO (15/11/2026, REPARADO) · aria-pressed de los carbonos marca el del grupo funcional, no si lleva el sustituyente', async ({ page }) => {
     // El botón añade o quita el sustituyente seleccionado («Carbono 5 del dibujo: añadir o quitar
     // metil»), pero su aria-pressed dice si es el carbono del grupo funcional. Por defecto (OH en el
     // C5, sin sustituyentes) el lector anuncia «pulsado» en el C5; tras poner un metilo en el C3,
@@ -331,12 +343,11 @@ test.describe('Textos y accesibilidad (inspector 15/11/2026)', () => {
     await pulsar(page, 'metil');
     await carbono(page, 3);
     await expect(nombreIupac(page)).toHaveText('4-metilhexan-2-ol');
-    test.fail();
     await expect.soft(c5).not.toHaveAttribute('aria-pressed', 'true', RAPIDO);
     await expect.soft(c3).toHaveAttribute('aria-pressed', 'true', RAPIDO);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · el desempate alfabético dice «el bromoo recibe el número más bajo»', async ({ page }) => {
+  test('HALLAZGO (15/11/2026, REPARADO) · el desempate alfabético dice «el bromoo recibe el número más bajo»', async ({ page }) => {
     // El motivo pega una «o» a la clave alfabética («metil» → «metilo»), y con los halógenos y el
     // nitro sale «bromoo», «cloroo», «fluoroo», «yodoo», «nitroo».
     await sembrarValor(page, LONGITUD, 5);
@@ -347,21 +358,19 @@ test.describe('Textos y accesibilidad (inspector 15/11/2026)', () => {
     await carbono(page, 4);
     // {2,4} contra {2,4}: decide el bromo, que va antes → 2-bromo-4-cloropentano
     await expect(nombreIupac(page)).toHaveText('2-bromo-4-cloropentano');
-    test.fail();
     await expect(resultado(page)).not.toContainText('bromoo', RAPIDO);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · «1 carbonos (met-)» en el corrector', async ({ page }) => {
+  test('HALLAZGO (15/11/2026, REPARADO) · «1 carbonos (met-)» en el corrector', async ({ page }) => {
     // Metanal (HCHO, sin localizador también para la app): la tarjeta «Cadena principal» dice
     // «1 carbonos». Esperado: «1 carbono (met-)».
     await abrirInterpretar(page);
     await interpretar(page, 'metanal');
     await expect(respuesta(page)).toContainText(BIEN);
-    test.fail();
     await expect(tarjeta(respuesta(page), 'Cadena principal')).toHaveText('1 carbono (met-)', RAPIDO);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · «ocho grupos funcionales» y la app tiene siete más «Ninguno (hidrocarburo)»', async ({ page }) => {
+  test('HALLAZGO (15/11/2026, REPARADO) · «ocho grupos funcionales» y la app tiene siete más «Ninguno (hidrocarburo)»', async ({ page }) => {
     // featureList: «Ocho grupos funcionales con su orden de prioridad…»; «Hasta dónde llega»: «Un
     // grupo funcional principal de los ocho más frecuentes». Los botones del paso 2 son ácido,
     // amida, nitrilo, aldehído, cetona, alcohol, amina y «Ninguno (hidrocarburo)»: siete grupos.
@@ -374,12 +383,11 @@ test.describe('Textos y accesibilidad (inspector 15/11/2026)', () => {
     expect(funcionales).toHaveLength(7);
     const cuerpo = (await page.locator('body').textContent()) ?? '';
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
-    test.fail();
     expect.soft(/de los ocho más frecuentes/.test(cuerpo), 'bloque «Hasta dónde llega»').toBe(false);
     expect.soft(/Ocho grupos funcionales/.test(ld), 'featureList del JSON-LD').toBe(false);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · «¿Por dónde se empieza a numerar?» está en las dos FAQ con respuestas distintas', async ({ page }) => {
+  test('HALLAZGO (15/11/2026, REPARADO) · «¿Por dónde se empieza a numerar?» está en las dos FAQ con respuestas distintas', async ({ page }) => {
     // FAQPage: «¿Por dónde se empieza a numerar la cadena principal?»; FAQ visible: «¿Por dónde
     // empiezo a numerar?», con una respuesta que resume la otra. Una sola constante (check:faq-unica).
     interface Pregunta { name: string; acceptedAnswer: { text: string } }
@@ -392,7 +400,6 @@ test.describe('Textos y accesibilidad (inspector 15/11/2026)', () => {
       .locator('xpath=following-sibling::p[1]')
       .textContent();
     const normal = (t: string | null): string => (t ?? '').replace(/\s+/g, ' ').trim();
-    test.fail();
     expect(normal(visible)).toBe(normal(ld));
   });
 });

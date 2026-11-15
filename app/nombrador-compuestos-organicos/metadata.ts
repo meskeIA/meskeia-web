@@ -49,7 +49,7 @@ export const jsonLd = generateWebAppSchema({
     'Nombre IUPAC moderno (hexan-2-ol) y variante clásica (2-hexanol)',
     'Fórmula molecular y fórmula semidesarrollada generadas a la vez',
     'Corrector inverso: escribe un nombre y señala si la numeración o la cadena principal están mal',
-    'Ocho grupos funcionales con su orden de prioridad y doce sustituyentes frecuentes',
+    'Siete grupos funcionales con su orden de prioridad y doce sustituyentes frecuentes',
     'Detecta carbonos sin enlaces libres y avisa antes de nombrar',
     'Funciona 100% en el navegador, sin registro ni instalación',
   ],
@@ -62,6 +62,11 @@ export const jsonLd = generateWebAppSchema({
 export const RESPUESTA_FAQ_HEXAN_2_OL =
   'Las dos formas designan el mismo compuesto y se entienden igual. Hexan-2-ol es la forma recomendada por la IUPAC desde 2013: el localizador se coloca justo delante del sufijo al que se refiere, lo que evita ambigüedades en moléculas con varios grupos. La forma 2-hexanol es la clásica, agrupa todos los localizadores al principio y sigue siendo mayoritaria en muchos libros de texto de España y América Latina, así que conviene reconocer ambas. Esta herramienta muestra las dos cuando existen.';
 
+// Hallazgo 4770 (15/11/2026): la pregunta de por dónde se numera estaba en las dos FAQ con dos
+// redacciones (la visible resumía esta). Una sola respuesta para las dos.
+export const RESPUESTA_FAQ_NUMERAR =
+  'Se numera por el extremo que dé el localizador más bajo al grupo funcional principal. Si no hay grupo funcional con sufijo, manda la insaturación: el doble o triple enlace debe recibir el número más bajo. Si tampoco hay insaturación, se elige el sentido que dé el conjunto de localizadores más bajo a los sustituyentes, comparándolos uno a uno. Y si aun así hay empate, gana el sentido que dé el número menor al sustituyente que va antes por orden alfabético.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -71,7 +76,7 @@ export const faqJsonLd = {
       name: '¿Por dónde se empieza a numerar la cadena principal?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Se numera por el extremo que dé el localizador más bajo al grupo funcional principal. Si no hay grupo funcional con sufijo, manda la insaturación: el doble o triple enlace debe recibir el número más bajo. Si tampoco hay insaturación, se elige el sentido que dé el conjunto de localizadores más bajo a los sustituyentes, comparándolos uno a uno. Y si aun así hay empate, gana el sentido que dé el número menor al sustituyente que va antes por orden alfabético.',
+        text: RESPUESTA_FAQ_NUMERAR,
       },
     },
     {
