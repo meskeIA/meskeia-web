@@ -291,6 +291,25 @@ const ajusteDe = (acentuacion: Acentuacion): number =>
   acentuacion === 'aguda' ? 1 : acentuacion === 'esdrujula' ? -1 : 0;
 
 /**
+ * ── La sobresdrújula final resta DOS (cabo C0562, 15/11/2026) ────────────────────────────
+ * La medida del verso termina en el último acento, y lo que sigue a la tónica vale por un solo
+ * tiempo: «la pausa que sigue al acento final tiene la virtud de equivaler a un tiempo […] La
+ * medida del verso termina en el último acento» (Robles Dégano, Ortología, pp. 94-96, citado por
+ * J. Domínguez Caparrós, «Teoría métrica del verso esdrújulo», Rhythmica XII, 2014, p. 85, n. 69).
+ * De ahí salen los tres casos de siempre —aguda +1, llana ±0, esdrújula −1— y el cuarto: la
+ * sobresdrújula lleva tres sílabas tras la tónica, que valen por una, así que resta 2. Antes se
+ * rotulaba esdrújula y restaba 1: «y no me lo cuentes, cuéntamelo» salía con una de más. El tipo
+ * `Acentuacion` sigue con tres valores (lo comparte diccionario-rimas, donde una sobresdrújula
+ * rima como esdrújula): aquí solo cambia la cuenta. Los adverbios en -mente siguen siendo llanos.
+ */
+const ajusteFinal = (palabra: string, silabas: string[]): { acentuacion: Acentuacion; ajuste: number } => {
+  const acentuacion = acentuacionDe(palabra, silabas);
+  if (acentuacion !== 'esdrujula') return { acentuacion, ajuste: ajusteDe(acentuacion) };
+  const postonicas = silabas.length - 1 - indiceTonica(palabra, silabas);
+  return { acentuacion, ajuste: 1 - Math.max(2, postonicas) };
+};
+
+/**
  * Índice (desde el principio) de la sílaba tónica de una palabra: la de la tilde y, sin ella,
  * la que da la acentuación. En un adverbio en -mente es -men-, no la tilde del adjetivo
  * (hallazgo 3873). Lo usa también diccionario-rimas para empezar la rima.
@@ -398,8 +417,7 @@ function escandirTramo(
     veniaFundida = funde;
   }
 
-  const acentuacion = acentuacionDe(ultima.palabra, ultima.silabas);
-  const ajuste = ajusteDe(acentuacion);
+  const { acentuacion, ajuste } = ajusteFinal(ultima.palabra, ultima.silabas);
 
   return {
     silabasFoneticas,

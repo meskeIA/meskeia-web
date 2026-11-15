@@ -2463,6 +2463,35 @@ test.describe('contador-silabas · Inspector 01/11/2026 (octava inspección)', (
     });
   });
 
+  test('C0562 (reparado) · una sobresdrújula al final del verso resta dos, no una', async ({ page }) => {
+    // REPARADO, cabo C0562 (15/11/2026). La medida del verso termina en el último acento y lo que
+    // sigue vale por un tiempo (Robles Dégano, citado por Domínguez Caparrós, Rhythmica XII, 2014,
+    // p. 85): aguda +1, llana ±0, esdrújula −1 y sobresdrújula −2. Antes la sobresdrújula se
+    // rotulaba esdrújula y restaba 1.
+    //   «y no me lo cuentes, cuéntamelo»  y(1) no(1) me(1) lo(1) cuen-tes(2) cuén-ta-me-lo(4) = 10,
+    //       sin contactos vocálicos; último acento en la 7.ª (cuén) → 7 + 1 = 8, octosílabo.
+    //       Salía 10 − 1 «(última palabra esdrújula)» = 9.
+    //   Control, esdrújula: «y no me lo cuentes, cuéntalo»  y(1) no(1) me(1) lo(1) cuen-tes(2)
+    //       cuén-ta-lo(3) = 9, último acento en la 7.ª → 9 − 1 = 8, con «− 1».
+    await analizarTexto(page, 'y no me lo cuentes, cuéntamelo\ny no me lo cuentes, cuéntalo');
+    const medidas = await versos(page, 2);
+    const desgloses = [await desgloseDe(page, 0).innerText(), await desgloseDe(page, 1).innerText()];
+    expect({
+      medidas,
+      sobresdrujula: desgloses[0].includes('− 2 (última palabra sobresdrújula)'),
+      esdrujula: desgloses[1].includes('− 1 (última palabra esdrújula)'),
+    }).toEqual({
+      medidas: [
+        { m: '8', sinalefas: 0 },
+        { m: '8', sinalefas: 0 },
+      ],
+      sobresdrujula: true,
+      esdrujula: true,
+    });
+    // El motor, sin la vista
+    expect(analizarVerso('y no me lo cuentes, cuéntamelo')?.silabasMetricas).toBe(8);
+  });
+
   test('HALLAZGO 3875 (reparado) · un plural agudo en consonante + s («robots», «complots») se toma por llano', async ({
     page,
   }) => {

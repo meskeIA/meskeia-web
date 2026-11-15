@@ -410,13 +410,15 @@ sabañón garrafal, morado y frito.`,
                         )}
                         {v.cesura && v.cesura.ajustePrimero !== 0 && (
                           <span className={styles.versoOperando}>
-                            {v.cesura.ajustePrimero > 0 ? '+ 1' : '− 1'} (primer hemistiquio{' '}
-                            {v.cesura.acentuacionPrimero === 'esdrujula' ? 'esdrújulo' : 'agudo'})
+                            {v.cesura.ajustePrimero > 0 ? '+ 1' : `− ${-v.cesura.ajustePrimero}`} (primer hemistiquio{' '}
+                            {v.cesura.acentuacionPrimero === 'esdrujula'
+                              ? v.cesura.ajustePrimero < -1 ? 'sobresdrújulo' : 'esdrújulo'
+                              : 'agudo'})
                           </span>
                         )}
                         <span className={styles.versoOperando}>
-                          {v.ajuste > 0 ? '+ 1' : v.ajuste < 0 ? '− 1' : '± 0'} (última palabra{' '}
-                          {v.acentuacion === 'esdrujula' ? 'esdrújula' : v.acentuacion})
+                          {v.ajuste > 0 ? '+ 1' : v.ajuste < 0 ? `− ${-v.ajuste}` : '± 0'} (última palabra{' '}
+                          {v.acentuacion === 'esdrujula' ? (v.ajuste < -1 ? 'sobresdrújula' : 'esdrújula') : v.acentuacion})
                         </span>
                         <span className={styles.versoIgual}>= {v.silabasMetricas}</span>
                       </div>
@@ -817,7 +819,7 @@ sabañón garrafal, morado y frito.`,
               <span className={styles.eduPasoNum}>4</span>
               <div>
                 <strong>Comprueba el ajuste por la sílaba final tónica</strong>
-                <p>El cómputo aplica solo la regla del acento final: aguda (+1), llana (±0) o esdrújula (−1). La herramienta indica cuál ha detectado, para que puedas verificarlo si la última palabra es ambigua.</p>
+                <p>El cómputo aplica solo la regla del acento final: aguda (+1), llana (±0), esdrújula (−1) o sobresdrújula (−2), porque lo que sigue a la última tónica vale por una sola sílaba. La herramienta indica cuál ha detectado, para que puedas verificarlo si la última palabra es ambigua.</p>
               </div>
             </li>
             <li className={styles.eduPaso}>
