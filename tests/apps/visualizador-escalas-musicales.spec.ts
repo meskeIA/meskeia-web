@@ -260,7 +260,7 @@ test.describe('S0177 · escuchar la escala', () => {
     await expect(botonEscuchar(page)).toHaveText(/Escuchar la escala/);
   });
 
-  test('cada ficha suena sola a su altura: La pentatónica menor, I = 440 y III = Do5', async ({ page }) => {
+  test('cada ficha suena sola a su altura: La pentatónica menor, 1 = 440 y ♭3 = Do5', async ({ page }) => {
     await elegirRaiz(page, 'A (La)');
     await elegirEscala(page, 'Pentatónica menor');
     await expect(fichas(page)).toHaveCount(5);
@@ -270,8 +270,10 @@ test.describe('S0177 · escuchar la escala', () => {
     await fichas(page).nth(1).click();
     await expect(fichas(page).nth(1)).toHaveAttribute('data-sonando', 'true');
     expect(await frecuencias(page)).toEqual([440, 523.25]);
-    // La ficha se anuncia como botón que suena, con lo que se ve escrito
-    await expect(fichas(page).nth(0)).toHaveAccessibleName(/Escuchar I A La/);
+    // La ficha se anuncia como botón que suena, con lo que se ve escrito. Desde el hallazgo 4808
+    // el grado de una pentatónica es su intervalo (1, ♭3…), no el romano de su posición.
+    await expect(fichas(page).nth(0)).toHaveAccessibleName(/Escuchar 1 A La/);
+    await expect(fichas(page).nth(1)).toHaveAccessibleName(/Escuchar ♭3 C Do/);
   });
 
   test('cambiar de escala mientras suena la calla', async ({ page }) => {
@@ -452,67 +454,89 @@ test.describe('Inspector 15/11/2026 · caso 2 (límite) en el mástil', () => {
 });
 
 /**
- * HALLAZGO (15/11/2026, ABIERTO) · el deletreo. Las alturas son correctas (lo prueban las
- * frecuencias de arriba), pero la app nombra todas las notas con sostenidos y rompe la regla de
- * una letra por nota: Fa mayor sale con La# en vez de Si♭, Fa# mayor con Fa en vez de Mi#, y
- * la tabla y el texto de la propia app (Blues «Mib», frigio «2ª bemol») la contradicen.
+ * HALLAZGO 4806 (15/11/2026, REPARADO el mismo día) · el deletreo. Las alturas eran correctas
+ * (lo prueban las frecuencias de arriba), pero la app nombraba todas las notas con sostenidos y
+ * rompía la regla de una letra por nota: Fa mayor salía con La# en vez de Si♭, Fa# mayor con Fa
+ * en vez de Mi#. Ahora cada nota toma la letra de su grado (deletreo.ts) y una tónica en tecla
+ * negra se escribe con la grafía de menos alteraciones, o la que se elija.
  */
-test.describe('Inspector 15/11/2026 · HALLAZGO ABIERTO: deletreo enarmónico', () => {
+test.describe('Inspector 15/11/2026 · REPARADO: deletreo enarmónico (hallazgo 4806)', () => {
   async function letrasDe(page: Page, raiz: string, escala: string) {
     await elegirRaiz(page, raiz);
     await elegirEscala(page, escala);
     return (await nombresFichas(page)).map(letraDe);
   }
 
-  test('ABIERTO · Fa mayor lleva Si♭ (IV) y no La#; su acorde IV es Si♭', async ({ page }) => {
-    test.fail();
+  test('Fa mayor lleva Si♭ (IV) y no La#; su acorde IV es Si♭', async ({ page }) => {
     const letras = await letrasDe(page, 'F (Fa)', 'Mayor');
-    expect(new Set(letras).size).toBe(7); // hoy: F G A A C D E — la A dos veces
+    expect(new Set(letras).size).toBe(7); // antes: F G A A C D E — la A dos veces
     expect(letras[3]).toBe('B');
-    expect(letraDe((await nombresAcordes(page))[3])).toBe('B'); // hoy: «A#»
+    expect(await nombresFichas(page)).toEqual(['F', 'G', 'A', 'B♭', 'C', 'D', 'E']);
+    expect(await nombresAcordes(page)).toEqual(['F', 'Gm', 'Am', 'B♭', 'C', 'Dm', 'E°']);
   });
 
-  test('ABIERTO · Fa# mayor lleva Mi# (VII) y no Fa', async ({ page }) => {
-    test.fail();
+  test('Fa# mayor lleva Mi# (VII) y no Fa', async ({ page }) => {
     const letras = await letrasDe(page, 'F# (Fa#)', 'Mayor');
-    expect(new Set(letras).size).toBe(7); // hoy: F# … F — la F dos veces
+    expect(new Set(letras).size).toBe(7); // antes: F# … F — la F dos veces
     expect(letras[6]).toBe('E');
+    expect((await nombresFichas(page))[6]).toBe('E#');
   });
 
-  test('ABIERTO · Do# menor armónica lleva Si# (VII) y no Do', async ({ page }) => {
-    test.fail();
+  test('Do# menor armónica lleva Si# (VII) y no Do', async ({ page }) => {
     const letras = await letrasDe(page, 'C# (Do#)', 'Menor armónica');
-    expect(new Set(letras).size).toBe(7); // hoy: C# … C
+    expect(new Set(letras).size).toBe(7); // antes: C# … C
     expect(letras[6]).toBe('B');
   });
 
-  test('ABIERTO · el blues de La lleva Mi♭, como dice la tabla de la propia app, y no Re#', async ({ page }) => {
-    test.fail();
+  test('el blues de La lleva Mi♭, como dice la tabla de la propia app, y no Re#', async ({ page }) => {
     const letras = await letrasDe(page, 'A (La)', 'Blues');
-    expect(letras[3]).toBe('E'); // hoy: D# (Re#)
+    expect(letras[3]).toBe('E'); // antes: D# (Re#)
+    expect(await nombresFichas(page)).toEqual(['A', 'C', 'D', 'E♭', 'E', 'G']);
   });
 
-  test('ABIERTO · La frigio lleva Si♭ («la 2ª bemol») y no La#', async ({ page }) => {
-    test.fail();
+  test('La frigio lleva Si♭ («la 2ª bemol») y no La#', async ({ page }) => {
     const letras = await letrasDe(page, 'A (La)', 'Frigio');
     expect(new Set(letras).size).toBe(7);
-    expect(letras[1]).toBe('B'); // hoy: A# (La#)
+    expect(letras[1]).toBe('B'); // antes: A# (La#)
+  });
+
+  test('la tecla de La#/Si♭ en mayor se escribe Si♭ mayor, y se puede pedir como La#', async ({ page }) => {
+    await elegirRaiz(page, 'A# (La#)');
+    await elegirEscala(page, 'Mayor');
+    await expect(page.getByRole('heading', { level: 2, name: 'B♭ Mayor' })).toBeVisible();
+    expect(await nombresFichas(page)).toEqual(['B♭', 'C', 'D', 'E♭', 'F', 'G', 'A']);
+    const grafia = page.getByRole('group', { name: 'Escribir la tónica como' });
+    await expect(grafia.getByRole('button', { name: 'B♭ · Si♭' })).toHaveAttribute('aria-pressed', 'true');
+    await grafia.getByRole('button', { name: 'A# · La#' }).click();
+    expect(await nombresFichas(page)).toEqual(['A#', 'B#', 'C##', 'D#', 'E#', 'F##', 'G##']);
+  });
+
+  test('con una tónica en tecla blanca no se ofrece elegir grafía', async ({ page }) => {
+    await elegirRaiz(page, 'D (Re)');
+    await expect(page.getByRole('group', { name: 'Escribir la tónica como' })).toBeHidden();
   });
 });
 
 /**
- * HALLAZGO (15/11/2026, ABIERTO) · los grados de la pentatónica. La FAQ de la app dice que la
- * pentatónica menor es «1, b3, 4, 5, b7»; las fichas la numeran por posición (I II III IV V), de
- * modo que el Sol de La pentatónica menor sale como «V» y el Mi, la quinta, como «IV».
+ * HALLAZGO 4808 (15/11/2026, REPARADO el mismo día) · los grados de la pentatónica. La FAQ de
+ * la app dice que la pentatónica menor es «1, b3, 4, 5, b7»; las fichas la numeraban por
+ * posición (I II III IV V). Ahora en las escalas de cinco y seis notas el grado es el intervalo
+ * respecto a la mayor.
  */
-test('Inspector 15/11/2026 · ABIERTO · La pentatónica menor: el Do es una tercera y el Sol una séptima', async ({ page }) => {
-  test.fail();
+test('Inspector 15/11/2026 · REPARADO · La pentatónica menor: el Do es una tercera y el Sol una séptima', async ({ page }) => {
   await elegirRaiz(page, 'A (La)');
   await elegirEscala(page, 'Pentatónica menor');
   const grados = await gradosFichas(page);
-  expect(grados[1]).toMatch(/(3|III)$/); // hoy: «II»
-  expect(grados[3]).toMatch(/^(5|V)$/); // hoy: «IV»
-  expect(grados[4]).toMatch(/(7|VII)$/); // hoy: «V»
+  expect(grados[1]).toMatch(/(3|III)$/); // antes: «II»
+  expect(grados[3]).toMatch(/^(5|V)$/); // antes: «IV»
+  expect(grados[4]).toMatch(/(7|VII)$/); // antes: «V»
+  expect(grados).toEqual(['1', '♭3', '4', '5', '♭7']);
+});
+
+test('Inspector 15/11/2026 · REPARADO · el blues de La numera la blue note como ♭5', async ({ page }) => {
+  await elegirRaiz(page, 'A (La)');
+  await elegirEscala(page, 'Blues');
+  expect(await gradosFichas(page)).toEqual(['1', '♭3', '4', '♭5', '5', '♭7']);
 });
 
 /**
@@ -574,18 +598,17 @@ test.describe('Inspector 15/11/2026 · accesibilidad de los selectores (cabos C0
     await expect(grupo.getByRole('button')).toHaveCount(12);
   });
 
-  test('C0497 · ABIERTO · la etiqueta «Nota raíz» rotula algo (hoy apunta a un id que no existe)', async ({ page }) => {
-    test.fail();
+  test('C0497 · REPARADO (hallazgo 4809) · la etiqueta «Nota raíz» rotula el grupo de raíces', async ({ page }) => {
+    await expect(page.getByRole('group', { name: 'Nota raíz', exact: true }).getByRole('button')).toHaveCount(12);
     const huerfanas = await page.locator('main label').evaluateAll((labels) =>
       (labels as HTMLLabelElement[])
         .filter((l) => !l.control && !(l.id && document.querySelector(`[aria-labelledby~="${l.id}"]`)))
         .map((l) => `${(l.textContent ?? '').trim()} → for="${l.htmlFor}"`),
     );
-    expect(huerfanas).toEqual([]); // hoy: ['Nota raíz → for="nota-raiz"']
+    expect(huerfanas).toEqual([]); // antes: ['Nota raíz → for="nota-raiz"']
   });
 
-  test('ABIERTO · la lista estática «Errores frecuentes» no es una región de alerta', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4810) · la lista estática «Errores frecuentes» no es una región de alerta', async ({ page }) => {
     await expect(page.locator('[role="alert"]', { hasText: 'Errores frecuentes al estudiar escalas' })).toHaveCount(0);
   });
 });

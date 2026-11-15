@@ -6,6 +6,16 @@ import styles from './VisualizadorEscalasMusicales.module.css';
 import { notasMidiEscala, type Recorrido } from './sonido';
 import { useSonidoEscala } from './useSonidoEscala';
 import {
+  deletrearEscala,
+  deletrearNota,
+  enarmoniaPreferida,
+  esTeclaNegra,
+  letraDeTonica,
+  letrasDeEscala,
+  nombreGrado,
+  type Enarmonia,
+} from './deletreo';
+import {
   MeskeiaLogo,
   Footer,
   EducationalSection,
@@ -21,12 +31,15 @@ import {
 interface TipoEscala {
   nombre: string;
   intervalos: number[];
+  /** Grado (0-6) de cada nota en las escalas de menos de siete; da su letra y su número. */
+  letras?: number[];
   caracter: string;
   grupo: 'basicas' | 'menores' | 'pentatonicas' | 'modos';
 }
 
 interface NotaEscala {
   nombre: string;
+  nombreEs: string;
   grado: string;
   indicecromatico: number;
 }
@@ -50,9 +63,9 @@ const TIPOS_ESCALA: TipoEscala[] = [
   { nombre: 'Menor natural', intervalos: [0, 2, 3, 5, 7, 8, 10], caracter: 'Oscura, melancólica, expresiva. Muy usada en baladas y rock.', grupo: 'menores' },
   { nombre: 'Menor armónica', intervalos: [0, 2, 3, 5, 7, 8, 11], caracter: 'Dramática, exótica, tensa. El intervalo aumentado le da un color oriental.', grupo: 'menores' },
   { nombre: 'Menor melódica', intervalos: [0, 2, 3, 5, 7, 9, 11], caracter: 'Fluida y sofisticada. Muy usada en jazz y música clásica contemporánea.', grupo: 'menores' },
-  { nombre: 'Pentatónica mayor', intervalos: [0, 2, 4, 7, 9], caracter: 'Simple, universal, sin tensión. Base del folk, country y blues mayor.', grupo: 'pentatonicas' },
-  { nombre: 'Pentatónica menor', intervalos: [0, 3, 5, 7, 10], caracter: 'Poderosa y versátil. La más usada en rock, blues y solos de guitarra.', grupo: 'pentatonicas' },
-  { nombre: 'Blues', intervalos: [0, 3, 5, 6, 7, 10], caracter: 'Intensa, expresiva, con blue note. Fundamental en blues, jazz y rock.', grupo: 'pentatonicas' },
+  { nombre: 'Pentatónica mayor', intervalos: [0, 2, 4, 7, 9], letras: [0, 1, 2, 4, 5], caracter: 'Simple, universal, sin tensión. Base del folk, country y blues mayor.', grupo: 'pentatonicas' },
+  { nombre: 'Pentatónica menor', intervalos: [0, 3, 5, 7, 10], letras: [0, 2, 3, 4, 6], caracter: 'Poderosa y versátil. La más usada en rock, blues y solos de guitarra.', grupo: 'pentatonicas' },
+  { nombre: 'Blues', intervalos: [0, 3, 5, 6, 7, 10], letras: [0, 2, 3, 4, 4, 6], caracter: 'Intensa, expresiva, con blue note. Fundamental en blues, jazz y rock.', grupo: 'pentatonicas' },
   { nombre: 'Dórico', intervalos: [0, 2, 3, 5, 7, 9, 10], caracter: 'Menor con 6ª mayor. Mística y moderna. Usada en jazz (So What, Miles Davis).', grupo: 'modos' },
   { nombre: 'Frigio', intervalos: [0, 1, 3, 5, 7, 8, 10], caracter: 'Oscura, flamenca, con color español. La 2ª bemol es su sello distintivo.', grupo: 'modos' },
   { nombre: 'Lidio', intervalos: [0, 2, 4, 6, 7, 9, 11], caracter: 'Etérea, onírica, fantástica. La 4ª aumentada crea un efecto flotante.', grupo: 'modos' },
@@ -105,9 +118,11 @@ interface PianoProps {
   notasActivas: Set<number>;
   /** Clase de nota (0-11) que está sonando, para iluminar su tecla; null si no suena nada. */
   notaSonando: number | null;
+  /** Nombre de cada clase de nota tal como se escribe en la escala (Si♭ en Fa mayor, no La#). */
+  nombres: Map<number, string>;
 }
 
-function PianoVisual({ notasActivas, notaSonando }: PianoProps) {
+function PianoVisual({ notasActivas, notaSonando, nombres }: PianoProps) {
   // 2 octavas = 24 semitonos, empezamos en C (Do)
   const octavas = 2;
   const blancas: { idx: number; cromatico: number }[] = [];
@@ -174,7 +189,7 @@ function PianoVisual({ notasActivas, notaSonando }: PianoProps) {
               fill="#fff"
               className={styles.teclaLabel}
             >
-              {NOTAS_CROMATICAS[tecla.cromatico]}
+              {nombres.get(tecla.cromatico) ?? NOTAS_CROMATICAS[tecla.cromatico]}
             </text>
           );
         })}
@@ -207,7 +222,7 @@ function PianoVisual({ notasActivas, notaSonando }: PianoProps) {
                   fill="#fff"
                   className={styles.teclaLabel}
                 >
-                  {NOTAS_CROMATICAS[tecla.cromatico]}
+                  {nombres.get(tecla.cromatico) ?? NOTAS_CROMATICAS[tecla.cromatico]}
                 </text>
               )}
             </g>
@@ -251,9 +266,11 @@ interface MastilProps {
   notasActivas: Set<number>;
   /** Nota tónica, que se pinta distinta: es la referencia para colocar la mano. */
   tonica: number;
+  /** Nombre de cada clase de nota tal como se escribe en la escala. */
+  nombres: Map<number, string>;
 }
 
-function MastilVisual({ afinacion, notasActivas, tonica }: MastilProps) {
+function MastilVisual({ afinacion, notasActivas, tonica, nombres }: MastilProps) {
   const anchoNut = 26;
   const anchoTraste = 44;
   const altoCuerda = 30;
@@ -360,7 +377,7 @@ function MastilVisual({ afinacion, notasActivas, tonica }: MastilProps) {
                   fill="#fff"
                   className={styles.mastilNotaLabel}
                 >
-                  {NOTAS_CROMATICAS[cromatico]}
+                  {nombres.get(cromatico) ?? NOTAS_CROMATICAS[cromatico]}
                 </text>
               </g>
             );
@@ -401,24 +418,41 @@ export default function VisualizadorEscalasMusicales() {
 
   const { tocarEscala, tocarNota, detener, gradoSonando, reproduciendo, sinAudio } = useSonidoEscala();
 
+  // Grafía de una tónica en tecla negra (Do# o Re♭); null = la de menos alteraciones en la escala
+  const [enarmoniaElegida, setEnarmoniaElegida] = useState<Enarmonia | null>(null);
+
   const escala = TIPOS_ESCALA[escalaSeleccionada];
+  const letrasEscala = letrasDeEscala(escala.intervalos, escala.letras);
+  const raizNegra = esTeclaNegra(notaRaiz);
+  const enarmonia: Enarmonia = enarmoniaElegida ?? enarmoniaPreferida(notaRaiz, escala.intervalos, letrasEscala);
 
   // Si cambia la escala o la tónica mientras suena, se calla: lo que sonara ya no sería lo que se ve
   useEffect(() => {
     detener();
   }, [notaRaiz, escalaSeleccionada, detener]);
 
-  // Notas de la escala calculadas
+  // Notas de la escala, cada una con la letra de su grado (hallazgos 4806 y 4808)
   const notasEscala: NotaEscala[] = useMemo(() => {
-    return escala.intervalos.map((intervalo, i) => {
-      const idxCromatico = (notaRaiz + intervalo) % 12;
-      return {
-        nombre: NOTAS_CROMATICAS[idxCromatico],
-        grado: GRADOS_NOMBRES[i],
-        indicecromatico: idxCromatico,
-      };
-    });
-  }, [notaRaiz, escala]);
+    const letras = letrasDeEscala(escala.intervalos, escala.letras);
+    const deletreadas = deletrearEscala(notaRaiz, escala.intervalos, letras, enarmonia);
+    return deletreadas.map((nota, i) => ({
+      nombre: nota.nombre,
+      nombreEs: nota.nombreEs,
+      grado: nombreGrado(escala.intervalos[i], letras[i], escala.intervalos.length),
+      indicecromatico: nota.pc,
+    }));
+  }, [notaRaiz, escala, enarmonia]);
+
+  const nombrePorClase = useMemo(
+    () => new Map(notasEscala.map((n) => [n.indicecromatico, n.nombre])),
+    [notasEscala],
+  );
+
+  // Las dos grafías de una tónica en tecla negra, para el conmutador
+  const grafiasTonica = (['sostenido', 'bemol'] as const).map((e) => ({
+    id: e,
+    nota: deletrearNota(letraDeTonica(notaRaiz, e), notaRaiz),
+  }));
 
   // Nota MIDI de cada grado, para que cada ficha suene a su altura dentro de la escala
   const notasMidi = useMemo(() => notasMidiEscala(notaRaiz, escala.intervalos), [notaRaiz, escala]);
@@ -536,16 +570,20 @@ export default function VisualizadorEscalasMusicales() {
         {/* Selectores */}
         <section className={styles.selectores}>
           <div className={styles.selectorGroup}>
-            <label className={styles.selectorLabel} htmlFor="nota-raiz">
+            {/* Hallazgo 4809: la etiqueta rotula el grupo por aria-labelledby (antes, htmlFor a un id inexistente) */}
+            <label id="nota-raiz-label" className={styles.selectorLabel}>
               Nota raíz
             </label>
-            <div className={styles.notasGrid} role="group" aria-label="Selecciona la nota raíz">
+            <div className={styles.notasGrid} role="group" aria-labelledby="nota-raiz-label">
               {NOTAS_CROMATICAS.map((nota, idx) => (
                 <button
                   key={nota}
                   type="button"
                   className={`${styles.notaBtn} ${notaRaiz === idx ? styles.notaBtnActiva : ''}`}
-                  onClick={() => setNotaRaiz(idx)}
+                  onClick={() => {
+                    setNotaRaiz(idx);
+                    setEnarmoniaElegida(null);
+                  }}
                   aria-pressed={notaRaiz === idx}
                   title={`${nota} (${NOMBRES_NOTAS_ES[idx]})`}
                 >
@@ -553,6 +591,29 @@ export default function VisualizadorEscalasMusicales() {
                   <span className={styles.notaBtnEs}>{NOMBRES_NOTAS_ES[idx]}</span>
                 </button>
               ))}
+            </div>
+            {/* Hallazgo 4806: una tónica en tecla negra se escribe con sostenido o con bemol
+                (Si♭ mayor, no La# mayor). Siempre montado y oculto en las blancas. */}
+            <div
+              className={styles.grupoEscala}
+              role="group"
+              aria-labelledby="grafia-tonica-label"
+              hidden={!raizNegra}
+            >
+              <span id="grafia-tonica-label" className={styles.grupoLabel}>Escribir la tónica como</span>
+              <div className={styles.escalasBtns}>
+                {grafiasTonica.map((g) => (
+                  <button
+                    key={g.id}
+                    type="button"
+                    className={`${styles.escalaBtn} ${enarmonia === g.id ? styles.escalaBtnActiva : ''}`}
+                    onClick={() => setEnarmoniaElegida(g.id)}
+                    aria-pressed={enarmonia === g.id}
+                  >
+                    {g.nota.nombre} · {g.nota.nombreEs}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -587,7 +648,7 @@ export default function VisualizadorEscalasMusicales() {
           {/* Carácter de la escala */}
           <div className={styles.caracterCard}>
             <h2 className={styles.caracterTitulo}>
-              {NOTAS_CROMATICAS[notaRaiz]} {escala.nombre}
+              {notasEscala[0].nombre} {escala.nombre}
             </h2>
             <p className={styles.caracterDesc}>{escala.caracter}</p>
           </div>
@@ -656,7 +717,7 @@ export default function VisualizadorEscalasMusicales() {
                     <span className="sr-only">Escuchar </span>
                     <span className={styles.chipGrado}>{nota.grado}</span>
                     <span className={styles.chipNombre}>{nota.nombre}</span>
-                    <span className={styles.chipNombreEs}>{NOMBRES_NOTAS_ES[nota.indicecromatico]}</span>
+                    <span className={styles.chipNombreEs}>{nota.nombreEs}</span>
                   </button>
                 </div>
               ))}
@@ -673,6 +734,7 @@ export default function VisualizadorEscalasMusicales() {
             <PianoVisual
               notasActivas={notasActivasSet}
               notaSonando={gradoSonando === null ? null : notasEscala[gradoSonando]?.indicecromatico ?? null}
+              nombres={nombrePorClase}
             />
             <p className={styles.pianoLeyenda}>
               Las teclas resaltadas en azul corresponden a las notas de la escala seleccionada (2 octavas).
@@ -700,10 +762,11 @@ export default function VisualizadorEscalasMusicales() {
               afinacion={AFINACIONES[afinacionSeleccionada]}
               notasActivas={notasActivasSet}
               tonica={notaRaiz}
+              nombres={nombrePorClase}
             />
             <p className={styles.pianoLeyenda}>
               Cada punto marca dónde pisar una nota de la escala; los destacados son la tónica
-              ({NOTAS_CROMATICAS[notaRaiz]}), que es la referencia para colocar la mano. La columna
+              ({notasEscala[0].nombre}), que es la referencia para colocar la mano. La columna
               del traste 0 son las cuerdas al aire y la cuerda más grave se dibuja abajo, como
               cuando miras el mástil tocando. En el traste 12 el patrón se repite una octava más
               agudo: por eso ahí va la doble marca.
@@ -735,7 +798,7 @@ export default function VisualizadorEscalasMusicales() {
               {escala.intervalos.map((intervalo, i) => (
                 <div key={i} className={styles.intervaloItem}>
                   <span className={styles.intervaloNum}>{intervalo}</span>
-                  <span className={styles.intervaloGrado}>{GRADOS_NOMBRES[i]}</span>
+                  <span className={styles.intervaloGrado}>{notasEscala[i].grado}</span>
                 </div>
               ))}
             </div>
@@ -829,8 +892,8 @@ export default function VisualizadorEscalasMusicales() {
             </ul>
           </div>
 
-          {/* Errores frecuentes — warningBox */}
-          <div className={styles.warningBox} role="alert">
+          {/* Errores frecuentes — warningBox. Contenido estático: sin role="alert" (hallazgo 4810) */}
+          <div className={styles.warningBox}>
             <h3 className={styles.warningTitulo}>Errores frecuentes al estudiar escalas</h3>
             <ul className={styles.warningList}>
               <li>Memorizar las notas sin entender los intervalos: si cambias la raíz no sabrás reconstruirla.</li>
