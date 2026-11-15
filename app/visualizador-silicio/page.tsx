@@ -22,6 +22,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import type { TooltipItem } from 'chart.js';
 import styles from './VisualizadorSilicio.module.css';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
 
 ChartJS.register(
   CategoryScale,
@@ -32,6 +33,8 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+ChartJS.register(PLUGIN_REDIMENSION_APLAZADA);
 
 type TipoBanda = 'conductor' | 'semiconductor' | 'aislante';
 type TipoDopado = 'N' | 'P';

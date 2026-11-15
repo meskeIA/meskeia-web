@@ -22,6 +22,7 @@ import {
   Filler,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
 
 ChartJS.register(
   CategoryScale,
@@ -34,6 +35,8 @@ ChartJS.register(
   Legend,
   Filler
 );
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+ChartJS.register(PLUGIN_REDIMENSION_APLAZADA);
 
 // ----- Tipos -----
 interface PasoData {

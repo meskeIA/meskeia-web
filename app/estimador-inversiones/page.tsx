@@ -7,6 +7,10 @@ import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import Chart from 'chart.js/auto';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
+
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+Chart.register(PLUGIN_REDIMENSION_APLAZADA);
 
 type PerfilInversor = 'conservador' | 'moderado' | 'equilibrado' | 'dinamico' | 'agresivo';
 type ModoApp = 'calculadora' | 'comparador';

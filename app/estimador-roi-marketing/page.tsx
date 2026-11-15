@@ -5,6 +5,10 @@ import styles from './EstimadorROIMarketing.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber, formatPercentage } from '@/lib';
 import Chart from 'chart.js/auto';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
+
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+Chart.register(PLUGIN_REDIMENSION_APLAZADA);
 
 interface CanalMarketing {
   id: string;

@@ -25,6 +25,7 @@ import {
 } from '@/components';
 import { formatNumber, formatCurrency, formatPercentage } from '@/lib/formatters';
 import styles from './VisualizadorDesigualdadRiqueza.module.css';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
 
 ChartJS.register(
   CategoryScale,
@@ -37,6 +38,8 @@ ChartJS.register(
   Legend,
   Filler
 );
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+ChartJS.register(PLUGIN_REDIMENSION_APLAZADA);
 
 interface PaisData {
   nombre: string;

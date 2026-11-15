@@ -9,6 +9,7 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -267,7 +268,7 @@ export default function VisualizadorIbuprofeno() {
       if (!chartRef.current) return;
 
       const { Chart, registerables } = await import('chart.js');
-      Chart.register(...registerables);
+      Chart.register(...registerables, PLUGIN_REDIMENSION_APLAZADA);
 
       // Destruir instancia previa si existe
       if (chartInstanceRef.current) {

@@ -5,6 +5,10 @@ import styles from './EstimadorPrestamos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, EducationalSection, ShareCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import Chart from 'chart.js/auto';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
+
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+Chart.register(PLUGIN_REDIMENSION_APLAZADA);
 
 type Sistema = 'frances' | 'aleman' | 'americano';
 type ModoApp = 'simulador' | 'comparador';

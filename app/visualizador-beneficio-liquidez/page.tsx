@@ -4,6 +4,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+Chart.register(PLUGIN_REDIMENSION_APLAZADA);
 import styles from './VisualizadorBeneficioLiquidez.module.css';
 import {
   MeskeiaLogo,
@@ -14,6 +16,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 

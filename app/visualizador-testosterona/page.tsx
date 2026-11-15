@@ -15,8 +15,11 @@ import { Line } from 'react-chartjs-2';
 import styles from './VisualizadorTestosterona.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard, EducationalSection } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+ChartJS.register(PLUGIN_REDIMENSION_APLAZADA);
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
 

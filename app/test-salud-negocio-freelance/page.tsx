@@ -13,6 +13,10 @@ import {
   ShareCard,
 } from '@/components';
 import Chart from 'chart.js/auto';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
+
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+Chart.register(PLUGIN_REDIMENSION_APLAZADA);
 
 // ============================================================================
 // TIPOS

@@ -24,6 +24,7 @@ import {
   Filler,
 } from 'chart.js';
 import { Line, Doughnut, Bar } from 'react-chartjs-2';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -38,6 +39,8 @@ ChartJS.register(
   Legend,
   Filler
 );
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+ChartJS.register(PLUGIN_REDIMENSION_APLAZADA);
 
 // Tipos inferidos del router tRPC: una sola fuente de verdad (server/routers/analytics.ts).
 // Las antiguas interfaces locales estaban muertas y habían divergido del servidor.

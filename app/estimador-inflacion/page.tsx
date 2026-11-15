@@ -10,6 +10,10 @@ import DataReference from '@/components/DataReference';
 import EducationalSection from '@/components/EducationalSection';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { IPC_DATA, IPC_META, IPC_YEARS as YEARS } from '@/data/ipc-ine';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
+
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+Chart.register(PLUGIN_REDIMENSION_APLAZADA);
 
 type ModoApp = 'calculadora' | 'comparador';
 

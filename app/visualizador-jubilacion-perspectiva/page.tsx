@@ -34,6 +34,10 @@ import {
   ejemploInicio,
   frenteAlCien,
 } from './escala';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
+
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+Chart.register(PLUGIN_REDIMENSION_APLAZADA);
 
 // El porcentaje de la pensión sale SIEMPRE del motor compartido (calcularPorcentajePension,
 // lib/calculadoras/pensionPublica.ts), con la escala definitiva de 2027 (ver ./escala.ts). Hasta el

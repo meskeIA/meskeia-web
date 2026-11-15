@@ -28,6 +28,10 @@ import {
   type TramoDesglose,
 } from './motor';
 import Chart from 'chart.js/auto';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
+
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+Chart.register(PLUGIN_REDIMENSION_APLAZADA);
 
 /** Ejercicio de los datos que se aplican (hallazgo 1895: se anunciaba 2025 y se calculaba 2026). */
 const EJERCICIO = FISCAL_IRPF_META.vigencia;

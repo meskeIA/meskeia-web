@@ -22,8 +22,11 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import styles from './VisualizadorGeopoliticaRecursos.module.css';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+ChartJS.register(PLUGIN_REDIMENSION_APLAZADA);
 
 /** Espacio duro entre la cifra y el «%» (Ortografía de la RAE, 2010). */
 const NB = ' ';

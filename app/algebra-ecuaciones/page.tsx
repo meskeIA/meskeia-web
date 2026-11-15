@@ -29,8 +29,11 @@ import {
   type Fraccion,
   type PasoRuffini,
 } from './casos';
+import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
 
 Chart.register(...registerables);
+// Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
+Chart.register(PLUGIN_REDIMENSION_APLAZADA);
 
 // Tipos de ecuaciones
 type EquationType = 'linear' | 'quadratic' | 'system' | 'polynomial';
