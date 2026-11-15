@@ -2971,7 +2971,7 @@ function crearServidorDelegum(): McpServer {
               : `🔒 **Legítima total de los ${r.legitimarios}: ${fmt(r.legitimaTotal)} €** — ${r.fraccionLegitima}`,
           r.legitimaPorHijo !== null
             ? `  • Por hijo: ${fmt(r.legitimaPorHijo)} €`
-            : (r.esLegitivaColectiva ? '  • Legítima colectiva (Aragón): reparto libre entre los descendientes' : ''),
+            : (r.esLegitivaColectiva ? `  • Legítima colectiva (${r.nombreRegimen}): reparto libre entre los descendientes` : ''),
           r.tercioMejora !== null ? `  • Tercio de mejora: ${fmt(r.tercioMejora)} €` : '',
           `🟢 Libre disposición: ${fmt(r.libreDisposicion)} €`,
           r.derechoConyuge !== null ? `👤 Derecho del cónyuge viudo: ${fmt(r.derechoConyuge)} € — ${r.descripcionDerechoConyuge}` : '',

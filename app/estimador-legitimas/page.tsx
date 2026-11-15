@@ -11,6 +11,7 @@ import {
   type RegimenId,
   type ResultadoLegitimas,
 } from '@/lib/calculadoras/legitimas';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 // ─── Datos normativos ─────────────────────────────────────────────────────────
 
@@ -32,7 +33,7 @@ const DESCRIPCION_BREVE: Record<RegimenId, string> = {
   aragon: 'Legítima colectiva = 1/2 para todos los descendientes; el testador elige la distribución',
   galicia: 'Legítima = 1/4 del haber hereditario para descendientes',
   baleares: '1/3 con cuatro hijos o menos; 1/2 si son más de cuatro (arts. 42 y 79 de la Compilació)',
-  'pais-vasco': 'Legítima = 1/3 del haber hereditario para descendientes',
+  'pais-vasco': 'Legítima colectiva = 1/3 del haber hereditario; el testador elige entre los descendientes',
   navarra: 'Legítima formal (simbólica). Práctica libertad total de testar',
 };
 
@@ -44,6 +45,30 @@ interface EstadoResultado {
   regimenId: RegimenId;
   numHijos: number;
   tieneConyuge: boolean;
+}
+
+/**
+ * Rótulo de la tarjeta del cónyuge según la naturaleza de su derecho. La cuarta viudal catalana
+ * no es un usufructo sino una cantidad en propiedad, «hasta un máximo de la cuarta parte» y según
+ * necesidad (art. 452-1 CCCat): hasta el 15/11/2026 salía como «Usufructo estimado» (hallazgo 4733).
+ */
+function rotuloConyuge(regimenId: RegimenId, importe: number): string {
+  if (regimenId === 'cataluna') return `Cuarta viudal: hasta ${formatCurrency(importe)} en propiedad, según sus necesidades`;
+  return `Usufructo estimado sobre ${formatCurrency(importe)}`;
+}
+
+/**
+ * Quiénes son herederos forzosos en el resultado. El viudo se cuenta donde la norma leída lo
+ * nombra legitimario: el Código Civil (art. 807.3.º) y la Ley 5/2015 vasca (art. 47). En
+ * Cataluña la cuarta viudal no es legítima, y en los demás forales no se ha cotejado la norma.
+ */
+function herederosForzosos(r: EstadoResultado): string {
+  const partes: string[] = [];
+  if (r.numHijos > 0) partes.push(`${r.numHijos} hijo${r.numHijos > 1 ? 's' : ''}`);
+  else if (r.motor.legitimarios === 'ascendientes') partes.push('ascendientes');
+  const viudoLegitimario = r.regimenId === 'comun' || r.regimenId === 'pais-vasco';
+  if (r.tieneConyuge && viudoLegitimario && r.motor.derechoConyuge !== null) partes.push('cónyuge (usufructo)');
+  return partes.length > 0 ? partes.join(' + ') : 'ninguno';
 }
 
 /**
@@ -75,6 +100,7 @@ export default function EstimadorLegitimas() {
   const [regimenId, setRegimenId] = useState<RegimenId>('comun');
   const [numHijosStr, setNumHijosStr] = useState('2');
   const [tieneConyuge, setTieneConyuge] = useState(true);
+  const [tieneAscendientes, setTieneAscendientes] = useState(true);
   const [resultado, setResultado] = useState<EstadoResultado | null>(null);
   const [error, setError] = useState('');
 
@@ -83,11 +109,15 @@ export default function EstimadorLegitimas() {
     const pat = parseSpanishNumber(patrimonio);
     const hijos = parseInt(numHijosStr, 10);
 
+    // Un dato rechazado borra también el resultado anterior: si no, el aviso convivía con la
+    // distribución de otro caudal (hallazgo 4739).
     if (Number.isNaN(pat) || pat < 0) {
+      setResultado(null);
       setError('Introduce un patrimonio neto válido (puede ser 0 si las deudas igualan al activo).');
       return;
     }
     if (Number.isNaN(hijos) || hijos < 0 || hijos > 20) {
+      setResultado(null);
       setError('Introduce un número de hijos/descendientes válido (0–20).');
       return;
     }
@@ -102,6 +132,8 @@ export default function EstimadorLegitimas() {
           regimen: regimenId,
           numHijos: hijos,
           tieneConyuge,
+          // Solo cuenta sin descendientes (art. 807: los descendientes excluyen a los ascendientes).
+          tieneAscendientes: hijos === 0 ? tieneAscendientes : undefined,
         }),
         regimenId,
         numHijos: hijos,
@@ -147,7 +179,7 @@ export default function EstimadorLegitimas() {
 
           <NumberInput
             value={patrimonio}
-            onChange={setPatrimonio}
+            onChange={(v) => { setPatrimonio(v); setResultado(null); }}
             label="Patrimonio neto hereditario (€)"
             placeholder="200000"
             helperText="Activo (bienes + derechos) menos pasivo (deudas y cargas). Las donaciones en vida pueden sumarse al caudal relicto (colación)."
@@ -181,12 +213,34 @@ export default function EstimadorLegitimas() {
               value={numHijosStr}
               onChange={e => { setNumHijosStr(e.target.value); setResultado(null); }}
             >
-              {[1, 2, 3, 4, 5, 6].map(n => (
-                <option key={n} value={n}>{`${n} hijo${n > 1 ? 's' : ''}`}</option>
+              {/* De 0 a 20, lo que admite el motor: el selector se paraba en 6 y no dejaba pedir
+                  el caso sin descendientes, que el motor calcula (hallazgo 4729). */}
+              {Array.from({ length: 21 }, (_, n) => (
+                <option key={n} value={n}>{n === 0 ? 'Sin hijos ni descendientes' : `${n} hijo${n > 1 ? 's' : ''}`}</option>
               ))}
             </select>
             <p className={styles.hint}>Si hay nietos (en lugar de hijos fallecidos), se representan en la misma porción que correspondía a su progenitor.</p>
           </div>
+
+          {numHijosStr === '0' && (
+            <div className={styles.switchGroup}>
+              <span className={styles.switchLabel}>¿Viven los padres u otros ascendientes?</span>
+              <div className={styles.switchRow}>
+                {(['Sí', 'No'] as const).map(opcion => (
+                  <button
+                    key={opcion}
+                    type="button"
+                    className={`${styles.switchBtn} ${(opcion === 'Sí') === tieneAscendientes ? styles.switchActivo : ''}`}
+                    onClick={() => { setTieneAscendientes(opcion === 'Sí'); setResultado(null); }}
+                    aria-pressed={(opcion === 'Sí') === tieneAscendientes}
+                    aria-label={`Ascendientes: ${opcion}`}
+                  >
+                    {opcion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className={styles.switchGroup}>
             <span className={styles.switchLabel}>¿Hay cónyuge superviviente?</span>
@@ -207,7 +261,7 @@ export default function EstimadorLegitimas() {
 
           {error && (
             <div role="alert" aria-live="polite" className={styles.errorMsg}>
-              ⚠️ {error}
+              <span aria-hidden="true">⚠️</span> {error}
             </div>
           )}
 
@@ -240,6 +294,18 @@ export default function EstimadorLegitimas() {
                   <span className={styles.bloqueLabel}>Libre disposición total</span>
                 </div>
               </div>
+              {/* El usufructo de fidelidad lo calcula el motor: sin esta tarjeta, el resultado
+                  era idéntico con viudo y sin él (hallazgo 4734). */}
+              {resultado.motor.derechoConyuge !== null && resultado.motor.derechoConyuge > 0 && (
+                <div className={styles.conyugeCard}>
+                  <span aria-hidden="true">💍</span>
+                  <div>
+                    <strong>Cónyuge superviviente</strong>
+                    <p>{rotuloConyuge(resultado.regimenId, resultado.motor.derechoConyuge)}</p>
+                    <p className={styles.conyugeNota}>{resultado.motor.descripcionDerechoConyuge}</p>
+                  </div>
+                </div>
+              )}
               <NotasLista notas={resultado.motor.notas} stylesModule={styles} />
             </div>
           ) : (
@@ -248,7 +314,7 @@ export default function EstimadorLegitimas() {
                 <span aria-hidden="true">📜</span>
                 <div>
                   <strong>{resultado.motor.nombreRegimen}</strong>
-                  <p>{DESCRIPCION_BREVE[resultado.regimenId]}</p>
+                  <p>{resultado.numHijos === 0 ? resultado.motor.fraccionLegitima : DESCRIPCION_BREVE[resultado.regimenId]}</p>
                 </div>
               </div>
 
@@ -276,12 +342,16 @@ export default function EstimadorLegitimas() {
                     </span>
                     <span className={styles.bloqueImporte}>{formatCurrency(resultado.motor.legitimaTotal)}</span>
                     <span className={styles.bloqueLabel}>
-                      Legítima {resultado.motor.esLegitivaColectiva ? 'colectiva' : 'total'}
+                      {resultado.motor.legitimarios === 'ascendientes'
+                        ? 'Legítima de los ascendientes'
+                        : `Legítima ${resultado.motor.esLegitivaColectiva ? 'colectiva' : 'total'}`}
                     </span>
                     <span className={styles.bloqueSublabel}>
-                      {resultado.motor.esLegitivaColectiva || resultado.motor.legitimaPorHijo === null
-                        ? 'Distribución libre entre descendientes'
-                        : `${formatCurrency(resultado.motor.legitimaPorHijo)}/hijo · Obligatoria`}
+                      {resultado.motor.legitimarios === 'ascendientes'
+                        ? 'Por mitad entre la línea paterna y la materna (CC art. 810)'
+                        : resultado.motor.esLegitivaColectiva || resultado.motor.legitimaPorHijo === null
+                          ? 'Distribución libre entre descendientes'
+                          : `${formatCurrency(resultado.motor.legitimaPorHijo)}/hijo · Obligatoria`}
                     </span>
                   </div>
                 )}
@@ -318,7 +388,7 @@ export default function EstimadorLegitimas() {
                   <span aria-hidden="true">💍</span>
                   <div>
                     <strong>Cónyuge superviviente</strong>
-                    <p>Usufructo estimado sobre {formatCurrency(resultado.motor.derechoConyuge)}</p>
+                    <p>{rotuloConyuge(resultado.regimenId, resultado.motor.derechoConyuge)}</p>
                     {/* La descripción la da el motor porque cita el artículo que sostiene la
                         fracción: es donde se colaba el «usufructo universal» balear y vasco. */}
                     <p className={styles.conyugeNota}>{resultado.motor.descripcionDerechoConyuge}</p>
@@ -333,7 +403,7 @@ export default function EstimadorLegitimas() {
                 </div>
                 <div className={styles.resumenItem}>
                   <span className={styles.resumenLabel}>Herederos forzosos</span>
-                  <strong>{resultado.numHijos} hijo<span>{resultado.numHijos > 1 ? 's' : ''}</span></strong>
+                  <strong>{herederosForzosos(resultado)}</strong>
                 </div>
               </div>
 
@@ -349,12 +419,12 @@ export default function EstimadorLegitimas() {
         <ul>
           <li><strong>Descendientes</strong> (hijos, nietos…): son los principales legitimarios en todos los regímenes.</li>
           <li><strong>Ascendientes</strong> (padres, abuelos…): si no hay descendientes, tienen legítima en la mayoría de regímenes.</li>
-          <li><strong>Cónyuge</strong>: no es heredero forzoso en sentido estricto, pero tiene derecho a un usufructo viudal garantizado.</li>
+          <li><strong>Cónyuge viudo</strong>: en el Código Civil también es heredero forzoso (art. 807.3.º), pero su legítima es un usufructo, no una parte en propiedad.</li>
         </ul>
         <h3>¿Por qué varía la legítima entre CCAA?</h3>
         <p>España tiene una pluralidad de sistemas civiles. El Código Civil (Derecho Común) aplica en la mayoría de comunidades, pero Cataluña, Aragón, Navarra, País Vasco, Galicia y Baleares tienen derechos civiles propios con normas de legítima diferentes — en algunos casos otorgan más margen al testador (Navarra, Aragón, Cataluña) y en otros se acercan al modelo de cuota más amplia para los descendientes.</p>
         <h3>¿Qué derecho civil aplica a mi herencia?</h3>
-        <p>El derecho civil aplicable lo determina la vecindad civil del fallecido, no su domicilio. La vecindad civil se adquiere por nacimiento, residencia continuada o inscripción en el Registro Civil. Una persona nacida en Navarra que lleva 10 años en Madrid puede seguir siendo de vecindad civil navarra si no ha declarado cambio.</p>
+        <p>El derecho civil aplicable lo determina la vecindad civil del fallecido, no su domicilio. La vecindad civil se adquiere por nacimiento, residencia continuada o declaración ante el Registro Civil. Diez años de residencia continuada cambian la vecindad salvo que se declare lo contrario durante ese plazo (art. 14.5 del Código Civil): una persona nacida en Navarra que lleva 10 años en Madrid sin haber declarado nada ya tiene vecindad civil común; solo conserva la navarra si declaró que quería mantenerla.</p>
         <h3>¿Qué es el tercio de mejora?</h3>
         <p>En el Derecho Común, el tercio de mejora permite al testador favorecer a uno o varios hijos/nietos sobre los demás dentro de ese tramo. Por ejemplo, puede dejarse íntegro a un hijo con discapacidad, sin infringir la legítima de los demás (que queda cubierta por el tercio estricto).</p>
         <h3>¿Cómo se calcula el caudal hereditario (haber hereditario)?</h3>
@@ -383,15 +453,15 @@ export default function EstimadorLegitimas() {
             </tr>
             <tr>
               <td>Cataluña</td>
-              <td>1/4 del caudal (solo en metálico)</td>
-              <td>Solo si no hay hijos (1/4 usufructo)</td>
+              <td>1/4 del caudal (en dinero o en bienes de la herencia)</td>
+              <td>Cuarta viudal: si no tiene recursos suficientes, hasta 1/4 en propiedad, haya o no hijos</td>
               <td>3/4 libres (mayor libertad)</td>
             </tr>
             <tr>
               <td>País Vasco (Troncalidad)</td>
-              <td>1/3 o según bien troncal</td>
-              <td>Usufructo del haber conyugal</td>
-              <td>Variable según territorio foral</td>
+              <td>1/3 (legítima colectiva: puede atribuirse a uno o varios) o según bien troncal</td>
+              <td>Usufructo de la mitad de todos los bienes si hay descendientes; de dos tercios si no</td>
+              <td>2/3 libres; en el valle de Ayala, libertad de testar</td>
             </tr>
             <tr>
               <td>Navarra</td>
@@ -425,8 +495,8 @@ export default function EstimadorLegitimas() {
             <span className={styles.escenarioIcon} aria-hidden="true">🏘️</span>
             <strong>Residente en Cataluña con patrimonio inmobiliario</strong>
           </div>
-          <p>La legítima catalana (1/4) se paga en metálico, no necesariamente con el inmueble. Más libertad para transmitir la vivienda familiar íntegra a quien el testador quiera.</p>
-          <div className={styles.escenarioExample}>Caudal 400.000 €: legítima 100.000 € en metálico, 300.000 € libres para el heredero elegido</div>
+          <p>La legítima catalana (1/4) puede pagarse en dinero, aunque no lo haya en la herencia, no necesariamente con el inmueble. Más libertad para transmitir la vivienda familiar íntegra a quien el testador quiera.</p>
+          <div className={styles.escenarioExample}>Caudal 400.000 €: legítima 100.000 € (que puede pagarse en dinero), 300.000 € libres para el heredero elegido</div>
           <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> La legítima catalana al 1/4 permite al testador disponer libremente de hasta 3/4 del patrimonio, frente al 1/3 del derecho común.</div>
         </div>
         <div className={styles.escenarioCard}>
@@ -434,8 +504,8 @@ export default function EstimadorLegitimas() {
             <span className={styles.escenarioIcon} aria-hidden="true">🤝</span>
             <strong>Sin hijos, con cónyuge y padres</strong>
           </div>
-          <p>En derecho común, si no hay descendientes, los ascendientes tienen legítima (1/2 del caudal) y el cónyuge tiene derecho al usufructo del tercio libre.</p>
-          <div className={styles.escenarioExample}>Caudal 200.000 €: padres 100.000 € + cónyuge usufructo 1/3 libre (33.333 €)</div>
+          <p>En derecho común, si no hay descendientes, los ascendientes tienen legítima: la mitad del caudal, o un tercio si concurren con el cónyuge viudo (art. 809). El viudo tiene el usufructo de la mitad de la herencia (art. 837).</p>
+          <div className={styles.escenarioExample}>Caudal 200.000 €: padres 66.666,67 € (1/3) + cónyuge con el usufructo de la mitad (100.000 €)</div>
           <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> El seguro de vida no forma parte de la herencia y no está sujeto a legítimas.</div>
         </div>
         <div className={styles.escenarioCard}>
@@ -452,39 +522,14 @@ export default function EstimadorLegitimas() {
       {/* 3. FAQ */}
       <div className={styles.faqList}>
         <h3>Preguntas frecuentes sobre las legítimas</h3>
-        <div className={styles.faqItem}>
-          <strong>¿Qué herederos son forzosos en derecho común?</strong>
-          <p>Primero: los hijos y descendientes. Si no hay descendientes, los padres y ascendientes. El cónyuge superviviente no es heredero forzoso pero tiene derecho a usufructo de una parte.</p>
-        </div>
-        <div className={styles.faqItem}>
-          <strong>¿Puedo desheredar a un hijo?</strong>
-          <p>Solo por causas tasadas en el Código Civil: atentado contra la vida del testador, abandono o malos tratos, privación de la libertad, negar alimentos, condenado por delitos contra la familia, etc.</p>
-        </div>
-        <div className={styles.faqItem}>
-          <strong>¿Las donaciones en vida reducen la herencia?</strong>
-          <p>Sí, las donaciones a herederos forzosos se &quot;colacionan&quot; (se suman al caudal ficticio para calcular legítimas). Las donaciones a terceros pueden atacarse si vulneran legítimas.</p>
-        </div>
-        <div className={styles.faqItem}>
-          <strong>¿El seguro de vida forma parte de la herencia?</strong>
-          <p>No, el seguro de vida va directamente al beneficiario designado y no forma parte del caudal hereditario. No está sujeto a legítimas ni a impuesto de sucesiones como herencia.</p>
-        </div>
-        <div className={styles.faqItem}>
-          <strong>¿Qué es la &quot;acción de suplemento de legítima&quot;?</strong>
-          <p>Es la acción judicial que el legitimario perjudicado puede ejercitar para reclamar su parte si el testamento no la respeta o si las donaciones la han vulnerado. Prescribe en 15 años.</p>
-        </div>
-        <div className={styles.faqItem}>
-          <strong>¿Puedo beneficiar a mi cónyuge en Derecho Común?</strong>
-          <p>En derecho común, el cónyuge no es heredero forzoso. Puedes dejarle el tercio libre y el usufructo universal a tu cónyuge, pero los hijos reclamarian los 2/3 restantes (legítima).</p>
-        </div>
-        <div className={styles.faqItem}>
-          <strong>¿Qué ley se aplica si vivo en una CCAA pero nací en otra?</strong>
-          <p>La vecindad civil (no el empadronamiento) determina la ley aplicable. La vecindad civil se adquiere por origen, residencia continuada o declaración. Puede diferir del lugar de residencia actual.</p>
-        </div>
-        <div className={styles.faqItem}>
-          <strong>¿Pueden los herederos renunciar a la legítima?</strong>
-          <p>Sí, pero solo una vez abierta la sucesión (tras el fallecimiento). No es posible renunciar anticipadamente a la legítima del testador vivo, excepto en algunos territorios forales (como Navarra).</p>
-          <div className={styles.faqTip}><span aria-hidden="true">💡</span> Consultar con notario o abogado especializado para planificar la herencia respetando las legítimas de la CCAA aplicable.</div>
-        </div>
+        {/* Fuente única con el FAQPage: PREGUNTAS_FRECUENTES de metadata.ts (hallazgo 4736). */}
+        {PREGUNTAS_FRECUENTES.map((f) => (
+          <div key={f.question} className={styles.faqItem}>
+            <strong>{f.question}</strong>
+            <p>{f.answer}</p>
+          </div>
+        ))}
+        <div className={styles.faqTip}><span aria-hidden="true">💡</span> Consultar con notario o abogado especializado para planificar la herencia respetando las legítimas de la CCAA aplicable.</div>
       </div>
 
       {/* 4. Guía Paso a Paso */}

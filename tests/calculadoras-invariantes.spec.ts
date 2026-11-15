@@ -5209,6 +5209,29 @@ test.describe('Unificación 10/09 — legítimas: la web publicaba otra cifra qu
     }
   });
 
+  test('País Vasco: la legítima es colectiva y rige también en Gipuzkoa (hallazgos 4727 y 4728)', () => {
+    // Ley 5/2015 (BOE-A-2015-8273), leída el 15/11/2026: art. 8, la ley se aplica «en todo el
+    // ámbito territorial de la Comunidad Autónoma»; art. 49, un tercio; art. 48.2, el causante
+    // «puede elegir entre ellos a uno o varios y apartar a los demás». No hay mínimo por hijo y
+    // Gipuzkoa no es una excepción (la excepción es el valle de Ayala, art. 89).
+    const res = calcularLegitimas({ patrimonioNeto: 300000, regimen: 'pais-vasco', numHijos: 2, tieneConyuge: true });
+    expect(res.legitimaTotal).toBe(100000);
+    expect(res.esLegitivaColectiva).toBe(true);
+    expect(res.legitimaPorHijo).toBeNull();
+    const texto = [res.ccaas, res.fraccionLegitima, ...res.notas].join(' ');
+    expect(texto).not.toMatch(/Gipuzkoa[^.]*sin legítima|En Gipuzkoa no existe/i);
+    expect(res.ccaas).toContain('Gipuzkoa');
+  });
+
+  test('Cataluña: la cuarta viudal es una cantidad en propiedad, no un usufructo (hallazgo 4733)', () => {
+    // Art. 452-1 CCCat (BOE-A-2008-13533), leído el 15/11/2026: «la cantidad que sea precisa para
+    // atenderlas, hasta un máximo de la cuarta parte del activo hereditario líquido».
+    const res = calcularLegitimas({ patrimonioNeto: 400000, regimen: 'cataluna', numHijos: 2, tieneConyuge: true });
+    expect(res.derechoConyuge).toBe(100000);
+    expect(res.descripcionDerechoConyuge).toContain('452-1');
+    expect(res.descripcionDerechoConyuge.toLowerCase()).not.toContain('usufructo');
+  });
+
   test('los textos normativos del selector salen del motor, no de una copia', () => {
     // La tabla de regímenes de la app afirmaba que «en Menorca rige el Derecho Común», y el
     // art. 65 de la Compilació le extiende el régimen de Mallorca. Ahora la ficha de cada

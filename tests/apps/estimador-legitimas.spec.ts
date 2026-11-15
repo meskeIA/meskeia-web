@@ -142,10 +142,9 @@ test.describe('Derecho común (Código Civil)', () => {
     }
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · tras un resultado válido, un patrimonio negativo deja la distribución vieja junto al error', async ({ page }) => {
+  test('HALLAZGO 4739 (15/11/2026, REPARADO) · tras un resultado válido, un patrimonio negativo deja la distribución vieja junto al error', async ({ page }) => {
     // 300.000 € → resultado; luego solo se cambia el patrimonio a -50000 y se pulsa Calcular.
-    // Esperado: aviso y SIN distribución. Hoy: el aviso convive con la de 300.000 €.
-    test.fail();
+    // Esperado: aviso y SIN distribución. Antes: el aviso convivía con la de 300.000 €.
     await calcular(page, { patrimonio: '300.000' });
     await expect(tarjetaResultado(page).getByText('Libre disposición', { exact: true })).toBeVisible();
     await page.locator(ENTRADA).fill('-50000');
@@ -155,74 +154,114 @@ test.describe('Derecho común (Código Civil)', () => {
     await expect(tarjetaResultado(page).getByText('Libre disposición', { exact: true })).toHaveCount(0, { timeout: 2000 });
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · no se puede pedir el caso sin descendientes (arts. 809, 837 y 838)', async ({ page }) => {
+  test('HALLAZGO 4729 (15/11/2026, REPARADO) · el caso sin descendientes se puede pedir (arts. 809, 837 y 838)', async ({ page }) => {
     // Sin hijos, con padres y viudo, 200.000 €: ascendientes 1/3 = 66.666,67 € (art. 809) y
-    // viudo con el usufructo de la mitad = 100.000 € (art. 837). El motor lo calcula, pero el
-    // selector solo ofrece de 1 a 6 hijos y la página no pregunta por los ascendientes.
-    test.fail();
-    await expect(page.locator('#numHijos option[value="0"]')).toHaveCount(1, { timeout: 2000 });
+    // viudo con el usufructo de la mitad = 100.000 € (art. 837). Sin padres: ninguna legítima y
+    // usufructo de los dos tercios = 133.333,33 € (art. 838). Antes el selector solo ofrecía de
+    // 1 a 6 hijos y la página no preguntaba por los ascendientes.
+    await calcular(page, { patrimonio: '200.000', hijos: '0', conyuge: true });
+    const tarjeta = tarjetaResultado(page);
+    await expect(tarjeta.getByText('Legítima de los ascendientes', { exact: true })).toBeVisible();
+    expect(await importeDe(page, 'Legítima de los ascendientes')).toBeCloseTo(66666.67, 2);
+    expect(await importeDe(page, 'Libre disposición')).toBeCloseTo(133333.33, 2);
+    await expect(tarjeta).toContainText(/Usufructo estimado sobre 100\.000,00\s*€/);
+    await expect(tarjeta).toContainText('CC art. 837');
+
+    await formulario(page).getByRole('button', { name: 'Ascendientes: No' }).click();
+    await page.getByRole('button', { name: 'Calcular legítimas' }).click();
+    await expect(tarjeta.getByText('Libre disposición', { exact: true })).toBeVisible();
+    expect(await importeDe(page, 'Libre disposición')).toBeCloseTo(200000, 2);
+    await expect(tarjeta).toContainText(/Usufructo estimado sobre 133\.333,33\s*€/);
+    await expect(tarjeta).toContainText('CC art. 838');
+    // Y caben más de seis hijos, hasta los veinte que admite el motor.
+    await expect(page.locator('#numHijos option[value="20"]')).toHaveCount(1);
+  });
+
+  test('HALLAZGO 4730 (15/11/2026, REPARADO) · el resultado cuenta al viudo entre los herederos forzosos (art. 807.3.º)', async ({ page }) => {
+    await calcular(page, { patrimonio: '300.000', hijos: '2', conyuge: true });
+    const fila = tarjetaResultado(page).getByText('Herederos forzosos', { exact: true }).locator('xpath=..');
+    await expect(fila).toContainText('2 hijos + cónyuge (usufructo)');
   });
 });
 
 test.describe('Textos normativos de la página', () => {
-  test('HALLAZGO (15/11/2026, ABIERTO) · el escenario «Sin hijos, con cónyuge y padres» da 100.000 € a los padres y 33.333 € de usufructo', async ({ page }) => {
+  test('HALLAZGO 4725 (15/11/2026, REPARADO) · el escenario «Sin hijos, con cónyuge y padres» da 100.000 € a los padres y 33.333 € de usufructo', async ({ page }) => {
     // 200.000 € sin descendientes, con ascendientes y viudo: los padres tienen 1/3 por
     // concurrir con el viudo = 66.666,67 € (art. 809) y el viudo el usufructo de la MITAD =
-    // 100.000 € (art. 837). La página dice «padres 100.000 € + cónyuge usufructo 1/3 libre
+    // 100.000 € (art. 837). La página decía «padres 100.000 € + cónyuge usufructo 1/3 libre
     // (33.333 €)»: ni la fracción ni la cifra (1/3 de 200.000 € no son 33.333 €).
-    test.fail();
     const escenario = page.getByText('Sin hijos, con cónyuge y padres').locator('xpath=../..');
     const texto = (await escenario.textContent()) ?? '';
     expect(texto).toContain('66.666');
     expect(texto).not.toContain('33.333');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · el ejemplo de vecindad civil invierte el art. 14.5.2.º CC', async ({ page }) => {
+  test('HALLAZGO 4726 (15/11/2026, REPARADO) · el ejemplo de vecindad civil invierte el art. 14.5.2.º CC', async ({ page }) => {
     // Art. 14.5.2.º: la vecindad civil se adquiere «por residencia continuada de diez años, sin
     // declaración en contrario durante este plazo». Quien nació en Navarra y lleva 10 años en
-    // Madrid SIN declarar nada ya es de vecindad común. La página dice lo contrario.
-    test.fail();
+    // Madrid SIN declarar nada ya es de vecindad común.
     const cuerpo = (await page.locator('body').textContent()) ?? '';
     expect(cuerpo).not.toContain('puede seguir siendo de vecindad civil navarra si no ha declarado cambio');
+    expect(cuerpo).toContain('sin haber declarado nada ya tiene vecindad civil común');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · la página dice que el viudo «no es heredero forzoso» (art. 807.3.º)', async ({ page }) => {
+  test('HALLAZGO 4730 (15/11/2026, REPARADO) · la página dice que el viudo «no es heredero forzoso» (art. 807.3.º)', async ({ page }) => {
     // Art. 807: «Son herederos forzosos: […] 3.º El viudo o viuda en la forma y medida que
-    // establece este Código». El FAQPage lo dice bien; la FAQ visible y el bloque educativo, no.
-    test.fail();
+    // establece este Código». El FAQPage lo decía bien; la FAQ visible y el bloque educativo, no.
     const cuerpo = (await page.locator('body').textContent()) ?? '';
     expect(cuerpo).not.toMatch(/c[óo]nyuge (superviviente )?no es heredero forzoso/i);
+    expect(cuerpo).not.toContain('reclamarian');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · «Prescribe en 15 años»: ningún artículo vigente del CC fija ese plazo', async ({ page }) => {
+  test('HALLAZGO 4731 (15/11/2026, REPARADO) · «Prescribe en 15 años»: ningún artículo vigente del CC fija ese plazo', async ({ page }) => {
     // El art. 815 (complemento de legítima) no tiene plazo propio; el art. 1964.2 vigente da
     // cinco años a las acciones personales y el 1963, treinta a las reales. Los 15 años eran la
-    // redacción de 1964 anterior a la Ley 42/2015.
-    test.fail();
+    // redacción de 1964 anterior a la Ley 42/2015. Se retira la cifra, no se cambia por otra.
     const cuerpo = (await page.locator('body').textContent()) ?? '';
     expect(cuerpo).not.toContain('Prescribe en 15 años');
+    expect(cuerpo).toContain('no le fija un plazo propio');
+  });
+
+  test('HALLAZGO 4736 (15/11/2026, REPARADO) · la FAQ visible y el FAQPage dicen lo mismo (una sola fuente)', async ({ page }) => {
+    // La desheredación tenía dos respuestas distintas y «quiénes son herederos forzosos» se
+    // contradecía entre las dos FAQ. Ahora cada pregunta del FAQPage está en la visible con la
+    // MISMA respuesta.
+    const faq = (await jsonLd(page)).find((b) => b['@type'] === 'FAQPage');
+    const entradas = (faq?.mainEntity as { name: string; acceptedAnswer: { text: string } }[]) ?? [];
+    expect(entradas.length).toBeGreaterThanOrEqual(5);
+    // La sección educativa nace plegada: se localiza por texto, no por rol (el rol omite lo oculto).
+    const lista = page.locator('h3', { hasText: 'Preguntas frecuentes sobre las legítimas' }).locator('xpath=..');
+    const visible = (await lista.textContent()) ?? '';
+    for (const e of entradas) {
+      expect(visible, e.name).toContain(e.name);
+      expect(visible, e.name).toContain(e.acceptedAnswer.text);
+    }
+    expect(visible).not.toContain('¿Puedo desheredar a un hijo?');
   });
 });
 
 test.describe('JSON-LD (FAQPage y WebApplication)', () => {
-  test('HALLAZGO (15/11/2026, ABIERTO) · el FAQPage dice que manda el domicilio habitual (art. 14.1 CC: la vecindad civil)', async ({ page }) => {
+  test('HALLAZGO 4732 (15/11/2026, REPARADO) · el FAQPage dice que manda el domicilio habitual (art. 14.1 CC: la vecindad civil)', async ({ page }) => {
     // Art. 14.1: «La sujeción al derecho civil común o al especial o foral se determina por la
     // vecindad civil». La propia página lo advierte como error frecuente.
-    test.fail();
     const faq = (await jsonLd(page)).find((b) => b['@type'] === 'FAQPage');
     expect(JSON.stringify(faq)).not.toContain('domicilio habitual');
+    expect(JSON.stringify(faq)).toContain('vecindad civil del fallecido');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · el FAQPage habla de «un euro simbólico» en Navarra y la página de «5 sueldos febles»', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 4735 (15/11/2026, REPARADO) · el FAQPage habla de «un euro simbólico» en Navarra y la página de «5 sueldos febles»', async ({ page }) => {
+    // No se cambia por otra cifra sin fuente leída: el FAQPage dice ahora que es una legítima
+    // formal sin contenido patrimonial efectivo, lo mismo que el resultado de la página.
     const faq = (await jsonLd(page)).find((b) => b['@type'] === 'FAQPage');
     expect(JSON.stringify(faq)).not.toContain('un euro simbólico');
+    expect(JSON.stringify(faq)).toContain('legítima formal, sin contenido patrimonial efectivo');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · el WebApplication sale con featureList vacía (§1.ter: 4-8)', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 4737 (15/11/2026, REPARADO) · el WebApplication sale con featureList vacía (§1.ter: 4-8)', async ({ page }) => {
     const app = (await jsonLd(page)).find((b) => b['@type'] === 'WebApplication');
-    expect(((app?.featureList as unknown[]) ?? []).length).toBeGreaterThanOrEqual(4);
+    const lista = (app?.featureList as unknown[]) ?? [];
+    expect(lista.length).toBeGreaterThanOrEqual(4);
+    expect(lista.length).toBeLessThanOrEqual(8);
   });
 });
 
@@ -230,31 +269,39 @@ test.describe('Regímenes forales', () => {
   test('País Vasco · 300.000 €, dos hijos y viudo: legítima 100.000 € y usufructo sobre 150.000 € (arts. 49 y 52.1)', async ({ page }) => {
     // Art. 49 Ley 5/2015: 1/3 del caudal = 100.000 €; libre 200.000 €. Art. 52.1: el viudo que
     // concurre con descendientes tiene el usufructo de la mitad = 150.000 €.
+    // (La legítima vasca se rotula «colectiva» desde el hallazgo 4728: art. 48.2.)
     await calcular(page, { patrimonio: '300.000', regimen: 'pais-vasco' });
-    await expect(tarjetaResultado(page).getByText('Legítima total', { exact: true })).toBeVisible();
-    expect(await importeDe(page, 'Legítima total')).toBeCloseTo(100000, 2);
+    await expect(tarjetaResultado(page).getByText('Legítima colectiva', { exact: true })).toBeVisible();
+    expect(await importeDe(page, 'Legítima colectiva')).toBeCloseTo(100000, 2);
     expect(await importeDe(page, 'Libre disposición')).toBeCloseTo(200000, 2);
     await expect(tarjetaResultado(page)).toContainText(/Usufructo estimado sobre 150\.000,00\s*€/);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · País Vasco: «Gipuzkoa: sin legítima» (arts. 8, 10.1 y 49 Ley 5/2015)', async ({ page }) => {
+  test('HALLAZGO 4727 (15/11/2026, REPARADO) · País Vasco: «Gipuzkoa: sin legítima» (arts. 8, 10.1 y 49 Ley 5/2015)', async ({ page }) => {
     // La ley rige en toda la Comunidad Autónoma (art. 8) para quien tenga vecindad civil vasca
     // (art. 10.1), y su art. 49 fija 1/3 sin excepción guipuzcoana: lo único propio de Gipuzkoa
     // es la ordenación del caserío (arts. 96-99). La excepción real es el valle de Ayala (art. 89).
-    test.fail();
     await page.locator('#regimen').selectOption('pais-vasco');
     const pista = page.locator('#regimen').locator('xpath=following-sibling::p');
-    await expect(pista).not.toContainText('Gipuzkoa: sin legítima', { timeout: 2000 });
+    await expect(pista).toContainText('Bizkaia, Gipuzkoa y Álava');
+    await expect(pista).not.toContainText('Gipuzkoa: sin legítima');
+    await calcular(page, { patrimonio: '300.000', regimen: 'pais-vasco' });
+    await expect(tarjetaResultado(page)).toContainText('también en Gipuzkoa');
+    await expect(tarjetaResultado(page)).not.toContainText('En Gipuzkoa no existe legítima');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · País Vasco: reparte la legítima por hijo como «Obligatoria» (art. 48.2: es colectiva)', async ({ page }) => {
+  test('HALLAZGO 4728 (15/11/2026, REPARADO) · País Vasco: reparte la legítima por hijo como «Obligatoria» (art. 48.2: es colectiva)', async ({ page }) => {
     // Art. 48.2 Ley 5/2015: «puede elegir entre ellos a uno o varios y apartar a los demás». No
     // hay mínimo individual: lo correcto es lo que la app ya hace con Aragón («Distribución
-    // libre entre descendientes»). Hoy: «50.000,00 €/hijo · Obligatoria».
-    test.fail();
+    // libre entre descendientes»). Antes: «50.000,00 €/hijo · Obligatoria».
     await calcular(page, { patrimonio: '300.000', regimen: 'pais-vasco' });
-    await expect(bloque(page, 'Legítima total')).toBeVisible();
-    await expect(bloque(page, 'Legítima total')).not.toContainText('/hijo', { timeout: 2000 });
+    await expect(bloque(page, 'Legítima colectiva')).toBeVisible();
+    await expect(bloque(page, 'Legítima colectiva')).toContainText('Distribución libre entre descendientes');
+    await expect(bloque(page, 'Legítima colectiva')).not.toContainText('/hijo');
+    // La tabla comparativa: art. 52.1, «usufructo de la mitad de todos los bienes».
+    const fila = page.locator('tr', { hasText: 'País Vasco' });
+    await expect(fila).toContainText('Usufructo de la mitad de todos los bienes');
+    await expect(fila).not.toContainText('haber conyugal');
   });
 
   test('Cataluña · 400.000 € y dos hijos: legítima 1/4 = 100.000 €, 50.000 € por hijo (arts. 451-3.1 y 451-5)', async ({ page }) => {
@@ -265,30 +312,36 @@ test.describe('Regímenes forales', () => {
     await expect(bloque(page, 'Legítima total')).toContainText(/50\.000,00\s*€\/hijo/);
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · Cataluña: la cuarta vidual sale como «Usufructo estimado» (art. 452-1: es una cantidad)', async ({ page }) => {
+  test('HALLAZGO 4733 (15/11/2026, REPARADO) · Cataluña: la cuarta vidual sale como «Usufructo estimado» (art. 452-1: es una cantidad)', async ({ page }) => {
     // Art. 452-1: el viudo sin recursos suficientes obtiene «la cantidad que sea precisa para
     // atenderlas, hasta un máximo de la cuarta parte del activo hereditario líquido». No es un
-    // usufructo ni depende de que no haya hijos (como dice la tabla comparativa).
-    test.fail();
+    // usufructo ni depende de que no haya hijos (como decía la tabla comparativa).
     await calcular(page, { patrimonio: '400.000', regimen: 'cataluna' });
     await expect(tarjetaResultado(page).getByText('Legítima total', { exact: true })).toBeVisible();
-    await expect(tarjetaResultado(page)).not.toContainText('Usufructo estimado', { timeout: 2000 });
+    await expect(tarjetaResultado(page)).not.toContainText('Usufructo estimado');
+    await expect(tarjetaResultado(page)).toContainText(/Cuarta viudal: hasta 100\.000,00\s*€ en propiedad/);
+    const fila = page.locator('tr', { hasText: 'Cataluña' });
+    await expect(fila).toContainText('haya o no hijos');
+    await expect(fila).not.toContainText('Solo si no hay hijos');
+    await expect(fila).not.toContainText('solo en metálico');
   });
 
-  test('HALLAZGO (15/11/2026, ABIERTO) · Navarra: con viudo, el resultado calla el usufructo de fidelidad que el motor calcula', async ({ page }) => {
+  test('HALLAZGO 4734 (15/11/2026, REPARADO) · Navarra: con viudo, el resultado calla el usufructo de fidelidad que el motor calcula', async ({ page }) => {
     // El motor devuelve derechoConyuge = 300.000 € («Usufructo de fidelidad…») y la tabla de la
-    // página lo nombra, pero la rama de Navarra no pinta la tarjeta del cónyuge: el resultado
-    // es idéntico con «Sí» y con «No».
-    test.fail();
+    // página lo nombra, pero la rama de Navarra no pintaba la tarjeta del cónyuge: el resultado
+    // era idéntico con «Sí» y con «No».
     await calcular(page, { patrimonio: '300.000', regimen: 'navarra', conyuge: true });
     await expect(tarjetaResultado(page).getByText('Libre disposición total', { exact: true })).toBeVisible();
-    await expect(tarjetaResultado(page)).toContainText('fidelidad', { timeout: 2000 });
+    await expect(tarjetaResultado(page)).toContainText('fidelidad');
+    await expect(tarjetaResultado(page)).toContainText(/Usufructo estimado sobre 300\.000,00\s*€/);
+    await calcular(page, { patrimonio: '300.000', regimen: 'navarra', conyuge: false });
+    await expect(tarjetaResultado(page).getByText('Libre disposición total', { exact: true })).toBeVisible();
+    await expect(tarjetaResultado(page)).not.toContainText('fidelidad');
   });
 });
 
 test.describe('Accesibilidad', () => {
-  test('HALLAZGO (15/11/2026, ABIERTO) · el ⚠️ del aviso de error no va en aria-hidden y el lector lo anuncia', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 4740 (15/11/2026, REPARADO) · el ⚠️ del aviso de error no va en aria-hidden y el lector lo anuncia', async ({ page }) => {
     await calcular(page, { patrimonio: '-50000' });
     const aviso = formulario(page).locator('[role="alert"]');
     await expect(aviso).toBeVisible();

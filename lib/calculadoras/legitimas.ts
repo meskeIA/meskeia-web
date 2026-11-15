@@ -51,7 +51,7 @@ export interface ParametrosLegitimas {
    * - 'aragon': Aragón
    * - 'galicia': Galicia
    * - 'baleares': Illes Balears
-   * - 'pais-vasco': Bizkaia y Álava (Gipuzkoa no tiene legítima)
+   * - 'pais-vasco': toda la Comunidad Autónoma, también Gipuzkoa (Ley 5/2015 arts. 8 y 10.1)
    * - 'navarra': Comunidad Foral de Navarra (legítima puramente formal)
    */
   regimen: RegimenId;
@@ -87,7 +87,7 @@ export interface ResultadoLegitimas {
    * Legítima individual por hijo (€) — mínimo indisponible de cada uno.
    * En Derecho Común es la legítima ESTRICTA repartida entre los hijos (el tercio de mejora
    * es de reparto libre); en el resto de regímenes, la legítima total entre los hijos.
-   * `null` cuando no hay descendientes o la legítima es colectiva (Aragón).
+   * `null` cuando no hay descendientes o la legítima es colectiva (Aragón y País Vasco).
    */
   legitimaPorHijo: number | null;
   /** Tercio de mejora (€) — solo Derecho Común con descendientes */
@@ -120,7 +120,10 @@ const REGIMENES: Record<RegimenId, DatosRegimen> = {
   aragon:      { nombre: 'Aragón', ccaas: 'Aragón', fuente: 'Código del Derecho Foral de Aragón (CDFA) arts. 486 y ss.' },
   galicia:     { nombre: 'Galicia', ccaas: 'Galicia', fuente: 'Ley 2/2006 de Derecho Civil de Galicia' },
   baleares:    { nombre: 'Islas Baleares', ccaas: 'Illes Balears (Mallorca e Ibiza)', fuente: 'Compilació de Dret Civil de les Illes Balears' },
-  'pais-vasco':{ nombre: 'País Vasco', ccaas: 'Bizkaia y Álava (Gipuzkoa: sin legítima)', fuente: 'Ley 5/2015 de Derecho Civil Vasco' },
+  // Ley 5/2015, art. 8: se aplica «en todo el ámbito territorial de la Comunidad Autónoma del País
+  // Vasco», y art. 10.1: a quien tenga vecindad civil vasca. Hasta el 15/11/2026 decía «Gipuzkoa:
+  // sin legítima», y el art. 49 fija 1/3 sin excepción guipuzcoana (hallazgo 4727).
+  'pais-vasco':{ nombre: 'País Vasco', ccaas: 'Bizkaia, Gipuzkoa y Álava (vecindad civil vasca)', fuente: 'Ley 5/2015 de Derecho Civil Vasco' },
   navarra:     { nombre: 'Navarra', ccaas: 'Comunidad Foral de Navarra', fuente: 'Compilación del Derecho Civil Foral de Navarra' },
 };
 
@@ -253,8 +256,11 @@ export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
         legitimaPorHijo = r(legitimaTotal / p.numHijos);
         fraccionLegitima = '1/4 del patrimonio para todos los descendientes';
         if (tieneConyuge) {
+          // Art. 452-1 CCCat: no es un usufructo, sino «la cantidad que sea precisa para
+          // atenderlas, hasta un máximo de la cuarta parte del activo hereditario líquido», y
+          // solo si el viudo no tiene recursos suficientes. La cifra publicada es ese MÁXIMO.
           derechoConyuge = r(PN / 4);
-          descripcionDerechoConyuge = 'Cuarta viudal: derecho a 1/4 del patrimonio si quedan sin recursos. No siempre aplicable.';
+          descripcionDerechoConyuge = 'Cuarta viudal (CCCat art. 452-1): si el viudo no tiene recursos suficientes, la cantidad necesaria para atender sus necesidades, en propiedad, hasta un máximo de 1/4 del activo hereditario líquido. La cifra es ese máximo, haya o no hijos.';
         }
         notas.push('Mayor libertad de testar que el Derecho Común. La legítima es un crédito contra la herencia, no una parte indisponible.');
         break;
@@ -300,9 +306,11 @@ export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
       }
       case 'pais-vasco': {
         // Art. 49 Ley 5/2015: la legítima de los hijos o descendientes es un tercio del caudal.
+        // Art. 48.2: el causante «puede elegir entre ellos a uno o varios y apartar a los demás»
+        // (el art. 51.3 la llama «legítima colectiva»): no hay mínimo por hijo, como en Aragón.
         legitimaTotal = r(PN / 3);
-        legitimaPorHijo = r(legitimaTotal / p.numHijos);
-        fraccionLegitima = '1/3 del patrimonio para descendientes (Bizkaia/Álava)';
+        esLegitivaColectiva = true;
+        fraccionLegitima = '1/3 del patrimonio para descendientes (legítima colectiva)';
         if (tieneConyuge) {
           // Art. 52: usufructo de la MITAD de todos los bienes si concurre con descendientes
           // (dos tercios en su defecto). No es un usufructo universal.
@@ -311,7 +319,8 @@ export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
           // usufructo alcanza la MITAD, y esa frase es la que delata a un usufructo universal.
           descripcionDerechoConyuge = 'Usufructo de la mitad de los bienes del causante por concurrir con descendientes (Ley 5/2015 art. 52). Sin descendientes sería el usufructo de dos tercios.';
         }
-        notas.push('En Gipuzkoa no existe legítima de descendientes y en el valle de Ayala rige la libertad absoluta de testar. En el resto de Bizkaia y Álava aplica este 1/3.');
+        notas.push('Legítima colectiva (Ley 5/2015 arts. 48.2 y 51.3): el tercio puede atribuirse a uno o varios descendientes, apartando a los demás.');
+        notas.push('Rige en toda la Comunidad Autónoma, también en Gipuzkoa (arts. 8 y 49). Excepciones: en el valle de Ayala (Álava) hay libertad de testar (art. 89), y en la tierra llana de Bizkaia, Aramaio y Llodio la troncalidad prevalece sobre la legítima (art. 47).');
         break;
       }
       case 'navarra': {
