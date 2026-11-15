@@ -42,6 +42,13 @@ export const jsonLd = generateWebAppSchema({
   features: [],
 });
 
+// Cabo C0570 (15/11/2026): la FAQ visible decía 3-5 «según Instagram (2024)» y el JSON-LD 5-15 «sin
+// pasar de 10», y la herramienta recomendaba 10-15. Desde diciembre de 2025 Instagram no admite más
+// de 5 hashtags por publicación o reel (anuncio de Adam Mosseri del 19/12/2025, recogido por Social
+// Media Today: socialmediatoday.com/news/instagram-implements-new-limits-on-hashtag-use/808309/).
+export const RESPUESTA_FAQ_HASHTAGS_INSTAGRAM =
+  'Como mucho 5: desde diciembre de 2025 Instagram no admite más de 5 hashtags por publicación o reel (antes el tope era 30). La propia plataforma pide que sean pocos y específicos del contenido en lugar de genéricos: ayudan a clasificar la publicación y a que la encuentre quien sigue ese tema, pero no multiplican el alcance por sí solos. Con ese tope, lo más útil es elegir de 3 a 5 que describan de verdad lo que publicas.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -59,7 +66,7 @@ export const faqJsonLd = {
       name: '¿Cuántos hashtags debo usar en Instagram?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Instagram permite hasta 30 hashtags por publicación, pero la práctica recomendada en 2024-2025 es usar entre 5 y 15 hashtags relevantes. El propio Instagram sugiere no exceder 10 para evitar que el algoritmo los interprete como spam. Lo más efectivo es combinar hashtags de gran volumen (más de 1 millón de publicaciones), de nicho (100.000-500.000) y específicos del contenido.',
+        text: RESPUESTA_FAQ_HASHTAGS_INSTAGRAM,
       },
     },
     {

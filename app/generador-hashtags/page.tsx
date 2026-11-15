@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './GeneradorHashtags.module.css';
+import { RESPUESTA_FAQ_HASHTAGS_INSTAGRAM } from './metadata';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard,
@@ -67,7 +68,8 @@ const HASHTAGS_POR_NICHO: Record<string, HashtagCategoria[]> = {
 };
 
 const PLATAFORMAS = [
-  { id: 'instagram', nombre: 'Instagram', icono: '📸', maxHashtags: 30, recomendado: '10-15' },
+  // Tope de 5 desde diciembre de 2025 (cabo C0570; fuente en RESPUESTA_FAQ_HASHTAGS_INSTAGRAM)
+  { id: 'instagram', nombre: 'Instagram', icono: '📸', maxHashtags: 5, recomendado: '3-5' },
   { id: 'tiktok', nombre: 'TikTok', icono: '🎵', maxHashtags: 100, recomendado: '3-5' },
   { id: 'twitter', nombre: 'Twitter/X', icono: '🐦', maxHashtags: 280, recomendado: '1-3' },
   { id: 'linkedin', nombre: 'LinkedIn', icono: '💼', maxHashtags: 30, recomendado: '3-5' },
@@ -317,7 +319,7 @@ export default function GeneradorHashtagsPage() {
                 <tr><th>Plataforma</th><th>Cantidad óptima</th><th>Tamaño ideal</th><th>Dónde ponerlos</th><th>Estrategia recomendada</th></tr>
               </thead>
               <tbody>
-                <tr><td>Instagram</td><td>5–15 (máx. 30)</td><td>Mixto: nicho + medio + popular</td><td>Caption o primer comentario</td><td>3 grandes + 5 medianos + 7 nicho</td></tr>
+                <tr><td>Instagram</td><td>3–5 (máx. 5 desde dic. 2025)</td><td>Específicos del contenido</td><td>Caption o primer comentario</td><td>Pocos y de nicho, mejor que populares genéricos</td></tr>
                 <tr><td>TikTok</td><td>3–8</td><td>Trending + nicho específico</td><td>Caption (primeras palabras)</td><td>1–2 trending + 2–3 nicho + #FYP</td></tr>
                 <tr><td>Twitter / X</td><td>1–3</td><td>Cortos y precisos</td><td>Integrados en el texto</td><td>1 trending + 1 nicho temático</td></tr>
                 <tr><td>LinkedIn</td><td>3–7</td><td>Profesionales y específicos</td><td>Al final del post</td><td>Sector + habilidad + tendencia</td></tr>
@@ -367,7 +369,7 @@ export default function GeneradorHashtagsPage() {
         <div className={styles.eduFaq}>
           <h2>Preguntas frecuentes sobre hashtags</h2>
           <div className={styles.faqList}>
-            <div className={styles.faqItem}><h4>¿Cuántos hashtags debo usar en Instagram?</h4><p>La recomendación actual de Instagram (2024) es usar entre 3 y 5 hashtags muy relevantes. Estudios internos de Instagram sugieren que más hashtags no implica más alcance. Sin embargo, muchas cuentas siguen obteniendo buenos resultados con 10–15. Prueba ambas estrategias con tu audiencia.</p></div>
+            <div className={styles.faqItem}><h4>¿Cuántos hashtags debo usar en Instagram?</h4><p>{RESPUESTA_FAQ_HASHTAGS_INSTAGRAM}</p></div>
             <div className={styles.faqItem}><h4>¿Los hashtags funcionan en 2025?</h4><p>Sí, pero de forma diferente. Instagram y TikTok han evolucionado hacia algoritmos de recomendación por contenido (similar a YouTube). Los hashtags ayudan a categorizar el contenido para el algoritmo, pero el alcance depende más del engagement que del volumen de hashtags. Son una señal de contexto, no un motor de alcance.</p></div>
             <div className={styles.faqItem}><h4>¿Debo poner los hashtags en el caption o en los comentarios?</h4><p>Ambas opciones funcionan igual en términos de alcance según Instagram. En el caption son inmediatos; en el primer comentario mantienen el caption más limpio. La elección es estética. En TikTok y LinkedIn, siempre en el caption.</p></div>
             <div className={styles.faqItem}><h4>¿Qué es un hashtag shadowbanned?</h4><p>Algunos hashtags son penalizados por Instagram por haberse usado para contenido inapropiado. Los posts con estos hashtags no aparecen en la página de exploración del hashtag. Puedes verificarlo buscando el hashtag: si el tab &quot;recientes&quot; está oculto, está shadowbanned. Evita usarlos aunque parezcan inocuos.</p></div>
@@ -409,7 +411,7 @@ export default function GeneradorHashtagsPage() {
             <strong>Errores que reducen el alcance de tus hashtags</strong>
           </div>
           <ul className={styles.warningList}>
-            <li>Usar siempre los mismos 30 hashtags en cada post — puede interpretarse como spam y reduce el alcance orgánico</li>
+            <li>Usar siempre los mismos hashtags en cada post — puede interpretarse como spam y reduce el alcance orgánico</li>
             <li>Elegir solo hashtags masivos (#love, #photo, #food) — tienen millones de publicaciones y tu contenido desaparece en segundos</li>
             <li>No verificar si el hashtag está shadowbanned — un hashtag penalizado oculta tu post en la página de exploración</li>
             <li>Ignorar la relevancia del hashtag para el contenido — Instagram penaliza cuando el contexto del post no coincide con los hashtags usados</li>
