@@ -143,7 +143,9 @@ test.describe('estimacion-deduccion-discapacidad — la regla del art. 60', () =
     // Los tres supuestos del art. 60 son ALTERNATIVOS y el grado basta por sí solo. Esta era la
     // regla que el motor tenía mal y la app tenía bien: al unificar había que conservar la de la app.
     await page.getByRole('radio', { name: /ascendiente/i }).check();
-    await page.getByRole('radio', { name: /65% o superior/i }).check();
+    // La etiqueta lleva espacio duro antes del % desde el hallazgo 4793 (formato RAE): `\s` lo
+    // admite, igual que la forma pegada de antes.
+    await page.getByRole('radio', { name: /65\s?% o superior/i }).check();
     await expect(page.getByRole('checkbox', { name: /asistencia de terceras/i })).not.toBeChecked();
     await page.getByRole('button', { name: /Estimar ahorro fiscal/i }).click();
 
@@ -155,7 +157,7 @@ test.describe('estimacion-deduccion-discapacidad — la regla del art. 60', () =
 
     // Con grado 33-64 % la acreditación sí es condición necesaria: solo el mínimo de 3.000 €.
     await page.getByRole('radio', { name: /ascendiente/i }).check();
-    await page.getByRole('radio', { name: /33% al 64%/i }).check();
+    await page.getByRole('radio', { name: /33\s?% al 64\s?%/i }).check();
     await page.getByRole('button', { name: /Estimar ahorro fiscal/i }).click();
 
     // Sin acreditar, con grado 33-64 % el incremento de asistencia NO procede: la línea de
