@@ -1482,11 +1482,15 @@ test.describe('re-inspección 02/10/2026 · móvil 412 px (Pixel 7)', () => {
     const caja = (await boton.boundingBox())!;
     const x = caja.x + caja.width / 2;
     const y = caja.y + caja.height / 2;
+    // Los dos toques seguidos, sin esperar a la pregunta 9 entre medias: con carga esa espera
+    // pasaba de los ~300 ms en que Chrome cuenta una ráfaga (C0743, ver anotarRafaga).
+    await anotarRafaga(page);
     await page.touchscreen.tap(x, y);
-    await expect(page.getByText('Pregunta 9 de 10').first()).toBeVisible();
     await page.waitForTimeout(150);
     await page.touchscreen.tap(x, y);
     await page.waitForTimeout(300);
+    expect(await detallesDeLaRafaga(page), 'el 2.º toque debe contar como ráfaga (detail 2)').toEqual([1, 2]);
+    await expect(page.getByText('Pregunta 9 de 10').first()).toBeVisible();
     await expect(page.locator(MARCADAS_EN_PANTALLA)).toHaveCount(0);
     // El testigo de que el 2.º toque de verdad cayó sobre una opción: medio segundo después, un
     // toque en el mismo punto ya es una intención nueva y sí la marca.
