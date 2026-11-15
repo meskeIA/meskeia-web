@@ -438,6 +438,16 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Alerta metodológica**: cambio del múltiplo (200% SMI titular) o del régimen fiscal asociado (impatriados/Beckham).
 - **Verificado**: 2026-06-11 · vigencia 2026.
 
+#### `legitimas.ts` — Legítimas y derecho del cónyuge viudo en los siete regímenes civiles
+- **Contiene**: las fracciones de la legítima de los descendientes (y de los ascendientes en el Código Civil) y del usufructo o cuota del cónyuge viudo, cada una con su artículo y su cita literal. Derecho civil, no tributario: está aquí por la regla de `data/fiscal` (dato normativo con fuente y fecha, nunca a mano en el motor).
+- **Normativa**: Código Civil (BOE-A-1889-4763, arts. 807-838) · Libro IV CCCat (BOE-A-2008-13533, arts. 451-5 y 452-1) · CDFA (BOA-d-2011-90007, arts. 271, 283 y 486) · Ley 2/2006 de Galicia (BOE-A-2006-14563, arts. 238, 243 y 253) · Compilación de Baleares (BOIB-i-1990-90001, arts. 41, 42, 45, 65 y 79) · Ley 5/2015 vasca (BOE-A-2015-8273, arts. 47-52) · Fuero Nuevo (BOE-A-1973-330, leyes 253, 267 y 268).
+- **Vigilar**: reformas de los derechos civiles autonómicos (precedentes: Ley 7/2017 balear, Ley Foral 21/2019 de Navarra, Ley 5/2015 vasca, que unificó Bizkaia, Gipuzkoa y Álava) y del Código Civil en sucesiones (Ley 8/2021 tocó el art. 808).
+- **Cadencia**: puntual (ley autonómica, sin calendario); marco estable.
+- **Alerta metodológica**: que un régimen cambie QUIÉN es legitimario (no solo la fracción), como hizo Galicia en 2006 al retirar a los ascendientes: el motor rechaza los forales sin descendientes según esa lista (cabo C0776).
+- **Dependencias internas**: `lib/calculadoras/legitimas.ts` → `estimador-legitimas`, MCP de Delegum (`calcular_legitimas`) y `/api/chatgpt/legitimas`.
+- **Auditoría de origen (15/11/2026)**: nace del hallazgo 4738 (cabo C0763). Las 15 fracciones estaban escritas a mano en el motor; todas coincidían con su artículo (0 diferencias en 3.541.230 casos) y el usuario dio el OK a cada una con su cita.
+- **Verificado**: 2026-11-15 · vigencia 2026.
+
 ### 3.5 Catálogos estables (marcos, no cifras)
 
 > Estos cuatro módulos describen **categorías** de ayuda/trámite, no importes. Cambian poco, pero

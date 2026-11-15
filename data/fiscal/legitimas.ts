@@ -24,8 +24,8 @@
  *     y 268 (redacción de la Ley Foral 21/2019).
  *
  * Al crearlo NO se cambió ningún valor del motor: todas las fracciones que ya calculaba
- * coincidían con su artículo. Es tipo `fiscal` (nivel 3): cada valor espera el OK del usuario,
- * con su cita, antes de dar el módulo por verificado del todo (cabo de destino `usuario`).
+ * coincidían con su artículo. Es tipo `fiscal` (nivel 3): el usuario dio el OK a los 15 valores,
+ * con su cita, en /reparar del 15/11/2026 (cabo C0775). Ficha de vigilancia: §3.4 del manifiesto.
  */
 
 // ─── Metadatos ───────────────────────────────────────────────────────────────
