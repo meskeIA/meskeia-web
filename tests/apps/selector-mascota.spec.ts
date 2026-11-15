@@ -1572,6 +1572,26 @@ test.describe('re-inspección 02/10/2026 · contenido y lectores de pantalla', (
 //      página cita como contraste (cabo C0011).
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * Anota el `detail` de cada clic desde ahora (C0743, 15/11/2026). La guarda de ráfaga solo frena
+ * el 2.º toque si el navegador lo cuenta como ráfaga (`detail` 2), y Chrome deja de contarlo así
+ * pasados ~300 ms. Antes, entre los dos toques se esperaba a que se pintara la pantalla nueva, y con
+ * 8 workers esa espera pasaba de 300 ms: el 2.º toque llegaba como toque NUEVO, iba a «Contacto»
+ * con razón y el test fallaba (suite del 14/11; aislado, 3 de 3). Ahora los dos toques van seguidos
+ * y el test exige [1, 2]: si la carga separa los toques, falla diciéndolo, no culpando a la app.
+ */
+async function anotarRafaga(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const w = window as unknown as { __detallesRafaga: number[] };
+    w.__detallesRafaga = [];
+    window.addEventListener('click', (e) => w.__detallesRafaga.push(e.detail), true);
+  });
+}
+
+async function detallesDeLaRafaga(page: Page): Promise<number[]> {
+  return page.evaluate(() => (window as unknown as { __detallesRafaga: number[] }).__detallesRafaga);
+}
+
 /** Como `responder`, pero en la pregunta 6 se pueden marcar varias casillas (lista de textos). */
 async function responderConCasillas(page: Page, perfil: ReadonlyArray<string | readonly string[]>): Promise<void> {
   for (let i = 0; i < perfil.length; i++) {
@@ -1955,12 +1975,14 @@ for (const movil of MOVILES_1010) {
       await abrirTest(page);
       await contestarLasDiez(page);
       const p = await centrarBotonEn(page, '[class*="btnSiguiente"]', movil.yVer);
+      await anotarRafaga(page);
       await page.touchscreen.tap(p.x, p.y);
-      await expect(page.getByRole('heading', { name: 'Tu mascota ideal' })).toBeVisible();
       await page.waitForTimeout(150);
       await page.touchscreen.tap(p.x, p.y);
       await page.waitForTimeout(800);
+      expect(await detallesDeLaRafaga(page), 'el 2.º toque debe contar como ráfaga (detail 2)').toEqual([1, 2]);
       expect(new URL(page.url()).pathname).toBe('/selector-mascota/');
+      await expect(page.getByRole('heading', { name: 'Tu mascota ideal' })).toBeVisible();
       await expect(page.locator('[class*="recomendacionValor"]')).toBeVisible();
     });
 
@@ -1982,11 +2004,12 @@ for (const movil of MOVILES_1010) {
       await page.getByRole('heading', { name: 'Tu mascota ideal' }).waitFor();
       await page.waitForTimeout(500);
       const p = await centrarBotonEn(page, '[class*="btnRepetir"]', movil.yRepetir);
+      await anotarRafaga(page);
       await page.touchscreen.tap(p.x, p.y);
-      await expect(page.getByRole('button', { name: /Empezar el test/ })).toBeVisible();
       await page.waitForTimeout(150);
       await page.touchscreen.tap(p.x, p.y);
       await page.waitForTimeout(800);
+      expect(await detallesDeLaRafaga(page), 'el 2.º toque debe contar como ráfaga (detail 2)').toEqual([1, 2]);
       expect(new URL(page.url()).pathname).toBe('/selector-mascota/');
       await expect(page.getByRole('button', { name: /Empezar el test/ })).toBeVisible();
     });
