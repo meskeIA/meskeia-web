@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion } from './_hidratacion';
 
 /**
  * estimacion-deduccion-discapacidad — el mínimo valorado al tipo marginal
@@ -35,6 +36,30 @@ import { test, expect, Page } from '@playwright/test';
  *
  * Es una cota INFERIOR: quien tenga además mínimos por descendientes o ascendientes los apila
  * debajo, y el de discapacidad cae en tramos algo más altos.
+ *
+ * ── Inspección del 15/11/2026 (primera, segmento fiscal) ─────────────────────────────────
+ * Fuentes de los esperados, leídas ese día:
+ *   · `data/fiscal/irpf.ts`: TRAMOS_IRPF_2025 (19 % hasta 12.450 · 24 % hasta 20.200 · 30 %
+ *     hasta 35.200), MINIMOS_IRPF_2025.personal = 5.550, `calcularCuotaIntegraGeneral`.
+ *   · `data/fiscal/dependencia.ts`: DEDUCCIONES_IRPF_DISCAPACIDAD_2025 (3.000 / 9.000 + 3.000).
+ *   · BOE, Ley 35/2006 consolidada (BOE-A-2006-20764): art. 60.1 y 60.2 (3.000 / 9.000 € y
+ *     3.000 € por asistencia ante «ayuda de terceras personas o movilidad reducida, o un grado
+ *     de discapacidad igual o superior al 65 por ciento»), art. 60.3 (pensionistas de
+ *     incapacidad permanente total, absoluta o gran invalidez → grado ≥ 33 %; ≥ 65 % solo para
+ *     la incapacidad declarada judicialmente), art. 61.3.ª (circunstancias a la fecha de
+ *     devengo), art. 19.2.f (+3.500 € / +7.750 € de gastos para trabajadores activos con
+ *     discapacidad) y art. 81 bis (hasta 1.200 €/año por descendiente o ascendiente con
+ *     discapacidad, con abono anticipado).
+ *
+ * El motor da lo que la ley pide para las cuatro combinaciones que admite la app (casos 3-5).
+ * Los casos con `test.fail()` vigilan hallazgos ABIERTOS de esa inspección: el día que se
+ * reparen darán «unexpectedly passed» y hay que quitarles la marca y dejar el caso como
+ * comprobación normal.
+ *
+ * ⚠️ Nota sobre el test «ya no se pregunta el tipo marginal»: su `toContainText('cota inferior')`
+ * consagra una afirmación que solo es cierta si la base liquidable general alcanza 5.550 € más el
+ * mínimo (ver el caso ABIERTO «cota inferior» de abajo). Si la reparación cambia ese texto,
+ * esa línea tendrá que ajustarse con ella.
  */
 
 const RUTA = '/estimacion-deduccion-discapacidad/';
@@ -45,6 +70,12 @@ const limpiar = (s: string) => s.replace(ESPACIO_DURO, ' ').replace(/\s+/g, ' ')
 async function fila(page: Page, etiqueta: string): Promise<string> {
   const f = page.locator(`css=div:has(> span:text-is("${etiqueta}"))`).first();
   return limpiar(await f.locator('span').nth(1).innerText());
+}
+
+/** La misma celda SIN normalizar los espacios: para mirar el espacio duro antes del «%». */
+async function filaCruda(page: Page, etiqueta: string): Promise<string> {
+  const f = page.locator(`css=div:has(> span:text-is("${etiqueta}"))`).first();
+  return (await f.locator('span').nth(1).textContent()) ?? '';
 }
 
 async function ahorro(page: Page): Promise<string> {
@@ -58,11 +89,48 @@ async function estimar(page: Page, opciones: { titular?: string; grado?: string;
   await page.getByRole('button', { name: 'Estimar ahorro fiscal por discapacidad' }).click();
 }
 
+/** Respuesta de una pregunta del FAQPage que sirve el layout (lo que leen buscadores e IA). */
+async function respuestaFaqJsonLd(page: Page, pregunta: string): Promise<string> {
+  const bloques = await page.$$eval('script[type="application/ld+json"]', (ss) => ss.map((s) => s.textContent ?? ''));
+  for (const b of bloques) {
+    const j = JSON.parse(b) as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] };
+    if (j['@type'] !== 'FAQPage') continue;
+    const q = j.mainEntity?.find((e) => e.name === pregunta);
+    if (q) return q.acceptedAnswer.text;
+  }
+  throw new Error(`La pregunta «${pregunta}» no está en el FAQPage`);
+}
+
+/** Lista `featureList` del WebApplication que sirve el layout. */
+async function featuresJsonLd(page: Page): Promise<string[]> {
+  const bloques = await page.$$eval('script[type="application/ld+json"]', (ss) => ss.map((s) => s.textContent ?? ''));
+  for (const b of bloques) {
+    const j = JSON.parse(b) as { '@type'?: string; featureList?: string[] | string };
+    if (j['@type'] !== 'WebApplication') continue;
+    const f = j.featureList ?? [];
+    return Array.isArray(f) ? f : f.split(',').map((s) => s.trim());
+  }
+  throw new Error('No hay WebApplication en el JSON-LD');
+}
+
+/**
+ * Respuesta de una pregunta de la FAQ VISIBLE. Va dentro de <EducationalSection>, que nace
+ * plegada pero monta su contenido (lo oculta por CSS): se lee con textContent.
+ */
+async function respuestaFaqVisible(page: Page, pregunta: string): Promise<string> {
+  const h4 = page.locator('h4', { hasText: pregunta }).first();
+  const texto = await h4.locator('xpath=following-sibling::p[1]').textContent();
+  return limpiar(texto ?? '');
+}
+
 test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Estimación de Deducción IRPF por Discapacidad'
   );
+  // 15/11/2026: antes de marcar radios o pulsar, React tiene que haber montado los controles;
+  // un clic previo a la hidratación se pierde y el caso mediría los valores por defecto.
+  await esperarHidratacion(page, ['input[name="grado"]', 'input[name="titular"]']);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -110,4 +178,197 @@ test('ya no se pregunta el tipo marginal, porque no interviene', async ({ page }
   await expect(nota).toContainText('tipo cero');
   await expect(nota).toContainText('no depende de tu tipo marginal');
   await expect(nota).toContainText('cota inferior');
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Inspección del 15/11/2026 — casos que el motor resuelve bien
+// ═════════════════════════════════════════════════════════════════════════════
+
+test('CASO 3 · descendiente con grado 33-64 % y movilidad reducida: 3.000 + 3.000 €', async ({ page }) => {
+  // Art. 60.2 LIRPF: 3.000 € por el descendiente con discapacidad, más 3.000 € por gastos de
+  // asistencia porque acredita movilidad reducida (casilla marcada) = 6.000 €.
+  // Ahorro = escala(5.550 + 6.000) − escala(5.550) = escala(11.550) − escala(5.550)
+  //        = 2.194,50 − 1.054,50 = 1.140,00 € (todo cae en el tramo del 19 %) → 19,00 %.
+  await estimar(page, { titular: 'Un descendiente (hijo/a)', grado: 'Del 33% al 64%', asistencia: true });
+
+  expect(await fila(page, 'Mínimo por discapacidad')).toBe('3000,00 €');
+  expect(await fila(page, 'Gastos de asistencia')).toBe('3000,00 €');
+  expect(await fila(page, 'Total mínimo aplicable')).toBe('6000,00 €');
+  expect(await fila(page, 'Tipo al que se valora el mínimo')).toBe('19,00 %');
+  expect(await ahorro(page)).toBe('1140,00 €');
+});
+
+test('CASO 4 · ascendiente con grado ≥ 65 % SIN marcar la casilla: el grado basta para los 3.000 €', async ({ page }) => {
+  // Art. 60.2 LIRPF: 9.000 € por el ascendiente con grado ≥ 65 %, y el aumento de 3.000 € por
+  // asistencia procede también por «un grado de discapacidad igual o superior al 65 por
+  // ciento», sin acreditar ayuda de terceros = 12.000 €.
+  // Ahorro = escala(17.550) − escala(5.550) = 3.589,50 − 1.054,50 = 2.535,00 €;
+  // tipo = 2.535 / 12.000 = 21,125 % → 21,13 %.
+  await estimar(page, { titular: 'Un ascendiente (padre/madre)', grado: '65% o superior' });
+  await expect(page.getByRole('checkbox').first()).not.toBeChecked();
+
+  expect(await fila(page, 'Mínimo por discapacidad')).toBe('9000,00 €');
+  expect(await fila(page, 'Gastos de asistencia')).toBe('3000,00 €');
+  expect(await fila(page, 'Total mínimo aplicable')).toBe('12.000,00 €');
+  expect(await fila(page, 'Tipo al que se valora el mínimo')).toBe('21,13 %');
+  expect(await ahorro(page)).toBe('2535,00 €');
+});
+
+test('CASO 5 · grado ≥ 65 % CON la casilla marcada: los supuestos son alternativos, no se suman', async ({ page }) => {
+  // Art. 60.1: los tres supuestos del aumento (ayuda de terceros, movilidad reducida, grado
+  // ≥ 65 %) dan derecho a UN aumento de 3.000 €, no a uno por supuesto. Esperado: 3.000 € de
+  // asistencia (no 6.000), 12.000 € de total y el mismo ahorro de 2.535,00 €.
+  await estimar(page, { grado: '65% o superior', asistencia: true });
+
+  expect(await fila(page, 'Gastos de asistencia')).toBe('3000,00 €');
+  expect(await fila(page, 'Total mínimo aplicable')).toBe('12.000,00 €');
+  expect(await ahorro(page)).toBe('2535,00 €');
+});
+
+test('CASO 6 · no se puede pedir un grado inferior al 33 %, y «Limpiar» retira el resultado', async ({ page }) => {
+  // Art. 60.3 LIRPF: solo es persona con discapacidad a efectos del impuesto quien acredita un
+  // grado ≥ 33 %. La app no admite otra cosa: el grupo de grado ofrece exactamente dos opciones,
+  // las dos ≥ 33 %, y no hay ningún campo numérico donde colar un grado o una renta inválidos.
+  const grados = page.locator('input[name="grado"]');
+  await expect(grados).toHaveCount(2);
+  expect(await grados.evaluateAll((is) => is.map((i) => (i as HTMLInputElement).value))).toEqual(['33a65', '65oMas']);
+
+  await estimar(page, { titular: 'Un ascendiente (padre/madre)', grado: '65% o superior', asistencia: true });
+  expect(await ahorro(page)).toBe('2535,00 €');
+
+  await page.getByRole('button', { name: 'Limpiar formulario' }).click();
+  await expect(page.getByText('Completa los datos y pulsa')).toBeVisible();
+  await expect(page.getByText('Ahorro fiscal estimado')).toHaveCount(0);
+  await expect(page.getByRole('radio', { name: 'El contribuyente' })).toBeChecked();
+  await expect(page.getByRole('radio', { name: 'Del 33% al 64%' })).toBeChecked();
+  await expect(page.getByRole('checkbox').first()).not.toBeChecked();
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Inspección del 15/11/2026 — hallazgos ABIERTOS (test.fail hasta que se reparen)
+// ═════════════════════════════════════════════════════════════════════════════
+
+test('ABIERTO · el FAQPage no debe decir que el ahorro depende del tipo marginal (3.600 € al 30 %)', async ({ page }) => {
+  // El FAQPage responde «¿Cuánto dinero me puedo ahorrar…?» con «depende del tipo marginal… con
+  // un tipo marginal del 30 %, el ahorro fiscal sería de 3.600 €» para el mínimo de 12.000 €.
+  // Es el defecto reparado el 12/09/2026, que sigue publicado para buscadores e IA: el motor y
+  // la página dan 2.535,00 € (art. 63.1.2.º, cálculo del CASO 2), sea cual sea el marginal.
+  test.fail();
+  const r = await respuestaFaqJsonLd(page, '¿Cuánto dinero me puedo ahorrar en la declaración de la renta por discapacidad?');
+  expect(r).not.toContain('3.600');
+  expect(r).toMatch(/2\.535/);
+});
+
+test('ABIERTO · la tabla comparativa no debe valorar el mínimo al 30 % ni al 45 %', async ({ page }) => {
+  // La tabla del bloque educativo publica «Ahorro al 45 %: 5.400 €» para 12.000 € de mínimo, y
+  // «Ahorro al 19 %: 2.280 €». Por el art. 63.1.2.º, 12.000 € sobre el mínimo personal ahorran
+  // 2.535,00 € (CASO 2) a cualquier renta suficiente; la propia página lo dice dos párrafos antes.
+  test.fail();
+  const filas = await page.locator('table tr').evaluateAll((trs) => trs.map((tr) => tr.textContent ?? ''));
+  expect(filas.some((f) => /Ahorro al (30|45)/.test(f))).toBe(false);
+  expect(filas.join(' ')).toMatch(/2\.?535/);
+});
+
+test('ABIERTO · features del JSON-LD no debe prometer el ahorro «según tipo marginal»', async ({ page }) => {
+  // La app no pide el tipo marginal y su motor no lo usa (desde el 12/09/2026).
+  test.fail();
+  const f = await featuresJsonLd(page);
+  expect(f.some((x) => /tipo marginal/i.test(x))).toBe(false);
+});
+
+test('ABIERTO · la incapacidad permanente absoluta o gran invalidez equivale a ≥ 33 %, no a ≥ 65 %', async ({ page }) => {
+  // Art. 60.3 LIRPF (BOE-A-2006-20764): «se considerará acreditado un grado de discapacidad igual
+  // o superior al 33 por ciento en el caso de los pensionistas de la Seguridad Social que tengan
+  // reconocida una pensión de incapacidad permanente total, absoluta o gran invalidez». El 65 %
+  // solo se presume para la incapacidad declarada judicialmente. La FAQ visible asimila la
+  // absoluta y la gran invalidez a ≥ 65 %: quien la siga marcará «65 % o superior» y la app le
+  // dará 2.535,00 € de ahorro (CASO 2) en vez de 570,00 € (CASO 1).
+  test.fail();
+  const r = await respuestaFaqVisible(page, '¿La incapacidad permanente equivale a discapacidad a efectos del IRPF?');
+  expect(r).not.toMatch(/65\s*%\s*\(absoluta/);
+});
+
+test('ABIERTO · la discapacidad reconocida a mitad de año no se prorratea: cuenta la fecha de devengo', async ({ page }) => {
+  // Art. 61.3.ª LIRPF: «La determinación de las circunstancias personales y familiares que deban
+  // tenerse en cuenta a efectos de lo establecido en los artículos 57, 58, 59 y 60 de esta Ley,
+  // se realizará atendiendo a la situación existente en la fecha de devengo del Impuesto». La
+  // FAQ visible dice que «el mínimo se aplica proporcionalmente al período del año».
+  test.fail();
+  const r = await respuestaFaqVisible(page, '¿Qué pasa si la discapacidad se reconoce a mitad de año?');
+  expect(r).not.toContain('proporcionalmente');
+});
+
+test('ABIERTO · «cota inferior» solo vale con base suficiente: con 12.000 € de base el ahorro es 1.225,50 €', async ({ page }) => {
+  // La app no pide la renta y llama a su cifra «cota inferior». Con la fórmula canónica
+  // `calcularCuotaIntegraGeneral` (data/fiscal/irpf.ts), contribuyente con grado ≥ 65 % y base
+  // liquidable general de 12.000 € (una pensión, por ejemplo):
+  //   sin el mínimo de discapacidad: escala(12.000) − escala(5.550) = 2.280,00 − 1.054,50 = 1.225,50 €
+  //   con él: mínimo 5.550 + 12.000 = 17.550 > base → se limita a 12.000 → cuota 0,00 €
+  //   ahorro real = 1.225,50 €; la app muestra 2.535,00 € y dice que ahorrarías «un poco más».
+  // Vale cualquiera de las dos reparaciones: pedir la base, o condicionar el texto a la base
+  // mínima (5.550 € + el mínimo: 17.550 € en este caso).
+  test.fail();
+  await estimar(page, { grado: '65% o superior' });
+  expect(await ahorro(page)).toBe('2535,00 €');
+  const hayEntradaDeRenta = (await page.getByLabel(/base liquidable|renta|ingresos/i).count()) > 0;
+  const nota = (await page.locator('css=div[role="note"]').last().textContent()) ?? '';
+  const condicionaLaCota = /17\.?550/.test(nota) || !/cota inferior/.test(nota);
+  expect(hayEntradaDeRenta || condicionaLaCota).toBe(true);
+});
+
+test('ABIERTO · la app calla el art. 19.2.f (+3.500 €) y la deducción del art. 81 bis (1.200 €)', async ({ page }) => {
+  // El ejemplo «Trabajador con discapacidad del 40 %, salario bruto 28.000 €» da «Ahorro: 570 €»,
+  // y el recuadro de limitaciones solo excluye las deducciones autonómicas. Con data/fiscal
+  // (COTIZACIONES_SS_2025: 6,48 % → 1.814,40 €; art. 20: 0; gastos 2.000 €; TRAMOS_IRPF_2025):
+  //   sin discapacidad: base 24.185,60, mínimo 5.550 → escala(24.185,60) − escala(5.550) = 4.366,68 €
+  //   con ella: gastos +3.500 € (art. 19.2.f) → base 20.685,60, mínimo 8.550 → 4.371,18 − 1.624,50 = 2.746,68 €
+  //   ahorro real = 1.620,00 € (570 del mínimo + 3.500 × 30 % = 1.050 del art. 19.2.f).
+  // Y por un hijo o un ascendiente con discapacidad a cargo, el art. 81 bis da hasta 1.200 €/año
+  // de deducción en la cuota diferencial, anticipable a 100 €/mes, que la app no menciona.
+  test.fail();
+  const texto = (await page.locator('body').textContent()) ?? '';
+  expect(texto).toMatch(/(?<![\d.])1\.?200(,00)?\s?€/);
+  expect(texto).toMatch(/(?<![\d.])3\.?500(,00)?\s?€/);
+});
+
+test('ABIERTO · requisito del ascendiente: convivencia, no «o dependencia económica»', async ({ page }) => {
+  // Art. 59.1 LIRPF: mínimo por el ascendiente «que conviva con el contribuyente»; solo se
+  // asimila a la convivencia el ascendiente con discapacidad que, dependiendo del contribuyente,
+  // esté internado en un centro especializado. La nota de requisitos ofrece la dependencia
+  // económica como alternativa general a la convivencia.
+  test.fail();
+  await page.getByRole('radio', { name: 'Un ascendiente (padre/madre)' }).check();
+  const nota = page.getByRole('note').filter({ hasText: 'Requisitos para aplicar el mínimo por ascendiente' });
+  await expect(nota).toBeVisible();
+  await expect(nota).not.toContainText('o dependencia económica', { timeout: 1000 });
+});
+
+test('ABIERTO · DataReference debe citar la Ley del IRPF, no la LAPAD', async ({ page }) => {
+  // La app muestra «Mínimos por discapacidad IRPF 2025 — Ley 39/2006 LAPAD + LPGE 2025 + RD
+  // 1051/2013 … + RDL 17/2026», verificado el 14/07/2026 y con enlace al IMSERSO: es la meta de
+  // las prestaciones de dependencia (FISCAL_DEPENDENCIA_META). Los mínimos son arts. 60-61 de la
+  // Ley 35/2006.
+  test.fail();
+  await expect(page.getByRole('note', { name: 'Datos de referencia normativos' })).toContainText('35/2006', { timeout: 1000 });
+});
+
+test('ABIERTO · el «%» del resultado va con espacio duro (U+00A0)', async ({ page }) => {
+  // Norma de formato de meskeIA (25/09/2026): «19,00 %» con espacio duro para que el «%» no
+  // salte solo de línea. La celda lleva un espacio normal (U+0020).
+  test.fail();
+  await estimar(page, { grado: 'Del 33% al 64%' });
+  expect(await filaCruda(page, 'Tipo al que se valora el mínimo')).toBe(`19,00${String.fromCharCode(160)}%`);
+});
+
+test('ABIERTO · el resultado se anuncia a los lectores de pantalla', async ({ page }) => {
+  // Tras pulsar «Estimar ahorro» el foco se queda en el botón y la tarjeta de resultados no
+  // tiene región viva: el lector no dice nada (WCAG 4.1.3). La única región viva de la página
+  // es el anunciador de rutas de Next, que se excluye.
+  test.fail();
+  await estimar(page, { grado: 'Del 33% al 64%' });
+  expect(await ahorro(page)).toBe('570,00 €');
+  const vivas = page
+    .locator('[aria-live]:not(#__next-route-announcer__), [role="status"]')
+    .filter({ hasText: '570,00' });
+  expect(await vivas.count()).toBeGreaterThan(0);
 });

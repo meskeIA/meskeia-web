@@ -85,9 +85,23 @@ async function elegirAfinacion(page: Page, nombre: string) {
   await page.getByRole('button', { name: nombre, exact: true }).click();
 }
 
+/**
+ * React ha enganchado los botones de la app. El <h1> viaja en el HTML servido, así que verlo no
+ * dice que la página responda: un clic anterior a la hidratación se pierde (cabecera de
+ * tests/apps/_hidratacion.ts). Añadido por el Inspector el 15/11/2026: los casos del diapasón
+ * pulsaban la raíz nada más ver el título.
+ */
+async function esperarBotonesHidratados(page: Page) {
+  await page.waitForFunction(() => {
+    const boton = Array.from(document.querySelectorAll('button')).find((b) => b.textContent?.includes('Escuchar la escala'));
+    return !!boton && Object.keys(boton).some((k) => k.startsWith('__reactProps$'));
+  });
+}
+
 test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Escalas Musicales');
+  await esperarBotonesHidratados(page);
 });
 
 test.describe('El diapasón dibuja la escala en la posición correcta', () => {
@@ -267,5 +281,309 @@ test.describe('S0177 · escuchar la escala', () => {
     await elegirEscala(page, 'Menor natural');
     await expect(botonEscuchar(page)).toHaveText(/Escuchar la escala/);
     await expect(page.locator('[data-sonando="true"]')).toHaveCount(0);
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR · 15/11/2026 (primera inspección entera, cabos C0496 y C0497)
+ *
+ * CASOS RESUELTOS A MANO ANTES DE ABRIR LA APP (.inspector-trabajo/esperados-escalas.mjs):
+ * fórmula de semitonos de cada escala, deletreo con cada letra UNA sola vez en las escalas de
+ * siete notas y temperamento igual con La4 = 440 Hz, f = 440 · 2^((midi − 69)/12). La app
+ * arranca la escala en la octava del Do central (MIDI 60 + raíz) y la cierra en la octava.
+ *
+ *   1 · normal — La menor natural (raíz 9, 0 2 3 5 7 8 10): A B C D E F G, acordes Am B° C Dm
+ *       Em F G; MIDI 69 71 72 74 76 77 79 + 81 → 440 · 493,88 · 523,25 · 587,33 · 659,26 ·
+ *       698,46 · 783,99 · 880 Hz.
+ *   2 · límite — Fa# mayor (raíz 6): F# G# A# B C# D# **E#** (no F: la letra F ya está en F#);
+ *       MIDI 66 68 70 71 73 75 77 + 78 → 369,99 · 415,30 · 466,16 · 493,88 · 554,37 · 622,25 ·
+ *       698,46 · 739,99 Hz. Fa mayor: F G A **B♭** C D E (no A#). Do# menor armónica: C# D# E
+ *       F# G# A **B#** (MIDI 72, 523,25 Hz). Blues de La: A C D **E♭** E G (lo dice la tabla de
+ *       la propia app, «La-Do-Re-Mib-Mi-Sol», y su FAQ llama b5 a la blue note). La frigio:
+ *       A **B♭** C D E F G («la 2ª bemol es su sello distintivo», dice la app). Mástil: Mi frigio
+ *       en guitarra estándar tiene las mismas clases de nota que Do mayor (48 puntos) y la tónica
+ *       sale en las dos cuerdas de Mi al aire y en su traste 12: 6 + 2 = 8 tónicas, 40 normales.
+ *   3 · a tratar — pulsar «Escuchar» dos veces seguidas no puede dejar dos escalas superpuestas;
+ *       «Detener» y cambiar la raíz mientras suena dejan todos los osciladores terminados.
+ *
+ * Las frecuencias, el mástil y el sonido cuadran. Lo que NO cuadra es el NOMBRE de las notas:
+ * la app solo conoce sostenidos (NOTAS_CROMATICAS), así que toda escala con bemoles o con E#/B#
+ * sale mal deletreada. Esos casos van en test.fail() con «ABIERTO»: cuando se reparen, el test
+ * «pasará», Playwright lo marcará como fallo inesperado y habrá que quitar el test.fail().
+ * ══════════════════════════════════════════════════════════════════════════════════════════ */
+
+type VentanaEspia = typeof window & { __hz: number[]; __creados: number; __escalasTerminados: number };
+
+/** Letra de una nota escrita en inglés (A#, B♭, Bb) o en español (Si♭, Fa#). */
+function letraDe(nombre: string): string {
+  const limpio = nombre.trim();
+  const silabas: Record<string, string> = { Do: 'C', Re: 'D', Mi: 'E', Fa: 'F', Sol: 'G', La: 'A', Si: 'B' };
+  for (const [silaba, letra] of Object.entries(silabas)) if (limpio.startsWith(silaba)) return letra;
+  return limpio.charAt(0).toUpperCase();
+}
+
+const listaNotas = (page: Page) => page.getByRole('list', { name: 'Notas de la escala' });
+const nombresFichas = (page: Page) => listaNotas(page).locator('[class$="_chipNombre"]').allTextContents();
+const gradosFichas = (page: Page) => listaNotas(page).locator('[class$="_chipGrado"]').allTextContents();
+const nombresAcordes = (page: Page) =>
+  page.getByRole('list', { name: 'Acordes diatónicos' }).locator('[class$="_acordeNombre"]').allTextContents();
+
+test.describe('Inspector 15/11/2026 · caso 1 (normal): La menor natural y Do mayor', () => {
+  test('La menor natural: A B C D E F G y sus acordes Am B° C Dm Em F G', async ({ page }) => {
+    await elegirRaiz(page, 'A (La)');
+    await elegirEscala(page, 'Menor natural');
+    expect(await nombresFichas(page)).toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
+    expect(await nombresAcordes(page)).toEqual(['Am', 'B°', 'C', 'Dm', 'Em', 'F', 'G']);
+  });
+
+  test('Do mayor: C D E F G A B y sus acordes C Dm Em F G Am B°', async ({ page }) => {
+    await elegirRaiz(page, 'C (Do)');
+    await elegirEscala(page, 'Mayor');
+    expect(await nombresFichas(page)).toEqual(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
+    expect(await nombresAcordes(page)).toEqual(['C', 'Dm', 'Em', 'F', 'G', 'Am', 'B°']);
+  });
+});
+
+test.describe('Inspector 15/11/2026 · el sonido: frecuencias y silencio', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      const w = window as VentanaEspia;
+      w.__hz = [];
+      w.__creados = 0;
+      w.__escalasTerminados = 0;
+      const original = AudioContext.prototype.createOscillator;
+      AudioContext.prototype.createOscillator = function (this: AudioContext) {
+        const osc = original.call(this);
+        w.__creados++;
+        osc.addEventListener('ended', () => {
+          w.__escalasTerminados++;
+        });
+        const fijar = osc.frequency.setValueAtTime.bind(osc.frequency);
+        osc.frequency.setValueAtTime = (valor: number, cuando: number) => {
+          w.__hz.push(valor);
+          return fijar(valor, cuando);
+        };
+        return osc;
+      };
+    });
+    await page.reload();
+    await esperarBotonesHidratados(page);
+  });
+
+  const hz = (page: Page) => page.evaluate(() => (window as VentanaEspia).__hz);
+  const vivos = (page: Page) =>
+    page.evaluate(() => (window as VentanaEspia).__creados - (window as VentanaEspia).__escalasTerminados);
+  const creados = (page: Page) => page.evaluate(() => (window as VentanaEspia).__creados);
+  const botonEscuchar = (page: Page) => page.getByRole('button', { name: /Escuchar la escala|Detener/ });
+
+  async function escucharSubiendo(page: Page, raiz: string, escala: string): Promise<number[]> {
+    await elegirRaiz(page, raiz);
+    await elegirEscala(page, escala);
+    await page.getByRole('button', { name: 'Subir', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Subir', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await botonEscuchar(page).click();
+    await expect(botonEscuchar(page)).toHaveText(/Detener/);
+    return hz(page);
+  }
+
+  function cuadra(obtenidas: number[], esperadas: number[]) {
+    expect(obtenidas).toHaveLength(esperadas.length);
+    esperadas.forEach((f, i) => expect(obtenidas[i]).toBeCloseTo(f, 2));
+  }
+
+  test('caso 1 · La menor natural subiendo: 440 … 880 Hz', async ({ page }) => {
+    cuadra(await escucharSubiendo(page, 'A (La)', 'Menor natural'),
+      [440, 493.88, 523.25, 587.33, 659.26, 698.46, 783.99, 880]);
+  });
+
+  test('caso 2 · Fa# mayor subiendo: 369,99 … 739,99 Hz (el VII, Mi#, es MIDI 77 = 698,46)', async ({ page }) => {
+    cuadra(await escucharSubiendo(page, 'F# (Fa#)', 'Mayor'),
+      [369.99, 415.3, 466.16, 493.88, 554.37, 622.25, 698.46, 739.99]);
+  });
+
+  test('caso 2 · Do# menor armónica subiendo: el VII (Si#) suena en 523,25 Hz', async ({ page }) => {
+    cuadra(await escucharSubiendo(page, 'C# (Do#)', 'Menor armónica'),
+      [277.18, 311.13, 329.63, 369.99, 415.3, 440, 523.25, 554.37]);
+  });
+
+  test('caso 3 · «Detener» deja todos los osciladores terminados', async ({ page }) => {
+    await page.getByRole('button', { name: 'Lento', exact: true }).click();
+    await botonEscuchar(page).click();
+    await expect(botonEscuchar(page)).toHaveText(/Detener/);
+    expect(await creados(page)).toBe(15); // subir y bajar: 15 notas programadas
+    await botonEscuchar(page).click();
+    await expect(botonEscuchar(page)).toHaveText(/Escuchar la escala/);
+    await expect.poll(() => vivos(page)).toBe(0);
+  });
+
+  test('caso 3 · dos pulsaciones seguidas nunca dejan dos escalas superpuestas', async ({ page }) => {
+    await page.getByRole('button', { name: 'Lento', exact: true }).click();
+    await botonEscuchar(page).dblclick();
+    await page.waitForTimeout(400); // a 60 notas/min ninguna nota acaba sola antes de 0,94 s
+    const enMarcha = await vivos(page);
+    // Una escala de ida y vuelta son 15 osciladores: 30 serían dos sonando a la vez
+    expect(enMarcha).toBeLessThanOrEqual(15);
+    const texto = await botonEscuchar(page).textContent();
+    expect(enMarcha > 0).toBe(/Detener/.test(texto ?? ''));
+  });
+
+  test('caso 3 · cambiar la nota raíz mientras suena la calla del todo', async ({ page }) => {
+    await page.getByRole('button', { name: 'Lento', exact: true }).click();
+    await botonEscuchar(page).click();
+    await expect(botonEscuchar(page)).toHaveText(/Detener/);
+    await elegirRaiz(page, 'D (Re)');
+    await expect(botonEscuchar(page)).toHaveText(/Escuchar la escala/);
+    await expect.poll(() => vivos(page)).toBe(0);
+    await expect(page.locator('[data-sonando="true"]')).toHaveCount(0);
+  });
+});
+
+test.describe('Inspector 15/11/2026 · caso 2 (límite) en el mástil', () => {
+  test('Mi frigio en guitarra estándar: 8 tónicas (las dos cuerdas de Mi, al aire y en el traste 12) y 40 normales', async ({ page }) => {
+    await elegirRaiz(page, 'E (Mi)');
+    await elegirEscala(page, 'Frigio');
+    const { tonicas, normales } = await contarNotas(page);
+    expect(tonicas).toBe(8);
+    expect(normales).toBe(40);
+    expect(await hayNotaEn(page, 0, 12)).toBe('tonica'); // 1ª cuerda, posición más alta
+    expect(await hayNotaEn(page, 5, 12)).toBe('tonica');
+    expect(await hayNotaEn(page, 0, 1)).toBe('normal'); // Fa, la 2ª menor del frigio
+  });
+});
+
+/**
+ * HALLAZGO (15/11/2026, ABIERTO) · el deletreo. Las alturas son correctas (lo prueban las
+ * frecuencias de arriba), pero la app nombra todas las notas con sostenidos y rompe la regla de
+ * una letra por nota: Fa mayor sale con La# en vez de Si♭, Fa# mayor con Fa en vez de Mi#, y
+ * la tabla y el texto de la propia app (Blues «Mib», frigio «2ª bemol») la contradicen.
+ */
+test.describe('Inspector 15/11/2026 · HALLAZGO ABIERTO: deletreo enarmónico', () => {
+  async function letrasDe(page: Page, raiz: string, escala: string) {
+    await elegirRaiz(page, raiz);
+    await elegirEscala(page, escala);
+    return (await nombresFichas(page)).map(letraDe);
+  }
+
+  test('ABIERTO · Fa mayor lleva Si♭ (IV) y no La#; su acorde IV es Si♭', async ({ page }) => {
+    test.fail();
+    const letras = await letrasDe(page, 'F (Fa)', 'Mayor');
+    expect(new Set(letras).size).toBe(7); // hoy: F G A A C D E — la A dos veces
+    expect(letras[3]).toBe('B');
+    expect(letraDe((await nombresAcordes(page))[3])).toBe('B'); // hoy: «A#»
+  });
+
+  test('ABIERTO · Fa# mayor lleva Mi# (VII) y no Fa', async ({ page }) => {
+    test.fail();
+    const letras = await letrasDe(page, 'F# (Fa#)', 'Mayor');
+    expect(new Set(letras).size).toBe(7); // hoy: F# … F — la F dos veces
+    expect(letras[6]).toBe('E');
+  });
+
+  test('ABIERTO · Do# menor armónica lleva Si# (VII) y no Do', async ({ page }) => {
+    test.fail();
+    const letras = await letrasDe(page, 'C# (Do#)', 'Menor armónica');
+    expect(new Set(letras).size).toBe(7); // hoy: C# … C
+    expect(letras[6]).toBe('B');
+  });
+
+  test('ABIERTO · el blues de La lleva Mi♭, como dice la tabla de la propia app, y no Re#', async ({ page }) => {
+    test.fail();
+    const letras = await letrasDe(page, 'A (La)', 'Blues');
+    expect(letras[3]).toBe('E'); // hoy: D# (Re#)
+  });
+
+  test('ABIERTO · La frigio lleva Si♭ («la 2ª bemol») y no La#', async ({ page }) => {
+    test.fail();
+    const letras = await letrasDe(page, 'A (La)', 'Frigio');
+    expect(new Set(letras).size).toBe(7);
+    expect(letras[1]).toBe('B'); // hoy: A# (La#)
+  });
+});
+
+/**
+ * HALLAZGO (15/11/2026, ABIERTO) · los grados de la pentatónica. La FAQ de la app dice que la
+ * pentatónica menor es «1, b3, 4, 5, b7»; las fichas la numeran por posición (I II III IV V), de
+ * modo que el Sol de La pentatónica menor sale como «V» y el Mi, la quinta, como «IV».
+ */
+test('Inspector 15/11/2026 · ABIERTO · La pentatónica menor: el Do es una tercera y el Sol una séptima', async ({ page }) => {
+  test.fail();
+  await elegirRaiz(page, 'A (La)');
+  await elegirEscala(page, 'Pentatónica menor');
+  const grados = await gradosFichas(page);
+  expect(grados[1]).toMatch(/(3|III)$/); // hoy: «II»
+  expect(grados[3]).toMatch(/^(5|V)$/); // hoy: «IV»
+  expect(grados[4]).toMatch(/(7|VII)$/); // hoy: «V»
+});
+
+/**
+ * HALLAZGO (15/11/2026, ABIERTO) · la tabla «Comparativa de escalas principales». Su columna
+ * «Patrón» (1 = semitono, 2 = tono, según la nota al pie) no da el patrón de NINGUNA de las seis
+ * filas: la mayor sale 1-2-2-1-2-2-2 (S-T-T-S-T-T-T, que es el locrio) mientras la FAQ de la
+ * misma sección dice tono-tono-semitono-tono-tono-tono-semitono. Y la columna «Ejemplo en Do»
+ * pone cuatro ejemplos en La o en Re.
+ * Esperados, de la fórmula en semitonos de cada escala (diferencias sucesivas, cerrando en 12).
+ */
+test('Inspector 15/11/2026 · ABIERTO · la tabla comparativa da el patrón de tonos y semitonos de cada escala', async ({ page }) => {
+  test.fail();
+  const esperados: Record<string, string> = {
+    Mayor: '2-2-1-2-2-2-1',
+    'Menor natural': '2-1-2-2-1-2-2',
+    'Menor armónica': '2-1-2-2-1-3-1',
+    'Pentatónica mayor': '2-2-3-2-3',
+    Blues: '3-2-1-1-3-2',
+    Dórico: '2-1-2-2-2-1-2',
+  };
+  const filas = await page.locator('table tbody tr').evaluateAll((trs) =>
+    trs.map((tr) => Array.from(tr.querySelectorAll('td')).map((td) => (td.textContent ?? '').trim())),
+  );
+  const cabecera = (await page.locator('table thead th').allTextContents()).map((t) => t.trim());
+  expect(filas.length).toBe(6);
+  for (const [escala, patron, , ejemplo] of filas) {
+    const normalizado = patron.replace(/\s/g, '').replace(/T/g, '2').replace(/S/g, '1');
+    expect(normalizado, `patrón de ${escala}`).toBe(esperados[escala]);
+    if (cabecera[3] === 'Ejemplo en Do') expect(ejemplo, `ejemplo de ${escala}`).toMatch(/^Do-/);
+  }
+});
+
+/**
+ * HALLAZGO (15/11/2026, ABIERTO) · el consejo dice que el dórico «tiene los mismos acordes base»
+ * que la menor; la propia app muestra que La dórico y La menor natural difieren en tres de siete.
+ */
+test('Inspector 15/11/2026 · La dórico y La menor natural difieren en tres acordes (ii, IV y vi)', async ({ page }) => {
+  await elegirRaiz(page, 'A (La)');
+  await elegirEscala(page, 'Dórico');
+  const dorico = await nombresAcordes(page);
+  await elegirEscala(page, 'Menor natural');
+  const menor = await nombresAcordes(page);
+  // Lo que pinta la app es correcto: Bm/B°, D/Dm y F#°/F
+  expect(dorico).toEqual(['Am', 'Bm', 'C', 'D', 'Em', 'F#°', 'G']);
+  expect(dorico.filter((a, i) => a !== menor[i])).toHaveLength(3);
+});
+
+test('Inspector 15/11/2026 · ABIERTO · el consejo del dórico no dice que tiene «los mismos acordes base» que la menor', async ({ page }) => {
+  test.fail();
+  await expect(page.locator('[data-guia-educativa] li', { hasText: 'mismos acordes base' })).toHaveCount(0);
+});
+
+test.describe('Inspector 15/11/2026 · accesibilidad de los selectores (cabos C0496 y C0497)', () => {
+  test('C0496 (ya reparado en eba00f2da) · el grupo de tipos de escala se llama «Tipo de escala»', async ({ page }) => {
+    const grupo = page.getByRole('group', { name: 'Tipo de escala', exact: true });
+    await expect(grupo).toBeVisible();
+    await expect(grupo.getByRole('button')).toHaveCount(12);
+  });
+
+  test('C0497 · ABIERTO · la etiqueta «Nota raíz» rotula algo (hoy apunta a un id que no existe)', async ({ page }) => {
+    test.fail();
+    const huerfanas = await page.locator('main label').evaluateAll((labels) =>
+      (labels as HTMLLabelElement[])
+        .filter((l) => !l.control && !(l.id && document.querySelector(`[aria-labelledby~="${l.id}"]`)))
+        .map((l) => `${(l.textContent ?? '').trim()} → for="${l.htmlFor}"`),
+    );
+    expect(huerfanas).toEqual([]); // hoy: ['Nota raíz → for="nota-raiz"']
+  });
+
+  test('ABIERTO · la lista estática «Errores frecuentes» no es una región de alerta', async ({ page }) => {
+    test.fail();
+    await expect(page.locator('[role="alert"]', { hasText: 'Errores frecuentes al estudiar escalas' })).toHaveCount(0);
   });
 });
