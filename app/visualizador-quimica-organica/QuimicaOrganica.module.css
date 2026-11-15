@@ -675,7 +675,7 @@
 }
 
 .warningBox strong {
-  color: #78350f;
+  color: var(--naranja-texto, #78350f);
 }
 
 /* ══════════════════════════════════════════

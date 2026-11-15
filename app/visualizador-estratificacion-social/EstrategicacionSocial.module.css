@@ -558,7 +558,7 @@
 }
 
 .teoriaCritica .teoriaEtiq {
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
 }
 
 .teoriaVigencia .teoriaEtiq {

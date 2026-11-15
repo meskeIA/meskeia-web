@@ -195,7 +195,7 @@
 
 .riesgoAlto {
   background: rgba(224, 92, 92, 0.15);
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
 }
 
 .badgeLiquidez {

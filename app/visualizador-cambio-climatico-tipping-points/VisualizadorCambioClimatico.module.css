@@ -471,7 +471,7 @@
 
 .warningBox strong {
   display: block;
-  color: #C0392B;
+  color: var(--rojo-texto, #C0392B);
   margin-bottom: 0.35rem;
   font-size: 0.92rem;
 }
@@ -548,7 +548,7 @@
 }
 
 .cascadaIntensalta {
-  color: #C0392B;
+  color: var(--rojo-texto, #C0392B);
 }
 
 .cascadaIntensmedia {

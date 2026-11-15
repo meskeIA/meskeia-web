@@ -345,11 +345,11 @@
 }
 
 .thPlantas {
-  color: #2E7D32 !important;
+  color: var(--verde-texto, #2E7D32) !important;
 }
 
 .thHongos {
-  color: #8E4B00 !important;
+  color: var(--ambar-texto, #8E4B00) !important;
 }
 
 .comparativaTable td {

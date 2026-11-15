@@ -116,7 +116,7 @@
 }
 
 .warningBox strong {
-  color: #C0392B;
+  color: var(--rojo-texto, #C0392B);
 }
 
 /* ─── Alert box ──────────────────────────────── */
@@ -126,7 +126,7 @@
   border-radius: 0 6px 6px 0;
   padding: 0.7rem 1rem;
   font-size: 0.88rem;
-  color: #C0392B;
+  color: var(--rojo-texto, #C0392B);
   margin-top: 0.75rem;
   line-height: 1.5;
 }
@@ -509,7 +509,7 @@
 }
 
 .timelineStepAlerta .timelineLabel {
-  color: #C0392B;
+  color: var(--rojo-texto, #C0392B);
 }
 
 .timelineDesc {

@@ -68,7 +68,7 @@
 .sliderListas { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-top: var(--spacing-md); }
 .sliderListaTitulo { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem; }
 .sliderListaRaya { color: var(--verde-texto, #16A34A); }
-.sliderListaNoRaya { color: #DC2626; }
+.sliderListaNoRaya { color: var(--rojo-texto, #DC2626); }
 .sliderListaItem { font-size: 0.78rem; color: var(--text-secondary); padding: 0.15rem 0; }
 
 /* ─── Sección 2: Gemas preciosas ─── */

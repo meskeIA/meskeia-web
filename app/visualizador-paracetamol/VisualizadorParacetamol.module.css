@@ -259,7 +259,7 @@
 
 .metabolismoNAPQI .metabolismoPorcentaje {
   background: rgba(192, 57, 43, 0.1);
-  color: #C0392B;
+  color: var(--rojo-texto, #C0392B);
 }
 
 .metabolismoPasoDesc {
@@ -358,7 +358,7 @@
 }
 
 .margenAlerta {
-  color: #C0392B;
+  color: var(--rojo-texto, #C0392B);
 }
 
 .barraProgreso {
@@ -480,7 +480,7 @@
 .cifraNum {
   font-size: clamp(1.4rem, 3vw, 1.9rem);
   font-weight: 800;
-  color: #C0392B;
+  color: var(--rojo-texto, #C0392B);
   line-height: 1.1;
 }
 
@@ -546,7 +546,7 @@
 }
 
 .timelineHitoAlerta .timelineTiempo {
-  color: #C0392B;
+  color: var(--rojo-texto, #C0392B);
 }
 
 .timelineDesc {

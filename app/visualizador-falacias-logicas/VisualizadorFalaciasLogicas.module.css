@@ -581,7 +581,7 @@
 }
 
 .transformacionLabelMalo {
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
 }
 
 .transformacionLabelBueno {
@@ -597,7 +597,7 @@
 
 .transformacionFalacia {
   font-size: 0.75rem;
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
   font-weight: 600;
   font-style: italic;
 }

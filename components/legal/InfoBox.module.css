@@ -69,6 +69,7 @@
 
 .medicalTitle {
   font-weight: 600;
+  /* semanticos-ok: va sobre el #FEF7F7 fijo de .medicalBox, que InfoBox.tsx elige con styles[`${type}Box`] y el candado no ve; la receta lo aclararía en oscuro sobre casi blanco (C0708) */
   color: #DC2626;
   margin-bottom: 0.75rem;
   display: flex;

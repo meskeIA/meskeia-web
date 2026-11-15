@@ -91,7 +91,7 @@
 }
 
 .phBarZones { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.3rem; padding: 0 4px; }
-.phZoneAcido { color: #CC3333; font-weight: 600; }
+.phZoneAcido { color: var(--rojo-texto, #CC3333); font-weight: 600; }
 .phZoneNeutro { color: var(--verde-texto, #33AA66); font-weight: 600; }
 .phZoneBase { color: #6644CC; font-weight: 600; }
 
@@ -251,7 +251,7 @@
   margin-bottom: var(--spacing-md); padding: var(--spacing-md);
   background: var(--hover); border-radius: 8px; font-size: 0.82rem;
 }
-.neutralizacionAcido { font-family: 'Courier New', monospace; color: #CC3333; font-weight: 600; }
+.neutralizacionAcido { font-family: 'Courier New', monospace; color: var(--rojo-texto, #CC3333); font-weight: 600; }
 .neutralizacionBase { font-family: 'Courier New', monospace; color: #3333CC; font-weight: 600; }
 .neutralizacionResultado { font-family: 'Courier New', monospace; color: var(--primary-texto); font-weight: 600; }
 .neutralizacionDescripcion { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }

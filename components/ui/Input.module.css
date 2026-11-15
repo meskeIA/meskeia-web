@@ -72,7 +72,7 @@
 
 .errorText {
   font-size: 0.875rem;
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
 }
 
 .helperText {

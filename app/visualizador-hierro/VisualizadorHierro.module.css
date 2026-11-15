@@ -321,7 +321,7 @@
 
 .absorptionValorMalo {
   font-size: 0.88rem;
-  color: #C0392B;
+  color: var(--rojo-texto, #C0392B);
   font-weight: 600;
 }
 

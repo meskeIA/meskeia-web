@@ -857,7 +857,7 @@
   margin: 0 0 0.4rem;
 }
 
-.penaltyTituloMal { color: #c0392b; }
+.penaltyTituloMal { color: var(--rojo-texto, #c0392b); }
 .penaltyTituloBien { color: var(--verde-texto, #27ae60); }
 .penaltyTituloAlto { color: var(--naranja-texto, #e67e22); }
 

@@ -348,7 +348,7 @@
 
 .machPeligro {
   background: rgba(220, 50, 50, 0.12);
-  color: #c01010;
+  color: var(--rojo-texto, #c01010);
 }
 
 .sliderInput {
