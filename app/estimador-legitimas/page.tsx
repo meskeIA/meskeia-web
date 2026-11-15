@@ -11,6 +11,8 @@ import {
   type RegimenId,
   type ResultadoLegitimas,
 } from '@/lib/calculadoras/legitimas';
+import DataReference from '@/components/DataReference';
+import { FISCAL_LEGITIMAS_META } from '@/data/fiscal/legitimas';
 import { PREGUNTAS_FRECUENTES } from './metadata';
 
 // ─── Datos normativos ─────────────────────────────────────────────────────────
@@ -171,6 +173,14 @@ export default function EstimadorLegitimas() {
           <br /><em>meskeIA no se responsabiliza de decisiones basadas en esta estimación.</em>
         </span>
       </DisclaimerCard>
+      {/* Las fracciones salen de data/fiscal/legitimas.ts, con la cita de cada artículo (hallazgo 4738). */}
+      <DataReference
+        normativa="Legítimas por régimen civil"
+        fuente={FISCAL_LEGITIMAS_META.fuente}
+        verificado={FISCAL_LEGITIMAS_META.verificado}
+        urlOficial={FISCAL_LEGITIMAS_META.urlOficial}
+        nota={FISCAL_LEGITIMAS_META.nota}
+      />
 
       <div className={styles.mainContent}>
         {/* Formulario */}

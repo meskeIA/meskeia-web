@@ -32,7 +32,29 @@
  *   · Compilació de Dret Civil de les Illes Balears, arts. 41, 42, 45, 65 y 79
  *     (BOIB-i-1990-90001, con la reforma de la Ley 7/2017)
  *   · Ley 5/2015 de Derecho Civil Vasco, arts. 47, 48, 49 y 52 (BOE-A-2015-8273)
+ *
+ * Desde el 15/11/2026 (cabo C0763, hallazgo 4738) las fracciones NO se escriben aquí: salen de
+ * `data/fiscal/legitimas.ts`, con la cita literal de su artículo y la fecha de verificación. Al
+ * mudarlas no cambió ningún resultado: el motor calcula `(caudal × num) / den`, la misma
+ * aritmética de antes (los dos «PN × (1/3)» pasaron a «PN / 3», que no mueve un céntimo: un tercio
+ * de una cifra en céntimos nunca cae en el medio céntimo donde el redondeo podría cambiar).
  */
+
+import {
+  LEGITIMAS_ARAGON,
+  LEGITIMAS_BALEARES,
+  LEGITIMAS_CATALUNA,
+  LEGITIMAS_COMUN,
+  LEGITIMAS_GALICIA,
+  LEGITIMAS_NAVARRA,
+  LEGITIMAS_PAIS_VASCO,
+  type FraccionNormativa,
+} from '@/data/fiscal/legitimas';
+
+/** Aplica una fracción normativa al caudal, sin redondear: `(caudal × num) / den`. */
+function aplicar(caudal: number, f: Pick<FraccionNormativa, 'num' | 'den'>): number {
+  return (caudal * f.num) / f.den;
+}
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -210,7 +232,7 @@ export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
     if (tieneAscendientes) {
       legitimarios = 'ascendientes';
       // Art. 809: la mitad del haber hereditario, o un tercio si concurren con el cónyuge viudo.
-      legitimaTotal = r(PN * (tieneConyuge ? 1 / 3 : 1 / 2));
+      legitimaTotal = r(aplicar(PN, tieneConyuge ? LEGITIMAS_COMUN.legitimaAscendientesConViudo : LEGITIMAS_COMUN.legitimaAscendientes));
       fraccionLegitima = tieneConyuge
         ? '1/3 del patrimonio para los ascendientes, por concurrir con el cónyuge viudo (CC art. 809)'
         : '1/2 del patrimonio para los ascendientes (CC art. 809)';
@@ -218,7 +240,7 @@ export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
       notas.push('La legítima se divide por mitad entre la línea paterna y la materna; si solo sobrevive una línea, la recibe entera (CC art. 810).');
       if (tieneConyuge) {
         // Art. 837: usufructo de la mitad de la herencia cuando concurre con ascendientes.
-        derechoConyuge = r(PN / 2);
+        derechoConyuge = r(aplicar(PN, LEGITIMAS_COMUN.usufructoViudoConAscendientes));
         descripcionDerechoConyuge = 'Usufructo de la mitad de la herencia (CC art. 837), por concurrir con ascendientes. No es propiedad, solo uso y disfrute vitalicio, y grava también la legítima de los ascendientes (CC art. 813).';
       }
     } else {
@@ -230,7 +252,7 @@ export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
       notas.push('Sin descendientes ni ascendientes vivos no hay legítima que reservar: puede testarse libremente a favor de cualquier persona (CC art. 807).');
       if (tieneConyuge) {
         // Art. 838: usufructo de los dos tercios de la herencia.
-        derechoConyuge = r((PN * 2) / 3);
+        derechoConyuge = r(aplicar(PN, LEGITIMAS_COMUN.usufructoViudoSinDescendientesNiAscendientes));
         descripcionDerechoConyuge = 'Usufructo de los dos tercios de la herencia (CC art. 838), al no haber descendientes ni ascendientes. No es propiedad, solo uso y disfrute vitalicio.';
       }
     }
@@ -239,8 +261,8 @@ export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
       case 'comun': {
         // 2/3 legítima (1/3 estricta + 1/3 mejora) + 1/3 libre disposición.
         // Las tres partes se derivan por diferencia para que sumen EXACTAMENTE el caudal.
-        legitimaTotal = r((PN * 2) / 3);
-        const tercioEstricto = r(PN / 3);
+        legitimaTotal = r(aplicar(PN, LEGITIMAS_COMUN.legitimaDescendientes));
+        const tercioEstricto = r(aplicar(PN, LEGITIMAS_COMUN.legitimaEstricta));
         tercioMejora = r(legitimaTotal - tercioEstricto);
         legitimaPorHijo = r(tercioEstricto / p.numHijos);
         fraccionLegitima = '2/3 del patrimonio (1/3 estricta + 1/3 mejora)';
@@ -252,36 +274,36 @@ export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
         break;
       }
       case 'cataluna': {
-        legitimaTotal = r(PN / 4);
+        legitimaTotal = r(aplicar(PN, LEGITIMAS_CATALUNA.legitima));
         legitimaPorHijo = r(legitimaTotal / p.numHijos);
         fraccionLegitima = '1/4 del patrimonio para todos los descendientes';
         if (tieneConyuge) {
           // Art. 452-1 CCCat: no es un usufructo, sino «la cantidad que sea precisa para
           // atenderlas, hasta un máximo de la cuarta parte del activo hereditario líquido», y
           // solo si el viudo no tiene recursos suficientes. La cifra publicada es ese MÁXIMO.
-          derechoConyuge = r(PN / 4);
+          derechoConyuge = r(aplicar(PN, LEGITIMAS_CATALUNA.cuartaViudalMaxima));
           descripcionDerechoConyuge = 'Cuarta viudal (CCCat art. 452-1): si el viudo no tiene recursos suficientes, la cantidad necesaria para atender sus necesidades, en propiedad, hasta un máximo de 1/4 del activo hereditario líquido. La cifra es ese máximo, haya o no hijos.';
         }
         notas.push('Mayor libertad de testar que el Derecho Común. La legítima es un crédito contra la herencia, no una parte indisponible.');
         break;
       }
       case 'aragon': {
-        legitimaTotal = r(PN / 2);
+        legitimaTotal = r(aplicar(PN, LEGITIMAS_ARAGON.legitimaColectiva));
         esLegitivaColectiva = true;
         fraccionLegitima = '1/2 del patrimonio (legítima colectiva — distribución libre entre descendientes)';
         if (tieneConyuge) {
-          derechoConyuge = PN;
+          derechoConyuge = aplicar(PN, LEGITIMAS_ARAGON.usufructoViudedad);
           descripcionDerechoConyuge = 'Usufructo universal de viudedad (CDFA art. 271): uso y disfrute de TODOS los bienes durante la vida del viudo.';
         }
         notas.push('Legítima colectiva: el testador puede designar libremente qué descendiente recibe qué parte, siempre que el conjunto reciba ≥ 1/2.');
         break;
       }
       case 'galicia': {
-        legitimaTotal = r(PN / 4);
+        legitimaTotal = r(aplicar(PN, LEGITIMAS_GALICIA.legitima));
         legitimaPorHijo = r(legitimaTotal / p.numHijos);
         fraccionLegitima = '1/4 del patrimonio para descendientes';
         if (tieneConyuge) {
-          derechoConyuge = r(PN / 4);
+          derechoConyuge = r(aplicar(PN, LEGITIMAS_GALICIA.usufructoViudoConDescendientes));
           descripcionDerechoConyuge = 'Usufructo del 1/4 del haber hereditario (Ley 2/2006 art. 253).';
         }
         break;
@@ -289,8 +311,8 @@ export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
       case 'baleares': {
         // Arts. 42 (Mallorca y, por el art. 65, Menorca) y 79 (Eivissa i Formentera):
         // 1/3 del haber si los hijos son CUATRO O MENOS, 1/2 si exceden de ese número.
-        const hastaCuatroHijos = p.numHijos <= 4;
-        legitimaTotal = r(PN * (hastaCuatroHijos ? 1 / 3 : 1 / 2));
+        const hastaCuatroHijos = p.numHijos <= LEGITIMAS_BALEARES.umbralHijos.valor;
+        legitimaTotal = r(aplicar(PN, hastaCuatroHijos ? LEGITIMAS_BALEARES.legitimaHastaUmbral : LEGITIMAS_BALEARES.legitimaSobreUmbral));
         legitimaPorHijo = r(legitimaTotal / p.numHijos);
         fraccionLegitima = hastaCuatroHijos
           ? '1/3 del patrimonio (cuatro hijos o menos)'
@@ -298,7 +320,7 @@ export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
         if (tieneConyuge) {
           // Art. 45 (redacción de la Ley 7/2017): en concurrencia con descendientes, el
           // usufructo es de la MITAD del haber; el universal queda para los demás supuestos.
-          derechoConyuge = r(PN / 2);
+          derechoConyuge = r(aplicar(PN, LEGITIMAS_BALEARES.usufructoViudoConDescendientes));
           descripcionDerechoConyuge = 'Usufructo de la mitad del haber hereditario por concurrir con descendientes (art. 45 Compilació Balear, Ley 7/2017). Rige en Mallorca y Menorca; en Eivissa i Formentera el cónyuge viudo no es legitimario (art. 79).';
         }
         notas.push(`Con ${p.numHijos} hijo(s) se aplica la fracción ${hastaCuatroHijos ? '1/3' : '1/2'}: la Compilació reserva 1/3 si los hijos son cuatro o menos y 1/2 si exceden de cuatro (arts. 42 y 79).`);
@@ -308,13 +330,13 @@ export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
         // Art. 49 Ley 5/2015: la legítima de los hijos o descendientes es un tercio del caudal.
         // Art. 48.2: el causante «puede elegir entre ellos a uno o varios y apartar a los demás»
         // (el art. 51.3 la llama «legítima colectiva»): no hay mínimo por hijo, como en Aragón.
-        legitimaTotal = r(PN / 3);
+        legitimaTotal = r(aplicar(PN, LEGITIMAS_PAIS_VASCO.legitima));
         esLegitivaColectiva = true;
         fraccionLegitima = '1/3 del patrimonio para descendientes (legítima colectiva)';
         if (tieneConyuge) {
           // Art. 52: usufructo de la MITAD de todos los bienes si concurre con descendientes
           // (dos tercios en su defecto). No es un usufructo universal.
-          derechoConyuge = r(PN / 2);
+          derechoConyuge = r(aplicar(PN, LEGITIMAS_PAIS_VASCO.usufructoViudoConDescendientes));
           // La descripción evita a propósito la fórmula «todos los bienes» del art. 52: aquí el
           // usufructo alcanza la MITAD, y esa frase es la que delata a un usufructo universal.
           descripcionDerechoConyuge = 'Usufructo de la mitad de los bienes del causante por concurrir con descendientes (Ley 5/2015 art. 52). Sin descendientes sería el usufructo de dos tercios.';
@@ -324,12 +346,12 @@ export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
         break;
       }
       case 'navarra': {
-        legitimaTotal = 0;
+        legitimaTotal = aplicar(PN, LEGITIMAS_NAVARRA.legitimaFormal);
         legitimarios = 'ninguno';
         esNavarra = true;
         fraccionLegitima = 'Legítima formal (simbólica) — 0 € efectivos';
         if (tieneConyuge) {
-          derechoConyuge = PN;
+          derechoConyuge = aplicar(PN, LEGITIMAS_NAVARRA.usufructoFidelidad);
           descripcionDerechoConyuge = 'Usufructo de fidelidad: derecho al usufructo de todos los bienes del premuerto mientras no contraiga nuevas nupcias.';
         }
         notas.push('En Navarra la legítima es "formal": basta con mencionar a los herederos forzosos sin dejarles nada real. Total libertad de testar.');

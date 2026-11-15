@@ -222,6 +222,25 @@ test.describe('Textos normativos de la página', () => {
     expect(cuerpo).toContain('no le fija un plazo propio');
   });
 
+  test('HALLAZGO 4738 (15/11/2026, módulo creado; el OK por valor espera al usuario) · las fracciones salen de data/fiscal con fuente y fecha, y la página lo dice', async ({ page }) => {
+    // Esperado: un <DataReference> tras la DisclaimerCard con la fecha de verificación del módulo
+    // data/fiscal/legitimas.ts (15/11/2026, cuando se leyeron las siete normas en el BOE) y su
+    // enlace a la fuente oficial. Antes: ninguno, y el motor llevaba las fracciones a mano.
+    const ref = page.getByRole('note', { name: 'Datos de referencia normativos' });
+    await expect(ref).toHaveCount(1);
+    await expect(ref).toContainText('Legítimas por régimen civil');
+    await expect(ref).toContainText('15/11/2026');
+    await expect(ref).toContainText('Fuero Nuevo de Navarra');
+    await expect(ref.getByRole('link', { name: /Fuente oficial/ })).toHaveAttribute('href', /boe\.es/);
+    // Va justo después del aviso de responsabilidad, no dentro de la sección educativa plegada.
+    const orden = await page.evaluate(() => {
+      const nota = document.querySelector('[aria-label="Datos de referencia normativos"]');
+      const previo = nota?.previousElementSibling;
+      return previo?.textContent?.includes('SOLO orientativo') ?? false;
+    });
+    expect(orden).toBe(true);
+  });
+
   test('HALLAZGO 4736 (15/11/2026, REPARADO) · la FAQ visible y el FAQPage dicen lo mismo (una sola fuente)', async ({ page }) => {
     // La desheredación tenía dos respuestas distintas y «quiénes son herederos forzosos» se
     // contradecía entre las dos FAQ. Ahora cada pregunta del FAQPage está en la visible con la

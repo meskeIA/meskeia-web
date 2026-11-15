@@ -47,3 +47,4 @@ export * from './subastas';
 export * from './recargos-sanciones';
 export * from './retribuciones-exentas';
 export * from './pensiones-irpf';
+export * from './legitimas';
