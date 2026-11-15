@@ -346,7 +346,25 @@ test('REPARADO · tabla y ejemplos salen de data/fiscal y del motor, no de liter
   expect(body).toMatch(/Ahorro por el mínimo: 570,00/);
 });
 
-test('ABIERTO · la app calla el art. 19.2.f (+3.500 €) y la deducción del art. 81 bis (1.200 €)', async ({ page }) => {
+test('REPARADO · el ejemplo del trabajador y las limitaciones dan las cifras del art. 19.2.f (3.500 / 7.750 €)', async ({ page }) => {
+  // Parte del hallazgo 4786. El usuario decidió el 15/11/2026 (cabo C0770) mostrar las cifras
+  // del art. 19.2.f, leídas ese día en el BOE: +3.500 €/año para el trabajador activo con
+  // discapacidad y +7.750 € con ayuda de terceros, movilidad reducida o grado ≥ 65 %. Salen de
+  // INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025 (data/fiscal/irpf.ts). La app sigue sin
+  // calcularlas: las nombra en el consejo del ejemplo y en el recuadro de limitaciones.
+  // El div más interior con ese texto es el último en orden de documento (los ancestros van antes).
+  const consejo = page.locator('div').filter({ hasText: 'Esta herramienta solo calcula el mínimo' }).last();
+  await expect(consejo).toContainText(/3500,00\s€ al año/);
+  await expect(consejo).toContainText(/7750,00\s€ con/);
+  // Va dentro de la sección educativa colapsada, fuera del árbol accesible: se busca el <li>.
+  const limitaciones = page.locator('li').filter({ hasText: 'Solo el mínimo por discapacidad' });
+  await expect(limitaciones).toContainText(/art\. 19\.2\.f LIRPF: 3500,00\s€ al año, o 7750,00\s€/);
+});
+
+test('ABIERTO · la app calla el importe de la deducción del art. 81 bis (1.200 €)', async ({ page }) => {
+  // Sigue abierto tras /reparar del 15/11/2026: el art. 81 bis no se pudo leer en la fuente
+  // (el texto consolidado del BOE se corta antes de él), y sin fuente consultada no se escribe
+  // la cifra. La del art. 19.2.f, que este caso también pedía, está en el test de arriba.
   // El ejemplo «Trabajador con discapacidad del 40 %, salario bruto 28.000 €» da «Ahorro: 570 €»,
   // y el recuadro de limitaciones solo excluye las deducciones autonómicas. Con data/fiscal
   // (COTIZACIONES_SS_2025: 6,48 % → 1.814,40 €; art. 20: 0; gastos 2.000 €; TRAMOS_IRPF_2025):
@@ -358,7 +376,6 @@ test('ABIERTO · la app calla el art. 19.2.f (+3.500 €) y la deducción del ar
   test.fail();
   const texto = (await page.locator('body').textContent()) ?? '';
   expect(texto).toMatch(/(?<![\d.])1\.?200(,00)?\s?€/);
-  expect(texto).toMatch(/(?<![\d.])3\.?500(,00)?\s?€/);
 });
 
 test('REPARADO · requisito del ascendiente: convivencia, no «o dependencia económica»', async ({ page }) => {

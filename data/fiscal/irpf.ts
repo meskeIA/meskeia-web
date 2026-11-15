@@ -355,6 +355,22 @@ export const GASTOS_DEDUCIBLES_TRABAJO_2025 = {
 };
 
 /**
+ * Incremento de los gastos deducibles del art. 19.2.f para trabajadores ACTIVOS con
+ * discapacidad. Se suma a `GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral`.
+ * Ley 35/2006 IRPF art. 19.2.f, leído en el BOE (BOE-A-2006-20764, texto consolidado) el
+ * 15/11/2026: «Tratándose de personas con discapacidad que obtengan rendimientos del trabajo
+ * como trabajadores activos, se incrementará dicha cuantía en 3.500 euros anuales. Dicho
+ * incremento será de 7.750 euros anuales, para las personas con discapacidad que siendo
+ * trabajadores activos acrediten necesitar ayuda de terceras personas o movilidad reducida, o
+ * un grado de discapacidad igual o superior al 65 por ciento».
+ * Decidido con el usuario en /reparar del 15/11/2026 (cabo C0770, hallazgo 4786).
+ */
+export const INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025 = {
+  general: 3500,         // €/año · trabajador activo con discapacidad (grado ≥ 33 %)
+  asistenciaO65: 7750,   // €/año · con ayuda de terceros, movilidad reducida o grado ≥ 65 %
+};
+
+/**
  * Reducción por obtención de rendimientos del trabajo (art. 20 LIRPF), ejercicio 2025.
  * Se aplica sobre el rendimiento íntegro menos los gastos de las letras a) a e) del art. 19.2
  * — SIN restar los 2.000 € de la letra f) (art. 20, último párrafo; hallazgo 1687).

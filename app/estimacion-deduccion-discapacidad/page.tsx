@@ -16,6 +16,7 @@ import { formatCurrency, formatNumber } from '@/lib';
 import {
   DEDUCCIONES_IRPF_DISCAPACIDAD_2025,
   FISCAL_IRPF_META,
+  INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025,
   MINIMOS_IRPF_2025,
   NORMAS_MINIMOS_FAMILIARES_IRPF,
 } from '@/data/fiscal';
@@ -438,7 +439,9 @@ export default function EstimacionDeduccionDiscapacidadPage() {
             </div>
             <div className={styles.escenarioTip}>
               Esta herramienta solo calcula el mínimo. Como trabajador activo con discapacidad,
-              el art. 19.2.f LIRPF le sube además los gastos deducibles del trabajo (más aún con
+              el art. 19.2.f LIRPF le sube además los gastos deducibles del trabajo en{' '}
+              {formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.general)} al año
+              ({formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.asistenciaO65)} con
               ayuda de terceros, movilidad reducida o grado ≥ 65{PCT}), y ese incremento sí reduce
               la base y se valora a su tipo marginal. Revisa también las deducciones autonómicas.
             </div>
@@ -607,7 +610,10 @@ export default function EstimacionDeduccionDiscapacidadPage() {
             </li>
             <li>
               <strong>Solo el mínimo por discapacidad:</strong> no incluye el incremento de gastos
-              deducibles para trabajadores activos con discapacidad (art. 19.2.f LIRPF), la
+              deducibles para trabajadores activos con discapacidad (art. 19.2.f LIRPF:{' '}
+              {formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.general)} al año, o{' '}
+              {formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.asistenciaO65)} con
+              ayuda de terceros, movilidad reducida o grado ≥ 65{PCT}), la
               deducción por descendiente o ascendiente con discapacidad a cargo (art. 81 bis), ni
               las deducciones autonómicas por discapacidad, que varían según la CCAA.
             </li>
