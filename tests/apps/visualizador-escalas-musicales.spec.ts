@@ -523,8 +523,9 @@ test('Inspector 15/11/2026 · ABIERTO · La pentatónica menor: el Do es una ter
  * pone cuatro ejemplos en La o en Re.
  * Esperados, de la fórmula en semitonos de cada escala (diferencias sucesivas, cerrando en 12).
  */
-test('Inspector 15/11/2026 · ABIERTO · la tabla comparativa da el patrón de tonos y semitonos de cada escala', async ({ page }) => {
-  test.fail();
+test('Inspector 15/11/2026 · REPARADO · la tabla comparativa da el patrón de tonos y semitonos de cada escala', async ({ page }) => {
+  // Reparado el 15/11/2026 (hallazgo 4807): el patrón sale de los intervalos de la propia escala
+  // y los ejemplos empiezan en Do.
   const esperados: Record<string, string> = {
     Mayor: '2-2-1-2-2-2-1',
     'Menor natural': '2-1-2-2-1-2-2',
@@ -560,9 +561,10 @@ test('Inspector 15/11/2026 · La dórico y La menor natural difieren en tres aco
   expect(dorico.filter((a, i) => a !== menor[i])).toHaveLength(3);
 });
 
-test('Inspector 15/11/2026 · ABIERTO · el consejo del dórico no dice que tiene «los mismos acordes base» que la menor', async ({ page }) => {
-  test.fail();
+test('Inspector 15/11/2026 · REPARADO · el consejo del dórico no dice que tiene «los mismos acordes base» que la menor', async ({ page }) => {
+  // Reparado el 15/11/2026 (hallazgo 4811): el consejo dice ahora que cambian ii, IV y vi.
   await expect(page.locator('[data-guia-educativa] li', { hasText: 'mismos acordes base' })).toHaveCount(0);
+  await expect(page.locator('[data-guia-educativa] li', { hasText: 'cambian tres de siete' })).toHaveCount(1);
 });
 
 test.describe('Inspector 15/11/2026 · accesibilidad de los selectores (cabos C0496 y C0497)', () => {

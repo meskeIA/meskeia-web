@@ -60,6 +60,14 @@ const TIPOS_ESCALA: TipoEscala[] = [
   { nombre: 'Locrio', intervalos: [0, 1, 3, 5, 6, 8, 10], caracter: 'Muy disonante, inestable. Rara vez usada sola; aparece en metal progresivo.', grupo: 'modos' },
 ];
 
+/** Patrón «2-2-1-2-2-2-1»: semitonos de cada nota a la siguiente, cerrando en la octava. */
+function patronSemitonos(nombre: string): string {
+  const escala = TIPOS_ESCALA.find((e) => e.nombre === nombre);
+  if (!escala) return '';
+  const conOctava = [...escala.intervalos, 12];
+  return conOctava.slice(1).map((v, i) => v - conOctava[i]).join('-');
+}
+
 const GRUPOS_ESCALA = [
   { id: 'basicas', label: 'Básicas' },
   { id: 'menores', label: 'Menores' },
@@ -441,14 +449,17 @@ export default function VisualizadorEscalasMusicales() {
   // Contenido educativo v2.0
   const contenidoEducativo = {
     intro: 'Una escala musical es una secuencia de notas ordenadas por altura, separadas por intervalos específicos. Cada tipo de escala tiene un carácter sonoro propio que lo hace ideal para diferentes géneros y emociones musicales.',
+    // Hallazgo 4807 (15/11/2026): el patrón se escribía a mano y estaba mal en las seis filas
+    // (la mayor salía con el patrón del locrio). Ahora sale de los intervalos de TIPOS_ESCALA:
+    // las diferencias entre notas sucesivas, cerrando en la octava (12).
     tablaComparativa: [
-      { escala: 'Mayor', intervalos: '1-2-2-1-2-2-2', caracter: 'Brillante, alegre', ejemplo: 'Do-Re-Mi-Fa-Sol-La-Si' },
-      { escala: 'Menor natural', intervalos: '1-2-1-2-2-1-2', caracter: 'Melancólica, oscura', ejemplo: 'La-Si-Do-Re-Mi-Fa-Sol' },
-      { escala: 'Menor armónica', intervalos: '1-2-1-2-2-3-1', caracter: 'Dramática, exótica', ejemplo: 'La-Si-Do-Re-Mi-Fa-Sol#' },
-      { escala: 'Pentatónica mayor', intervalos: '1-2-2-3-2', caracter: 'Simple, universal', ejemplo: 'Do-Re-Mi-Sol-La' },
-      { escala: 'Blues', intervalos: '1-3-2-1-1-3', caracter: 'Intensa, expresiva', ejemplo: 'La-Do-Re-Mib-Mi-Sol' },
-      { escala: 'Dórico', intervalos: '1-2-1-2-2-2-1', caracter: 'Mística, jazzística', ejemplo: 'Re-Mi-Fa-Sol-La-Si-Do' },
-    ],
+      { escala: 'Mayor', caracter: 'Brillante, alegre', ejemplo: 'Do-Re-Mi-Fa-Sol-La-Si' },
+      { escala: 'Menor natural', caracter: 'Melancólica, oscura', ejemplo: 'Do-Re-Mib-Fa-Sol-Lab-Sib' },
+      { escala: 'Menor armónica', caracter: 'Dramática, exótica', ejemplo: 'Do-Re-Mib-Fa-Sol-Lab-Si' },
+      { escala: 'Pentatónica mayor', caracter: 'Simple, universal', ejemplo: 'Do-Re-Mi-Sol-La' },
+      { escala: 'Blues', caracter: 'Intensa, expresiva', ejemplo: 'Do-Mib-Fa-Solb-Sol-Sib' },
+      { escala: 'Dórico', caracter: 'Mística, jazzística', ejemplo: 'Do-Re-Mib-Fa-Sol-La-Sib' },
+    ].map((fila) => ({ ...fila, intervalos: patronSemitonos(fila.escala) })),
     escenarios: [
       {
         titulo: 'El compositor busca un color sonoro',
@@ -498,7 +509,7 @@ export default function VisualizadorEscalasMusicales() {
     ],
     tips: [
       'La pentatónica menor es la escala más segura para improvisar: con solo 5 notas evitas la mayoría de disonancias.',
-      'El modo Dórico es la versión "más brillante" de la menor: tiene los mismos acordes base pero el VI grado mayor le da luminosidad.',
+      'El modo Dórico es una menor con la 6ª mayor, y esa sexta es la que le da luminosidad. No comparte todos los acordes con la menor natural: cambian tres de siete (ii, IV y vi). En La, Bm, D y F#° en lugar de B°, Dm y F.',
       'Aprende las escalas en todas las tonalidades. Una escala Mayor en Re tiene las mismas relaciones que en Do, solo transpuesta.',
       'Relaciona cada escala con canciones conocidas: "Happy Birthday" es Mayor, "Smoke on the Water" usa pentatónica menor.',
       'En el diapasón, fíjate primero en las tónicas: son el mapa. Todo lo demás se aprende como distancias respecto a ellas, y así el patrón se traslada a cualquier tonalidad moviendo la mano por el mástil.',
@@ -746,7 +757,7 @@ export default function VisualizadorEscalasMusicales() {
                 <thead>
                   <tr>
                     <th>Escala</th>
-                    <th>Patrón (T=tono, S=semitono)</th>
+                    <th>Patrón en semitonos (2 = tono, 1 = semitono)</th>
                     <th>Carácter sonoro</th>
                     <th>Ejemplo en Do</th>
                   </tr>
@@ -763,7 +774,7 @@ export default function VisualizadorEscalasMusicales() {
                 </tbody>
               </table>
             </div>
-            <p className={styles.tablaNote}>Nota: Los intervalos se expresan en semitonos (1=semitono, 2=tono). Las 12 escalas completas están disponibles en el visualizador.</p>
+            <p className={styles.tablaNote}>Nota: cada número es la distancia en semitonos de una nota a la siguiente, hasta la octava (1 = semitono, 2 = tono, 3 = tono y medio). La mayor, 2-2-1-2-2-2-1, es el tono-tono-semitono-tono-tono-tono-semitono de siempre. Las 12 escalas completas están disponibles en el visualizador.</p>
           </div>
 
           {/* Casos de uso */}
