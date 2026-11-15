@@ -38,6 +38,8 @@ import CasosAula from './CasosAula';
 const TEMPERATURA_MAX = 100;
 const MOLARIDAD_MAX = 10;
 const PORCENTAJE_MAX = 100;
+/** Tope del campo de osmolaridad del interior de la célula (osmol/L). */
+const INTERIOR_MAX = 5;
 /** Por encima de 1 mol/L la ecuación de van 't Hoff es solo una aproximación. */
 const MOLARIDAD_DILUIDA = 1;
 /** Cada punto del dibujo representa 0,05 osmol/L, con un tope para que no se apelotonen. */
@@ -88,7 +90,11 @@ interface Calculada {
 function calcularDisolucion(d: Disolucion): Calculada | null {
   const soluto = solutoPorId(d.solutoId);
   if (!soluto) return null;
-  const molaridad = molaridadDesde(parseSpanishNumber(d.concentracion), d.unidad, soluto);
+  const valor = parseSpanishNumber(d.concentracion);
+  // Fuera del rango del campo no hay cifra: antes el campo la reescribía al límite al salir y la
+  // app calculaba un supuesto que nadie había pedido (hallazgo 4742).
+  if (valor > (d.unidad === 'molar' ? MOLARIDAD_MAX : PORCENTAJE_MAX)) return null;
+  const molaridad = molaridadDesde(valor, d.unidad, soluto);
   if (molaridad === null) return null;
   const osm = osmolaridad(molaridad, soluto);
   if (osm === null) return null;
@@ -100,9 +106,23 @@ interface SelectorDisolucionProps {
   titulo: string;
   disolucion: Disolucion;
   onCambio: (d: Disolucion) => void;
+  /** Los solutos que se ofrecen; por defecto, todos. */
+  solutos?: readonly Soluto[];
+  /** Una línea bajo los botones de soluto, para explicar por qué falta alguno. */
+  notaSolutos?: string;
 }
 
-function SelectorDisolucion({ idBase, titulo, disolucion, onCambio }: SelectorDisolucionProps) {
+/**
+ * Solutos que se ofrecen frente a una célula. La urea atraviesa la membrana celular, así que no
+ * cuenta para la tonicidad: un medio de urea se comporta como hipotónico a cualquier
+ * concentración (es el ejemplo de libro de «isoosmótico pero no isotónico»). El panel la contaba
+ * como un soluto que no cruza y daba «isotónico» con 0,30 M y «crenación» con 0,6 M (hallazgo
+ * 4741). Es lo mismo que ya decidía casos.ts al dejarla fuera de los casos de célula. En la
+ * sección 1 sí vale, porque allí la membrana es ideal.
+ */
+const SOLUTOS_CELULA: readonly Soluto[] = SOLUTOS.filter((s) => s.id !== 'urea');
+
+function SelectorDisolucion({ idBase, titulo, disolucion, onCambio, solutos = SOLUTOS, notaSolutos }: SelectorDisolucionProps) {
   const { solutoId, concentracion, unidad } = disolucion;
   return (
     <div className={styles.disolucion} role="group" aria-labelledby={`${idBase}-titulo`}>
@@ -110,7 +130,7 @@ function SelectorDisolucion({ idBase, titulo, disolucion, onCambio }: SelectorDi
 
       <p className={styles.subgrupo} id={`${idBase}-soluto`}>Soluto</p>
       <div className={styles.presets} role="group" aria-labelledby={`${idBase}-soluto`}>
-        {SOLUTOS.map((s) => (
+        {solutos.map((s) => (
           <button
             key={s.id}
             type="button"
@@ -123,6 +143,7 @@ function SelectorDisolucion({ idBase, titulo, disolucion, onCambio }: SelectorDi
           </button>
         ))}
       </div>
+      {notaSolutos && <p className={styles.nota}>{notaSolutos}</p>}
 
       <p className={styles.subgrupo} id={`${idBase}-unidad`}>La concentración viene en</p>
       <div className={styles.presets} role="group" aria-labelledby={`${idBase}-unidad`}>
@@ -151,6 +172,7 @@ function SelectorDisolucion({ idBase, titulo, disolucion, onCambio }: SelectorDi
           onChange={(v) => onCambio({ ...disolucion, concentracion: v })}
           min={0}
           max={unidad === 'molar' ? MOLARIDAD_MAX : PORCENTAJE_MAX}
+          acotarAlSalir={false}
           step={unidad === 'molar' ? 0.05 : 0.1}
           suffix={unidad === 'molar' ? 'mol/L' : '% m/v'}
           placeholder={unidad === 'molar' ? '0,1' : '0,9'}
@@ -197,7 +219,7 @@ const EXPLICACION: Record<EstadoCelula, { titulo: string; texto: string }> = {
   normal: {
     titulo: 'La célula conserva su forma',
     texto:
-      'Entra y sale la misma cantidad de agua, así que el volumen no cambia. Por eso las disoluciones que se ponen en vena se preparan isotónicas con la sangre.',
+      'El agua entra y sale casi por igual, así que el volumen apenas cambia. Por eso las disoluciones que se ponen en vena se preparan isotónicas con la sangre.',
   },
   crenada: {
     titulo: 'La célula se arruga (crenación)',
@@ -212,7 +234,7 @@ const EXPLICACION: Record<EstadoCelula, { titulo: string; texto: string }> = {
   flacida: {
     titulo: 'La célula queda flácida',
     texto:
-      'No hay paso neto de agua, así que la membrana no presiona la pared. La célula no se daña, pero pierde firmeza: así se ven los tallos y las hojas mustios.',
+      'Apenas hay paso neto de agua, así que la membrana no presiona la pared. La célula no se daña, pero pierde firmeza: así se ven los tallos y las hojas mustios.',
   },
   plasmolizada: {
     titulo: 'La membrana se despega de la pared (plasmólisis)',
@@ -249,8 +271,12 @@ export default function SimuladorOsmosisPage() {
   const [interiorTexto, setInteriorTexto] = useState('0,30');
   const [medio, setMedio] = useState<Disolucion>({ solutoId: 'nacl', concentracion: '0,9', unidad: 'porcentaje' });
 
-  const temperatura = parseSpanishNumber(temperaturaTexto);
-  const temperaturaValida = aKelvin(temperatura) !== null;
+  // Lo que el campo admite, 0-100 °C (agua líquida). Antes el campo reescribía al salir «−10» a
+  // 0 °C y «150» a 100 °C, y la app daba dos cifras según cuándo se mirara (hallazgo 4742).
+  const temperaturaLeida = parseSpanishNumber(temperaturaTexto);
+  const temperaturaValida =
+    aKelvin(temperaturaLeida) !== null && temperaturaLeida >= 0 && temperaturaLeida <= TEMPERATURA_MAX;
+  const temperatura = temperaturaValida ? temperaturaLeida : NaN;
 
   const calcA = useMemo(() => calcularDisolucion(ladoA), [ladoA]);
   const calcB = useMemo(() => calcularDisolucion(ladoB), [ladoB]);
@@ -261,19 +287,20 @@ export default function SimuladorOsmosisPage() {
 
   const calcMedio = useMemo(() => calcularDisolucion(medio), [medio]);
   const osmInterior = parseSpanishNumber(interiorTexto);
+  const interiorValido = Number.isFinite(osmInterior) && osmInterior > 0 && osmInterior <= INTERIOR_MAX;
   const celula = useMemo<ResultadoCelula | null>(
-    () => (calcMedio ? celulaEnMedio(tipoCelula, osmInterior, calcMedio.osm, temperatura) : null),
-    [calcMedio, tipoCelula, osmInterior, temperatura],
+    () => (calcMedio && interiorValido ? celulaEnMedio(tipoCelula, osmInterior, calcMedio.osm, temperatura) : null),
+    [calcMedio, interiorValido, tipoCelula, osmInterior, temperatura],
   );
 
   const faltanMembrana: string[] = [];
-  if (!temperaturaValida) faltanMembrana.push('una temperatura válida');
+  if (!temperaturaValida) faltanMembrana.push('una temperatura válida, entre 0 y 100 °C');
   if (!calcA) faltanMembrana.push('la concentración del lado A');
   if (!calcB) faltanMembrana.push('la concentración del lado B');
 
   const faltanCelula: string[] = [];
-  if (!temperaturaValida) faltanCelula.push('una temperatura válida');
-  if (!(Number.isFinite(osmInterior) && osmInterior > 0)) faltanCelula.push('la osmolaridad del interior de la célula, mayor que 0');
+  if (!temperaturaValida) faltanCelula.push('una temperatura válida, entre 0 y 100 °C');
+  if (!interiorValido) faltanCelula.push(`la osmolaridad del interior de la célula, mayor que 0 y hasta ${INTERIOR_MAX}`);
   if (!calcMedio) faltanCelula.push('la concentración del medio');
 
   const t = aKelvin(temperatura);
@@ -305,6 +332,7 @@ export default function SimuladorOsmosisPage() {
               onChange={setTemperaturaTexto}
               min={0}
               max={TEMPERATURA_MAX}
+              acotarAlSalir={false}
               suffix="°C"
               placeholder="25"
               helperText="25 °C para el laboratorio, 37 °C para el cuerpo humano. La fórmula usa kelvin: T = t + 273,15"
@@ -457,7 +485,8 @@ export default function SimuladorOsmosisPage() {
                 value={interiorTexto}
                 onChange={setInteriorTexto}
                 min={0}
-                max={5}
+                max={INTERIOR_MAX}
+                acotarAlSalir={false}
                 step={0.01}
                 suffix="osmol/L"
                 placeholder="0,30"
@@ -483,7 +512,14 @@ export default function SimuladorOsmosisPage() {
             </div>
           </div>
 
-          <SelectorDisolucion idBase="medio" titulo="O el medio que quieras" disolucion={medio} onCambio={setMedio} />
+          <SelectorDisolucion
+            idBase="medio"
+            titulo="O el medio que quieras"
+            disolucion={medio}
+            onCambio={setMedio}
+            solutos={SOLUTOS_CELULA}
+            notaSolutos="La urea no se ofrece aquí: atraviesa la membrana de la célula y no cuenta para la tonicidad. Un glóbulo rojo en un medio de urea se comporta como en uno hipotónico."
+          />
 
           <div className={styles.simLayout}>
             <div className={styles.dibujoCaja}>
@@ -529,10 +565,14 @@ export default function SimuladorOsmosisPage() {
                   </div>
 
                   <p className={styles.aclaracion}>{EXPLICACION[celula.estado].texto}</p>
+                  {/* La banda es un convenio de la app (motor.ts), no la definición: estrictamente,
+                      isotónico es la MISMA osmolaridad efectiva (hallazgo 4745). */}
                   <p className={styles.nota}>
-                    Se llama isotónico a un medio que no se aleja más de un{' '}
-                    {formatPercentage(BANDA_ISOTONICA, 0)} de la osmolaridad del interior: dentro de
-                    esa banda el agua apenas se mueve.
+                    En este simulador se llama isotónico a un medio que no se aleja más de un{' '}
+                    {formatPercentage(BANDA_ISOTONICA, 0)} de la osmolaridad del interior, para que el
+                    suero fisiológico salga isotónico con la sangre, como en los libros. Es un
+                    convenio: dentro de esa banda el agua se mueve poco, pero si la Δπ no es cero
+                    algo se mueve.
                   </p>
                 </div>
               ) : (

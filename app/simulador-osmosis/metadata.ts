@@ -38,7 +38,9 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [
     'Dos compartimentos separados por una membrana semipermeable, con un soluto distinto en cada lado',
-    'Presión osmótica con la ecuación de van \'t Hoff π = i·M·R·T, en atm, kPa y mmHg',
+    // Bajada a lo que la página enseña (hallazgo 4743): prometía también mmHg, que el motor
+    // calcula y ninguna vista pinta, y la π de cada lado solo sale en atm.
+    'Presión osmótica con la ecuación de van \'t Hoff π = i·M·R·T, en atm, y la diferencia entre los dos lados también en kPa',
     'Seis solutos con su factor de van \'t Hoff: glucosa, sacarosa, urea, NaCl, KCl y CaCl₂',
     'Concentración en mol/L o en % masa/volumen, con la conversión a molaridad y osmolaridad',
     'Columna de agua que equilibra la diferencia de presión osmótica (osmómetro)',
@@ -68,7 +70,7 @@ export const PREGUNTAS_FRECUENTES: FAQItem[] = [
   },
   {
     question: '¿Cómo se calcula la presión osmótica?',
-    answer: `Con la ecuación de van 't Hoff, π = i·M·R·T: factor de van 't Hoff por molaridad por la constante de los gases (0,082 atm·L/(mol·K)) por la temperatura en kelvin. Una disolución de glucosa 0,1 M a 25 °C tiene π = 0,1 · 0,082 · 298 ≈ ${atmGlucosa} atm, la presión de una columna de agua de unos ${mGlucosa} m.`,
+    answer: `Con la ecuación de van 't Hoff, π = i·M·R·T: factor de van 't Hoff por molaridad por la constante de los gases (0,08206 atm·L/(mol·K), que muchos libros redondean a 0,082) por la temperatura en kelvin. Una disolución de glucosa 0,1 M a 25 °C tiene π = 0,1 · 0,08206 · 298,15 ≈ ${atmGlucosa} atm, la presión de una columna de agua de unos ${mGlucosa} m.`,
   },
   {
     question: '¿Qué diferencia hay entre un medio hipotónico, isotónico e hipertónico?',

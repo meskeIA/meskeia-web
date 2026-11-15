@@ -305,56 +305,65 @@ test.describe('Inspector 15/11/2026 · casos a mano', () => {
     await expect(veredicto).toContainText('No es correcto');
   });
 
-  test('HALLAZGO A (15/11/2026, ABIERTO) · la urea atraviesa la membrana: un glóbulo rojo en urea no conserva su forma ni se arruga', async ({ page }) => {
+  test('HALLAZGO A · 4741 (15/11/2026, REPARADO) · la urea atraviesa la membrana: no se ofrece frente a la célula', async ({ page }) => {
     // casos.ts: «La urea no entra en los casos de célula: atraviesa la membrana, y un medio de
-    // urea iso-osmolar se comporta como hipotónico». El panel la ofrece y la cuenta como un
-    // soluto que no cruza. Reparado si la urea deja de ofrecerse en la sección 2 o si deja de
-    // dar «conserva su forma» (0,30 M) y «crenación» (0,6 M).
-    test.fail();
+    // urea iso-osmolar se comporta como hipotónico». El panel la ofrecía y la contaba como un
+    // soluto que no cruza («conserva su forma» con 0,30 M y «crenación» con 0,6 M). Ahora la
+    // sección 2 no la ofrece y dice por qué; la sección 1 (membrana ideal) la sigue ofreciendo.
     const medio = 'O el medio que quieras';
-    const urea = grupo(page, medio).getByRole('button', { name: /^Urea/ });
-    if ((await urea.count()) === 0) return;
-    await urea.click();
-    await grupo(page, medio).getByRole('button', { name: /^mol\/L/ }).click();
-    await escribir(concentracion(page, medio), page, '0,3');
-    const zona = estado(page, CELULA);
-    await expect(zona).not.toContainText('La célula conserva su forma');
-    await expect(zona).not.toContainText('Medio isotónico');
-    await escribir(concentracion(page, medio), page, '0,6');
-    await expect(zona).not.toContainText('crenación');
+    await expect(grupo(page, medio).getByRole('button', { name: /^Glucosa/ })).toBeVisible();
+    await expect(grupo(page, medio).getByRole('button', { name: /^Urea/ })).toHaveCount(0);
+    await expect(grupo(page, medio)).toContainText('La urea no se ofrece aquí');
+    await expect(grupo(page, 'Lado A').getByRole('button', { name: /^Urea/ })).toHaveCount(1);
   });
 
-  test('HALLAZGO B (15/11/2026, ABIERTO) · al salir del campo, «−0,2» no se convierte en agua pura ni −300 °C en 0 °C', async ({ page }) => {
-    // Hoy: con el foco, «Falta un dato»; tras Tab, el campo pasa a «0» y la sección publica
+  test('HALLAZGO B · 4742 (15/11/2026, REPARADO) · al salir del campo, «−0,2» no se convierte en agua pura ni −300 °C en 0 °C', async ({ page }) => {
+    // Antes: con el foco, «Falta un dato»; tras Tab, el campo pasaba a «0» y la sección publicaba
     // agua pura frente a glucosa 0,1 M (De A hacia B, Δπ 2,45 atm), o el cálculo a 0 °C (4,48 atm).
-    test.fail();
     const caja = concentracion(page, 'Lado A');
     await escribir(caja, page, '-0,2');
     await caja.press('Tab');
+    await expect(caja).toHaveValue('-0,2');
+    await expect(estado(page, MEMBRANA)).toContainText('la concentración del lado A');
     await expect(estado(page, MEMBRANA)).not.toContainText('Δπ');
 
     await escribir(caja, page, '0,3');
     const t = temperatura(page);
     await escribir(t, page, '-300');
     await t.press('Tab');
+    await expect(t).toHaveValue('-300');
     await expect(estado(page, MEMBRANA)).not.toContainText('atm');
+
+    // −10 y 150 °C quedan fuera de 0-100 °C: sin cifra, con el foco y sin él (antes 4,32 atm con
+    // el foco y 4,48 tras Tab; 6,94 y 6,12).
+    for (const valor of ['-10', '150']) {
+      await escribir(t, page, valor);
+      await expect(estado(page, MEMBRANA)).toContainText('entre 0 y 100 °C');
+      await t.press('Tab');
+      await expect(t).toHaveValue(valor);
+      await expect(estado(page, MEMBRANA)).not.toContainText('atm');
+    }
   });
 
-  test('HALLAZGO C (15/11/2026, ABIERTO) · features promete la presión en mmHg y la página no la enseña', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO C · 4743 (15/11/2026, REPARADO) · features promete la presión en mmHg y la página no la enseña', async ({ page }) => {
+    // Se bajó la promesa a lo que la página enseña (tipo promesa): sin mmHg.
+    const bloquesJson = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const webApp = bloquesJson.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'WebApplication');
+    expect((webApp?.featureList as string[]).some((f) => /van 't Hoff/.test(f))).toBe(true);
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const app = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'WebApplication');
     const features: string[] = app?.featureList ?? app?.features ?? [];
     const prometeMmHg = features.some((f) => /mmHg/.test(f));
+    expect(prometeMmHg).toBe(false);
     if (prometeMmHg) {
       // innerText: el textContent incluiría el propio JSON-LD si estuviera dentro
       await expect(page.locator('main').first()).toContainText('mmHg', { useInnerText: true });
     }
   });
 
-  test('HALLAZGO D (15/11/2026, ABIERTO) · la cuenta de la FAQ cuadra con su resultado', async ({ page }) => {
-    // «π = 0,1 · 0,082 · 298 ≈ 2,45 atm»: 0,1 · 0,082 · 298 = 2,4436 → 2,44
-    test.fail();
+  test('HALLAZGO D · 4744 (15/11/2026, REPARADO) · la cuenta de la FAQ cuadra con su resultado', async ({ page }) => {
+    // Antes: «π = 0,1 · 0,082 · 298 ≈ 2,45 atm», y 0,1 · 0,082 · 298 = 2,4436 → 2,44. Ahora la
+    // cuenta va con las constantes que dan la cifra: 0,1 · 0,08206 · 298,15 = 2,4466 → 2,45.
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
     const respuesta: string = faq.mainEntity.find((q: { name: string }) => /calcula la presión osmótica/.test(q.name))
@@ -364,5 +373,22 @@ test.describe('Inspector 15/11/2026 · casos a mano', () => {
     const n = (s: string) => Number(s.replace(',', '.'));
     const producto = n(m![1]) * n(m![2]) * n(m![3]);
     expect(Math.abs(producto - n(m![4]))).toBeLessThanOrEqual(0.005 + 1e-9);
+  });
+
+  test('HALLAZGO E · 4745 (15/11/2026, REPARADO) · la banda isotónica sale como convenio y el texto no niega la Δπ', async ({ page }) => {
+    // Glucosa 0,315 M frente a 0,30: isotónico por la banda del 5 % (convenio de motor.ts), con
+    // Δπ = 0,367 atm. Antes: «Entra y sale la misma cantidad de agua, así que el volumen no
+    // cambia» y «Se llama isotónico a…», como si fuera la definición.
+    const medio = 'O el medio que quieras';
+    await grupo(page, medio).getByRole('button', { name: /^Glucosa/ }).click();
+    await grupo(page, medio).getByRole('button', { name: /^mol\/L/ }).click();
+    await escribir(concentracion(page, medio), page, '0,315');
+    const zona = estado(page, CELULA);
+    await expect(zona).toContainText('Medio isotónico');
+    expect(await leerTarjeta(zona, 'Diferencia de presión osmótica')).toBe('0,367 atm');
+    await expect(zona).toContainText('el volumen apenas cambia');
+    await expect(zona).not.toContainText('el volumen no cambia');
+    await expect(zona).toContainText('En este simulador se llama isotónico');
+    await expect(zona).toContainText('Es un convenio');
   });
 });
