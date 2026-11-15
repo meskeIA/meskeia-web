@@ -145,3 +145,224 @@ test.describe('Simulador de Ósmosis', () => {
     await expect(estado(page, CELULA)).toContainText('una temperatura válida');
   });
 });
+
+/**
+ * INSPECTOR, primera inspección (15/11/2026) — casos resueltos a mano ANTES de ejecutar la app.
+ *
+ * Constantes cotejadas con su fuente: R = 8,314462618 J/(mol·K) exacta (CODATA, physics.nist.gov),
+ * 1 atm = 101.325 Pa exacta (NIST); g = 9,81 m/s² es el convenio de clase declarado en
+ * simulador-principio-pascal/motor.ts (g_n = 9,80665, un 0,035 % menos). Masas molares con los
+ * pesos atómicos abreviados de la CIAAW (H 1,0080 · C 12,011 · N 14,007 · O 15,999 · Na 22,990 ·
+ * Cl 35,45 · K 39,098 · Ca 40,078): glucosa 180,16 · sacarosa 342,30 · urea 60,06 · NaCl 58,44 ·
+ * KCl 74,55 · CaCl₂ 110,98, las de SOLUTOS.
+ *
+ *   R = 8,314462618 / 101,325 = 0,0820573661 atm·L/(mol·K)
+ *   R·T: 0 °C → 22,41397 · 25 °C → 24,46540 · 37 °C → 25,45009 · 100 °C → 30,61971
+ *
+ *   8)  A NaCl 0,15 M (i = 2) | B glucosa 0,1 M, 37 °C
+ *       osm A 0,300 · osm B 0,100 → el agua va de B a A
+ *       π A = 0,3 · 25,45009 = 7,635 → «7,64 atm» · π B = 2,545009 → «2,55 atm»
+ *       Δπ = 0,2 · 25,45009 = 5,0900 atm → «5,09 atm» · ×101,325 = 515,746 → «515,7 kPa»
+ *       h = 0,2·1000·8,314462618·310,15 / 9810 = 515.746 Pa / 9810 = 52,574 → «52,57 m»
+ *   9)  A CaCl₂ 0,1 M (i = 3) | B NaCl 0,15 M (i = 2): 0,3 = 0,3 → «Ninguno» (con 3 · 0,1 =
+ *       0,30000000000000004 en coma flotante) · agua | agua: 0 = 0 → «Ninguno», «0 atm»
+ *   10) Iniciales (sacarosa 0,3 | glucosa 0,1) a 100 °C: Δπ 0,2 · 30,61971 = 6,1239 → «6,12 atm»,
+ *       620,508 → «620,5 kPa», π A 9,186 → «9,19 atm», π B 3,062 → «3,06 atm», h 63,253 → «63,25 m»
+ *       a 0 °C: Δπ 4,4828 → «4,48 atm», 454,22 → «454,2 kPa», h 46,302 → «46,30 m»
+ *       a −273,15 °C: T = 0 K → no hay cálculo, «una temperatura válida»
+ *   11) Célula animal, interior 0,30: KCl 0,2 M → 0,4 osmol/L, +33,3 % → hipertónico, crenación,
+ *       Δπ 0,1 · 24,4654 = 2,4465 → «2,45 atm» · glucosa 0,315 M → +5,0 % justo en el borde de la
+ *       banda (incluido) → isotónico, Δπ 0,015 · 24,4654 = 0,367 → «0,367 atm» · glucosa 0,316 M
+ *       → +5,3 % → hipertónico
+ *   12) Rechazo con el foco puesto: «−0,2» de concentración y «−300 °C» → «Falta un dato»
+ *   13) Caso de aula 10 (NaCl 3,5 % a 20 °C): 35/58,44 = 0,598905 M · 2 = 1,197810 osmol/L ·
+ *       24,05512 = 28,8135 → «28,81 atm» (clase: 1,19781 · 0,082 · 293 = 28,78, dentro del 1 %);
+ *       «14,41» es el de i = 1 y se nombra; «50» no vale
+ *
+ * HALLAZGOS ABIERTOS de esta inspección (llevan test.fail(); al repararlos, se quita):
+ *   A) Urea en la sección de la célula: es un soluto que ATRAVIESA la membrana (lo dice casos.ts y
+ *      por eso la excluye de los casos de aula), así que no cuenta para la tonicidad: un glóbulo
+ *      rojo en urea 0,30 M acaba en hemólisis. El panel dice «Medio isotónico · La célula conserva
+ *      su forma», y con urea 0,6 M «crenación».
+ *   B) Al salir del campo, NumberInput acota lo imposible al límite: «−0,2» pasa a «0» (agua
+ *      pura) y «−300 °C» a «0 °C», y la app publica un cálculo que el usuario no pidió.
+ *   C) features del JSON-LD promete la presión osmótica «en atm, kPa y mmHg»: mmHg no aparece en
+ *      la página (el motor lo calcula y nadie lo pinta).
+ *   D) La FAQ «¿Cómo se calcula la presión osmótica?» escribe «0,1 · 0,082 · 298 ≈ 2,45 atm»; ese
+ *      producto es 2,4436 → 2,44 (el 2,45 sale de R exacta y 298,15 K).
+ *   E) (sin test: es redacción) Con glucosa 0,315 M frente a 0,30 el panel enseña Δπ = 0,367 atm y
+ *      a la vez «Entra y sale la misma cantidad de agua, así que el volumen no cambia», y la nota
+ *      presenta la banda del 5 % como la definición («Se llama isotónico a…»), no como convenio.
+ */
+test.describe('Inspector 15/11/2026 · casos a mano', () => {
+  const temperatura = (page: Page) =>
+    page.getByRole('textbox', { name: 'Temperatura de las disoluciones', exact: true });
+
+  test('8 · NaCl 0,15 M frente a glucosa 0,1 M a 37 °C: Δπ 5,09 atm, 515,7 kPa y 52,57 m', async ({ page }) => {
+    await grupo(page, 'Lado A').getByRole('button', { name: /^Cloruro de sodio/ }).click();
+    await escribir(concentracion(page, 'Lado A'), page, '0,15');
+    await escribir(temperatura(page), page, '37');
+    const zona = estado(page, MEMBRANA);
+    await expect(zona).toContainText('De B hacia A');
+    await expect(zona).toContainText('Δπ = 5,09 atm · 515,7 kPa');
+    await expect(zona).toContainText('52,57 m');
+    expect(await leerTarjeta(zona, 'Osmolaridad A (i·M)')).toBe('0,300 osmol/L');
+    expect(await leerTarjeta(zona, 'Osmolaridad B (i·M)')).toBe('0,100 osmol/L');
+    expect(await leerTarjeta(zona, 'Presión osmótica A')).toBe('7,64 atm');
+    expect(await leerTarjeta(zona, 'Presión osmótica B')).toBe('2,55 atm');
+    // La fórmula enseña el factor i = 2 del NaCl y T en kelvin
+    await expect(seccion(page, MEMBRANA)).toContainText('T = 310,15 K');
+    await expect(seccion(page, MEMBRANA)).toContainText('Lado A: π = 2 · 0,1500');
+  });
+
+  test('9 · CaCl₂ 0,1 M frente a NaCl 0,15 M: 0,300 = 0,300, sin paso neto; agua frente a agua, igual', async ({ page }) => {
+    await grupo(page, 'Lado A').getByRole('button', { name: /^Cloruro de calcio/ }).click();
+    await escribir(concentracion(page, 'Lado A'), page, '0,1');
+    await grupo(page, 'Lado B').getByRole('button', { name: /^Cloruro de sodio/ }).click();
+    await escribir(concentracion(page, 'Lado B'), page, '0,15');
+    const zona = estado(page, MEMBRANA);
+    await expect(zona).toContainText('Ninguno');
+    expect(await leerTarjeta(zona, 'Osmolaridad A (i·M)')).toBe('0,300 osmol/L');
+    expect(await leerTarjeta(zona, 'Osmolaridad B (i·M)')).toBe('0,300 osmol/L');
+    await expect(seccion(page, MEMBRANA).getByRole('img')).toHaveAttribute('aria-label', /no pasa en neto/);
+
+    await escribir(concentracion(page, 'Lado A'), page, '0');
+    await escribir(concentracion(page, 'Lado B'), page, '0');
+    await expect(zona).toContainText('Ninguno');
+    expect(await leerTarjeta(zona, 'Presión osmótica A')).toBe('0 atm');
+    expect(await leerTarjeta(zona, 'Presión osmótica B')).toBe('0 atm');
+  });
+
+  test('10 · temperatura en los extremos: 100 °C, 0 °C y el cero absoluto', async ({ page }) => {
+    const zona = estado(page, MEMBRANA);
+    await escribir(temperatura(page), page, '100');
+    await expect(zona).toContainText('Δπ = 6,12 atm · 620,5 kPa');
+    await expect(zona).toContainText('63,25 m');
+    expect(await leerTarjeta(zona, 'Presión osmótica A')).toBe('9,19 atm');
+    expect(await leerTarjeta(zona, 'Presión osmótica B')).toBe('3,06 atm');
+
+    await escribir(temperatura(page), page, '0');
+    await expect(zona).toContainText('Δπ = 4,48 atm · 454,2 kPa');
+    await expect(zona).toContainText('46,30 m');
+
+    await escribir(temperatura(page), page, '-273,15');
+    await expect(zona).toContainText('una temperatura válida');
+    await expect(zona).not.toContainText('atm');
+  });
+
+  test('11 · glóbulo rojo de 0,30: KCl 0,2 M lo arruga; glucosa 0,315 M es el borde isotónico', async ({ page }) => {
+    const medio = 'O el medio que quieras';
+    await grupo(page, medio).getByRole('button', { name: /^Cloruro de potasio/ }).click();
+    await grupo(page, medio).getByRole('button', { name: /^mol\/L/ }).click();
+    await escribir(concentracion(page, medio), page, '0,2');
+    const zona = estado(page, CELULA);
+    await expect(zona).toContainText('Medio hipertónico');
+    await expect(zona).toContainText('La célula se arruga (crenación)');
+    await expect(zona).toContainText('El agua sale de la célula');
+    expect(await leerTarjeta(zona, 'Osmolaridad del medio')).toBe('0,400 osmol/L');
+    expect(await leerTarjeta(zona, 'Medio frente al interior')).toMatch(/^\+33,3\s%$/);
+    expect(await leerTarjeta(zona, 'Diferencia de presión osmótica')).toBe('2,45 atm');
+
+    await grupo(page, medio).getByRole('button', { name: /^Glucosa/ }).click();
+    await escribir(concentracion(page, medio), page, '0,315');
+    await expect(zona).toContainText('Medio isotónico');
+    expect(await leerTarjeta(zona, 'Medio frente al interior')).toMatch(/^\+5,0\s%$/);
+    expect(await leerTarjeta(zona, 'Diferencia de presión osmótica')).toBe('0,367 atm');
+    await escribir(concentracion(page, medio), page, '0,316');
+    await expect(zona).toContainText('Medio hipertónico');
+  });
+
+  test('12 · con el foco puesto, una concentración negativa y −300 °C no dan cifra', async ({ page }) => {
+    await escribir(concentracion(page, 'Lado A'), page, '-0,2');
+    const zona = estado(page, MEMBRANA);
+    await expect(zona).toContainText('Falta un dato');
+    await expect(zona).toContainText('la concentración del lado A');
+    await expect(zona).not.toContainText('atm');
+
+    await escribir(concentracion(page, 'Lado A'), page, '0,3');
+    await escribir(temperatura(page), page, '-300');
+    await expect(zona).toContainText('una temperatura válida');
+    await expect(estado(page, CELULA)).toContainText('una temperatura válida');
+    await expect(zona).not.toContainText('atm');
+  });
+
+  test('13 · caso de aula 10: «28,81» y la de clase «28,78» valen; «14,41» es i = 1; «50» no', async ({ page }) => {
+    await page.getByRole('button', { name: /^Caso 10: / }).click();
+    const caja = page.locator('#casos-respuesta');
+    const veredicto = page.locator('#casos-veredicto');
+    const responder = async (texto: string) => {
+      await caja.fill(texto);
+      await esperarValorEnReact(page, caja, texto);
+      await page.locator('#casos-comprobar').click();
+    };
+    await responder('28,81');
+    await expect(veredicto).toContainText('¡Correcto!');
+    await responder('28,78');
+    await expect(veredicto).toContainText('¡Correcto!');
+    await responder('14,41');
+    await expect(veredicto).toContainText('Has tomado i = 1');
+    await responder('50');
+    await expect(veredicto).toContainText('No es correcto');
+  });
+
+  test('HALLAZGO A (15/11/2026, ABIERTO) · la urea atraviesa la membrana: un glóbulo rojo en urea no conserva su forma ni se arruga', async ({ page }) => {
+    // casos.ts: «La urea no entra en los casos de célula: atraviesa la membrana, y un medio de
+    // urea iso-osmolar se comporta como hipotónico». El panel la ofrece y la cuenta como un
+    // soluto que no cruza. Reparado si la urea deja de ofrecerse en la sección 2 o si deja de
+    // dar «conserva su forma» (0,30 M) y «crenación» (0,6 M).
+    test.fail();
+    const medio = 'O el medio que quieras';
+    const urea = grupo(page, medio).getByRole('button', { name: /^Urea/ });
+    if ((await urea.count()) === 0) return;
+    await urea.click();
+    await grupo(page, medio).getByRole('button', { name: /^mol\/L/ }).click();
+    await escribir(concentracion(page, medio), page, '0,3');
+    const zona = estado(page, CELULA);
+    await expect(zona).not.toContainText('La célula conserva su forma');
+    await expect(zona).not.toContainText('Medio isotónico');
+    await escribir(concentracion(page, medio), page, '0,6');
+    await expect(zona).not.toContainText('crenación');
+  });
+
+  test('HALLAZGO B (15/11/2026, ABIERTO) · al salir del campo, «−0,2» no se convierte en agua pura ni −300 °C en 0 °C', async ({ page }) => {
+    // Hoy: con el foco, «Falta un dato»; tras Tab, el campo pasa a «0» y la sección publica
+    // agua pura frente a glucosa 0,1 M (De A hacia B, Δπ 2,45 atm), o el cálculo a 0 °C (4,48 atm).
+    test.fail();
+    const caja = concentracion(page, 'Lado A');
+    await escribir(caja, page, '-0,2');
+    await caja.press('Tab');
+    await expect(estado(page, MEMBRANA)).not.toContainText('Δπ');
+
+    await escribir(caja, page, '0,3');
+    const t = temperatura(page);
+    await escribir(t, page, '-300');
+    await t.press('Tab');
+    await expect(estado(page, MEMBRANA)).not.toContainText('atm');
+  });
+
+  test('HALLAZGO C (15/11/2026, ABIERTO) · features promete la presión en mmHg y la página no la enseña', async ({ page }) => {
+    test.fail();
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const app = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'WebApplication');
+    const features: string[] = app?.featureList ?? app?.features ?? [];
+    const prometeMmHg = features.some((f) => /mmHg/.test(f));
+    if (prometeMmHg) {
+      // innerText: el textContent incluiría el propio JSON-LD si estuviera dentro
+      await expect(page.locator('main').first()).toContainText('mmHg', { useInnerText: true });
+    }
+  });
+
+  test('HALLAZGO D (15/11/2026, ABIERTO) · la cuenta de la FAQ cuadra con su resultado', async ({ page }) => {
+    // «π = 0,1 · 0,082 · 298 ≈ 2,45 atm»: 0,1 · 0,082 · 298 = 2,4436 → 2,44
+    test.fail();
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
+    const respuesta: string = faq.mainEntity.find((q: { name: string }) => /calcula la presión osmótica/.test(q.name))
+      .acceptedAnswer.text;
+    const m = respuesta.match(/π = ([\d,]+) · ([\d,]+) · ([\d,]+) ≈ ([\d,]+) atm/);
+    expect(m).not.toBeNull();
+    const n = (s: string) => Number(s.replace(',', '.'));
+    const producto = n(m![1]) * n(m![2]) * n(m![3]);
+    expect(Math.abs(producto - n(m![4]))).toBeLessThanOrEqual(0.005 + 1e-9);
+  });
+});

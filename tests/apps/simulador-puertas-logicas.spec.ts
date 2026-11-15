@@ -1,4 +1,4 @@
-import { test, expect, devices, type Page } from '@playwright/test';
+import { test, expect, devices, type Locator, type Page } from '@playwright/test';
 import {
   analizar,
   contarOperadores,
@@ -10,6 +10,8 @@ import {
   RETOS,
   type Reto,
 } from '../../app/simulador-puertas-logicas/motor-retos';
+import { selectorDelModulo } from './_modulo-css';
+import { esperarPaginaAsentada } from './_hidratacion';
 
 /**
  * Simulador de Puertas Lógicas — modo Retos (18/08/2026)
@@ -911,7 +913,7 @@ test.describe('16/10 · CASO 2 · límite, en móvil (360×740, táctil)', () =>
     await expect(page.getByText('Resueltos: 1 de 9')).toBeVisible(); // 9 retos en motor-retos.ts
   });
 
-  // HALLAZGO ABIERTO (16/10/2026). A 360×740 el selector de modo se apila en una columna de
+  // HALLAZGO 3352 (16/10/2026, REPARADO el 17/10/2026). A 360×740 el selector de modo se apila en una columna de
   // 388 px (4 botones de ~85 px) y la herramienta empieza en y≈1008. Al tocar «Circuitos» lo
   // que cambia (el selector de circuito, y≈996) queda por debajo de la pantalla: lo único que
   // se ve es el borde del botón. Medido en la inspección: top 996 px con 740 px de alto.
@@ -985,7 +987,7 @@ test.describe('16/10 · CASO 3 · lo que debe rechazarse', () => {
 });
 
 // ───────────────────────────────────────────────────────────────────────────────
-// Contraste de las tablas de verdad (hallazgo ABIERTO del 16/10/2026)
+// Contraste de las tablas de verdad (hallazgo 3354 del 16/10/2026, REPARADO el 17/10/2026)
 // ───────────────────────────────────────────────────────────────────────────────
 /**
  * El «1» de cada celda (.cellOne: #10b981 sobre ese mismo verde al 15 %) y la cabecera «Y»
@@ -1073,7 +1075,7 @@ test.describe('16/10 · contraste de las tablas de verdad', () => {
 });
 
 // ───────────────────────────────────────────────────────────────────────────────
-// Contenido: bloque educativo, FAQPage y featureList (hallazgos ABIERTOS del 16/10/2026)
+// Contenido: bloque educativo, FAQPage y featureList (hallazgos 3355-3360 del 16/10/2026, REPARADOS el 17/10/2026)
 // ───────────────────────────────────────────────────────────────────────────────
 test.describe('16/10 · contenido', () => {
   // REPARADO (hallazgo 3356, 17/10/2026)
@@ -1161,5 +1163,256 @@ test.describe('16/10 · contenido', () => {
     await expect(seccion).toHaveCount(1);
     await expect(seccion).not.toContainText('cualquier fórmula booleana');
     await expect(seccion).toContainText('hasta cuatro variables (A, B, C y D)');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN DE CAMBIO 15/11/2026 — 68e83c8a5 (color del aviso de expresión rota) y
+// 9ad445972 (fuera <ZonaHerramienta> y el data-zona-estatica del símbolo)
+// ═══════════════════════════════════════════════════════════════════════════════
+/**
+ * CONTRASTE DEL AVISO, calculado a mano ANTES de medir (WCAG 2.x, luminancia relativa sRGB).
+ * .expressionError pinta `var(--rojo-texto, #ef4444)` a 14,4 px y peso 400 (texto PEQUEÑO: 4,5:1)
+ * sobre .mainContent, que es `var(--bg-card)`:
+ *   · Claro: --rojo-texto vale #B91C1C en :root (app/globals.css) sobre #FFFFFF → 6,47:1. Cumple.
+ *   · Oscuro: globals deja --rojo-texto en `initial` (C0296: «en oscuro manda la reserva»), así
+ *     que pinta #EF4444 sobre el --bg-card oscuro #2D2D2D → 3,66:1. NO llega a 4,5.
+ * Medido en el navegador el 15/11/2026: 6,47 y 3,66, con el fondo compuesto rgb(255, 255, 255)
+ * y rgb(45, 45, 45). Un rojo que sí llega sobre #2D2D2D, calculado: #F87171 → 4,98:1.
+ *
+ * MAQUETACIÓN SIN EL ENVOLTORIO. <ZonaHerramienta> llevaba `display: contents`: quitarlo no
+ * debe mover nada, y ninguna regla del módulo depende de la jerarquía (no hay `>`, `+` ni `~`).
+ *   · 1280 px: .container de 1200 px (border-box) con 24 px de relleno lateral → selector de modo
+ *     y herramienta de 1200 − 48 = 1152 px, alineados, con los 32 px del margin-bottom del
+ *     selector entre ambos; el selector en 4 columnas (la media de 1024 px no aplica).
+ *   · 390 px: la media de 768 px deja el relleno en 16 px → 390 − 32 = 358 px, selector en 1 columna.
+ *   · El símbolo es un svg de 200×100 dentro de un .diagramContainer con 24 px de relleno
+ *     (248 px de ancho), que cabe en los 358 − 2·32 = 294 px útiles de la herramienta a 390 px.
+ */
+
+/** Abre el simulador con un ancho dado y espera a que React haya pintado antes de medir. */
+async function abrirConAncho(page: Page, ancho: number): Promise<void> {
+  await page.setViewportSize({ width: ancho, height: 900 });
+  await abrirSimulador(page);
+  await esperarPaginaAsentada(page);
+  // Las transiciones dejan leer colores intermedios y el overlay de dev tapa: fuera los dos.
+  await page.addStyleTag({
+    content: 'nextjs-portal { display: none !important; } *, *::before, *::after { animation: none !important; transition: none !important; }',
+  });
+}
+
+/** Contraste del texto de un elemento contra el fondo que tiene DEBAJO (capas compuestas). */
+async function contrasteDe(loc: Locator): Promise<{ ratio: number; color: string; fondo: string }> {
+  const medir = (): Promise<{ ratio: number; color: string; fondo: string }> => loc.evaluate((el) => {
+    const leer = (c: string): number[] => {
+      const m = c.match(/rgba?\(([^)]+)\)/);
+      if (!m) return [0, 0, 0, 0];
+      const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+      return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1];
+    };
+    const sobre = (a: number[], b: number[]): number[] => [0, 1, 2].map((i) => a[i] * a[3] + b[i] * (1 - a[3])).concat(1);
+    const capas: number[][] = [];
+    for (let e: Element | null = el; e; e = e.parentElement) {
+      const c = leer(getComputedStyle(e).backgroundColor);
+      if (c[3] > 0) capas.push(c);
+      if (c[3] >= 1) break;
+    }
+    const bg = capas.reverse().reduce((res, capa) => sobre(capa, res), [255, 255, 255, 1]);
+    const fg = sobre(leer(getComputedStyle(el).color), bg);
+    const lum = (c: number[]): number => {
+      const f = (v: number): number => { const s = v / 255; return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; };
+      return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+    };
+    const [hi, lo] = [lum(fg), lum(bg)].sort((x, y) => y - x);
+    return {
+      ratio: Math.round(((hi + 0.05) / (lo + 0.05)) * 100) / 100,
+      color: getComputedStyle(el).color,
+      fondo: `rgb(${bg.slice(0, 3).map(Math.round).join(', ')})`,
+    };
+  });
+  // Dos lecturas seguidas iguales: la medida ya no está a mitad de un cambio de tema.
+  let previa = await medir();
+  for (let i = 0; i < 20; i++) {
+    await loc.page().waitForTimeout(150);
+    const actual = await medir();
+    if (actual.ratio === previa.ratio && actual.fondo === previa.fondo) return actual;
+    previa = actual;
+  }
+  throw new Error('la medida de contraste no se estabiliza');
+}
+
+/** Con el conmutador de la propia web: sembrar data-theme lo pisa el gestor y pasa en falso. */
+async function ponerTemaOscuro(page: Page): Promise<void> {
+  await expect(async () => {
+    if ((await page.locator('html').getAttribute('data-theme')) !== 'dark') {
+      await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click({ timeout: 1000 });
+    }
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark', { timeout: 1000 });
+  }).toPass({ timeout: 15000 });
+}
+
+/** Escribe una expresión rota y devuelve SU aviso (no el anunciador de rutas de Next). */
+async function avisoDeExpresionRota(page: Page): Promise<Locator> {
+  await elegirModo(page, 'Expresiones');
+  await page.getByLabel('Expresión Booleana').fill('A AND');
+  const aviso = page.locator(AVISO_EXPRESION);
+  // «A AND»: falta el segundo operando (mismo texto que el CASO 3 del 16/10, arriba).
+  await expect(aviso).toHaveText('La expresión termina antes de tiempo.');
+  await expect(aviso).toHaveAttribute('role', 'alert');
+  return aviso;
+}
+
+test.describe('15/11 · cambio 68e83c8a5 · contraste del aviso de expresión rota', () => {
+  test('claro: el aviso pinta --rojo-texto y llega a 4,5:1 sobre la tarjeta (6,47 calculado)', async ({ page }) => {
+    await abrirConAncho(page, 1280);
+    const aviso = await avisoDeExpresionRota(page);
+    const c = await contrasteDe(aviso);
+    expect(c.fondo, 'fondo real: --bg-card claro #FFFFFF').toBe('rgb(255, 255, 255)');
+    expect(c.color, '--rojo-texto de globals.css: #B91C1C').toBe('rgb(185, 28, 28)');
+    expect(c.ratio).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('oscuro: el aviso se mide sobre la tarjeta oscura #2D2D2D (precondición del test de abajo)', async ({ page }) => {
+    await abrirConAncho(page, 1280);
+    await ponerTemaOscuro(page);
+    const aviso = await avisoDeExpresionRota(page);
+    await expect(aviso).toBeVisible();
+    const c = await contrasteDe(aviso);
+    expect(c.fondo, 'fondo real: --bg-card oscuro #2D2D2D').toBe('rgb(45, 45, 45)');
+  });
+
+  // HALLAZGO ABIERTO (inspección de cambio del 15/11/2026). 68e83c8a5 solo arregla el claro: en
+  // oscuro manda la reserva #EF4444, que sobre #2D2D2D da 3,66:1 (calculado y medido). Nace con
+  // test.fail(): afirma lo correcto y hoy falla. Al repararlo, quitar el .fail.
+  test('oscuro: el aviso de expresión rota llega a 4,5:1 sobre la tarjeta', async ({ page }) => {
+    test.fail();
+    await abrirConAncho(page, 1280);
+    await ponerTemaOscuro(page);
+    const aviso = await avisoDeExpresionRota(page);
+    const c = await contrasteDe(aviso); // medido el 15/11/2026: 3,66 (rgb(239, 68, 68) sobre rgb(45, 45, 45))
+    expect(c.ratio).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+interface Caja { x: number; y: number; width: number; height: number }
+
+/** Cajas del selector de modo, la herramienta, el diagrama y el svg, por las clases del módulo. */
+async function cajasDeLaHerramienta(page: Page): Promise<{
+  anchoVentana: number; anchoDocumento: number; mismosPadres: boolean; columnas: number;
+  anchoContenedor: number; selector: Caja; herramienta: Caja; diagrama: Caja; svg: Caja;
+  restosDelPiloto: number;
+}> {
+  const mod = await selectorDelModulo(page.locator('[class$="_modeSelector"]'), 'modeSelector');
+  return page.evaluate((mod) => {
+    const uno = (local: string): Element => {
+      const el = document.querySelector(`${mod}[class$="_${local}"]`);
+      if (!el) throw new Error(`falta .${local}`);
+      return el;
+    };
+    const caja = (el: Element): { x: number; y: number; width: number; height: number } => {
+      const r = el.getBoundingClientRect();
+      return { x: Math.round(r.x), y: Math.round(r.y + scrollY), width: Math.round(r.width), height: Math.round(r.height) };
+    };
+    const selector = uno('modeSelector');
+    const herramienta = uno('mainContent');
+    const contenedor = selector.parentElement;
+    return {
+      anchoVentana: innerWidth,
+      anchoDocumento: document.documentElement.scrollWidth,
+      mismosPadres: !!contenedor && herramienta.parentElement === contenedor && /_container$/.test(contenedor.className),
+      columnas: getComputedStyle(selector).gridTemplateColumns.split(' ').length,
+      anchoContenedor: Math.round(contenedor?.getBoundingClientRect().width ?? 0),
+      selector: caja(selector),
+      herramienta: caja(herramienta),
+      diagrama: caja(uno('diagramContainer')),
+      svg: caja(uno('gateSvg')),
+      restosDelPiloto: document.querySelectorAll('[data-zona-herramienta], [data-zona-estatica]').length,
+    };
+  }, mod);
+}
+
+/** Píxeles de tinta (oscuros) del símbolo en tema claro, leídos de una captura del svg. */
+async function tintaDelSimbolo(page: Page): Promise<number> {
+  const svg = page.locator('svg[class$="_gateSvg"]');
+  await svg.scrollIntoViewIfNeeded();
+  const png = (await svg.screenshot()).toString('base64');
+  return page.evaluate(async (b64) => {
+    const img = new Image();
+    img.src = `data:image/png;base64,${b64}`;
+    await img.decode();
+    const lienzo = document.createElement('canvas');
+    lienzo.width = img.width;
+    lienzo.height = img.height;
+    const ctx = lienzo.getContext('2d');
+    if (!ctx) throw new Error('sin contexto 2d');
+    ctx.drawImage(img, 0, 0);
+    const d = ctx.getImageData(0, 0, lienzo.width, lienzo.height).data;
+    let tinta = 0;
+    for (let i = 0; i < d.length; i += 4) if (d[i] < 128 && d[i + 1] < 128 && d[i + 2] < 128) tinta++;
+    return tinta;
+  }, png);
+}
+
+test.describe('15/11 · cambio 9ad445972 · sin <ZonaHerramienta>, la herramienta sigue maquetada', () => {
+  test('1280 px: selector en 4 columnas y herramienta de 1152 px, alineados y a 32 px', async ({ page }) => {
+    await abrirConAncho(page, 1280);
+    const c = await cajasDeLaHerramienta(page);
+    expect(c.restosDelPiloto, 'ni data-zona-herramienta ni data-zona-estatica').toBe(0);
+    expect(c.anchoDocumento, 'sin desborde horizontal').toBeLessThanOrEqual(c.anchoVentana);
+    expect(c.mismosPadres, 'selector y herramienta, hijos directos del .container').toBe(true);
+    expect(c.anchoContenedor).toBe(1200); // max-width del .container
+    expect(c.columnas).toBe(4);
+    expect(c.selector.width).toBe(1152); // 1200 − 2·24
+    expect(c.herramienta.width).toBe(1152);
+    expect(c.herramienta.x).toBe(c.selector.x);
+    expect(c.herramienta.y - (c.selector.y + c.selector.height), 'margin-bottom del selector').toBe(32);
+  });
+
+  test('390 px: selector en 1 columna, herramienta de 358 px y el diagrama dentro', async ({ page }) => {
+    await abrirConAncho(page, 390);
+    const c = await cajasDeLaHerramienta(page);
+    expect(c.restosDelPiloto).toBe(0);
+    expect(c.anchoDocumento, 'sin desborde horizontal').toBeLessThanOrEqual(c.anchoVentana);
+    expect(c.mismosPadres).toBe(true);
+    expect(c.columnas).toBe(1);
+    expect(c.selector.width).toBe(358); // 390 − 2·16
+    expect(c.herramienta.width).toBe(358);
+    expect(c.herramienta.x).toBe(c.selector.x);
+    expect(c.herramienta.y - (c.selector.y + c.selector.height)).toBe(32);
+    // El diagrama (248 px) cabe entero en la herramienta, sin cortarse por la derecha
+    expect(c.diagrama.width).toBe(248);
+    expect(c.diagrama.x).toBeGreaterThanOrEqual(c.herramienta.x);
+    expect(c.diagrama.x + c.diagrama.width).toBeLessThanOrEqual(c.herramienta.x + c.herramienta.width);
+  });
+
+  for (const ancho of [1280, 390]) {
+    test(`${ancho} px: el símbolo SVG de la puerta se sigue pintando (200×100, con tinta)`, async ({ page }) => {
+      await abrirConAncho(page, ancho);
+      const c = await cajasDeLaHerramienta(page);
+      expect([c.svg.width, c.svg.height]).toEqual([200, 100]);
+      // AND por defecto: dos entradas de 40 px, salida de 70 px y el cuerpo en D (40+40+60 de
+      // lados rectos y ~94 de arco), todo a 2 px de trazo ≈ 770 px de tinta. Medido: 789 y 775.
+      // Exigir la mitad distingue «se pinta» de «svg vacío o del color del fondo».
+      expect(await tintaDelSimbolo(page)).toBeGreaterThan(380);
+    });
+  }
+
+  test('cada puerta dibuja su símbolo normalizado: burbuja si niega, doble curva si es XOR', async ({ page }) => {
+    await abrirConAncho(page, 1280);
+    // Forma distintiva (IEEE 91): AND en D, OR en escudo, NOT en triángulo; la negación añade una
+    // burbuja (círculo) en la salida y la O exclusiva una segunda curva en la entrada.
+    // [cuerpos (path/polygon), burbujas, líneas de entrada + salida]
+    const esperado: Record<string, [number, number, number]> = {
+      AND: [1, 0, 3], OR: [1, 0, 3], NOT: [1, 1, 2], NAND: [1, 1, 3],
+      NOR: [1, 1, 3], XOR: [2, 0, 3], XNOR: [2, 1, 3],
+    };
+    for (const [puerta, [cuerpos, burbujas, lineas]] of Object.entries(esperado)) {
+      await elegirPuerta(page, puerta);
+      const svg = page.locator('svg[class$="_gateSvg"]');
+      await expect(svg, puerta).toBeVisible();
+      await expect(svg.locator('path, polygon'), `${puerta}: cuerpos`).toHaveCount(cuerpos);
+      await expect(svg.locator('circle'), `${puerta}: burbujas`).toHaveCount(burbujas);
+      await expect(svg.locator('line'), `${puerta}: líneas`).toHaveCount(lineas);
+    }
   });
 });
