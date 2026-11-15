@@ -456,6 +456,12 @@
   margin-top: var(--spacing-sm);
 }
 
+/* En oscuro --rojo-texto no existe (C0296) y mandaba la reserva #EF4444: 3,66:1 sobre la tarjeta
+   #2D2D2D. #F87171 da 4,98:1 (hallazgo 4712). */
+[data-theme='dark'] .expressionError {
+  color: var(--rojo-texto, #f87171);
+}
+
 /* Syntax Help */
 .syntaxHelp {
   background: var(--bg-primary);

@@ -1281,11 +1281,10 @@ test.describe('15/11 · cambio 68e83c8a5 · contraste del aviso de expresión ro
     expect(c.fondo, 'fondo real: --bg-card oscuro #2D2D2D').toBe('rgb(45, 45, 45)');
   });
 
-  // HALLAZGO ABIERTO (inspección de cambio del 15/11/2026). 68e83c8a5 solo arregla el claro: en
-  // oscuro manda la reserva #EF4444, que sobre #2D2D2D da 3,66:1 (calculado y medido). Nace con
-  // test.fail(): afirma lo correcto y hoy falla. Al repararlo, quitar el .fail.
+  // HALLAZGO 4712 REPARADO (inspección de cambio del 15/11/2026). 68e83c8a5 solo arreglaba el
+  // claro: en oscuro mandaba la reserva #EF4444, que sobre #2D2D2D da 3,66:1. Ahora una regla
+  // [data-theme='dark'] pone #F87171: 4,98:1 calculado.
   test('oscuro: el aviso de expresión rota llega a 4,5:1 sobre la tarjeta', async ({ page }) => {
-    test.fail();
     await abrirConAncho(page, 1280);
     await ponerTemaOscuro(page);
     const aviso = await avisoDeExpresionRota(page);
