@@ -1,5 +1,4 @@
 'use client';
-// @disclaimer: exempt
 import { useState } from 'react';
 import styles from './VisualizadorPiel.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
@@ -8,6 +7,7 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
+import DisclaimerCard from '@/components/DisclaimerCard';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
 
@@ -636,6 +636,10 @@ export default function VisualizadorPiel() {
             </div>
           </section>
         )}
+
+        {/* La pestaña de fototipos recomienda SPF y exposición según «el que mejor te describe»:
+            es orientación personal de hábitos de salud, nivel 2 de la política (C0754) */}
+        <DisclaimerCard variant="medical" severity="high" collapsible={false} />
 
         {/* Sección educativa */}
         <EducationalSection
