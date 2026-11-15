@@ -52,7 +52,8 @@ export const SOLUTO_PERSONALIZADO: Soluto = {
  * la masa elegida no se disuelve entera (hallazgo 4204: 100 g de KMnO₄ en 50 mL salían como
  * «12,656 mol/L» sin ningún aviso). El soluto personalizado no tiene cifra: no se avisa.
  *
- * DE DÓNDE SALE CADA CIFRA (consultado el 10/11/2026, cabo C0697 y hallazgo 4410). El aviso dice
+ * DE DÓNDE SALE CADA CIFRA (consultado el 10/11/2026 y el NiCl₂ el 15/11/2026, cabo C0697 y
+ * hallazgo 4410). El aviso dice
  * «se disuelven unos X g/L como mucho», así que una cifra muy baja también mentiría: se toma la
  * lectura literal de la fuente a 20-25 °C y se redondea un poco a la baja, sin inventar densidades.
  *   · NaCl 310: IUPAC-NIST Solubility Data Series, vol. 30 (1987), sec. 2.3, pp. 56 y 58 — la
@@ -68,15 +69,16 @@ export const SOLUTO_PERSONALIZADO: Soluto = {
  *     del agua pasa de 117 g/L.
  *   · KMnO₄ 60: PubChem (CID 516875), HSDB: «6.40X10+4 mg/l @ 20 °C» (Shiu et al., Rev Environ
  *     Contam Toxicol 116, 1990) e ICSC 0672: 6,4 g/100 mL a 20 °C = 64 g/L.
- *   · NiCl₂ 600: SIN ANCLA. PubChem (CID 24385) solo da 64,2 g por 100 cc de AGUA a 20 °C (Prager,
- *     1995, p. 867), sin decir si es la sal anhidra o el hexahidrato ni la densidad de la saturada,
- *     así que no se puede pasar a g por litro de disolución. Sigue en el cabo C0697.
+ *   · NiCl₂ 550: U.S. Bureau of Mines, Report of Investigations 8930 (Shanks y Noble, 1985), tabla
+ *     A-7, p. 18 — sistema NiCl₂-HCl-H₂O a 20 °C, fila sin HCl: la saturada tiene 37,7 % en peso de
+ *     NiCl₂ con gravedad específica 1,49 = 561,7 g/L de disolución. Hasta el 15/11/2026 ponía 600,
+ *     por encima de la saturación: el aviso decía que se disolvía más de lo que cabe.
  */
 export const SOLUBILIDAD_ORIENTATIVA_G_L: Readonly<Record<string, number>> = {
   kmno4: 60,
   cuso4: 200,
   k2cr2o7: 120,
-  nicl2: 600,
+  nicl2: 550,
   nacl: 310,
   glucosa: 470,
 };

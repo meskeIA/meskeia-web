@@ -660,11 +660,13 @@ function gPorLitroC0667(d: DatosCaso): number | undefined {
 
 /** [semilla, soluto] que llevan Practicar justo al tope de la tabla (medido el 09/11/2026). */
 // NaCl y glucosa, puestas al día el 10/11/2026 con sus topes nuevos (310 y 470, cabo C0697 y
-// hallazgo 4410): 3913 pide 46,5 g de NaCl en 150 mL y 1814, 47 g de glucosa en 100 mL.
+// hallazgo 4410): 3913 pide 46,5 g de NaCl en 150 mL y 1814, 47 g de glucosa en 100 mL. NiCl₂, el
+// 15/11/2026 con su tope de 550: 18193 pide 82,5 g en 150 mL (la 20220, 90 g en 150 mL = 600 g/L,
+// ya no sale; ninguna de las semillas 1-60000 pasa de 550).
 const SEMILLAS_AL_TOPE_C0667: ReadonlyArray<[number, string]> = [
   [3913, 'nacl'],
   [1814, 'glucosa'],
-  [20220, 'nicl2'],
+  [18193, 'nicl2'],
   [526, 'cuso4'],
   [12968, 'k2cr2o7'],
   [5443, 'kmno4'],
@@ -678,8 +680,9 @@ test.describe('Cabo C0667 — la solubilidad orientativa que acota Practicar', (
    * 20-25 °C y a menos de un 10 % de ella:
    *   NaCl 310 ≤ 318,7 (SDS) · glucosa 470 ≤ 479 (HSDB) · CuSO₄ 200 ≤ 203 (ICSC 0751)
    *   K₂Cr₂O₇ 120 ≤ 120 (ICSC) · KMnO₄ 60 ≤ 64 (HSDB e ICSC 0672)
-   * NiCl₂ 600 sigue SIN ANCLA: la única cifra es por 100 cc de AGUA (64,2, Prager) sin densidad de la
-   * saturada ni forma de la sal. Hasta el 10/11/2026 la tabla daba NaCl 350 y glucosa 900.
+   *   NiCl₂ 550 ≤ 561,7 (15/11/2026: Bureau of Mines RI 8930, tabla A-7, 37,7 % en peso con
+   *   gravedad específica 1,49 a 20 °C; 0,377 × 1.490 = 561,73 g/L)
+   * Hasta el 10/11/2026 la tabla daba NaCl 350 y glucosa 900, y hasta el 15/11/2026 NiCl₂ 600.
    */
   const FUENTE_G_L: Readonly<Record<string, number>> = {
     nacl: 318.72,
@@ -687,14 +690,15 @@ test.describe('Cabo C0667 — la solubilidad orientativa que acota Practicar', (
     cuso4: 203,
     k2cr2o7: 120,
     kmno4: 64,
+    nicl2: 0.377 * 1490,
   };
 
-  test('la tabla, en g por litro de disolución: KMnO₄ 60 · CuSO₄ 200 · K₂Cr₂O₇ 120 · NiCl₂ 600 · NaCl 310 · glucosa 470', () => {
+  test('la tabla, en g por litro de disolución: KMnO₄ 60 · CuSO₄ 200 · K₂Cr₂O₇ 120 · NiCl₂ 550 · NaCl 310 · glucosa 470', () => {
     expect({ ...SOLUBILIDAD_ORIENTATIVA_G_L }).toEqual({
       kmno4: 60,
       cuso4: 200,
       k2cr2o7: 120,
-      nicl2: 600,
+      nicl2: 550,
       nacl: 310,
       glucosa: 470,
     });
