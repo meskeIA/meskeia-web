@@ -599,7 +599,7 @@ export default function HuesosCuerpoHumanoPage() {
                 El chasquido articular tiene varias causas: 1) Cavitación del líquido sinovial (burbujas de CO₂ que estallan, el chasquido de nudillos), 2) Tendones que se deslizan sobre prominencias óseas, 3) Degeneración cartilaginosa (artrosis, crepitación). El chasquido de nudillos no causa artritis, pero puede inflamar ligeramente la cápsula articular con el tiempo.
               </p>
               <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> <strong>Mito derribado:</strong> Un estudio de 60 años de seguimiento (Donald Unger, Premio IgNobel 2009) demostró que chasquear los nudillos de una mano durante décadas no produce artritis.
+                <span aria-hidden="true">💡</span> <strong>Mito derribado:</strong> Un experimento de 60 años en un solo caso (Donald Unger, Premio IgNobel 2009, que chasqueó los nudillos de una sola mano y usó la otra como control) sugirió que hacerlo durante décadas no produce artritis.
               </p>
             </div>
             <div className={styles.faqItem}>
