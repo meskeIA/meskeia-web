@@ -374,14 +374,14 @@ test.describe('Hallazgos de accesibilidad', () => {
 });
 
 test.describe('Hallazgos de contenido', () => {
-  // HALLAZGO (15/11/2026, ABIERTO) · §1.quinquies 3: la entradilla, fuera de la guía, dice «Hersey y
-  // Blanchard demostraron que no existe un estilo de delegación "correcto" universal», y la guía de
-  // la misma página dice «El modelo es influyente pero discutido — su validez empírica se ha
-  // cuestionado».
+  // HALLAZGO 4714 (15/11/2026, REPARADO) · §1.quinquies 3: la entradilla, fuera de la guía, decía
+  // «Hersey y Blanchard demostraron que no existe un estilo de delegación "correcto" universal», y la
+  // guía de la misma página dice «El modelo es influyente pero discutido — su validez empírica se ha
+  // cuestionado». Decidido por el usuario en /reparar del 15/11/2026 (cabo C0764): «propusieron».
   test('la entradilla no dice que Hersey y Blanchard «demostraron» su modelo', async ({ page }) => {
-    test.fail();
     await abrir(page);
     await expect(page.getByText(/Hersey y Blanchard demostraron/)).toHaveCount(0);
+    await expect(page.getByText(/Hersey y Blanchard propusieron/)).toHaveCount(1);
   });
 
   // HALLAZGO 4719 (15/11/2026, REPARADO) · con una pregunta pendiente el botón decía «Responde las 1
@@ -392,17 +392,20 @@ test.describe('Hallazgos de contenido', () => {
     await expect(botonVer(page)).toHaveText('Responde la pregunta que falta');
   });
 
-  // HALLAZGO (15/11/2026, ABIERTO) · §1.quinquies 2: la entradilla abre el test a «autónomos que
-  // subcontratan, o cualquiera que reparta tareas en un grupo (incluso familiar o de voluntariado)»,
-  // pero las acciones dan por hecho un equipo jerárquico con varios niveles de experiencia.
+  // HALLAZGO 4717 (15/11/2026, REPARADO) · §1.quinquies 2: la entradilla abre el test a «autónomos
+  // que subcontratan, o cualquiera que reparta tareas en un grupo (incluso familiar o de
+  // voluntariado)», pero las acciones daban por hecho un equipo jerárquico con varios niveles de
+  // experiencia. Decidido por el usuario en /reparar del 15/11/2026 (cabo C0764): acciones que valgan
+  // también para quien delega en una o dos personas (se ajusta por tarea, no por persona del equipo).
   test('las acciones no dan por hecho un equipo con juniors y seniors', async ({ page }) => {
-    test.fail();
     await abrir(page);
     await verResultado(page, TODO_5);
     await expect(acciones(page).filter({ hasText: 'Clasificar a tu equipo en 3 niveles de madurez' })).toHaveCount(0);
+    await expect(acciones(page).filter({ hasText: 'experiencia de cada persona con cada tarea' })).toHaveCount(1);
     await abrir(page);
     await verResultado(page, A18_B16);
     await expect(acciones(page).filter({ hasText: '2-3 personas más experimentadas del equipo' })).toHaveCount(0);
+    await expect(acciones(page).filter({ hasText: 'tareas que quien recibe tus encargos ya domina' })).toHaveCount(1);
   });
 
   // HALLAZGO (15/11/2026, ABIERTO) · con la autonomía en el mínimo (5/25, «Nada» en las cinco) y el

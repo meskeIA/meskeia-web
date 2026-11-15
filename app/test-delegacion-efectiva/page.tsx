@@ -73,7 +73,7 @@ function obtenerPerfil(acompanamiento: number, autonomia: number): Perfil {
         'Asumir que todos necesitan el mismo nivel de acompañamiento',
       ],
       acciones: [
-        'Clasificar a tu equipo en 3 niveles de madurez y ajustar tu estilo: más dirección para juniors, más autonomía para seniors',
+        'Ajustar tu estilo a la experiencia de cada persona con cada tarea: más dirección donde la tarea es nueva para ella, más autonomía donde ya la domina',
         'Para personas con experiencia, reducir conscientemente el seguimiento: confía en el sistema que has creado',
         'Dedicar tiempo a documentar procesos para que la delegación no dependa siempre de tu explicación personal',
       ],
@@ -188,7 +188,7 @@ function obtenerPerfil(acompanamiento: number, autonomia: number): Perfil {
         'Riesgo de que el equipo no desarrolle iniciativa propia',
       ],
       acciones: [
-        'Identificar a las 2-3 personas más experimentadas del equipo y aumentar conscientemente su autonomía: menos checkpoints, más decisiones propias',
+        'Identificar las tareas que quien recibe tus encargos ya domina y aumentar conscientemente su autonomía en ellas: menos puntos de control, más decisiones propias',
         'En cada tarea delegada, definir explícitamente qué decisiones puede tomar la persona sin consultarte',
         'Medir tu éxito no por la calidad de lo que supervisas, sino por la calidad de lo que no necesitas supervisar',
       ],
@@ -300,8 +300,8 @@ export default function TestDelegacionEfectivaPage() {
             tiempo dar autonomía real (espacio para decidir, equivocarse y aprender).
           </p>
           <p>
-            Hersey y Blanchard demostraron que no existe un estilo de delegación &quot;correcto&quot;
-            universal — el mejor estilo depende de la madurez de la persona. Pero lo que sí existe
+            Hersey y Blanchard propusieron que no existe un estilo de delegación &quot;correcto&quot;
+            universal — según su modelo, el mejor estilo depende de la madurez de la persona. Pero lo que sí existe
             es un <strong>patrón de delegación</strong> personal que tendemos a repetir con todos.
             <strong> Este test mide el tuyo.</strong>
           </p>
