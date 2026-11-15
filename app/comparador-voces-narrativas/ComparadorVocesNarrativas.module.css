@@ -751,7 +751,7 @@
 .warningHeader h4 {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
   margin: 0;
 }
 
@@ -776,7 +776,7 @@
   content: '✗';
   position: absolute;
   left: 0;
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
   font-size: 0.75rem;
 }
 

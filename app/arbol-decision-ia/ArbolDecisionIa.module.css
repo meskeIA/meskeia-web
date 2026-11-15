@@ -207,7 +207,7 @@
   border-radius: 50%;
   border: none;
   background: rgba(192, 57, 43, 0.1);
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
   font-size: 0.75rem;
   cursor: pointer;
   transition: background 0.15s;

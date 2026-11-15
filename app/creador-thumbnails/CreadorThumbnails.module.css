@@ -1119,7 +1119,7 @@
   content: '✗';
   position: absolute;
   left: 0;
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
   font-weight: 700;
 }
 

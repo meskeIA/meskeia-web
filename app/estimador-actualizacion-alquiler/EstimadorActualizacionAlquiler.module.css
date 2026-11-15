@@ -388,7 +388,7 @@
 
 .cellBien { color: var(--verde-texto, #16a34a) !important; font-weight: 600; }
 .cellNeutral { color: var(--ambar-texto, #d97706) !important; }
-.cellMal { color: #dc2626 !important; }
+.cellMal { color: var(--rojo-texto, #dc2626) !important; }
 
 .tablaNota {
   font-size: 0.82rem;

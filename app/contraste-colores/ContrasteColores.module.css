@@ -221,7 +221,7 @@
 }
 
 .fail {
-  color: #DC3545;
+  color: var(--rojo-texto, #DC3545);
   font-weight: 600;
 }
 

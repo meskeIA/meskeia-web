@@ -859,7 +859,7 @@
   content: '✕';
   position: absolute;
   left: 0;
-  color: #dc3545;
+  color: var(--rojo-texto, #dc3545);
   font-weight: 700;
   font-size: 0.85rem;
   top: 2px;

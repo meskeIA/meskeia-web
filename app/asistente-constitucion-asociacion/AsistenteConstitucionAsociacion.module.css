@@ -241,7 +241,7 @@
 .errorList ul {
   margin: 0;
   padding-left: var(--spacing-lg);
-  color: #c62828;
+  color: var(--rojo-texto, #c62828);
 }
 
 .errorList li {
@@ -507,7 +507,7 @@
 }
 
 .customTag button:hover {
-  color: #c62828;
+  color: var(--rojo-texto, #c62828);
 }
 
 /* Checkbox Large (Ley 49/2002) */

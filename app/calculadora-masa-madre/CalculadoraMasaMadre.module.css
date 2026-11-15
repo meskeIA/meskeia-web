@@ -295,7 +295,7 @@
 .ajusteValor {
   font-size: 1rem;
   font-weight: 700;
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
 }
 
 .ajusteValorPos {

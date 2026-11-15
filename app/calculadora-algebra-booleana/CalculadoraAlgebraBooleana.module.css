@@ -911,7 +911,7 @@
 .warningTitle {
   font-size: 1rem;
   font-weight: 700;
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
   margin: 0 0 var(--spacing-md) 0;
 }
 
@@ -930,7 +930,7 @@
 }
 
 .warningList li strong {
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
 }
 
 /* Dark Mode - Educational Section */

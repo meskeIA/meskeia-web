@@ -876,7 +876,7 @@
 
 .estrofaAproximada {
   font-size: 0.8rem;
-  color: #8a5a10;
+  color: var(--ambar-texto, #8a5a10);
   font-style: italic;
 }
 

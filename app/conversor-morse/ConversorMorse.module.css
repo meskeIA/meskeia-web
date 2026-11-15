@@ -222,7 +222,7 @@
   border-radius: var(--radius);
   font-size: 0.9rem;
   cursor: pointer;
-  color: #B91C1C;
+  color: var(--rojo-texto, #B91C1C);
 }
 
 [data-theme='dark'] .container .btnStop {
@@ -646,7 +646,7 @@
 }
 
 .warningHeader h3 {
-  color: #92400E;
+  color: var(--naranja-texto, #92400E);
   font-size: 1.2rem;
   margin: 0;
 }

@@ -226,7 +226,7 @@
 
 .btnQuitarFestivo:hover {
   background: var(--hover);
-  color: #b3402f;
+  color: var(--rojo-texto, #b3402f);
 }
 
 .btnQuitarFestivo:focus-visible {

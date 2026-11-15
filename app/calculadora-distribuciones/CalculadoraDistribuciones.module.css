@@ -929,7 +929,7 @@
 
 .eduWarningHeader h3 {
   font-size: 1.1rem;
-  color: #92400E;
+  color: var(--naranja-texto, #92400E);
   font-weight: 700;
 }
 

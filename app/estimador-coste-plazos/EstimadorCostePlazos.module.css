@@ -375,7 +375,7 @@
 }
 
 .consejoAlerta {
-  color: #dc2626 !important;
+  color: var(--rojo-texto, #dc2626) !important;
 }
 
 .consejoPositivo {

@@ -329,7 +329,7 @@
 }
 
 .resultadoError h3 {
-  color: #b91c1c;
+  color: var(--rojo-texto, #b91c1c);
 }
 
 [data-theme='dark'] .container .resultadoError h3 {

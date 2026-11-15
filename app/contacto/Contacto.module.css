@@ -50,7 +50,7 @@
 }
 
 .required {
-  color: #dc3545;
+  color: var(--rojo-texto, #dc3545);
   margin-left: 2px;
 }
 

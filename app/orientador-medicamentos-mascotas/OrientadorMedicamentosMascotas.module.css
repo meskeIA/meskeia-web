@@ -529,7 +529,7 @@
 
 .urgenciaBadge.media {
   background: rgba(255, 193, 7, 0.2);
-  color: #856404;
+  color: var(--ambar-texto, #856404);
 }
 
 .urgenciaBadge.baja {

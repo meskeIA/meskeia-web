@@ -323,7 +323,7 @@
 }
 
 .critico {
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
 }
 
 .scoreBadge.critico {

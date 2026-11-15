@@ -93,7 +93,7 @@
 }
 
 .labelOriginal {
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
 }
 
 .labelModificado {
@@ -220,7 +220,7 @@
   width: 60px;
   height: 60px;
   background: #dcfce7;
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
   font-size: 2rem;
   border-radius: 50%;
   margin-bottom: 15px;
@@ -323,7 +323,7 @@
 }
 
 .diffEliminado .diffMark {
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
 }
 
 /* Dark mode adjustments */
