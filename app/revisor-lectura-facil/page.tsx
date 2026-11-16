@@ -12,7 +12,12 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { RESPUESTA_FAQ_VOZ_PASIVA } from './metadata';
+import {
+  RESPUESTA_FAQ_VOZ_PASIVA,
+  RESPUESTA_FAQ_LONGITUD,
+  RESPUESTA_FAQ_CERTIFICAR,
+  RESPUESTA_FAQ_CIFRAS,
+} from './metadata';
 
 // ═══════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -101,7 +106,7 @@ const REGLAS: InfoRegla[] = [
     etiqueta: 'Palabra muy larga',
     icono: '🔤',
     severidadBase: 'baja',
-    descripcion: 'Cinco sílabas o más. Suelen tener una alternativa más corta.',
+    descripcion: 'Cinco sílabas o más y más de 9 letras. Suelen tener una alternativa más corta.',
   },
   {
     id: 'tecnicismo',
@@ -197,7 +202,8 @@ const TECNICISMOS: Record<string, string> = {
   sufragar: 'pagar',
   devengar: 'generar',
   preceptivo: 'obligatorio',
-  perceptivo: 'obligatorio',
+  // «perceptivo» (relativo a la percepción) se retiró: proponía «obligatorio», que es el
+  // sentido de «preceptivo» (hallazgo 4821).
   facultativo: 'opcional',
   pertinente: 'adecuado',
   procedimiento: 'proceso',
@@ -241,7 +247,8 @@ const TECNICISMOS: Record<string, string> = {
   paliar: 'reducir',
   mitigar: 'reducir',
   optimizar: 'mejorar',
-  implementar: 'poner en marcha',
+  // No «poner en marcha»: la propia lista FIGURADO la marca como lenguaje figurado (hallazgo 4821)
+  implementar: 'aplicar',
   idóneo: 'adecuado',
   óptimo: 'el mejor',
   aludir: 'referirse',
@@ -337,20 +344,54 @@ function normalizar(texto: string): string {
   return texto.toLowerCase().normalize('NFD').replace(DIACRITICOS, '');
 }
 
-/** Cuenta sílabas de forma aproximada: cada grupo vocálico es una sílaba */
+/** Escapa un literal para meterlo en una RegExp */
+function escaparRegex(literal: string): string {
+  return literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Cuenta sílabas de forma aproximada: cada grupo vocálico es una sílaba, salvo que
+ * la «y» seguida de vocal es consonante («a-yun-ta-mien-to») y dos vocales fuertes
+ * seguidas (a, e, o) forman hiato y van en sílabas distintas («a-e-ro-puer-to»)
+ * (hallazgo 4820).
+ */
 function contarSilabas(palabra: string): number {
   // La í y la ú tildadas rompen el diptongo, así que se marcan como corte
   const conCortes = palabra.toLowerCase().replace(/[íú]/g, 'i|');
-  const limpio = conCortes.normalize('NFD').replace(DIACRITICOS, '');
+  const limpio = conCortes
+    .normalize('NFD')
+    .replace(DIACRITICOS, '')
+    .replace(/y(?=[aeiou])/g, 'j');
   const grupos = limpio
     .split('|')
     .flatMap((trozo) => trozo.match(/[aeiouy]+/g) ?? []);
-  return Math.max(1, grupos.length);
+  const silabas = grupos.reduce((suma, grupo) => {
+    let hiatos = 0;
+    for (let i = 1; i < grupo.length; i += 1) {
+      if ('aeo'.includes(grupo[i - 1]) && 'aeo'.includes(grupo[i])) hiatos += 1;
+    }
+    return suma + 1 + hiatos;
+  }, 0);
+  return Math.max(1, silabas);
 }
 
+/**
+ * Una cifra con sus separadores («1.500.000», «68,4») es UNA palabra; las demás
+ * palabras son secuencias de letras o dígitos (hallazgo 4819).
+ */
+const PALABRA = /\d+(?:[.,]\d+)*|[\p{L}\p{N}_]+/gu;
+
 function contarPalabras(texto: string): number {
-  const encontradas = texto.match(/[\wÁÉÍÓÚÜÑáéíóúüñ]+/g);
+  const encontradas = texto.match(PALABRA);
   return encontradas ? encontradas.length : 0;
+}
+
+/**
+ * Busca una abreviatura como palabra entera: no vale dentro de otra palabra
+ * («hotel.» no es «tel.», «piedra.» no es «dra.») (hallazgo 4814).
+ */
+function regexAbreviatura(abrev: string, banderas: string): RegExp {
+  return new RegExp(`(?<![\\p{L}\\p{N}])${escaparRegex(abrev)}`, `${banderas}u`);
 }
 
 /** Divide en frases respetando las abreviaturas con punto */
@@ -359,12 +400,9 @@ function dividirFrases(texto: string): string[] {
   ABREVIATURAS.forEach((abrev) => {
     if (!abrev.includes('.')) return;
     // El punto de la abreviatura se marca para que no cuente como fin de frase
-    const conMarca = abrev.split('.').join(MARCA_PUNTO);
-    protegido = protegido.split(abrev).join(conMarca);
-    const capitalizada = abrev.charAt(0).toUpperCase() + abrev.slice(1);
-    protegido = protegido
-      .split(capitalizada)
-      .join(capitalizada.split('.').join(MARCA_PUNTO));
+    protegido = protegido.replace(regexAbreviatura(abrev, 'gi'), (hallada) =>
+      hallada.split('.').join(MARCA_PUNTO),
+    );
   });
 
   return protegido
@@ -373,14 +411,59 @@ function dividirFrases(texto: string): string[] {
     .filter((f) => f.length > 0);
 }
 
+/**
+ * Un párrafo nuevo es una línea en blanco, o un salto de línea tras una frase
+ * terminada. Un salto a mitad de frase (renglón cortado de un PDF) se lee como un
+ * espacio: si no, la frase se partía en dos y nunca daba «Frase larga» (hallazgo 4823).
+ */
 function dividirParrafos(texto: string): string[] {
-  return texto
-    .split(/\n\s*\n|\n/)
-    .map((p) => p.trim())
-    .filter((p) => p.length > 0);
+  const parrafos: string[] = [];
+  texto.split(/\n\s*\n/).forEach((bloque) => {
+    let actual = '';
+    bloque.split('\n').forEach((linea) => {
+      const limpia = linea.trim();
+      if (!limpia) return;
+      if (actual && /[.!?…:;]$/.test(actual)) {
+        parrafos.push(actual);
+        actual = limpia;
+      } else {
+        actual = actual ? `${actual} ${limpia}` : limpia;
+      }
+    });
+    if (actual) parrafos.push(actual);
+  });
+  return parrafos;
 }
 
-function analizarFrase(frase: string, palabrasFrase: number, esPrimeraDelTexto: boolean): Aviso[] {
+/** Terminaciones de los verbos del diccionario de tecnicismos (sobre texto sin tildes) */
+const DESINENCIAS_AR = 'e|en|es|a|an|as|o|ado|ada|ados|adas|ando|aron|ara|aran';
+const DESINENCIAS_ER_IR = 'a|an|as|e|en|es|o|ido|ida|idos|idas|iendo|io|ieron';
+
+/**
+ * ¿Aparece el tecnicismo en el texto normalizado? El término como prefijo (como
+ * antes: «abonar», «abonará») y, si es un verbo, también sus formas personales más
+ * frecuentes, como el imperativo administrativo «Aporte», «Abone», «Subsane»
+ * (hallazgo 4822). Las formas cortas exigen palabra entera: «computa» sí,
+ * «computadora» no.
+ */
+function contieneTecnicismo(plano: string, termino: string): boolean {
+  const busca = normalizar(termino.replace('_', ' '));
+  if (new RegExp(`\\b${busca}`).test(plano)) return true;
+  const verbo = busca.match(/^([a-z]+)(ar|er|ir)$/);
+  if (!verbo) return false;
+  const desinencias = verbo[2] === 'ar' ? DESINENCIAS_AR : DESINENCIAS_ER_IR;
+  return new RegExp(`\\b${verbo[1]}(?:${desinencias})(?![a-z])`).test(plano);
+}
+
+/** Números romanos bien formados (I a MMMCMXCIX) */
+const ROMANO_VALIDO = /^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/;
+
+function analizarFrase(
+  frase: string,
+  palabrasFrase: number,
+  esPrimeraDelTexto: boolean,
+  siglasVistas: Set<string>,
+): Aviso[] {
   const avisos: Aviso[] = [];
   const plano = normalizar(frase);
 
@@ -400,7 +483,11 @@ function analizarFrase(frase: string, palabrasFrase: number, esPrimeraDelTexto: 
   }
 
   // 2 — Varias ideas encadenadas
-  const conectoresPresentes = CONECTORES_SUBORDINANTES.filter((c) => plano.includes(` ${c} `));
+  // Como palabra entera, no rodeado de espacios: «sin embargo,» y «no obstante,»
+  // van casi siempre seguidos de coma (hallazgo 4822)
+  const conectoresPresentes = CONECTORES_SUBORDINANTES.filter((c) =>
+    new RegExp(`(?<![a-z])${c}(?![a-z])`).test(plano),
+  );
   if (conectoresPresentes.length > 0 && palabrasFrase > 12) {
     avisos.push({
       regla: 'varias-ideas',
@@ -410,11 +497,16 @@ function analizarFrase(frase: string, palabrasFrase: number, esPrimeraDelTexto: 
   }
 
   // 3 — Voz pasiva y pasiva refleja
+  // Fronteras de palabra Unicode (bandera u y lookarounds): el \b de JavaScript solo
+  // conoce [A-Za-z0-9_], y tras «á» u «ó» no veía el final de la palabra, así que
+  // «se revisará» o «se aprobó» no casaban nunca (hallazgo 4813). El participio
+  // necesita una raíz de dos letras o más: «es cada», «es nada» o «es vida» no son
+  // pasivas (hallazgo 4822).
   const pasivaPerifrastica = frase.match(
-    /\b(es|son|era|eran|fue|fueron|será|serán|ha sido|han sido|había sido|habían sido|sea|sean)\s+[a-záéíóúñ]+(ado|ada|ados|adas|ido|ida|idos|idas)\b/gi,
+    /(?<!\p{L})(es|son|era|eran|fue|fueron|será|serán|ha sido|han sido|había sido|habían sido|sea|sean)\s+\p{L}{2,}(ado|ada|ados|adas|ido|ida|idos|idas)(?!\p{L})/giu,
   );
   const pasivaRefleja = frase.match(
-    /\bse\s+[a-záéíóúñ]+(ará|arán|erá|erán|irá|irán|ó|aron|ieron)\b/gi,
+    /(?<!\p{L})se\s+\p{L}+(ará|arán|erá|erán|irá|irán|ó|aron|ieron)(?!\p{L})/giu,
   );
   const pasivas = [...(pasivaPerifrastica ?? []), ...(pasivaRefleja ?? [])];
   if (pasivas.length > 0) {
@@ -439,10 +531,9 @@ function analizarFrase(frase: string, palabrasFrase: number, esPrimeraDelTexto: 
   }
 
   // 5 — Tecnicismos con alternativa
-  const tecnicismosHallados = Object.keys(TECNICISMOS).filter((termino) => {
-    const busca = normalizar(termino.replace('_', ' '));
-    return new RegExp(`\\b${busca}`, 'i').test(plano);
-  });
+  const tecnicismosHallados = Object.keys(TECNICISMOS).filter((termino) =>
+    contieneTecnicismo(plano, termino),
+  );
   if (tecnicismosHallados.length > 0) {
     avisos.push({
       regla: 'tecnicismo',
@@ -454,15 +545,21 @@ function analizarFrase(frase: string, palabrasFrase: number, esPrimeraDelTexto: 
   }
 
   // 6 — Cifras complicadas
+  // Cada cifra se cita entera, con sus separadores y su %: «1.500.000», «68,4 %»
+  // (antes salían «1.500», «68,4» y «4 %») (hallazgo 4819)
   const cifras: string[] = [];
-  const decimales = frase.match(/\d+[.,]\d+/g);
-  const porcentajes = frase.match(/\d+\s*%/g);
-  const grandes = frase.match(/\b\d{5,}\b/g);
-  const romanos = frase.match(/\b[IVXLCDM]{2,}\b/g);
-  if (decimales) cifras.push(...decimales);
-  if (porcentajes) cifras.push(...porcentajes);
-  if (grandes) cifras.push(...grandes);
-  if (romanos) cifras.push(...romanos);
+  (frase.match(/\d+(?:[.,]\d+)*(?:\s*%)?/g) ?? []).forEach((cifra) => {
+    const esPorcentaje = cifra.includes('%');
+    const conSeparador = /[.,]/.test(cifra);
+    const grande = /\d{5,}/.test(cifra);
+    if (esPorcentaje || conSeparador || grande) cifras.push(cifra);
+  });
+  // Romanos: palabra entera Unicode («ATENCIÓN» no esconde un «CI»), número romano
+  // bien formado y fuera de las siglas toleradas («DVD», «CD») (hallazgo 4818)
+  const romanos = (frase.match(/(?<![\p{L}\p{N}])[IVXLCDM]{2,}(?![\p{L}\p{N}])/gu) ?? []).filter(
+    (r) => ROMANO_VALIDO.test(r) && !SIGLAS_TOLERADAS.has(r),
+  );
+  cifras.push(...romanos);
   if (cifras.length > 0) {
     avisos.push({
       regla: 'cifra-compleja',
@@ -472,12 +569,22 @@ function analizarFrase(frase: string, palabrasFrase: number, esPrimeraDelTexto: 
   }
 
   // 7 — Siglas sin explicar
-  const siglas = (frase.match(/\b[A-ZÁÉÍÓÚÑ]{2,6}\b/g) ?? []).filter(
+  // Palabra entera Unicode: «ATENCIÓN» ya no se trocea en «ATENCI» y «ÓN» (hallazgo 4818).
+  // Se mira SOLO la primera aparición de cada sigla en el texto (siglasVistas viaja de
+  // frase en frase), y está explicada si va entre paréntesis tras su nombre completo
+  // —«Servicio de Empleo (SEPE)», lo que pide la propia sugerencia— o seguida del
+  // nombre entre paréntesis —«SEPE (Servicio de Empleo)»— (hallazgo 4812).
+  const siglas = (frase.match(/(?<![\p{L}\p{N}])\p{Lu}{2,6}(?![\p{L}\p{N}])/gu) ?? []).filter(
     (s) => !SIGLAS_TOLERADAS.has(s) && !(esPrimeraDelTexto && frase.trim().startsWith(s)),
   );
-  const siglasSinExplicar = Array.from(new Set(siglas)).filter(
-    (s) => !new RegExp(`${s}\\s*\\(`).test(frase) && !new RegExp(`\\)\\s*${s}`).test(frase),
-  );
+  const siglasSinExplicar = Array.from(new Set(siglas)).filter((s) => {
+    if (siglasVistas.has(s)) return false;
+    siglasVistas.add(s);
+    const explicada =
+      new RegExp(`\\(\\s*${s}\\s*\\)`, 'u').test(frase) ||
+      new RegExp(`(?<!\\p{L})${s}\\s*\\(`, 'u').test(frase);
+    return !explicada;
+  });
   if (siglasSinExplicar.length > 0) {
     avisos.push({
       regla: 'sigla',
@@ -487,7 +594,9 @@ function analizarFrase(frase: string, palabrasFrase: number, esPrimeraDelTexto: 
   }
 
   // 8 — Abreviaturas
-  const abreviaturasHalladas = ABREVIATURAS.filter((a) => plano.includes(normalizar(a)));
+  const abreviaturasHalladas = ABREVIATURAS.filter((a) =>
+    regexAbreviatura(normalizar(a), '').test(plano),
+  );
   if (abreviaturasHalladas.length > 0) {
     avisos.push({
       regla: 'abreviatura',
@@ -548,6 +657,7 @@ function analizar(texto: string): Analisis {
   const parrafosTexto = dividirParrafos(texto);
   const frases: FraseAnalizada[] = [];
   const parrafos: Analisis['parrafos'] = [];
+  const siglasVistas = new Set<string>();
   let indiceFrase = 0;
 
   parrafosTexto.forEach((parrafo, idxParrafo) => {
@@ -570,7 +680,7 @@ function analizar(texto: string): Analisis {
         texto: frase,
         palabras,
         parrafo: idxParrafo,
-        avisos: analizarFrase(frase, palabras, indiceFrase === 0),
+        avisos: analizarFrase(frase, palabras, indiceFrase === 0, siglasVistas),
       });
       indiceFrase += 1;
     });
@@ -595,8 +705,7 @@ function analizar(texto: string): Analisis {
   const vistos = new Set<string>();
   const plano = normalizar(texto);
   Object.entries(TECNICISMOS).forEach(([termino, alternativa]) => {
-    const busca = normalizar(termino.replace('_', ' '));
-    if (new RegExp(`\\b${busca}`).test(plano) && !vistos.has(termino)) {
+    if (contieneTecnicismo(plano, termino) && !vistos.has(termino)) {
       vistos.add(termino);
       sustituciones.push({ termino: termino.replace('_', ' '), alternativa });
     }
@@ -634,7 +743,7 @@ const TEXTO_EJEMPLO = `La solicitud de la ayuda será revisada por el órgano co
 
 Si transcurrido dicho plazo no se hubiera dictado resolución expresa, la solicitud se entenderá desestimada, sin que ello impida que el interesado pueda interponer el recurso que estime pertinente ante la instancia superior.
 
-Aproximadamente el 68,4 % de las personas solicitantes cumplimentan correctamente el formulario. No obstante, conviene tener en cuenta que la documentación acreditativa deberá aportarse íntegramente antes de la fecha límite, a fin de que el procedimiento pueda continuar su tramitación ordinaria.`;
+Aproximadamente el 68,4 % de las personas solicitantes cumplimentan correctamente el formulario. No obstante, conviene tener en cuenta que la documentación acreditativa deberá aportarse íntegramente antes de la fecha límite, a fin de que el procedimiento pueda continuar su tramitación ordinaria.`;
 
 // ═══════════════════════════════════════════════════════════════════════
 // COMPONENTE
@@ -642,10 +751,18 @@ Aproximadamente el 68,4 % de las personas solicitantes cumplimentan correctament
 
 export default function RevisorLecturaFacilPage() {
   const [texto, setTexto] = useState('');
-  const [filtro, setFiltro] = useState<ReglaId | 'todos'>('todos');
+  const [filtroElegido, setFiltro] = useState<ReglaId | 'todos'>('todos');
   const [copiado, setCopiado] = useState(false);
 
   const analisis = useMemo(() => (texto.trim() ? analizar(texto) : null), [texto]);
+
+  // Si al corregir el texto la regla filtrada se queda sin avisos, se vuelve a «Todas»:
+  // el panel de filtros desaparece sin avisos y el usuario se quedaba sin salida
+  // (hallazgo 4815).
+  const filtro: ReglaId | 'todos' =
+    filtroElegido !== 'todos' && analisis && analisis.recuentoPorRegla[filtroElegido] > 0
+      ? filtroElegido
+      : 'todos';
 
   const reglasConAvisos = useMemo(
     () => (analisis ? REGLAS.filter((r) => analisis.recuentoPorRegla[r.id] > 0) : []),
@@ -795,7 +912,7 @@ export default function RevisorLecturaFacilPage() {
                   />
                 </div>
                 <span className={styles.metricaNota}>
-                  {formatNumber(porcentajeConformes, 0)} % del texto
+                  {`${formatNumber(porcentajeConformes, 0)} % del texto`}
                 </span>
               </div>
 
@@ -811,7 +928,9 @@ export default function RevisorLecturaFacilPage() {
 
               <div className={styles.metricaCard}>
                 <span className={styles.metricaValor}>{totalAvisos}</span>
-                <span className={styles.metricaLabel}>avisos en total</span>
+                <span className={styles.metricaLabel}>
+                  {totalAvisos === 1 ? 'aviso en total' : 'avisos en total'}
+                </span>
                 <span className={styles.metricaNota}>
                   repartidos en {reglasConAvisos.length}{' '}
                   {reglasConAvisos.length === 1 ? 'regla distinta' : 'reglas distintas'}
@@ -820,7 +939,9 @@ export default function RevisorLecturaFacilPage() {
 
               <div className={styles.metricaCard}>
                 <span className={styles.metricaValor}>{analisis.totalPalabras}</span>
-                <span className={styles.metricaLabel}>palabras</span>
+                <span className={styles.metricaLabel}>
+                  {analisis.totalPalabras === 1 ? 'palabra' : 'palabras'}
+                </span>
                 <span className={styles.metricaNota}>
                   en {analisis.parrafos.length}{' '}
                   {analisis.parrafos.length === 1 ? 'párrafo' : 'párrafos'}
@@ -891,7 +1012,13 @@ export default function RevisorLecturaFacilPage() {
                 : `Frases con el aviso «${REGLA_POR_ID[filtro].etiqueta}»`}
             </h2>
 
-            {frasesVisibles.length === 0 ? (
+            {filtro === 'parrafo-largo' ? (
+              // El aviso es del párrafo, no de sus frases: ya está a la vista justo encima
+              // (hallazgo 4824)
+              <p className={styles.sinResultados}>
+                Este aviso es del párrafo entero, no de una frase: lo tienes justo encima.
+              </p>
+            ) : frasesVisibles.length === 0 ? (
               <p className={styles.sinResultados}>No hay frases con ese aviso.</p>
             ) : (
               <ol className={styles.listaFrases}>
@@ -902,7 +1029,9 @@ export default function RevisorLecturaFacilPage() {
                   >
                     <div className={styles.fraseCabecera}>
                       <span className={styles.fraseNumero}>{f.indice + 1}</span>
-                      <span className={styles.frasePalabras}>{f.palabras} palabras</span>
+                      <span className={styles.frasePalabras}>
+                        {`${f.palabras} ${f.palabras === 1 ? 'palabra' : 'palabras'}`}
+                      </span>
                     </div>
                     <p className={styles.fraseTexto}>{f.texto}</p>
 
@@ -1153,12 +1282,7 @@ export default function RevisorLecturaFacilPage() {
           <div className={styles.faqGrid}>
             <div className={styles.faqItem}>
               <p className={styles.faqQuestion}>¿Cuántas palabras puede tener una frase?</p>
-              <p className={styles.faqAnswer}>
-                La referencia habitual es no pasar de 15 y expresar una sola idea. No es una regla
-                matemática: una frase de 18 palabras con estructura simple puede leerse mejor que una
-                de 12 llena de subordinadas. Por eso aquí se avisa a partir de 15 y se marca como
-                grave a partir de 25, pero además se señalan aparte las frases que encadenan ideas.
-              </p>
+              <p className={styles.faqAnswer}>{RESPUESTA_FAQ_LONGITUD}</p>
             </div>
             <div className={styles.faqItem}>
               <p className={styles.faqQuestion}>¿Por qué se desaconseja la voz pasiva?</p>
@@ -1168,21 +1292,11 @@ export default function RevisorLecturaFacilPage() {
             </div>
             <div className={styles.faqItem}>
               <p className={styles.faqQuestion}>¿Puede certificar que mi texto es de lectura fácil?</p>
-              <p className={styles.faqAnswer}>
-                No, y ninguna herramienta automática puede. La UNE 153101:2018 EX establece que la
-                validación la hacen personas con dificultades de comprensión leyendo el texto. Un
-                revisor automático encuentra lo mecánico; la comprensión real solo la confirma quien
-                lee.
-              </p>
+              <p className={styles.faqAnswer}>{RESPUESTA_FAQ_CERTIFICAR}</p>
             </div>
             <div className={styles.faqItem}>
               <p className={styles.faqQuestion}>¿Qué hago con las cifras y los porcentajes?</p>
-              <p className={styles.faqAnswer}>
-                Se prefieren números redondos y expresiones cotidianas. En vez de «el 73,5 % de los
-                solicitantes», «casi todas las personas que lo piden». Los romanos se sustituyen por
-                arábigos, los decimales se evitan y las cantidades grandes se redondean o se comparan
-                con algo conocido.
-              </p>
+              <p className={styles.faqAnswer}>{RESPUESTA_FAQ_CIFRAS}</p>
             </div>
             <div className={styles.faqItem}>
               <p className={styles.faqQuestion}>¿Mi texto se envía a algún sitio?</p>

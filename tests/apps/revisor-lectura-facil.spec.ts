@@ -11,9 +11,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * encima de 25; párrafo largo: más de 5 frases o más de 70 palabras; varias ideas: conector y más
  * de 12 palabras). No hay dato normativo: la UNE 153101:2018 EX solo se cita como inspiración.
  *
- * Los casos marcados «HALLAZGO (…, ABIERTO)» llevan test.fail(): describen lo que DEBERÍA pasar y
- * hoy no pasa. Al reparar cada uno se quita su test.fail() —comprobando antes que lo que afirma
- * sigue siendo lo correcto— y el título pasa a REPARADO.
+ * Los casos «HALLAZGO (…)» describían lo que DEBERÍA pasar y no pasaba. Reparados todos en /reparar
+ * del 16/11/2026 (hallazgos 4812-4825): sin test.fail(), y comprobado que lo que afirman es lo correcto.
  */
 
 const RUTA = '/revisor-lectura-facil/';
@@ -175,7 +174,8 @@ test.describe('Casos resueltos a mano', () => {
 
     await escribir(page, SEIS_FRASES);
     await expect(valor(tarjeta(page, 'frases sin ningún aviso'))).toHaveText('6 de 6');
-    await expect(valor(tarjeta(page, 'avisos en total'))).toHaveText('1');
+    // Con un solo aviso, en singular (hallazgo 4825)
+    await expect(valor(tarjeta(page, 'aviso en total'))).toHaveText('1');
     await expect(page.getByText('Párrafo 1:', { exact: true }).locator('xpath=..')).toContainText(
       '6 frases y 19 palabras. Parte el párrafo.',
     );
@@ -259,6 +259,14 @@ test.describe('Casos resueltos a mano', () => {
     expect(conElTexto).toEqual([]);
   });
 
+  test('Control · un romano de verdad y una abreviatura de verdad siguen avisando', async ({ page }) => {
+    // Las reparaciones de 4814 y 4818 acotan los patrones; no deben dejarlos mudos.
+    await escribir(page, 'Vivimos en el siglo XXI. Llama al tel. de la oficina.');
+    await expect(frases(page)).toHaveCount(2);
+    await expect(frases(page).nth(0)).toContainText('Cifra complicada: «XXI»');
+    await expect(frases(page).nth(1)).toContainText('Abreviatura: «tel.»');
+  });
+
   test('Control · la sigla seguida de su nombre entre paréntesis no avisa', async ({ page }) => {
     await escribir(page, 'Llama al SEPE (Servicio de Empleo) por la mañana.');
     await expect(frases(page).first()).toContainText('Sin avisos.');
@@ -266,53 +274,47 @@ test.describe('Casos resueltos a mano', () => {
 });
 
 test.describe('Hallazgos de la primera inspección (16/11/2026)', () => {
-  // ── HALLAZGO siglas (alto, ABIERTO) ─────────────────────────────────────────────────────────
+  // ── HALLAZGO siglas (alto, REPARADO) ─────────────────────────────────────────────────────────
   // La propia sugerencia dice «Escribe el nombre completo la primera vez y la sigla entre
   // paréntesis», pero el motor solo da por explicada «SIGLA (…)» o «(…) SIGLA»: el formato que
   // recomienda, «Nombre completo (SIGLA)», sigue avisando. Y avisa en cada frase, no solo la
   // primera vez (característica del JSON-LD: «sin explicar la primera vez»).
-  test('HALLAZGO siglas (alto, ABIERTO) · «Servicio de Empleo (SEPE)», el formato que recomienda la app, no debe avisar', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO siglas (alto, REPARADO) · «Servicio de Empleo (SEPE)», el formato que recomienda la app, no debe avisar', async ({ page }) => {
     await escribir(page, 'Llama al Servicio de Empleo (SEPE) por la mañana.');
     await expect(frases(page).first()).toContainText('Sin avisos.');
   });
 
-  test('HALLAZGO siglas (alto, ABIERTO) · explicada la primera vez, la sigla no debe avisar en la frase siguiente', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO siglas (alto, REPARADO) · explicada la primera vez, la sigla no debe avisar en la frase siguiente', async ({ page }) => {
     await escribir(page, 'La Oficina de Empleo (SEPE) abre hoy. El SEPE cierra a las tres.');
     await expect(frases(page)).toHaveCount(2);
     await expect(panelFrases(page)).not.toContainText('Sigla sin explicar');
   });
 
-  // ── HALLAZGO pasiva refleja (medio, ABIERTO) ────────────────────────────────────────────────
+  // ── HALLAZGO pasiva refleja (medio, REPARADO) ────────────────────────────────────────────────
   // El regex termina en \b, que en JavaScript sin la bandera «u» solo conoce [A-Za-z0-9_]: tras
   // «á» u «ó» no hay frontera de palabra si sigue un espacio o un punto. Las terminaciones -ará,
   // -erá, -irá y -ó, que el propio regex enumera, no casan nunca; en -arán casa «-ará» y la cita
   // sale truncada. El ejemplo de la app, «la solicitud se entenderá desestimada», no avisa.
-  test('HALLAZGO pasiva refleja (medio, ABIERTO) · «se revisará» debe avisar de voz pasiva', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO pasiva refleja (medio, REPARADO) · «se revisará» debe avisar de voz pasiva', async ({ page }) => {
     await escribir(page, 'Mañana se revisará tu solicitud.');
     await expect(frases(page).first()).toContainText('Voz pasiva: «se revisará»');
   });
 
-  test('HALLAZGO pasiva refleja (medio, ABIERTO) · «se aprobó» debe avisar de voz pasiva', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO pasiva refleja (medio, REPARADO) · «se aprobó» debe avisar de voz pasiva', async ({ page }) => {
     await escribir(page, 'El lunes se aprobó la ayuda.');
     await expect(frases(page).first()).toContainText('Voz pasiva: «se aprobó»');
   });
 
-  test('HALLAZGO pasiva refleja (medio, ABIERTO) · «se revisarán» debe citarse entero, no como «se revisará»', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO pasiva refleja (medio, REPARADO) · «se revisarán» debe citarse entero, no como «se revisará»', async ({ page }) => {
     await escribir(page, 'Mañana se revisarán las solicitudes.');
     await expect(frases(page).first()).toContainText('Voz pasiva: «se revisarán»');
   });
 
-  // ── HALLAZGO abreviaturas dentro de palabras (medio, ABIERTO) ───────────────────────────────
+  // ── HALLAZGO abreviaturas dentro de palabras (medio, REPARADO) ───────────────────────────────
   // dividirFrases protege «tel.», «dra.», «dr.»… buscándolas como SUBCADENA, así que «hotel.»,
   // «piedra.», «cartel.» o «Sandra.» no cierran la frase: dos frases se funden en una (y salta
   // «Frase larga») y además se avisa de una abreviatura que no existe.
-  test('HALLAZGO abreviaturas (medio, ABIERTO) · «… en el hotel. Después …» son 2 frases (10 y 9 palabras) sin avisos', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO abreviaturas (medio, REPARADO) · «… en el hotel. Después …» son 2 frases (10 y 9 palabras) sin avisos', async ({ page }) => {
     await escribir(
       page,
       'Mañana por la mañana dormiremos todos juntos en el hotel. Después iremos andando hasta la playa con los niños.',
@@ -322,12 +324,11 @@ test.describe('Hallazgos de la primera inspección (16/11/2026)', () => {
     await expect(panelFrases(page)).not.toContainText('Abreviatura');
   });
 
-  // ── HALLAZGO filtro sin salida (medio, ABIERTO) ─────────────────────────────────────────────
+  // ── HALLAZGO filtro sin salida (medio, REPARADO) ─────────────────────────────────────────────
   // Con un filtro de regla activo, si al corregir el texto ya no queda ningún aviso, el panel de
   // filtros desaparece (solo se pinta con avisos) pero el filtro sigue puesto: «Frases con el
   // aviso «Sigla sin explicar» · No hay frases con ese aviso.» y ningún botón para volver a Todas.
-  test('HALLAZGO filtro sin salida (medio, ABIERTO) · al quedar el texto sin avisos se debe ver la frase o poder volver a «Todas»', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO filtro sin salida (medio, REPARADO) · al quedar el texto sin avisos se debe ver la frase o poder volver a «Todas»', async ({ page }) => {
     await escribir(page, 'Hoy la OMS publica datos.');
     const sigla = filtros(page).getByRole('button', { name: /Sigla sin explicar \(1\)/ });
     await sigla.click();
@@ -341,7 +342,7 @@ test.describe('Hallazgos de la primera inspección (16/11/2026)', () => {
     ).toBeVisible();
   });
 
-  // ── HALLAZGO FAQ duplicada (medio, ABIERTO) ─────────────────────────────────────────────────
+  // ── HALLAZGO FAQ duplicada (medio, REPARADO) ─────────────────────────────────────────────────
   // Tres preguntas están en la FAQ visible y en el FAQPage con otra redacción («¿Cuántas
   // palabras…?», «¿… certificar…?», «¿… cifras y los porcentajes?»). check:faq-unica no las ve
   // porque el enunciado también cambia. La del FAQPage sobre la longitud añade que se señalan las
@@ -377,8 +378,7 @@ test.describe('Hallazgos de la primera inspección (16/11/2026)', () => {
     return { visibles, jsonLd };
   }
 
-  test('HALLAZGO FAQ duplicada (medio, ABIERTO) · una pregunta que está en las dos FAQ debe tener UNA respuesta', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO FAQ duplicada (medio, REPARADO) · una pregunta que está en las dos FAQ debe tener UNA respuesta', async ({ page }) => {
     const { visibles, jsonLd } = await respuestasFaq(page);
     expect(visibles.size + jsonLd.size).toBeGreaterThan(0);
     for (const [clave, respuesta] of jsonLd) {
@@ -386,29 +386,26 @@ test.describe('Hallazgos de la primera inspección (16/11/2026)', () => {
     }
   });
 
-  test('HALLAZGO FAQ duplicada (medio, ABIERTO) · si el FAQPage dice «aunque sean cortas», una frase corta con «porque» debe avisar', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO FAQ duplicada (medio, REPARADO) · si el FAQPage dice «aunque sean cortas», una frase corta con «porque» debe avisar', async ({ page }) => {
     const { jsonLd, visibles } = await respuestasFaq(page);
     const prometeCortas = /aunque sean cortas/.test([...jsonLd.values(), ...visibles.values()].join(' '));
     await escribir(page, 'Mañana no abrimos porque hay obras.');
     if (prometeCortas) await expect(frases(page).first()).toContainText('Varias ideas juntas');
   });
 
-  // ── HALLAZGO umbrales de la FAQ (bajo, ABIERTO) ─────────────────────────────────────────────
+  // ── HALLAZGO umbrales de la FAQ (bajo, REPARADO) ─────────────────────────────────────────────
   // Las dos FAQ dicen que «avisa a partir de 15 palabras y marca como grave a partir de 25». El
   // motor avisa con MÁS de 15 (16 en adelante, como dice la tarjeta de la regla) y no marca nada
   // como grave: el aviso de 26 palabras lleva la misma severidad que el de 16; solo cambia el
   // consejo. La reparación natural es el texto, no el motor (CASO 2 fija el umbral de la regla).
-  test('HALLAZGO umbrales de la FAQ (bajo, ABIERTO) · si la FAQ dice «a partir de 15», una frase de 15 palabras debe avisar', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO umbrales de la FAQ (bajo, REPARADO) · si la FAQ dice «a partir de 15», una frase de 15 palabras debe avisar', async ({ page }) => {
     const { jsonLd, visibles } = await respuestasFaq(page);
     const dice15 = /a partir de 15/.test([...jsonLd.values(), ...visibles.values()].join(' '));
     await escribir(page, UMBRALES.split('\n')[0]);
     if (dice15) await expect(frases(page).first()).toContainText('Frase larga');
   });
 
-  test('HALLAZGO umbrales de la FAQ (bajo, ABIERTO) · si la FAQ dice «grave a partir de 25», el aviso de 26 palabras debe marcarse distinto del de 16', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO umbrales de la FAQ (bajo, REPARADO) · si la FAQ dice «grave a partir de 25», el aviso de 26 palabras debe marcarse distinto del de 16', async ({ page }) => {
     const { jsonLd, visibles } = await respuestasFaq(page);
     const diceGrave = /grave a partir de 25/.test([...jsonLd.values(), ...visibles.values()].join(' '));
     await escribir(page, UMBRALES);
@@ -417,54 +414,48 @@ test.describe('Hallazgos de la primera inspección (16/11/2026)', () => {
     if (diceGrave) expect(clase26).not.toBe(clase16);
   });
 
-  // ── HALLAZGO mayúsculas (bajo, ABIERTO) ─────────────────────────────────────────────────────
+  // ── HALLAZGO mayúsculas (bajo, REPARADO) ─────────────────────────────────────────────────────
   // Siglas y romanos se buscan con \b ASCII: «ATENCIÓN» sale como dos «siglas», «ATENCI» y «ÓN»;
   // y «DVD» o «CD», que la app tolera como siglas, salen como «Cifra complicada» (romanos).
-  test('HALLAZGO mayúsculas (bajo, ABIERTO) · «ATENCIÓN» no debe trocearse en las siglas «ATENCI» y «ÓN»', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO mayúsculas (bajo, REPARADO) · «ATENCIÓN» no debe trocearse en las siglas «ATENCI» y «ÓN»', async ({ page }) => {
     await escribir(page, 'Lee con ATENCIÓN las instrucciones del aviso.');
     await expect(frases(page)).toHaveCount(1);
     await expect(frases(page).first()).not.toContainText('«ÓN»');
   });
 
-  test('HALLAZGO mayúsculas (bajo, ABIERTO) · «DVD», sigla tolerada, no es un número romano', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO mayúsculas (bajo, REPARADO) · «DVD», sigla tolerada, no es un número romano', async ({ page }) => {
     await escribir(page, 'Compra un DVD en la tienda.');
     await expect(frases(page)).toHaveCount(1);
     await expect(frases(page).first()).not.toContainText('Cifra complicada');
   });
 
-  // ── HALLAZGO cifras (bajo, ABIERTO) ─────────────────────────────────────────────────────────
+  // ── HALLAZGO cifras (bajo, REPARADO) ─────────────────────────────────────────────────────────
   // contarPalabras usa \w+, que parte una cifra por sus separadores: «1.500.000» cuenta 3
   // palabras (el ejemplo de la app da 107 palabras en vez de 106 por «68,4»). Y la cita de la
   // cifra sale troceada: «1.500» por «1.500.000», «68,4» y «4 %» por «68,4 %».
-  test('HALLAZGO cifras (bajo, ABIERTO) · «Pagan 1.500.000 euros.» son 3 palabras', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO cifras (bajo, REPARADO) · «Pagan 1.500.000 euros.» son 3 palabras', async ({ page }) => {
     await escribir(page, 'Pagan 1.500.000 euros.');
     await expect(cabecera(frases(page).first())).toHaveText('3 palabras');
   });
 
-  test('HALLAZGO cifras (bajo, ABIERTO) · «68,4 %» no debe citarse como «4 %»', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO cifras (bajo, REPARADO) · «68,4 %» no debe citarse como «4 %»', async ({ page }) => {
     await escribir(page, 'El 68,4 % aprueba.');
     await expect(frases(page).first()).toContainText('Cifra complicada');
     await expect(frases(page).first()).not.toContainText('«4 %»');
   });
 
-  // ── HALLAZGO sílabas (bajo, ABIERTO) ────────────────────────────────────────────────────────
+  // ── HALLAZGO sílabas (bajo, REPARADO) ────────────────────────────────────────────────────────
   // «Cinco sílabas o más»: a-yun-ta-mien-to y a-e-ro-puer-to tienen cinco y más de 9 letras, pero
   // contarSilabas cuenta cuatro (la «y» entre vocales se toma por vocal y el hiato «ae» no se parte).
-  test('HALLAZGO sílabas (bajo, ABIERTO) · «ayuntamiento» y «aeropuerto» (5 sílabas) son palabras muy largas', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO sílabas (bajo, REPARADO) · «ayuntamiento» y «aeropuerto» (5 sílabas) son palabras muy largas', async ({ page }) => {
     await escribir(page, 'Ve al ayuntamiento o al aeropuerto.');
     await expect(frases(page).first()).toContainText(/Palabra muy larga: .*«ayuntamiento».*«aeropuerto»/);
   });
 
-  // ── HALLAZGO diccionarios (bajo, ABIERTO) ───────────────────────────────────────────────────
+  // ── HALLAZGO diccionarios (bajo, REPARADO) ───────────────────────────────────────────────────
   // «implementar» propone «poner en marcha», que la propia app marca como lenguaje figurado; y
   // «perceptivo» (relativo a la percepción) propone «obligatorio», que es el sentido de «preceptivo».
-  test('HALLAZGO diccionarios (bajo, ABIERTO) · la alternativa que propone para «implementar» no debe disparar otro aviso', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO diccionarios (bajo, REPARADO) · la alternativa que propone para «implementar» no debe disparar otro aviso', async ({ page }) => {
     await escribir(page, 'Vamos a implementar el plan.');
     const fila = tablaSustituciones(page).locator('tbody tr').filter({ hasText: 'implementar' });
     const alternativa = ((await fila.getByRole('cell').nth(1).textContent()) ?? '').trim();
@@ -473,24 +464,21 @@ test.describe('Hallazgos de la primera inspección (16/11/2026)', () => {
     await expect(frases(page).first()).toContainText('Sin avisos.');
   });
 
-  test('HALLAZGO diccionarios (bajo, ABIERTO) · «perceptivo» no debe proponerse como «obligatorio»', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO diccionarios (bajo, REPARADO) · «perceptivo» no debe proponerse como «obligatorio»', async ({ page }) => {
     await escribir(page, 'El sistema perceptivo humano es complejo.');
     await expect(frases(page)).toHaveCount(1);
     await expect(frases(page).first()).not.toContainText('«perceptivo» → obligatorio');
   });
 
-  // ── HALLAZGO patrones literales (bajo, ABIERTO) ─────────────────────────────────────────────
-  test('HALLAZGO patrones literales (bajo, ABIERTO) · «Aporte la documentación» debe avisar del tecnicismo como «aportar»', async ({ page }) => {
-    test.fail();
+  // ── HALLAZGO patrones literales (bajo, REPARADO) ─────────────────────────────────────────────
+  test('HALLAZGO patrones literales (bajo, REPARADO) · «Aporte la documentación» debe avisar del tecnicismo como «aportar»', async ({ page }) => {
     // El diccionario solo casa el infinitivo como prefijo: el imperativo administrativo
     // («Aporte», «Abone», «Subsane», «Acredite») no avisa nunca.
     await escribir(page, 'Aporte la documentación antes del lunes.');
     await expect(frases(page).first()).toContainText(/Palabra difícil: «aport/);
   });
 
-  test('HALLAZGO patrones literales (bajo, ABIERTO) · «…, sin embargo, …» en una frase de 18 palabras debe avisar de varias ideas', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO patrones literales (bajo, REPARADO) · «…, sin embargo, …» en una frase de 18 palabras debe avisar de varias ideas', async ({ page }) => {
     // El conector se busca rodeado de espacios: seguido de coma, como se escribe casi siempre
     // «sin embargo» y «no obstante», no se encuentra.
     await escribir(
@@ -500,19 +488,17 @@ test.describe('Hallazgos de la primera inspección (16/11/2026)', () => {
     await expect(frases(page).first()).toContainText('Varias ideas juntas');
   });
 
-  test('HALLAZGO patrones literales (bajo, ABIERTO) · «Es cada vez más caro» no es voz pasiva', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO patrones literales (bajo, REPARADO) · «Es cada vez más caro» no es voz pasiva', async ({ page }) => {
     // «es» + cualquier palabra acabada en -ada/-ido casa como participio: «es cada», «es nada», «es vida».
     await escribir(page, 'Es cada vez más caro.');
     await expect(frases(page)).toHaveCount(1);
     await expect(frases(page).first()).not.toContainText('Voz pasiva');
   });
 
-  // ── HALLAZGO salto de línea (bajo, ABIERTO) ─────────────────────────────────────────────────
+  // ── HALLAZGO salto de línea (bajo, REPARADO) ─────────────────────────────────────────────────
   // Cada salto de línea es un párrafo nuevo y parte la frase: un texto pegado de un PDF, con los
   // renglones cortados, nunca da «Frase larga».
-  test('HALLAZGO salto de línea (bajo, ABIERTO) · una frase de 23 palabras partida en dos renglones sigue siendo una frase larga', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO salto de línea (bajo, REPARADO) · una frase de 23 palabras partida en dos renglones sigue siendo una frase larga', async ({ page }) => {
     await escribir(
       page,
       'La solicitud de la ayuda será revisada por la oficina\nen el plazo de tres meses desde el día en que la presentes.',
@@ -521,30 +507,29 @@ test.describe('Hallazgos de la primera inspección (16/11/2026)', () => {
     await expect(frases(page).first()).toContainText('Frase larga: 23 palabras');
   });
 
-  // ── HALLAZGO filtro de párrafo (bajo, ABIERTO) ──────────────────────────────────────────────
-  test('HALLAZGO filtro de párrafo (bajo, ABIERTO) · con «Párrafo largo» no debe decir «No hay frases con ese aviso» bajo el aviso del párrafo', async ({ page }) => {
-    test.fail();
+  // ── HALLAZGO filtro de párrafo (bajo, REPARADO) ──────────────────────────────────────────────
+  test('HALLAZGO filtro de párrafo (bajo, REPARADO) · con «Párrafo largo» no debe decir «No hay frases con ese aviso» bajo el aviso del párrafo', async ({ page }) => {
     await escribir(page, SEIS_FRASES);
     await filtros(page).getByRole('button', { name: /Párrafo largo \(1\)/ }).click();
     await expect(page.getByText('Párrafo 1:', { exact: true })).toBeVisible();
     await expect(panelFrases(page).getByText('No hay frases con ese aviso.')).toHaveCount(0);
   });
 
-  // ── HALLAZGO formato (bajo, ABIERTO) ────────────────────────────────────────────────────────
-  test('HALLAZGO formato (bajo, ABIERTO) · con una palabra y un aviso, singular: «1 palabra», «1 aviso en total»', async ({ page }) => {
-    test.fail();
+  // ── HALLAZGO formato (bajo, REPARADO) ────────────────────────────────────────────────────────
+  test('HALLAZGO formato (bajo, REPARADO) · con una palabra y un aviso, singular: «1 palabra», «1 aviso en total»', async ({ page }) => {
     await escribir(page, 'Hola');
     await expect(cabecera(frases(page).first())).toHaveText('1 palabra');
     await escribir(page, SEIS_FRASES);
     await expect(metricas(page).getByText('aviso en total', { exact: true })).toBeVisible();
   });
 
-  test('HALLAZGO formato (bajo, ABIERTO) · el % va separado con espacio duro (U+00A0)', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO formato (bajo, REPARADO) · el % va separado con espacio duro (U+00A0)', async ({ page }) => {
     // Formato español del proyecto (decidido el 25/09/2026): «33 %» con U+00A0, para que el % no
     // salte solo de renglón. Hoy lleva un espacio normal (también en las dos FAQ y en el ejemplo).
     await escribir(page, TEXTO_NORMAL);
     const nota = await tarjeta(page, 'frases sin ningún aviso').textContent();
+    await page.getByRole('button', { name: 'Cargar ejemplo' }).click();
+    await expect(page.locator(AREA)).toHaveValue(/68,4 %/);
     expect(nota ?? '').toContain('33 %');
   });
 });

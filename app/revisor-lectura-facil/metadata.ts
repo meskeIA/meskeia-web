@@ -61,6 +61,19 @@ export const jsonLd = generateWebAppSchema({
 export const RESPUESTA_FAQ_VOZ_PASIVA =
   'Porque invierte el orden natural de la frase y esconde quién hace la acción. «La solicitud será revisada por el departamento» obliga al lector a reconstruir que es el departamento quien revisa. En voz activa —«el departamento revisa tu solicitud»— el sujeto aparece primero y la frase se entiende de una pasada. La pasiva refleja, del tipo «se revisarán las solicitudes», tiene el mismo problema y además borra al responsable.';
 
+// Tres preguntas más estaban en las dos FAQ con respuestas escritas aparte (hallazgo 4816): una sola
+// constante para cada una. La de la longitud ya no dice «a partir de 15» ni «grave a partir de 25»
+// (el motor avisa con MÁS de 15 y no marca grave nada: solo cambia el consejo; hallazgo 4817), ni
+// que señala las frases encadenadas «aunque sean cortas» (exige más de 12 palabras).
+export const RESPUESTA_FAQ_LONGITUD =
+  'La referencia habitual es no pasar de 15 palabras por frase y expresar una sola idea en cada una. No es un límite matemático: una frase de 18 palabras con estructura sencilla puede leerse mejor que una de 12 llena de subordinadas. Por eso esta herramienta avisa cuando una frase pasa de 15 palabras, y por encima de 25 propone dividirla en tres o cuatro. Además, señala aparte las frases de más de 12 palabras que encadenan ideas con un conector como «porque», «aunque» o «sin embargo».';
+
+export const RESPUESTA_FAQ_CERTIFICAR =
+  'No. La norma UNE 153101:2018 EX establece que la validación la hacen personas con dificultades de comprensión, que leen el texto y confirman si lo entienden. Ningún programa sustituye ese paso. Lo que sí hace un revisor automático es ahorrar la parte mecánica: encontrar las frases largas, los tecnicismos y las siglas antes de llevar el texto a validación, para que la sesión con personas usuarias se dedique a lo que solo ellas pueden decir.';
+
+export const RESPUESTA_FAQ_CIFRAS =
+  'Se prefieren números redondos y expresiones cotidianas. En lugar de «el 73,5 % de los solicitantes», es preferible «casi todas las personas que lo piden». Los números romanos se sustituyen por arábigos, los decimales se evitan y las cantidades muy grandes se redondean o se comparan con algo conocido. Las fechas se escriben completas y en un solo formato a lo largo de todo el documento.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -78,7 +91,7 @@ export const faqJsonLd = {
       name: '¿Cuántas palabras debe tener una frase en lectura fácil?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La referencia habitual es no pasar de 15 palabras por frase y expresar una sola idea en cada una. No es un límite matemático: una frase de 18 palabras con estructura sencilla puede leerse mejor que una de 12 llena de subordinadas. Por eso esta herramienta avisa a partir de 15 palabras y marca como grave a partir de 25, pero además señala aparte las frases que encadenan varias ideas aunque sean cortas.',
+        text: RESPUESTA_FAQ_LONGITUD,
       },
     },
     {
@@ -94,7 +107,7 @@ export const faqJsonLd = {
       name: '¿Una herramienta automática puede certificar que un texto es de lectura fácil?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. La norma UNE 153101:2018 EX establece que la validación la hacen personas con dificultades de comprensión, que leen el texto y confirman si lo entienden. Ningún programa sustituye ese paso. Lo que sí hace un revisor automático es ahorrar la parte mecánica: encontrar las frases largas, los tecnicismos y las siglas antes de llevar el texto a validación, para que la sesión con personas usuarias se dedique a lo que solo ellas pueden decir.',
+        text: RESPUESTA_FAQ_CERTIFICAR,
       },
     },
     {
@@ -102,7 +115,7 @@ export const faqJsonLd = {
       name: '¿Qué se hace con las cifras y los porcentajes en lectura fácil?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Se prefieren números redondos y expresiones cotidianas. En lugar de «el 73,5 % de los solicitantes», es preferible «casi todas las personas que lo piden». Los números romanos se sustituyen por arábigos, los decimales se evitan y las cantidades muy grandes se redondean o se comparan con algo conocido. Las fechas se escriben completas y en un solo formato a lo largo de todo el documento.',
+        text: RESPUESTA_FAQ_CIFRAS,
       },
     },
   ],
