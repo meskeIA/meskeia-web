@@ -3090,27 +3090,37 @@ function crearServidorDelegum(): McpServer {
     'personas, acreditar movilidad reducida, o tener un grado igual o superior al 65% —con grado ≥65% se aplica ' +
     'siempre, sin acreditar nada más—. El mínimo NO reduce la base liquidable: se grava a tipo cero (art. 63.1.2º ' +
     'LIRPF), de modo que el ahorro NO depende del tipo marginal del contribuyente y se valora a los tipos bajos ' +
-    'de la escala.',
+    'de la escala. Si el contribuyente es trabajador activo y se da su salario bruto, suma además el incremento de ' +
+    'gastos deducibles del art. 19.2.f LIRPF (3.500 €, o 7.750 € con ayuda de terceros, movilidad reducida o grado ' +
+    '≥65%), que SÍ reduce la base y se valora a su tipo marginal.',
     {
       titular: z.enum(['contribuyente', 'ascendiente', 'descendiente']).optional().describe('Quién tiene la discapacidad. Por defecto "contribuyente".'),
       grado: z.enum(['33a65', '65oMas']).optional().describe('Grado de discapacidad: "33a65" (entre 33% y 64%) o "65oMas" (65% o más). Por defecto "33a65".'),
       necesita_asistencia: z.boolean().optional().describe('¿Acredita necesidad de ayuda de terceras personas o movilidad reducida? (añade 3.000 €). Por defecto false. Irrelevante con grado "65oMas": ahí los 3.000 € se aplican por el propio grado aunque este parámetro sea false.'),
+      salario_bruto_trabajador_activo: z.number().positive().optional().describe('Salario bruto anual en € si el contribuyente con discapacidad es trabajador activo (por cuenta ajena). Activa el incremento de gastos del art. 19.2.f. Se ignora si el titular no es "contribuyente". Supone que el salario es su única renta.'),
     },
     { title: 'Calcula el mínimo por discapacidad en el IRPF', readOnlyHint: true },
-    async ({ titular, grado, necesita_asistencia }, extra) => {
+    async ({ titular, grado, necesita_asistencia, salario_bruto_trabajador_activo }, extra) => {
       await registrarUsoDelegum('calcular_deduccion_discapacidad', getCaller(extra));
       try {
         const r = calcularDeduccionDiscapacidadIRPF({
           titular: (titular ?? 'contribuyente') as TitularDiscapacidad,
           grado: (grado ?? '33a65') as GradoDiscapacidad,
           necesitaAsistencia: necesita_asistencia,
+          salarioBrutoTrabajadorActivo: salario_bruto_trabajador_activo,
         });
+        const t = r.trabajoActivo;
         const lineas = [
           `♿ **Mínimo por discapacidad (IRPF)**`,
           `📦 Mínimo por discapacidad: ${fmt(r.minimoDiscapacidad)} €`,
           r.gastosAsistencia > 0 ? `➕ Gastos de asistencia: ${fmt(r.gastosAsistencia)} €` : '',
           `🔢 **Mínimo total por discapacidad: ${fmt(r.totalMinimo)} €**`,
-          `💶 Ahorro estimado en cuota: **${fmt(r.ahorroEstimado)} €** (el mínimo acaba valorado al ${pct(r.tipoEfectivoAhorro)}%)`,
+          t
+            ? `💶 Ahorro por el mínimo con este salario: ${fmt(t.ahorroMinimo)} €`
+            : `💶 Ahorro estimado en cuota: **${fmt(r.ahorroEstimado)} €** (el mínimo acaba valorado al ${pct(r.tipoEfectivoAhorro)}%)`,
+          t ? `➕ Incremento de gastos del trabajo (art. 19.2.f): ${fmt(t.incrementoGastos)} € → ahorro ${fmt(t.ahorroIncrementoGastos)} €` : '',
+          t ? `🧮 Base liquidable general: ${fmt(t.baseSinDiscapacidad)} € sin discapacidad → ${fmt(t.baseConDiscapacidad)} € con ella (SS del trabajador ${fmt(t.cotizacionSS)} €). Cuota íntegra: ${fmt(t.cuotaSinDiscapacidad)} € → ${fmt(t.cuotaConDiscapacidad)} €` : '',
+          t ? `💶 **Ahorro total: ${fmt(t.ahorroTotal)} €** (supone que el salario es su única renta)` : '',
           '',
           `ℹ️ El mínimo NO reduce la base: forma parte de la base liquidable general y se grava a tipo cero (art. 63.1.2º LIRPF), aplicando la escala a la base completa y restando la escala aplicada al mínimo. Por eso el ahorro NO depende de tu tipo marginal. Es una cota INFERIOR: si además tienes mínimos por descendientes o ascendientes, estos se apilan debajo y el de discapacidad cae en tramos algo más altos.`,
           `📚 ${r.fuente} · verificado ${r.verificado}`,

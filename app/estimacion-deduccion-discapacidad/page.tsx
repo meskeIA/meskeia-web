@@ -10,9 +10,10 @@ import {
   EducationalSection,
   DisclaimerCard,
   ShareCard,
+  NumberInput,
   DataReference, RegionBadge
 } from '@/components';
-import { formatCurrency, formatNumber } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
   DEDUCCIONES_IRPF_DISCAPACIDAD_2025,
   FISCAL_IRPF_META,
@@ -39,6 +40,13 @@ const AHORRO_33_ASISTENCIA = calcularDeduccionDiscapacidadIRPF({
   titular: 'contribuyente', grado: '33a65', necesitaAsistencia: true,
 }).ahorroEstimado;
 const AHORRO_65 = calcularDeduccionDiscapacidadIRPF({ titular: 'contribuyente', grado: '65oMas' }).ahorroEstimado;
+/** Ejemplo del trabajador activo (hallazgo 4786): 28.000 € brutos, grado 40 %, sin asistencia.
+ * El motor da 570,00 € del mínimo + 1.050,00 € del art. 19.2.f = 1.620,00 € (cálculo a mano en
+ * `calcularTrabajoActivo`, lib/calculadoras/deduccionDiscapacidadIRPF.ts). */
+const SALARIO_EJEMPLO = 28000;
+const EJEMPLO_TRABAJADOR = calcularDeduccionDiscapacidadIRPF({
+  titular: 'contribuyente', grado: '33a65', salarioBrutoTrabajadorActivo: SALARIO_EJEMPLO,
+}).trabajoActivo;
 /** Rentas máximas del descendiente (art. 58.1 LIRPF, BOE-A-2006-20764, leído el 15/11/2026):
  * el mismo límite de 8.000 € que el art. 59.1 fija para el ascendiente. data/fiscal solo lo
  * declara con el nombre del ascendiente. */
@@ -63,20 +71,44 @@ export default function EstimacionDeduccionDiscapacidadPage() {
   const [titular, setTitular] = useState<TitularDiscapacidad>('contribuyente');
   const [grado, setGrado] = useState<GradoDiscapacidad>('33a65');
   const [necesitaAsistencia, setNecesitaAsistencia] = useState(false);
+  const [trabajadorActivo, setTrabajadorActivo] = useState(false);
+  const [salario, setSalario] = useState('');
+  const [errorSalario, setErrorSalario] = useState('');
   const [resultado, setResultado] = useState<ResultadoDeduccionDiscapacidad | null>(null);
 
+  // Hallazgo 4786 (decidido por el usuario el 16/11/2026, cabo C0796): el trabajador activo con
+  // discapacidad tiene además el incremento de gastos del art. 19.2.f, que reduce la base y por
+  // eso necesita el salario. Solo cuando la discapacidad es del propio contribuyente.
+  const pideSalario = titular === 'contribuyente' && trabajadorActivo;
+
   const calcular = useCallback(() => {
+    let salarioBrutoTrabajadorActivo: number | undefined;
+    if (pideSalario) {
+      const valor = parseSpanishNumber(salario);
+      if (!Number.isFinite(valor) || valor <= 0) {
+        setErrorSalario('Indica tu salario bruto anual para sumar los gastos del art. 19.2.f');
+        setResultado(null);
+        return;
+      }
+      salarioBrutoTrabajadorActivo = valor;
+    }
+    setErrorSalario('');
     setResultado(
-      calcularDeduccionDiscapacidadIRPF({ titular, grado, necesitaAsistencia })
+      calcularDeduccionDiscapacidadIRPF({ titular, grado, necesitaAsistencia, salarioBrutoTrabajadorActivo })
     );
-  }, [titular, grado, necesitaAsistencia]);
+  }, [titular, grado, necesitaAsistencia, pideSalario, salario]);
 
   const limpiar = useCallback(() => {
     setTitular('contribuyente');
     setGrado('33a65');
     setNecesitaAsistencia(false);
+    setTrabajadorActivo(false);
+    setSalario('');
+    setErrorSalario('');
     setResultado(null);
   }, []);
+
+  const trabajo = resultado?.trabajoActivo ?? null;
 
   return (
     <div className={styles.container}>
@@ -87,7 +119,7 @@ export default function EstimacionDeduccionDiscapacidadPage() {
         <span className={styles.heroIcon} aria-hidden="true">♿</span>
         <h1 className={styles.title}>Estimación de Deducción IRPF por Discapacidad</h1>
         <p className={styles.subtitle}>
-          Calcula el ahorro fiscal aproximado por los mínimos de discapacidad en tu declaración de la renta
+          Calcula el ahorro fiscal aproximado por el mínimo de discapacidad y, si trabajas, por el incremento de gastos del trabajo
         </p>
       </header>
 
@@ -98,13 +130,13 @@ export default function EstimacionDeduccionDiscapacidadPage() {
 
       <DisclaimerCard variant="financial" severity="critical">
         Esta herramienta ofrece una estimación <strong>ORIENTATIVA</strong> del ahorro fiscal
-        por los mínimos de discapacidad en IRPF. <strong>NO constituye asesoramiento fiscal</strong> ni
+        por los mínimos de discapacidad en IRPF y por el incremento de gastos del trabajo. <strong>NO constituye asesoramiento fiscal</strong> ni
         sustituye la intervención de un asesor tributario cualificado. Los importes reales dependen
         de la situación personal completa. Verifica siempre con la Agencia Tributaria o un profesional.
       </DisclaimerCard>
 
       <DataReference
-        normativa="Mínimos por discapacidad IRPF (arts. 60 y 61 de la Ley 35/2006)"
+        normativa="Mínimos por discapacidad e incremento de gastos del trabajo IRPF (arts. 19.2.f, 60 y 61 de la Ley 35/2006)"
         fuente={FISCAL_IRPF_META.fuente}
         verificado={FISCAL_IRPF_META.verificado}
         urlOficial={FISCAL_IRPF_META.urlOficial}
@@ -232,6 +264,42 @@ export default function EstimacionDeduccionDiscapacidadPage() {
             </p>
           </div>
 
+          {/* Trabajador activo (art. 19.2.f) */}
+          {titular === 'contribuyente' && (
+            <div className={styles.formGroup}>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={trabajadorActivo}
+                  onChange={(e) => setTrabajadorActivo(e.target.checked)}
+                  className={styles.checkboxInput}
+                />
+                <span className={styles.checkboxText}>
+                  Trabajo por cuenta ajena (cobro un salario como trabajador en activo)
+                </span>
+              </label>
+              <p className={styles.helpText}>
+                El art. 19.2.f de la Ley del IRPF sube tus gastos deducibles del trabajo
+                en {formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.general)} al año,
+                o en {formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.asistenciaO65)} con
+                ayuda de terceros, movilidad reducida o grado ≥ 65{PCT}. Ese incremento sí reduce la
+                base, así que su ahorro depende de tu salario.
+              </p>
+              {trabajadorActivo && (
+                <NumberInput
+                  label="Salario bruto anual"
+                  value={salario}
+                  onChange={(v) => { setSalario(v); setErrorSalario(''); }}
+                  min={0}
+                  step={100}
+                  suffix="€"
+                  placeholder="28.000"
+                  error={errorSalario || undefined}
+                />
+              )}
+            </div>
+          )}
+
           {/* Botones */}
           <div className={styles.buttonGroup}>
             <button
@@ -283,13 +351,34 @@ export default function EstimacionDeduccionDiscapacidadPage() {
                 </div>
                 <div className={styles.resultItem}>
                   <span className={styles.resultLabel}>Tipo al que se valora el mínimo</span>
-                  <span className={styles.resultValue}>{formatNumber(resultado.tipoEfectivoAhorro, 2)}{PCT}</span>
+                  <span className={styles.resultValue}>{formatNumber(
+                    trabajo && resultado.totalMinimo > 0
+                      ? (trabajo.ahorroMinimo / resultado.totalMinimo) * 100
+                      : resultado.tipoEfectivoAhorro,
+                    2,
+                  )}{PCT}</span>
                 </div>
+                {trabajo && (
+                  <>
+                    <div className={styles.resultItem}>
+                      <span className={styles.resultLabel}>Incremento de gastos (art. 19.2.f)</span>
+                      <span className={styles.resultValue}>{formatCurrency(trabajo.incrementoGastos)}</span>
+                    </div>
+                    <div className={styles.resultItem}>
+                      <span className={styles.resultLabel}>Ahorro por el mínimo</span>
+                      <span className={styles.resultValue}>{formatCurrency(trabajo.ahorroMinimo)}</span>
+                    </div>
+                    <div className={styles.resultItem}>
+                      <span className={styles.resultLabel}>Ahorro por los gastos del trabajo</span>
+                      <span className={styles.resultValue}>{formatCurrency(trabajo.ahorroIncrementoGastos)}</span>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className={styles.resultadoFinal}>
                 <p className={styles.resultadoLabel}>Ahorro fiscal estimado</p>
-                <p className={styles.resultadoValor}>{formatCurrency(resultado.ahorroEstimado)}</p>
+                <p className={styles.resultadoValor}>{formatCurrency(trabajo ? trabajo.ahorroTotal : resultado.ahorroEstimado)}</p>
                 <span className={styles.resultadoBadge}>al año</span>
               </div>
 
@@ -303,7 +392,19 @@ export default function EstimacionDeduccionDiscapacidadPage() {
                   ahorro <strong>no depende de tu tipo marginal</strong>: el mínimo se valora siempre a los
                   tipos bajos de la escala.
                 </p>
-                <p>
+                {trabajo ? (
+                <p key="trabajo">
+                  Con {formatCurrency(trabajo.salarioBruto)} brutos y una cotización a la Seguridad
+                  Social de {formatCurrency(trabajo.cotizacionSS)}, tu base liquidable general sería
+                  de <strong>{formatCurrency(trabajo.baseSinDiscapacidad)}</strong> sin discapacidad
+                  y de <strong>{formatCurrency(trabajo.baseConDiscapacidad)}</strong> con el
+                  incremento de gastos del art. 19.2.f. Ese incremento <strong>sí reduce la
+                  base</strong>, así que se valora a tu tipo marginal. La cuota íntegra pasa
+                  de {formatCurrency(trabajo.cuotaSinDiscapacidad)} a {formatCurrency(trabajo.cuotaConDiscapacidad)}.
+                  Supone que el salario es tu única renta y no incluye otros mínimos familiares.
+                </p>
+                ) : (
+                <p key="minimo">
                   {/* Hallazgo 4783: la cifra solo es cierta si la base da cabida al mínimo entero. */}
                   La cifra supone que tu <strong>base liquidable general</strong> llega al menos
                   a <strong>{formatCurrency(MINIMO_PERSONAL + resultado.totalMinimo)}</strong> (el
@@ -313,6 +414,7 @@ export default function EstimacionDeduccionDiscapacidadPage() {
                   inferior: si además tienes mínimos por descendientes o ascendientes, estos se apilan
                   debajo y el de discapacidad cae en tramos algo más altos.
                 </p>
+                )}
                 </div>
               </div>
             </>
@@ -433,17 +535,16 @@ export default function EstimacionDeduccionDiscapacidadPage() {
               <h4>Trabajador con discapacidad del 40{PCT}</h4>
             </div>
             <div className={styles.escenarioExample}>
-              <p>Salario bruto: {formatCurrency(28000)}/año.</p>
-              <p>Mínimo: {formatCurrency(D.discapacidad33a65)}. Sin asistencia de terceros.</p>
-              <p><strong>Ahorro por el mínimo: {formatCurrency(AHORRO_33)}/año</strong> (el mínimo cae entero en el tramo del 19{PCT})</p>
+              <p>Salario bruto: {formatCurrency(SALARIO_EJEMPLO)}/año. Sin asistencia de terceros.</p>
+              <p>Mínimo: {formatCurrency(D.discapacidad33a65)}. Gastos del trabajo: +{formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.general)} (art. 19.2.f).</p>
+              <p>Ahorro por el mínimo: {formatCurrency(EJEMPLO_TRABAJADOR?.ahorroMinimo ?? AHORRO_33)} (tramo del 19{PCT}) · por los gastos: {formatCurrency(EJEMPLO_TRABAJADOR?.ahorroIncrementoGastos ?? 0)} (bajan la base en el tramo del 30{PCT})</p>
+              <p><strong>Ahorro total: {formatCurrency(EJEMPLO_TRABAJADOR?.ahorroTotal ?? AHORRO_33)}/año</strong></p>
             </div>
             <div className={styles.escenarioTip}>
-              Esta herramienta solo calcula el mínimo. Como trabajador activo con discapacidad,
-              el art. 19.2.f LIRPF le sube además los gastos deducibles del trabajo en{' '}
-              {formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.general)} al año
-              ({formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.asistenciaO65)} con
-              ayuda de terceros, movilidad reducida o grado ≥ 65{PCT}), y ese incremento sí reduce
-              la base y se valora a su tipo marginal. Revisa también las deducciones autonómicas.
+              Marca «Trabajo por cuenta ajena» e indica tu salario para calcular tu caso. Con ayuda
+              de terceros, movilidad reducida o grado ≥ 65{PCT}, el incremento de gastos es
+              de {formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.asistenciaO65)}. Revisa
+              también las deducciones autonómicas.
             </div>
           </div>
 
@@ -609,13 +710,13 @@ export default function EstimacionDeduccionDiscapacidadPage() {
               completa (otros mínimos, reducciones, deducciones autonómicas y situación familiar).
             </li>
             <li>
-              <strong>Solo el mínimo por discapacidad:</strong> no incluye el incremento de gastos
-              deducibles para trabajadores activos con discapacidad (art. 19.2.f LIRPF:{' '}
-              {formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.general)} al año, o{' '}
-              {formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.asistenciaO65)} con
-              ayuda de terceros, movilidad reducida o grado ≥ 65{PCT}), la
-              deducción por descendiente o ascendiente con discapacidad a cargo (art. 81 bis), ni
-              las deducciones autonómicas por discapacidad, que varían según la CCAA.
+              <strong>Gastos del trabajo, solo con tu salario:</strong> el incremento del art.
+              19.2.f LIRPF ({formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.general)} al
+              año, o {formatCurrency(INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025.asistenciaO65)} con
+              ayuda de terceros, movilidad reducida o grado ≥ 65{PCT}) se suma si marcas que
+              trabajas por cuenta ajena e indicas tu salario, y supone que es tu única renta. No
+              incluye la deducción por descendiente o ascendiente con discapacidad a cargo (art. 81
+              bis) ni las deducciones autonómicas por discapacidad, que varían según la CCAA.
             </li>
             <li>
               <strong>Base suficiente:</strong> el ahorro se calcula apilando este mínimo sobre el

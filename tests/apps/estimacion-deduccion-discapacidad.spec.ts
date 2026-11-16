@@ -346,25 +346,79 @@ test('REPARADO · tabla y ejemplos salen de data/fiscal y del motor, no de liter
   expect(body).toMatch(/Ahorro por el mínimo: 570,00/);
 });
 
-test('REPARADO · el ejemplo del trabajador y las limitaciones dan las cifras del art. 19.2.f (3.500 / 7.750 €)', async ({ page }) => {
-  // Parte del hallazgo 4786. El usuario decidió el 15/11/2026 (cabo C0770) mostrar las cifras
-  // del art. 19.2.f, leídas ese día en el BOE: +3.500 €/año para el trabajador activo con
-  // discapacidad y +7.750 € con ayuda de terceros, movilidad reducida o grado ≥ 65 %. Salen de
-  // INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025 (data/fiscal/irpf.ts). La app sigue sin
-  // calcularlas: las nombra en el consejo del ejemplo y en el recuadro de limitaciones.
+test('REPARADO · el ejemplo del trabajador SUMA el art. 19.2.f: 570 + 1.050 = 1.620,00 €', async ({ page }) => {
+  // Hallazgo 4786. El 15/11/2026 (cabo C0770) se mostraron las cifras del art. 19.2.f, leídas en
+  // el BOE: +3.500 €/año para el trabajador activo con discapacidad y +7.750 € con ayuda de
+  // terceros, movilidad reducida o grado ≥ 65 % (INCREMENTO_GASTOS_TRABAJO_DISCAPACIDAD_2025).
+  // El 16/11/2026 el usuario decidió calcularlas (opción A, cabo C0796): el ejemplo da ahora el
+  // ahorro total del CASO 7 (1.620,00 €) y las limitaciones dicen que se suma con el salario.
+  const body = limpiar((await page.locator('body').textContent()) ?? '');
+  expect(body).toContain('por los gastos: 1050,00 €');
+  expect(body).toContain('Ahorro total: 1620,00 €/año');
   // El div más interior con ese texto es el último en orden de documento (los ancestros van antes).
-  const consejo = page.locator('div').filter({ hasText: 'Esta herramienta solo calcula el mínimo' }).last();
-  await expect(consejo).toContainText(/3500,00\s€ al año/);
-  await expect(consejo).toContainText(/7750,00\s€ con/);
+  const consejo = page.locator('div').filter({ hasText: 'Marca «Trabajo por cuenta ajena»' }).last();
+  await expect(consejo).toContainText(/7750,00\s€/);
   // Va dentro de la sección educativa colapsada, fuera del árbol accesible: se busca el <li>.
-  const limitaciones = page.locator('li').filter({ hasText: 'Solo el mínimo por discapacidad' });
-  await expect(limitaciones).toContainText(/art\. 19\.2\.f LIRPF: 3500,00\s€ al año, o 7750,00\s€/);
+  const limitaciones = page.locator('li').filter({ hasText: 'Gastos del trabajo, solo con tu salario' });
+  await expect(limitaciones).toContainText(/art\.\s+19\.2\.f LIRPF \(3500,00\s€ al\s+año, o 7750,00\s€/);
+});
+
+test('CASO 7 · trabajador activo, grado 40 %, 28.000 € brutos: 1.620,00 € (mínimo + art. 19.2.f)', async ({ page }) => {
+  // Hallazgo 4786, a mano con data/fiscal (COTIZACIONES_SS_2025 6,48 %, TRAMOS_IRPF_2025):
+  //   SS = 28.000 × 6,48 % = 1.814,40 → previo 26.185,60 → reducción art. 20 = 0 (≥ 19.747,5)
+  //   sin discapacidad: base 26.185,60 − 2.000 = 24.185,60; escala(24.185,60) − escala(5.550)
+  //                     = 5.421,18 − 1.054,50 = 4.366,68 €
+  //   con ella: gastos 2.000 + 3.500 → base 20.685,60; mínimo 5.550 + 3.000 = 8.550
+  //             escala(20.685,60) − escala(8.550) = 4.371,18 − 1.624,50 = 2.746,68 €
+  //   ahorro = 1.620,00 € = 570,00 (3.000 × 19 %) + 1.050,00 (3.500 × 30 %, la base baja dentro
+  //   del tramo de 20.200 a 35.200).
+  await page.getByRole('checkbox', { name: /Trabajo por cuenta ajena/ }).check();
+  await page.getByLabel('Salario bruto anual').fill('28.000');
+  await estimar(page, { grado: 'Del 33 % al 64 %' });
+
+  expect(await fila(page, 'Incremento de gastos (art. 19.2.f)')).toBe('3500,00 €');
+  expect(await fila(page, 'Ahorro por el mínimo')).toBe('570,00 €');
+  expect(await fila(page, 'Ahorro por los gastos del trabajo')).toBe('1050,00 €');
+  expect(await ahorro(page)).toBe('1620,00 €');
+  const nota = limpiar((await page.locator('css=div[role="note"]').last().textContent()) ?? '');
+  expect(nota).toContain('24.185,60 €');
+  expect(nota).toContain('20.685,60 €');
+});
+
+test('CASO 8 · trabajador activo con grado ≥ 65 %: +7.750 € de gastos y la base no llega al mínimo', async ({ page }) => {
+  // 28.000 € brutos, grado ≥ 65 % (los 3.000 € de asistencia y los 7.750 € del 19.2.f salen del grado):
+  //   sin discapacidad: cuota 4.366,68 € (CASO 7)
+  //   solo el mínimo (12.000 €): escala(24.185,60) − escala(17.550) = 5.421,18 − 3.589,50 = 1.831,68
+  //     → ahorro del mínimo = 4.366,68 − 1.831,68 = 2.535,00 €
+  //   con los gastos: base 26.185,60 − 2.000 − 7.750 = 16.435,60 < mínimo 17.550 → cuota 0,00 €
+  //     → ahorro de los gastos = 1.831,68 €; total = 4.366,68 € (toda la cuota íntegra)
+  await page.getByRole('checkbox', { name: /Trabajo por cuenta ajena/ }).check();
+  await page.getByLabel('Salario bruto anual').fill('28000');
+  await estimar(page, { grado: '65 % o superior' });
+
+  expect(await fila(page, 'Incremento de gastos (art. 19.2.f)')).toBe('7750,00 €');
+  expect(await fila(page, 'Ahorro por el mínimo')).toBe('2535,00 €');
+  expect(await fila(page, 'Ahorro por los gastos del trabajo')).toBe('1831,68 €');
+  expect(await ahorro(page)).toBe('4366,68 €');
+});
+
+test('CASO 9 · sin salario no se calcula el trabajador, y con un familiar no se pregunta', async ({ page }) => {
+  await page.getByRole('checkbox', { name: /Trabajo por cuenta ajena/ }).check();
+  await estimar(page, { grado: 'Del 33 % al 64 %' });
+  await expect(page.getByText('Indica tu salario bruto anual')).toBeVisible();
+  await expect(page.getByText('Ahorro fiscal estimado')).toHaveCount(0);
+  // El art. 19.2.f es del trabajador con discapacidad: con un hijo o un padre como titular no aplica.
+  await page.getByRole('radio', { name: 'Un descendiente (hijo/a)' }).check();
+  await expect(page.getByRole('checkbox', { name: /Trabajo por cuenta ajena/ })).toHaveCount(0);
+  await estimar(page, {});
+  expect(await ahorro(page)).toBe('570,00 €');
 });
 
 test('ABIERTO · la app calla el importe de la deducción del art. 81 bis (1.200 €)', async ({ page }) => {
-  // Sigue abierto tras /reparar del 15/11/2026: el art. 81 bis no se pudo leer en la fuente
-  // (el texto consolidado del BOE se corta antes de él), y sin fuente consultada no se escribe
-  // la cifra. La del art. 19.2.f, que este caso también pedía, está en el test de arriba.
+  // Sigue abierto: el art. 81 bis no se pudo leer en la fuente (el texto consolidado del BOE se
+  // corta antes de él), y sin fuente consultada no se escribe la cifra. El 16/11/2026 el usuario
+  // eligió calcular el art. 19.2.f (CASO 7) y nombrar el 81 bis sin cifra; la cifra pasa a un
+  // cabo fiscal. La parte del 19.2.f del hallazgo 4786 está reparada (casos 7 y 8).
   // El ejemplo «Trabajador con discapacidad del 40 %, salario bruto 28.000 €» da «Ahorro: 570 €»,
   // y el recuadro de limitaciones solo excluye las deducciones autonómicas. Con data/fiscal
   // (COTIZACIONES_SS_2025: 6,48 % → 1.814,40 €; art. 20: 0; gastos 2.000 €; TRAMOS_IRPF_2025):

@@ -7,10 +7,14 @@ import { calcularDeduccionDiscapacidadIRPF } from '@/lib/calculadoras/deduccionD
 // Hallazgo 4780 (15/11/2026): la respuesta del ahorro sale del motor, no de un tipo marginal.
 const MAXIMO = calcularDeduccionDiscapacidadIRPF({ titular: 'contribuyente', grado: '65oMas' });
 const BASE_MINIMA = MINIMOS_IRPF_2025.personal + MAXIMO.totalMinimo;
+// Hallazgo 4786: el trabajador activo suma el art. 19.2.f (28.000 € brutos, grado 40 %).
+const TRABAJADOR = calcularDeduccionDiscapacidadIRPF({
+  titular: 'contribuyente', grado: '33a65', salarioBrutoTrabajadorActivo: 28000,
+}).trabajoActivo;
 
 export const metadata: Metadata = {
   title: 'Estimación de Deducción IRPF por Discapacidad - Mínimos Personales | meskeIA',
-  description: 'Estima el ahorro fiscal en IRPF por mínimos de discapacidad del contribuyente, ascendientes o descendientes. Incluye gastos de asistencia y requisitos 2025.',
+  description: 'Estima el ahorro fiscal en IRPF por mínimos de discapacidad del contribuyente, ascendientes o descendientes, y por el incremento de gastos del trabajador activo. Incluye gastos de asistencia y requisitos 2025.',
   keywords: 'deduccion IRPF discapacidad, minimo discapacidad IRPF, ahorro fiscal discapacidad, IRPF dependencia, minimo ascendiente discapacidad, gastos asistencia IRPF',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -49,6 +53,7 @@ export const jsonLd = generateWebAppSchema({
     'Gastos de asistencia adicionales',
     'Ahorro en cuota con el mínimo gravado a tipo cero (art. 63.1.2.º LIRPF)',
     'Incremento por asistencia automático con grado igual o superior al 65 %',
+    'Incremento de gastos del trabajo para trabajadores activos (art. 19.2.f LIRPF) calculado con el salario',
     'Datos actualizados IRPF 2025',
   ],
 });
@@ -86,7 +91,7 @@ export const faqJsonLd = {
       name: '¿Cuánto dinero me puedo ahorrar en la declaración de la renta por discapacidad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El ahorro no depende de tu tipo marginal: el mínimo se grava a tipo cero (art. 63.1.2.º LIRPF) y se valora en los tramos bajos de la escala, encima del mínimo personal. Con un grado del 65 % o más, el mínimo total es de ${formatCurrency(MAXIMO.totalMinimo)} (incluidos los gastos de asistencia) y ahorra ${formatCurrency(MAXIMO.ahorroEstimado)} en la cuota, siempre que tu base liquidable general llegue al menos a ${formatCurrency(BASE_MINIMA)}; con menos base el ahorro es menor. La herramienta calcula el ahorro de tu caso según el grado y quién tiene la discapacidad.`,
+        text: `El ahorro no depende de tu tipo marginal: el mínimo se grava a tipo cero (art. 63.1.2.º LIRPF) y se valora en los tramos bajos de la escala, encima del mínimo personal. Con un grado del 65 % o más, el mínimo total es de ${formatCurrency(MAXIMO.totalMinimo)} (incluidos los gastos de asistencia) y ahorra ${formatCurrency(MAXIMO.ahorroEstimado)} en la cuota, siempre que tu base liquidable general llegue al menos a ${formatCurrency(BASE_MINIMA)}; con menos base el ahorro es menor. Si además trabajas por cuenta ajena, el art. 19.2.f sube tus gastos deducibles en 3.500 € (7.750 € con ayuda de terceros, movilidad reducida o grado del 65 % o más), y ese incremento sí reduce la base: con 28.000 € brutos y un grado del 40 %, el ahorro total es de ${formatCurrency(TRABAJADOR?.ahorroTotal ?? 0)} (${formatCurrency(TRABAJADOR?.ahorroMinimo ?? 0)} del mínimo y ${formatCurrency(TRABAJADOR?.ahorroIncrementoGastos ?? 0)} de los gastos). La herramienta calcula el ahorro de tu caso según el grado, quién tiene la discapacidad y, si trabajas, tu salario.`,
       },
     },
     {
