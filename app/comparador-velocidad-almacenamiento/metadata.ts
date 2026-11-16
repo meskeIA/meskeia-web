@@ -61,7 +61,7 @@ const faqSchema = generateFAQSchema({
     },
     {
       question: '¿Por qué el USB 3.0 es mucho más lento que su velocidad teórica de 5 Gbps?',
-      answer: 'El USB 3.0 tiene 5 Gbps teóricos (625 MB/s), pero en la práctica rara vez supera 380-400 MB/s por varios motivos: overhead del protocolo USB (~20%), latencias del controlador, limitaciones del almacenamiento flash interno del pendrive y la calidad del cable. Los pendrives USB 3.0 económicos pueden limitarse a 100-150 MB/s por su memoria flash de bajo coste.',
+      answer: 'El USB 3.0 tiene 5 Gbps de señal, pero su codificación 8b/10b dedica 2 de cada 10 bits a la propia línea, así que el techo de datos es de 500 MB/s (no 625). En la práctica rara vez supera 380-400 MB/s por varios motivos: el resto del protocolo USB, latencias del controlador, limitaciones del almacenamiento flash interno del pendrive y la calidad del cable. Los pendrives USB 3.0 económicos pueden limitarse a 100-150 MB/s por su memoria flash de bajo coste.',
     },
     {
       question: '¿Qué diferencia hay entre NVMe Gen 3 y Gen 4?',

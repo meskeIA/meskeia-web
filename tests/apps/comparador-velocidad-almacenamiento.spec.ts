@@ -347,26 +347,27 @@ test.describe('Móvil (Pixel 7)', () => {
     expect(recortados).toEqual([]);
   });
 
-  test('HALLAZGO (16/11/2026, ABIERTO) · «SSD NVMe Gen 4» y «SSD NVMe Gen 3» se recortan los dos a «SSD NVMe Ge…»', async ({ page }) => {
-    // ABIERTO: con 412 px la columna del nombre mide 130 px (`grid-template-columns: 130px 1fr
-    // 90px`) y .chartNombre lleva `text-overflow: ellipsis`: 96 de 101 px. Las dos filas más
-    // rápidas del interno se leen igual; también se recortan USB4, USB 3.0 y la tarjeta SD.
-    test.fail();
-    const recortados = await page.locator(`${GRAFICO} [class$="_chartNombre"]`).evaluateAll((els) =>
+  test('HALLAZGO 4889 (REPARADO) · ningún nombre de tecnología se recorta en móvil', async ({ page }) => {
+    // REPARADO: con 412 px la columna del nombre medía 130 px (`grid-template-columns: 130px 1fr
+    // 90px`) y .chartNombre lleva `text-overflow: ellipsis`: 96 de 101 px. «SSD NVMe Gen 4» y
+    // «SSD NVMe Gen 3» se leían igual («SSD NVMe Ge…»); también USB4, USB 3.0 y la tarjeta SD.
+    // Ahora, por debajo de 560 px, el nombre va en su propia línea a todo el ancho.
+    const nombres = page.locator(`${GRAFICO} [class$="_chartNombre"]`);
+    await expect(nombres).toHaveCount(10);
+    const recortados = await nombres.evaluateAll((els) =>
       els.filter((e) => e.scrollWidth > e.clientWidth).map((e) => e.textContent),
     );
-    expect(recortados).not.toContain('SSD NVMe Gen 4');
-    expect(recortados).not.toContain('SSD NVMe Gen 3');
+    expect(recortados).toEqual([]);
   });
 });
 
 test.describe('Hallazgos de accesibilidad (16/11/2026)', () => {
   for (const tema of ['light', 'dark'] as const) {
-    test(`HALLAZGO (16/11/2026, ABIERTO) · la categoría de cada fila llega a 4,5:1 (tema ${tema})`, async ({ page }) => {
-      // ABIERTO: CATEGORIAS[].color por style={{ color }}, texto de 11,2 px seminegrita. Medido:
+    test(`HALLAZGO 4890 (REPARADO) · la categoría de cada fila llega a 4,5:1 (tema ${tema})`, async ({ page }) => {
+      // REPARADO: CATEGORIAS[].color iba por style={{ color }}, texto de 11,2 px seminegrita. Medido:
       // claro «Almacenamiento interno» #2E86AB 4,11:1 y «USB / Externo» #16A34A 3,30:1; oscuro
       // (#2A2A2A) 3,50 · 4,36 · «Móvil (interno)» #B91C1C 2,22 · «Tarjeta SD/Flash» #92400E 2,02.
-      test.fail();
+      // Ahora cada categoría toma su token -texto (--primary-, --verde-, --rojo-, --ambar-texto).
       await esperarPaginaAsentada(page);
       await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
       await esperarPaginaAsentada(page);
@@ -401,15 +402,21 @@ test.describe('Hallazgos de accesibilidad (16/11/2026)', () => {
 });
 
 test.describe('Hallazgos de contenido (16/11/2026)', () => {
-  test('HALLAZGO (16/11/2026, ABIERTO) · «los valores teóricos pueden ser hasta un 30% más altos» no cubre las cifras de la propia app', async ({ page }) => {
-    // ABIERTO: la FAQ visible da USB 3.0 «5 Gb/s = 625 MB/s teórico» frente a ~380 reales (+64 %) y
+  test('HALLAZGO 4893 (REPARADO) · la nota del gráfico ya no promete «hasta un 30%» y da techos que cuadran con la app', async ({ page }) => {
+    // REPARADO: la FAQ visible daba USB 3.0 «5 Gb/s = 625 MB/s teórico» frente a ~380 reales (+64 %) y
     // USB4 «~5.000 MB/s teórico» frente a 3.500 (+43 %); USB 2.0, 480 Mb/s / 8 = 60 MB/s frente a
-    // 35 (+71 %). Aun con la codificación de línea (USB4 128b/132b: 4.848 MB/s) queda en +39 %:
-    // si la nota da un tope, que sea de al menos el 39 %.
-    test.fail();
+    // 35 (+71 %). Aun con la codificación de línea (USB4 128b/132b: 4.848 MB/s) queda en +39 %.
+    // Ahora la nota no da tope y pone dos ejemplos: USB 2.0, 480 / 8 = 60 MB/s; USB 3.0, 5 Gb/s ×
+    // 8/10 (8b/10b) / 8 = 500 MB/s de datos, el mismo descuento que la app ya hacía en SATA III.
     const nota = (await page.locator(GRAFICO).getByText(/Velocidades reales medias/).textContent()) ?? '';
-    const m = nota.match(/hasta un (\d+)\s*%/);
-    if (m) expect(Number(m[1]), nota).toBeGreaterThanOrEqual(39);
+    expect(nota).not.toMatch(/hasta un \d+\s*%/);
+    expect(nota).toMatch(/60 MB\/s en USB 2\.0 frente a ~35/);
+    expect(nota).toMatch(/500 MB\/s de datos en USB 3\.0 frente a ~380/);
+    // La FAQ visible y la de errores ya no presentan 625 MB/s como techo teórico a secas.
+    await expect(page.getByText(/5 Gb\/s = 625 MB\/s/)).toHaveCount(0);
+    const faq = await respuestaFaqPage(page, /USB 3\.0 es mucho más lento/);
+    expect(faq).toContain('500 MB/s');
+    expect(faq).not.toMatch(/\(625 MB\/s\)/);
   });
 
   test('HALLAZGO (16/11/2026, ABIERTO) · la guía dice que cada cuarto del slider multiplica por ~1.000 (es ×31,6)', async ({ page }) => {

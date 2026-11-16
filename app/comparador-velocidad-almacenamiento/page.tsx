@@ -151,6 +151,16 @@ const CATEGORIAS: Record<Categoria, { nombre: string; color: string }> = {
   tarjeta:  { nombre: 'Tarjeta SD/Flash',        color: '#92400E' },
 };
 
+// El texto de la categoría no usa CATEGORIAS[].color (solo sirve para el punto de la leyenda):
+// por style={{ color }} no llegaba a 4,5:1 y en oscuro bajaba a 2,02:1 (hallazgo 4890). Cada
+// clase toma un token -texto que cambia con el tema.
+const CLASE_TEXTO_CATEGORIA: Record<Categoria, string> = {
+  interno: styles.catInterno,
+  usb: styles.catUsb,
+  movil: styles.catMovil,
+  tarjeta: styles.catTarjeta,
+};
+
 interface Preset {
   nombre: string;
   emoji: string;
@@ -343,10 +353,7 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
                 <span className={styles.chartIcono} aria-hidden="true">{r.icono}</span>
                 <div className={styles.chartNombreWrap}>
                   <span className={styles.chartNombre}>{r.nombre}</span>
-                  <span
-                    className={styles.chartCategoria}
-                    style={{ color: CATEGORIAS[r.categoria].color }}
-                  >
+                  <span className={`${CLASE_TEXTO_CATEGORIA[r.categoria]} ${styles.chartCategoria}`}>
                     {CATEGORIAS[r.categoria].nombre}
                   </span>
                 </div>
@@ -372,7 +379,8 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
         </div>
 
         <p className={styles.chartNota}>
-          ⓘ Velocidades reales medias — los valores teóricos pueden ser hasta un 30% más altos.
+          ⓘ Velocidades reales medias, por debajo del máximo teórico de cada interfaz: por ejemplo,
+          60 MB/s en USB 2.0 frente a ~35 reales, o 500 MB/s de datos en USB 3.0 frente a ~380.
           Los tiempos incluyen solo la transferencia pura, sin latencias de inicio.
         </p>
       </section>
@@ -572,8 +580,9 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
               <h4><span aria-hidden="true">❓</span> ¿Qué significa «velocidad real» vs «velocidad teórica»?</h4>
               <p>
                 La velocidad teórica (o ancho de banda máximo) es el límite físico del bus de comunicación:
-                USB 3.0 tiene 5 Gb/s = 625 MB/s teórico. La velocidad real es lo que se logra en la práctica
-                tras descontar el overhead del protocolo (~20% en USB), las limitaciones del controlador,
+                USB 3.0 tiene 5 Gb/s de señal y, como su codificación 8b/10b dedica 2 de cada 10 bits a la
+                propia línea, un techo de 500 MB/s de datos (625 si se cuentan esos bits). La velocidad real
+                es lo que se logra en la práctica tras descontar el resto del protocolo, las limitaciones del controlador,
                 la velocidad de la memoria flash del dispositivo, la calidad del cable y el comportamiento
                 de escritura aleatorio vs secuencial. El USB 3.0 raramente supera 380-400 MB/s en condiciones ideales.
               </p>
@@ -581,7 +590,7 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Por qué el NVMe Gen 4 es casi tan rápido como USB4/Thunderbolt conectado externamente?</h4>
               <p>
-                USB4 y Thunderbolt 4 tienen 40 Gb/s de ancho de banda, lo que permite ~5.000 MB/s teórico.
+                USB4 y Thunderbolt 4 tienen 40 Gb/s de ancho de banda; con la codificación 128b/132b de USB4, unos 4.800 MB/s de datos teóricos.
                 Pero los SSD externos más rápidos del mercado están limitados por sus propios controladores
                 a ~3.000-4.000 MB/s. Además, en la práctica hay overhead de encapsulamiento USB4 sobre
                 el protocolo NVMe. El resultado es que un buen NVMe externo TB4 se aproxima pero no supera
@@ -701,7 +710,7 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
               <h2>Errores frecuentes al comparar velocidades</h2>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>Comparar velocidades teóricas con reales:</strong> "USB 3.0 tiene 5 Gbps" equivale a 625 MB/s, pero la velocidad real es ~380 MB/s. Siempre busca benchmarks reales, no la velocidad del bus.</li>
+              <li><strong>Comparar velocidades teóricas con reales:</strong> "USB 3.0 tiene 5 Gbps" equivale a 500 MB/s de datos (625 si se cuentan los bits de la codificación 8b/10b), pero la velocidad real es ~380 MB/s. Siempre busca benchmarks reales, no la velocidad del bus.</li>
               <li><strong>Creer que más MB/s siempre se nota:</strong> Pasar de SSD SATA (550 MB/s) a NVMe Gen 4 (7.000 MB/s) no mejora la velocidad de navegación web ni la apertura de documentos. Solo se nota en cargas de trabajo con archivos muy grandes o I/O intensivo.</li>
               <li><strong>No verificar la generación de NVMe:</strong> Una placa con ranura M.2 no garantiza PCIe 4.0. Muchos portátiles con ranura M.2 solo soportan PCIe 3.0 o incluso SATA. Un NVMe Gen 4 en una ranura PCIe 3.0 operará a velocidades Gen 3.</li>
               <li><strong>Confundir velocidad de lectura del SSD con velocidad de copia:</strong> Al copiar de un SSD a otro, el cuello de botella está en el más lento y en el bus de conexión. Copiar de un NVMe a un USB 2.0 está limitado por el USB 2.0, no por el NVMe.</li>

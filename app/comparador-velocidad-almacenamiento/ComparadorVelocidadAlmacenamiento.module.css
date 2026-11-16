@@ -305,6 +305,23 @@
   text-overflow: ellipsis;
 }
 
+/* Color del texto de cada categoría: tokens -texto, que cambian con el tema (hallazgo 4890). */
+.catInterno {
+  color: var(--primary-texto, #26718F);
+}
+
+.catUsb {
+  color: var(--verde-texto, #136E35);
+}
+
+.catMovil {
+  color: var(--rojo-texto, #B91C1C);
+}
+
+.catTarjeta {
+  color: var(--ambar-texto, #8A5A00);
+}
+
 .chartBarWrap {
   background: rgba(46, 134, 171, 0.08);
   border-radius: 4px;
@@ -738,9 +755,20 @@
 }
 
 @media (max-width: 560px) {
+  /* En móvil el nombre ocupa su propia línea, entero: en 130 px «SSD NVMe Gen 4» y «SSD NVMe
+     Gen 3» se recortaban los dos a «SSD NVMe Ge…» (hallazgo 4889). Debajo, barra y tiempo. */
   .chartRow {
-    grid-template-columns: 130px 1fr 90px;
+    grid-template-columns: 1fr 90px;
     gap: 0.4rem;
+  }
+
+  .chartRowLabel {
+    grid-column: 1 / -1;
+  }
+
+  .chartNombre,
+  .chartCategoria {
+    white-space: normal;
   }
 
   .presetsRow {
