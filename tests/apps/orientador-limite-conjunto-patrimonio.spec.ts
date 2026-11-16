@@ -153,16 +153,31 @@ test.describe('Art. 31 Ley 19/1991: casos resueltos a mano', () => {
 });
 
 test.describe('Hallazgos de la inspección del 16/11/2026', () => {
-  test('HALLAZGO (16/11/2026, ABIERTO) · la pista de la base imponible no excluye la ganancia a más de un año (art. 31.Uno.a)', async ({ page }) => {
+  test('REPARADO (hallazgo 4877) · la pista de la base imponible no excluía la ganancia a más de un año (art. 31.Uno.a)', async ({ page }) => {
     // Base general 20.000 y una ganancia de 400.000 € por un inmueble con 10 años. Siguiendo la pista
-    // («Suma de la base general + base del ahorro»): BI 420.000 e IRPF 3.123 + 101.880 (escala del
-    // ahorro de data/fiscal) = 105.003 → la app dice «no se activa». Con el art. 31.Uno.a: BI 20.000,
-    // IRPF 3.123 → reducción 21.123 € (CASO 2e). La pista tiene que advertir de la exclusión.
-    test.fail();
+    // vieja («Suma de la base general + base del ahorro»): BI 420.000 e IRPF 3.123 + 101.880 (escala
+    // del ahorro de data/fiscal) = 105.003 → la app dice «no se activa». Con el art. 31.Uno.a: BI
+    // 20.000, IRPF 3.123 → reducción 21.123 € (CASO 2e). La pista, el panel y la FAQ lo advierten.
     await comprobar(page, { ccaa: 'aragon', bi: '420.000', irpf: '105.003', ip: '30.000' });
     await expect(resultado(page)).toContainText('La reducción no se activa en tu caso');
     const pista = page.locator(`${BI} ~ span`);
     await expect(pista).toContainText(/ganancias/i);
+    await expect(pista).toContainText('más de un año');
+    await expect(page.locator('main').getByText(/art\. 31\.Uno\.a/).first()).toBeVisible();
+  });
+
+  test('REPARADO (hallazgo 4885) · «¿Qué es el límite conjunto?» tiene UNA respuesta para la FAQ visible y el FAQPage', async ({ page }) => {
+    interface Pregunta { name: string; acceptedAnswer: { text: string } }
+    interface BloqueLd { '@type'?: string; mainEntity?: Pregunta[] }
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.map((b) => JSON.parse(b) as BloqueLd).find((j) => j['@type'] === 'FAQPage');
+    const pregunta = faq?.mainEntity?.find((q) => /Qué es el límite conjunto/.test(q.name));
+    const visible = await page
+      .locator('h4', { hasText: '¿Qué es exactamente el límite conjunto IRPF-Patrimonio?' })
+      .locator('xpath=following-sibling::p[1]')
+      .textContent();
+    expect(visible).toBe(pregunta?.acceptedAnswer.text);
+    expect(visible).toMatch(/más de un año/);
   });
 
   test('HALLAZGO (16/11/2026, ABIERTO) · con IRPF conjunto la app dice que el cálculo exacto es individual, y la ley acumula (art. 31.Dos)', async ({ page }) => {
@@ -227,9 +242,8 @@ test.describe('Hallazgos de la inspección del 16/11/2026', () => {
     await expect(resultado(page)).toHaveCount(0);
   });
 
-  test('HALLAZGO (16/11/2026, ABIERTO) · la FAQ de buscadores resta «la diferencia» sin el tope del 80 %', async ({ page }) => {
+  test('REPARADO (hallazgo 4884) · la FAQ de buscadores restaba «la diferencia» sin el tope del 80 %', async ({ page }) => {
     // Con BI 5.000, IRPF 0 e IP 20.000 «la diferencia» son 17.000 €; la ley y el motor dan 16.000 (CASO 2c).
-    test.fail();
     interface Pregunta { name: string; acceptedAnswer: { text: string } }
     interface BloqueLd { '@type'?: string; mainEntity?: Pregunta[] }
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { LIMITE_CONJUNTO_PORCENTAJE, TOPE_REDUCCION_PORCENTAJE } from '@/data/fiscal';
 
 export const metadata: Metadata = {
   title: 'Orientador Límite Conjunto IRPF-Patrimonio (Art. 31) | meskeIA',
@@ -46,6 +47,22 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['Patrimonio España', 'límite conjunto IRPF', 'Art. 31 Ley 19/1991', 'reducción cuota Patrimonio', 'fiscal España'],
 });
 
+const PCT_LIMITE = `${Math.round(LIMITE_CONJUNTO_PORCENTAJE * 100)} %`;
+const PCT_TOPE = `${Math.round(TOPE_REDUCCION_PORCENTAJE * 100)} %`;
+const PCT_MINIMO = `${Math.round((1 - TOPE_REDUCCION_PORCENTAJE) * 100)} %`;
+
+/**
+ * Lo que el art. 31.Uno.a de la Ley 19/1991 deja fuera de la base y de la cuota del IRPF
+ * (hallazgo 4877): quien vende un bien con más de un año y suma la ganancia infla el límite.
+ */
+export const EXCLUSION_GANANCIAS_ART31 =
+  'No cuentan ni la parte de la base del ahorro que procede de ganancias por vender bienes que tenías desde hacía más de un año ni la parte de la cuota del IRPF que corresponde a esas ganancias (art. 31.Uno.a).';
+
+// La pregunta que está en el FAQPage y en la FAQ visible: una sola respuesta (hallazgo 4885,
+// check:faq-unica). Se queda la visible, que dice el mínimo que siempre se paga, con la
+// exclusión del art. 31.Uno.a.
+export const RESPUESTA_FAQ_QUE_ES = `Es una regla del art. 31 de la Ley 19/1991 según la cual la suma de tu cuota íntegra del IRPF más la cuota íntegra del Impuesto sobre el Patrimonio no puede superar el ${PCT_LIMITE} de la suma de las bases imponibles del IRPF. ${EXCLUSION_GANANCIAS_ART31} Si la suma supera el límite, se reduce la cuota de Patrimonio hasta llegar a él, con un tope: la reducción nunca puede exceder del ${PCT_TOPE} de la cuota de Patrimonio (siempre se paga al menos el ${PCT_MINIMO}).`;
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -55,7 +72,7 @@ export const faqJsonLd = {
       name: '¿Qué es el límite conjunto IRPF-Patrimonio del artículo 31?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El artículo 31 de la Ley 19/1991 establece que la suma de las cuotas del IRPF y del Impuesto sobre el Patrimonio no puede superar el 60% de la base imponible general y del ahorro del IRPF. Si se supera ese límite, la cuota del Patrimonio se reduce en el exceso, con un tope máximo del 80% de la cuota original. Es una ventaja fiscal reconocida por ley pero poco conocida entre los contribuyentes.',
+        text: RESPUESTA_FAQ_QUE_ES,
       },
     },
     {
@@ -63,7 +80,8 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula si tengo derecho a la reducción del Impuesto sobre el Patrimonio?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para verificarlo hay que sumar la cuota íntegra del IRPF más la cuota del Impuesto sobre el Patrimonio y comprobar si ese total supera el 60% de la base imponible general y de ahorro del IRPF. Si supera ese umbral, la diferencia se resta de la cuota de Patrimonio. El cálculo preciso requiere datos de ambas declaraciones, por lo que conviene hacerlo con un asesor fiscal.',
+        // Hallazgo 4884: decía «la diferencia se resta» sin el tope del art. 31.Uno.c.
+        text: `Para verificarlo hay que sumar la cuota íntegra del IRPF más la cuota íntegra del Impuesto sobre el Patrimonio y comprobar si ese total supera el ${PCT_LIMITE} de la suma de las bases imponibles del IRPF. ${EXCLUSION_GANANCIAS_ART31} Si supera ese umbral, la diferencia se resta de la cuota de Patrimonio, pero la reducción no puede pasar del ${PCT_TOPE} de esa cuota (art. 31.Uno.c). El cálculo preciso requiere datos de ambas declaraciones, por lo que conviene hacerlo con un asesor fiscal.`,
       },
     },
     {

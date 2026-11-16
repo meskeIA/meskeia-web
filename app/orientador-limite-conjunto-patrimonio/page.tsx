@@ -23,6 +23,7 @@ import {
   type ResultadoOrientacion,
 } from '@/data/fiscal';
 import styles from './OrientadorLimiteConjuntoPatrimonio.module.css';
+import { RESPUESTA_FAQ_QUE_ES, EXCLUSION_GANANCIAS_ART31 } from './metadata';
 
 // ─── Tipos del formulario ─────────────────────────────────────────────────────
 
@@ -175,6 +176,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
             se reduce la cuota de Patrimonio (con un tope: siempre se paga al menos el 20%). Es una posibilidad
             poco conocida que puede ahorrar miles de euros en patrimonios medios-altos con poca renta declarada.
           </p>
+          <p className={styles.panelDesc}>{EXCLUSION_GANANCIAS_ART31}</p>
 
           <div className={styles.comoFuncionaGrid}>
             <div className={styles.comoFuncionaCard}>
@@ -279,7 +281,11 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 onChange={(e) => setCampo('biIrpf', e.target.value)}
                 placeholder="Ej: 50.000"
               />
-              <span className={styles.formHint}>Suma de la base general + base del ahorro.</span>
+              <span className={styles.formHint}>
+                Suma de la base general + base del ahorro, sin las ganancias por vender bienes que tenías desde
+                hacía más de un año (art. 31.Uno.a). Si las hubo, réstalas aquí y quita de la cuota del IRPF la
+                parte que les corresponde.
+              </span>
             </div>
 
             {/* Cuota IRPF */}
@@ -585,13 +591,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
 
             <div className={styles.faqItem}>
               <h4>¿Qué es exactamente el límite conjunto IRPF-Patrimonio?</h4>
-              <p>
-                Es una regla del Art. 31 de la Ley 19/1991 según la cual la suma de tu cuota íntegra de IRPF más
-                la cuota íntegra del Impuesto sobre el Patrimonio no puede superar el 60% de la suma de las bases
-                imponibles del IRPF. Si la supera, se reduce la cuota de Patrimonio hasta llegar al límite, con un
-                tope: la reducción nunca puede exceder del 80% de la cuota de Patrimonio (siempre se paga al menos
-                el 20%).
-              </p>
+              <p>{RESPUESTA_FAQ_QUE_ES}</p>
               <div className={styles.faqTip}>
                 Ejemplo: BI IRPF 100.000 €, cuota IRPF 35.000 €, cuota Patrimonio 40.000 €. Suma 75.000 € &gt; 60% × 100.000 € = 60.000 €. Exceso 15.000 € → reducción aplicable hasta el tope (80% de 40.000 = 32.000). Reducción real: 15.000 €.
               </div>
