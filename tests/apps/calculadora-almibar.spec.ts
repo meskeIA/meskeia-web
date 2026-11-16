@@ -165,21 +165,19 @@ test.describe('Calculadora de almíbar — lo que promete el <h1>', () => {
     }
   });
 
-  test('HALLAZGO · «1.500» es mil quinientos en formato español, no 1,5 g', async ({ page }) => {
-    // ABIERTO: page.tsx parsea con parseFloat(v.replace(',', '.')): «1.500» → 1,5 g → 0,75 → round
-    // = 1 g de azúcar y 1 g de agua; «1.234,5» → «1.234.5» → 1,234 → 1 g y 1 g. El canónico es
+  test('REPARADO (hallazgo 4899) · «1.500» es mil quinientos en formato español, no 1,5 g', async ({ page }) => {
+    // REPARADO: page.tsx parseaba con parseFloat(v.replace(',', '.')): «1.500» → 1,5 g → 0,75 →
+    // round = 1 g de azúcar y 1 g de agua; «1.234,5» → «1.234.5» → 1,234 → 1 g y 1 g. Ahora,
     // parseSpanishNumber de @/lib.
     // Esperado: 1500 / 2 = 750 g + 750 g · 1234,5 / 2 = 617,25 → 617 g + 617 g.
-    test.fail();
     await ponerCantidad(page, '1.500');
     expect(await resultado(page)).toBe('750 g azúcar 750 g agua 50 °Bx concentración (ratio 1:1)');
     await ponerCantidad(page, '1.234,5');
     expect(await resultado(page)).toBe('617 g azúcar 617 g agua 50 °Bx concentración (ratio 1:1)');
   });
 
-  test('HALLAZGO · lo que no es un número se rechaza («12abc», «1e3»)', async ({ page }) => {
-    // ABIERTO: parseFloat se queda con el prefijo: «12abc» → 6 g + 6 g; «1e3» → 500 g + 500 g.
-    test.fail();
+  test('REPARADO (hallazgo 4899) · lo que no es un número se rechaza («12abc», «1e3»)', async ({ page }) => {
+    // REPARADO: parseFloat se quedaba con el prefijo: «12abc» → 6 g + 6 g; «1e3» → 500 g + 500 g.
     for (const basura of ['12abc', '1e3']) {
       await ponerCantidad(page, basura);
       expect(await resultado(page), `«${basura}» no debería producir resultado`).toBeNull();

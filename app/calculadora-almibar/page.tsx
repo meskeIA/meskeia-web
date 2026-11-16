@@ -5,14 +5,19 @@ import { useMemo, useState } from 'react';
 import styles from './CalculadoraAlmibar.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import { USOS_ALMIBAR, USO_ALMIBAR_POR_ID, calcularAlmibar } from '@/lib/calculadoras/almibar';
-import { formatNumber } from '@/lib/formatters';
+import { formatNumber, parseSpanishNumber } from '@/lib/formatters';
 
 export default function CalculadoraAlmibarPage() {
   const [usoId, setUsoId] = useState('medio');
   const [cantidad, setCantidad] = useState('300');
 
   const uso = USO_ALMIBAR_POR_ID[usoId];
-  const num = (v: string) => parseFloat(v.replace(',', '.')) || 0;
+  // Hallazgo 4899: el parseo casero con parseFloat leía «1.500» como 1,5 g y aceptaba «12abc».
+  // parseSpanishNumber da NaN en lo que no es un número, y 0 hace que no haya resultado.
+  const num = (v: string) => {
+    const n = parseSpanishNumber(v);
+    return Number.isNaN(n) ? 0 : n;
+  };
   const resultado = useMemo(
     () => calcularAlmibar(uso.azucar, uso.agua, num(cantidad)),
     [uso, cantidad],
