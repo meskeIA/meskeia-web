@@ -43,11 +43,13 @@ const BANCO_PREGUNTAS: PreguntaAlgo[] = [
     opciones: [
       'El tiempo exacto de ejecución en segundos',
       'El mejor caso de un algoritmo',
-      'El crecimiento del tiempo/espacio en función del tamaño de la entrada (caso peor)',
+      'El crecimiento del tiempo/espacio en función del tamaño de la entrada (una cota superior)',
       'El número de líneas de código',
     ],
     correcta: 2,
-    explicacion: 'Big O describe el comportamiento asintótico en el peor caso. No mide tiempo real (depende del hardware), sino cómo crece el recurso (tiempo o espacio) cuando n → ∞. Ignoramos constantes y términos de menor orden.',
+    // Hallazgo 3681: Big O es una cota superior asintótica de una función y vale para cualquier
+    // caso (Cormen et al., Introduction to Algorithms, cap. 3); antes decía «el peor caso».
+    explicacion: 'Big O da una cota superior asintótica: cómo crece, como mucho, el recurso (tiempo o espacio) cuando n → ∞. No está atada a un caso: se puede dar para el peor (Merge Sort, O(n log n)), el medio (Quicksort, O(n log n)) o el mejor (Insertion Sort con datos ya ordenados, O(n)); si no se dice el caso, por costumbre se entiende el peor. No mide tiempo real (depende del hardware) e ignora constantes y términos de menor orden (Cormen et al., «Introduction to Algorithms», cap. 3).',
   },
   {
     id: 2,
@@ -202,7 +204,8 @@ const BANCO_PREGUNTAS: PreguntaAlgo[] = [
     codigo: 'def fibonacci(n):\n    if n <= 1: return n\n    return fibonacci(n-1) + fibonacci(n-2)',
     opciones: ['O(n)', 'O(n log n)', 'O(n²)', 'O(2ⁿ)'],
     correcta: 3,
-    explicacion: 'Cada llamada genera 2 llamadas más. El árbol de recursión tiene profundidad n y ~2ⁿ nodos. Para n=40 ya son ~1.000 millones de llamadas. Solución: memoización reduce a O(n), programación dinámica iterativa también O(n).',
+    // Hallazgo 3682: el número exacto de llamadas es C(n) = 1 + C(n−1) + C(n−2) = 2·F(n+1) − 1.
+    explicacion: 'Cada llamada genera hasta 2 llamadas más, así que O(2ⁿ) es una cota superior válida. El número exacto de llamadas es 2·F(n+1) − 1, que crece como φⁿ (φ ≈ 1,618): la cota ajustada es Θ(φⁿ), algo menos que 2ⁿ. Para n = 40 son 331.160.281 llamadas. Solución: memoización reduce a O(n), programación dinámica iterativa también O(n).',
   },
   {
     id: 19,
@@ -293,6 +296,29 @@ const BANCO_PREGUNTAS: PreguntaAlgo[] = [
 
 const TODAS_CATEGORIAS = Object.keys(ETIQUETAS_CATEGORIA) as CategoriaAlgo[];
 
+/** Fisher-Yates sobre una copia. */
+function mezclar<T>(arr: readonly T[]): T[] {
+  const copia = [...arr];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
+/**
+ * Hallazgo 3680: el banco salía siempre en el mismo orden y cada opción en su letra (la correcta
+ * era la C en 14 de 25 y nunca la A), así que «siempre la C» sacaba un 56 %. Se barajan el orden
+ * de las preguntas y las opciones de cada una al empezar (en el cliente, al pulsar), y la
+ * correcta se recoloca en su nueva posición.
+ */
+function componerPartida(banco: readonly PreguntaAlgo[]): PreguntaAlgo[] {
+  return mezclar(banco).map((p) => {
+    const orden = mezclar(p.opciones.map((_, i) => i));
+    return { ...p, opciones: orden.map((i) => p.opciones[i]), correcta: orden.indexOf(p.correcta) };
+  });
+}
+
 function getClasificacion(pct: number): { texto: string; emoji: string } {
   if (pct === 100) return { texto: 'Experto en algoritmia', emoji: '🏆' };
   if (pct >= 80) return { texto: 'Listo para entrevistas senior', emoji: '🌟' };
@@ -358,7 +384,7 @@ export default function QuizComplejidadAlgoritmosPage() {
     } else {
       seleccionadas = BANCO_PREGUNTAS.filter(p => p.categoria === categoriaSeleccionada);
     }
-    setPreguntas(seleccionadas);
+    setPreguntas(componerPartida(seleccionadas));
     setIndice(0);
     setSeleccionada(null);
     setAciertos([]);

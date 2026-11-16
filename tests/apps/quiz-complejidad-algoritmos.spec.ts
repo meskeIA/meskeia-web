@@ -212,9 +212,8 @@ test.describe('Quiz Complejidad Algorítmica · partida', () => {
   /**
    * CASO NORMAL — examen, las 18 primeras bien y las 7 últimas mal.
    * A mano: 18/25 = 0,72 → 72 % → tramo ≥ 60 → 👍 «Buen nivel para entrevistas júnior»;
-   * estadísticas 18 · 7 · 72 %. El desglose se cuenta de las fichas jugadas; con el orden de hoy
-   * (fijo, el del banco) es Notación 5/5 · Búsqueda 5/5 · Estructuras 5/5 · Análisis 3/5 ·
-   * Comparativa 0/5.
+   * estadísticas 18 · 7 · 72 %. El desglose se cuenta de las fichas jugadas: el orden se baraja
+   * en cada partida (3680).
    */
   test('caso normal: 18 de 25 en el examen dan 72 % y «Buen nivel para entrevistas júnior»', async ({ page }) => {
     test.setTimeout(90_000);
@@ -542,18 +541,28 @@ test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
    * A mano sobre page.tsx: la correcta es la A en 0 de 25, la B en 1, la C en 14 y la D en 10.
    * Medido el 28/10/2026: pulsar SIEMPRE la C da 14/25 = 56 % «Base sólida, sigue practicando» en el
    * examen y 4/5 = 80 % 🌟 «Listo para entrevistas senior» en la práctica de Comparativa; «Repetir
-   * quiz» vuelve a sacar la misma secuencia. Con las letras barajadas, que una sola letra acapare
-   * más de 13 de 25 respuestas pasa ≈ 1 de cada 700 veces.
+   * quiz» vuelve a sacar la misma secuencia.
+   * REPARADO (3680, /reparar 16/11/2026): componerPartida baraja el orden y las opciones al empezar.
+   * Se miden dos partidas seguidas («Repetir quiz»): que la secuencia (pregunta + letra de la buena)
+   * cambie —con el banco fijo era idéntica; barajada, repetirse es 1 entre 25!·4²⁵— y que ninguna
+   * letra acapare más de 15 de 25 (con letras al azar, P ≈ 10⁻⁵; el umbral holgado evita el rojo
+   * intermitente que daría el 13 de antes, ≈ 1 de cada 700).
    */
   test('hallazgo · la correcta no cae siempre en la misma letra: «siempre la C» no aprueba', async ({ page }) => {
-    test.fail(); // ABIERTO — medido: { A: 0, B: 1, C: 14, D: 10 }
-    test.setTimeout(60_000);
+    test.setTimeout(120_000);
     await abrir(page);
     await comenzarExamen(page);
-    const { letras } = await jugar(page, 99);
-    const cuenta: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 };
-    for (const l of letras) cuenta[l]++;
-    expect(Math.max(...Object.values(cuenta)), `reparto de la correcta ${JSON.stringify(cuenta)}`).toBeLessThanOrEqual(13);
+    const a = await jugar(page, 99);
+    await page.getByRole('button', { name: 'Repetir quiz' }).click();
+    await expect(contador(page)).toHaveText('Pregunta 1 de 25');
+    const b = await jugar(page, 99);
+    const firma = (p: { fichas: Ficha[]; letras: string[] }) => p.fichas.map((f, i) => `${f.n}${p.letras[i]}`).join(' ');
+    expect(firma(b), '«Repetir quiz» saca la misma secuencia de preguntas y letras').not.toBe(firma(a));
+    for (const { letras } of [a, b]) {
+      const cuenta: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 };
+      for (const l of letras) cuenta[l]++;
+      expect(Math.max(...Object.values(cuenta)), `reparto de la correcta ${JSON.stringify(cuenta)}`).toBeLessThanOrEqual(15);
+    }
   });
 
   test('hallazgo · las insignias de categoría y el marcador «✓ N correctas» llegan a 4,5:1 (tema claro)', async ({ page }) => {
@@ -642,7 +651,8 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
   });
 
   test('hallazgo · P1: Big O no es «el peor caso»', () => {
-    test.fail(); // ABIERTO — la opción buena dice «(caso peor)» y la explicación «Big O describe el
+    // REPARADO (3681, /reparar 16/11/2026): «(una cota superior)» y la explicación de la cota. Era:
+    // la opción buena decía «(caso peor)» y la explicación «Big O describe el
     // comportamiento asintótico en el peor caso». O(g) es una COTA SUPERIOR de una función (Cormen et
     // al., Introduction to Algorithms, cap. 3), y se aplica a cualquier caso: la propia app da
     // «complejidad temporal MEDIA de Quicksort» O(n log n) (P7), HashSet «en el caso promedio» O(1)
@@ -650,7 +660,9 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
     // promedio, aunque O(n²) en el peor caso».
     const l = leida(/describe la notación Big O/);
     expect(l.correcta).not.toMatch(/caso peor/);
+    expect(l.correcta).toMatch(/cota superior/);
     expect(l.explicacion).not.toMatch(/Big O describe el comportamiento asintótico en el peor caso/);
+    expect(l.explicacion).toMatch(/No está atada a un caso/);
   });
 
   test('hallazgo · P10: un límite inferior se escribe con Ω, no con O', () => {
@@ -664,7 +676,7 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
   });
 
   test('hallazgo · P18: Fibonacci ingenuo no hace «~2ⁿ» llamadas ni «~1.000 millones» con n = 40', () => {
-    test.fail(); // ABIERTO — fib(n) ingenuo hace C(n) = 1 + C(n−1) + C(n−2), C(0) = C(1) = 1, es decir
+    // REPARADO (3682, /reparar 16/11/2026): la explicación da 2·F(n+1) − 1, Θ(φⁿ) y 331.160.281. Era: fib(n) ingenuo hace C(n) = 1 + C(n−1) + C(n−2), C(0) = C(1) = 1, es decir
     // 2·F(n+1) − 1 llamadas = Θ(φⁿ), φ ≈ 1,618. Con n = 40: 2·165.580.141 − 1 = 331.160.281, no «~1.000
     // millones»; y 2⁴⁰ ≈ 1,1·10¹², 3.300 veces más. O(2ⁿ) vale como cota superior (es la clave, y
     // está bien), pero «el árbol tiene ~2ⁿ nodos» y la cifra de n = 40 son falsas.
@@ -676,6 +688,7 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
     const l = leida(CODIGO, /return fibonacci\(n-1\)/);
     expect(l.explicacion).not.toMatch(/~?2ⁿ nodos/);
     expect(l.explicacion).not.toMatch(/1\.000 millones de llamadas/);
+    expect(l.explicacion).toContain('331.160.281');
   });
 
   test('hallazgo · P20: «O(2n²)» no puede ser una opción incorrecta, es la misma clase que O(n²)', () => {
@@ -975,7 +988,7 @@ test.describe('Inspector 29/10/2026 (tarde) · re-inspección tras /reparar · e
    * siempre la A: la barra marca aria-valuenow = índice (0…24) sobre 25.
    */
   test('caso normal: sin puntero encima, las cinco categorías dan 5,47 · 5,15 · 4,77 · 5,25 · 5,01 en botón e insignias, en claro y en oscuro', async ({ page }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(180_000);
     for (const tema of ['light', 'dark'] as const) {
       await abrir(page, tema);
       await esperarBotonHidratado(page, /Práctica por categoría/);
@@ -1002,6 +1015,9 @@ test.describe('Inspector 29/10/2026 (tarde) · re-inspección tras /reparar · e
         const barra = page.getByRole('progressbar', { name: 'Progreso del quiz' });
         await expect(barra).toHaveAttribute('aria-valuenow', String(n - 1));
         await expect(barra).toHaveAttribute('aria-valuemax', '25');
+        // Con el orden barajado (3680) la insignia cambia de categoría de una pregunta a otra, y
+        // globals.css da a todo `transition: background-color 0.3s`: se mide con el color ya asentado
+        await page.waitForTimeout(400);
         const [ins] = await pintados(page, '[class*="tarjetaPregunta"] > span[class*="badgeCategoria"]');
         vistas.set(ins.t, ins.ratio);
         await opciones(page).first().click();
