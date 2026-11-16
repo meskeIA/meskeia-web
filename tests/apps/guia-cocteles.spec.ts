@@ -300,14 +300,13 @@ test.describe('guia-cocteles — filtros, buscador y contenido', () => {
     await expect(guia).toContainText('no existe nivel seguro de consumo');
   });
 
-  test('HALLAZGO A (15/11/2026, ABIERTO) — buscar «gin» o «ron» casa subcadenas dentro de otras palabras', async ({ page }) => {
+  test('HALLAZGO A · 4771 (REPARADO) — buscar «gin» o «ron» ya no casa subcadenas dentro de otras palabras', async ({ page }) => {
     // Esperado: las fichas que llevan gin (7) o ron (8) en sus ingredientes, contadas en el array.
-    // Hoy «gin» da 16: entran Moscow Mule, Dark & Stormy y Shirley Temple por «ginger», Virgin
+    // Ahora casa palabras enteras en nombre, origen, ingredientes, perfil y graduación. Antes «gin» daba 16: entran Moscow Mule, Dark & Stormy y Shirley Temple por «ginger», Virgin
     // Mojito y Virgin Mary por «Virgin», Mai Tai y Bellini por «original», Americano y Agua de
     // Valencia sin alcohol por mencionar el gin en la descripción. «ron» da 18: Negroni y
     // Americano por «Negroni», Old Fashioned por «terrón», White Lady, Cosmopolitan y Sex on the
     // Beach por «convirtieron», Campari Spritz por «pronunciado», Virgin Mary por «gastronómica».
-    test.fail();
     await buscar(page, 'gin');
     await expect(fichas(page)).toHaveText([
       'Gimlet',
@@ -331,11 +330,10 @@ test.describe('guia-cocteles — filtros, buscador y contenido', () => {
     ]);
   });
 
-  test('HALLAZGO B (15/11/2026, ABIERTO) — «sin alcohol» en el buscador da 5 de las 7 sin alcohol', async ({ page }) => {
+  test('HALLAZGO B · 4772 (REPARADO) — «sin alcohol» en el buscador da las 7 sin alcohol', async ({ page }) => {
     // Cada una de las 7 lleva «Sin alcohol» escrito dos veces en su cabecera, pero el buscador no
-    // mira familia, base ni graduación: solo encuentra las que lo dicen en la descripción o en el
-    // nombre. Faltan Virgin Mojito y Virgin Mary, los dos mocktails más conocidos de la lista.
-    test.fail();
+    // miraba familia, base ni graduación: solo encontraba las que lo decían en la descripción o en
+    // el nombre, y faltaban Virgin Mojito y Virgin Mary. Ahora mira también la graduación.
     await buscar(page, 'sin alcohol');
     await expect(fichas(page)).toHaveText([
       'Virgin Mojito',
@@ -358,14 +356,18 @@ test.describe('guia-cocteles — filtros, buscador y contenido', () => {
     await expect(fichas(page)).toHaveText(['Pisco Sour']);
   });
 
-  test('HALLAZGO D (15/11/2026, ABIERTO) — el FAQPage da otra receta del Mojito que la ficha', async ({ page }) => {
-    // Ficha del Mojito: 50 ml de ron, 25 ml de lima, 15 ml de jarabe. FAQPage: «ron blanco cubano
-    // (45 ml), zumo de lima (30 ml)». Y «el Virgin Mojito sustituye el ron por agua con gas y más
-    // lima», cuando las dos fichas llevan 25 ml de lima.
-    test.fail();
+  test('HALLAZGO D · 4774 (REPARADO) — el FAQPage da la misma receta del Mojito que la ficha', async ({ page }) => {
+    // Ficha del Mojito: 50 ml de ron, 25 ml de lima, 15 ml de jarabe. El FAQPage decía «ron blanco
+    // cubano (45 ml), zumo de lima (30 ml)», y «el Virgin Mojito sustituye el ron por agua con gas y
+    // más lima», cuando las dos fichas llevan 25 ml de lima. También fijaba en el sour una
+    // «proporción clásica 2:1:¾» que no sigue ninguna ficha.
     const faq = await faqPage(page);
     const mojito = faq.find((q) => /receta cl[áa]sica/i.test(q.pregunta) && /Mojito/.test(q.pregunta));
     expect(mojito, 'el FAQPage tiene la pregunta del Mojito').toBeTruthy();
+    expect(mojito?.respuesta ?? '').toMatch(/50 ml de ron blanco, 25 ml de zumo de lima, 15 ml de jarabe/);
+    const sour = faq.find((q) => /sour/i.test(q.pregunta));
+    expect(sour?.respuesta ?? '').not.toMatch(/2:1:¾/);
+    expect(faq.map((q) => q.respuesta).join(' ')).not.toMatch(/m[áa]s lima/i);
     const ingredientesFicha = (await ficha(page, 'Mojito').getByRole('listitem').allTextContents()).join(' · ');
     for (const ml of (mojito?.respuesta ?? '').match(/\d+\s*ml/g) ?? []) {
       expect(ingredientesFicha, `«${ml}» del FAQPage no está en la ficha del Mojito`).toContain(ml);
@@ -378,31 +380,35 @@ test.describe('guia-cocteles — filtros, buscador y contenido', () => {
     }
   });
 
-  test('HALLAZGO E (15/11/2026, ABIERTO) — agitar un Martini: «no está mal» en el FAQPage, «incorrecto» en la página', async ({ page }) => {
-    // FAQPage, «¿Cuál es la diferencia entre agitar (shake) y remover (stir) un cóctel?»: «Agitar
-    // un Martini no está "mal", pero cambia su textura y claridad». FAQ visible, «¿Por qué el
-    // Martini se revuelve y no se agita?»: «es técnicamente incorrecto y produce un resultado
-    // inferior». La reparación es UNA constante que lean las dos (check:faq-unica).
-    test.fail();
+  test('HALLAZGO E · 4775 (REPARADO) — agitar un Martini: una sola respuesta en el FAQPage y en la página', async ({ page }) => {
+    // El FAQPage, «¿Cuál es la diferencia entre agitar (shake) y remover (stir) un cóctel?», decía
+    // «Agitar un Martini no está "mal"»; la FAQ visible, «¿Por qué el Martini se revuelve y no se
+    // agita?», «es técnicamente incorrecto y produce un resultado inferior». Ahora UNA constante
+    // que leen las dos, y la regla ya no mete los jarabes entre lo que se agita (Old Fashioned).
     await abrirGuia(page);
     const visible = await page
       .locator('[data-guia-educativa] li')
       .filter({ hasText: '¿Por qué el Martini se revuelve y no se agita?' })
+      .locator('p')
+      .first()
       .textContent();
-    const ld = (await faqPage(page)).find((q) => /agitar/i.test(q.pregunta) && /remover/i.test(q.pregunta));
-    const ldPermite = /no est[áa] "?mal/i.test(ld?.respuesta ?? '');
-    const visibleCondena = /t[ée]cnicamente incorrecto/i.test(visible ?? '');
-    expect(ldPermite && visibleCondena, 'las dos FAQ dan veredictos opuestos').toBe(false);
+    const ld = (await faqPage(page)).find((q) => q.pregunta === '¿Por qué el Martini se revuelve y no se agita?');
+    expect(ld, 'el FAQPage tiene la misma pregunta').toBeTruthy();
+    expect((visible ?? '').replace(/\s+/g, ' ').trim()).toBe(ld?.respuesta);
+    expect(ld?.respuesta ?? '').not.toMatch(/t[ée]cnicamente incorrecto/i);
+    expect(ld?.respuesta ?? '').toContain('Old Fashioned');
   });
 
-  test('HALLAZGO F (15/11/2026, ABIERTO) — textos que presentan el alcohol como beneficioso', async ({ page }) => {
+  test('HALLAZGO F · 4776 (REPARADO) — ningún texto presenta el alcohol como beneficioso', async ({ page }) => {
     // CLAUDE.md §1.quinquies punto 9: el alcohol no se presenta como saludable. Hot Toddy: «La
     // ciencia moderna confirma que la miel…» y remata «El alcohol... simplemente ayuda a dormir»,
     // como remedio «cuando se tiene frío o los primeros síntomas de un resfriado». Sobremesa: «El
     // whisky y los bitters facilitan la digestión». Aperitivo: «no superar los 2 unidades de
     // alcohol» como si por debajo fuera inocuo, en la misma guía que dice que no hay nivel seguro.
-    test.fail();
+    // REPARADO: el Hot Toddy queda como dato histórico, matizado en el acto con la OMS.
     await abrirGuia(page);
+    await expect(ficha(page, 'Hot Toddy')).toContainText('Es un dato histórico, no una recomendación');
+    await expect(page.getByText(/ciencia moderna confirma/i)).toHaveCount(0);
     await expect(page.getByText(/ayuda a dormir/i)).toHaveCount(0);
     await expect(page.getByText(/facilitan? la digesti[óo]n/i)).toHaveCount(0);
     await expect(page.getByText(/no superar los 2 unidades/i)).toHaveCount(0);

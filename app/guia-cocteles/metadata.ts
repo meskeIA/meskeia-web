@@ -50,16 +50,24 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// Hallazgo 4775 (16/11/2026): el FAQPage («Agitar un Martini no está "mal"») y la FAQ visible
+// («técnicamente incorrecto y produce un resultado inferior») daban veredictos opuestos, y la regla
+// del FAQPage («se agita cuando contiene… jarabes») chocaba con el Old Fashioned, que lleva jarabe y
+// se revuelve. Una sola respuesta, que leen las dos (check:faq-unica).
+export const PREGUNTA_MARTINI = '¿Por qué el Martini se revuelve y no se agita?';
+export const RESPUESTA_MARTINI =
+  'Se agita cuando el cóctel lleva zumo de cítrico, lácteos o huevo, que hay que integrar y emulsionar. Se revuelve en vaso mezclador cuando solo lleva espirituosos, a lo sumo con un poco de jarabe o unas gotas de bitters (Martini, Negroni, Manhattan, Old Fashioned): así se enfría y se diluye sin meter burbujas de aire ni fragmentos de hielo, y queda transparente y sedoso. Agitar un Martini, como pedía James Bond, no lo estropea como bebida, pero le da otra textura, más turbia, que no es la de la receta clásica.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuál es la diferencia entre agitar (shake) y remover (stir) un cóctel?',
+      name: PREGUNTA_MARTINI,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La regla general es: se agita cuando el cóctel contiene zumos, lácteos, jarabes o huevo (ingredientes opacos), porque hay que integrar y emulsionar. Se remueve cuando todos los ingredientes son alcohólicos y transparentes (Martini, Negroni, Manhattan), para enfriar y diluir sin añadir burbujas ni opacidad. Agitar un Martini no está "mal", pero cambia su textura y claridad.',
+        text: RESPUESTA_MARTINI,
       },
     },
     {
@@ -67,7 +75,7 @@ export const faqJsonLd = {
       name: '¿Cuáles son los cócteles más fáciles de preparar en casa sin equipamiento profesional?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los highballs (combinados de dos ingredientes sobre hielo) son los más sencillos: Gin Tonic, Cuba Libre, Vodka Tonic, Dark & Stormy. Solo requieren un vaso alto, hielo y las proporciones correctas. El Aperol Spritz también es muy accesible (Aperol + cava/prosecco + soda). Para cócteles algo más elaborados pero sin necesidad de coctelera, el Negroni (gin + Campari + vermut rojo en partes iguales sobre hielo) es una elección clásica.',
+        text: 'Los highballs (un destilado alargado con un refresco sobre hielo, a veces con un toque de cítrico, como la lima del Cuba Libre) son los más sencillos: Gin Tonic, Cuba Libre, Vodka Tonic, Dark & Stormy. Solo requieren un vaso alto, hielo y las proporciones correctas. El Aperol Spritz también es muy accesible (Aperol + cava/prosecco + soda). Para cócteles algo más elaborados pero sin necesidad de coctelera, el Negroni (gin + Campari + vermut rojo en partes iguales sobre hielo) es una elección clásica.',
       },
     },
     {
@@ -75,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Qué es un sour y qué cócteles pertenecen a esta familia?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un sour es una familia de cócteles que combina un destilado con un ácido cítrico (limón o lima) y un elemento dulce (jarabe de azúcar, licor dulce). La proporción clásica es 2:1:¾ (base:cítrico:dulce). Los sours más conocidos son: Daiquiri (ron), Margarita (tequila), Whiskey Sour (whiskey), Pisco Sour (pisco) y Gimlet (gin). Muchos sours admiten media clara de huevo para añadir textura cremosa.',
+        text: 'Un sour es una familia de cócteles que combina un destilado con un ácido cítrico (limón o lima) y un elemento dulce (jarabe de azúcar, licor dulce). Las proporciones cambian de una receta a otra: en las fichas de esta guía, el Daiquiri lleva 60 ml de ron, 25 de lima y 15 de jarabe, y el Whiskey Sour 50, 25 y 15. Los sours más conocidos son: Daiquiri (ron), Margarita (tequila), Whiskey Sour (whiskey), Pisco Sour (pisco) y Gimlet (gin). Varios admiten una clara de huevo para añadir textura cremosa.',
       },
     },
     {
@@ -83,7 +91,7 @@ export const faqJsonLd = {
       name: '¿Qué cócteles clásicos se pueden preparar sin alcohol?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Varios clásicos tienen versiones sin alcohol (mocktails) bien establecidas: el Virgin Mojito sustituye el ron por agua con gas y más lima; el Arnold Palmer mezcla té helado con limonada; el Shirley Temple usa ginger ale y granadina. Más allá de las versiones sin alcohol de clásicos, hay cócteles sin alcohol de identidad propia como el Agua de Valencia sin alcohol o el Cucumber Cooler. La clave es mantener el equilibrio ácido-dulce-amargo del original.',
+        text: 'Varios clásicos tienen versiones sin alcohol (mocktails) bien establecidas: el Virgin Mojito quita el ron y alarga con más soda; el Arnold Palmer mezcla té helado con limonada; el Shirley Temple usa ginger ale y granadina. Más allá de las versiones sin alcohol de clásicos, hay cócteles sin alcohol de identidad propia como el Agua de Valencia sin alcohol o el Cucumber Cooler. La clave es mantener el equilibrio ácido-dulce-amargo del original.',
       },
     },
     {
@@ -91,7 +99,7 @@ export const faqJsonLd = {
       name: '¿Cuál es el origen del Mojito y cuál es su receta clásica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Mojito tiene origen cubano, con raíces que se remontan al siglo XVI aunque su forma moderna se consolidó en La Habana en el siglo XX. Se asocia popularmente con Ernest Hemingway y el bar La Bodeguita del Medio. La receta clásica usa ron blanco cubano (45 ml), zumo de lima (30 ml), azúcar (2 cucharaditas o jarabe simple), hojas de hierbabuena fresca (8-10) y agua con gas. Se machaca suavemente la menta con el azúcar y la lima, se añade hielo y se completa con el agua con gas.',
+        text: 'El Mojito tiene origen cubano, con raíces que se remontan al siglo XVI aunque su forma moderna se consolidó en La Habana en el siglo XX. Se asocia popularmente con Ernest Hemingway y el bar La Bodeguita del Medio. La receta de la ficha de esta guía usa 50 ml de ron blanco, 25 ml de zumo de lima, 15 ml de jarabe de azúcar, 6-8 hojas de menta fresca y unos 100 ml de soda. Se machaca suavemente la menta con el azúcar y la lima, se añade hielo y se completa con el agua con gas.',
       },
     },
   ],

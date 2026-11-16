@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import styles from './GuiaCocteles.module.css';
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
+import { PREGUNTA_MARTINI, RESPUESTA_MARTINI } from './metadata';
 
 type FamiliaCoctel = 'Sour' | 'Highball' | 'Martini' | 'Tropical' | 'Spritz / Aperitivo' | 'Cremoso / Caliente' | 'Sin alcohol';
 type BaseAlcohol = 'Gin' | 'Vodka' | 'Ron' | 'Whisky / Bourbon' | 'Tequila / Mezcal' | 'Champán / Cava' | 'Vermut / Aperol' | 'Coñac / Brandy' | 'Sin alcohol';
@@ -585,8 +586,10 @@ const COCTELES: Coctel[] = [
     perfil: ['Especiado', 'Dulce', 'Cítrico', 'Caliente'],
     origen: 'Escocia / Irlanda',
     decada: 'Siglo XVIII',
-    descripcion: 'El Hot Toddy es el remedio casero por excelencia en los países anglosajones: un cóctel caliente a base de whisky, miel, limón y especias que se toma cuando se tiene frío o los primeros síntomas de un resfriado. Su preparación admite infinitas variantes según el whisky y las especias utilizadas.',
-    curiosidad: 'En Escocia e Irlanda el Hot Toddy se considera desde el siglo XVIII un remedio médico casero para el resfriado y la gripe. La ciencia moderna confirma que la miel tiene propiedades antibacterianas leves y el vapor de limón puede aliviar la congestión nasal. El alcohol... simplemente ayuda a dormir.',
+    // Hallazgo 4776 (16/11/2026): lo presentaba como remedio para el resfriado y decía que «la
+    // ciencia moderna confirma…» y que el alcohol «ayuda a dormir» (CLAUDE.md §1.quinquies, punto 9).
+    descripcion: 'El Hot Toddy es un cóctel caliente tradicional de los países anglosajones, a base de whisky, miel, limón y especias, que se toma sobre todo en invierno. Su preparación admite infinitas variantes según el whisky y las especias utilizadas.',
+    curiosidad: 'En Escocia e Irlanda el Hot Toddy se tomó desde el siglo XVIII como remedio casero para el resfriado y la gripe. Es un dato histórico, no una recomendación: el alcohol no cura el resfriado, y la OMS recuerda que ningún nivel de consumo de alcohol es seguro para la salud (comunicado del 04/01/2023).',
   },
   {
     nombre: 'Piña Colada cremosa',
@@ -709,18 +712,28 @@ export default function GuiaCocteles() {
   const [familia, setFamilia] = useState<FamiliaCoctel | 'Todas'>('Todas');
   const [base, setBase] = useState<BaseAlcohol | 'Todas'>('Todas');
 
+  /**
+   * Hallazgo 4771 (16/11/2026): casaba SUBCADENAS dentro de palabras y también en la descripción,
+   * que el buscador no promete: «gin» traía 16 fichas (ginger, Virgin, «original») y «ron», 18
+   * (Negroni, terrón, «convirtieron»). Ahora casa palabras enteras en nombre, origen, ingredientes
+   * y perfil, lo que dice el placeholder.
+   */
   const coctelesFiltrados = useMemo(() => {
-    const t = normalizarBusqueda(busqueda).trim();
+    const t = normalizarBusqueda(busqueda).trim().replace(/\s+/g, ' ');
+    const escapado = t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const palabra = new RegExp(`(^|[^\\p{L}\\p{N}])${escapado}($|[^\\p{L}\\p{N}])`, 'u');
+    const casa = (texto: string) => palabra.test(normalizarBusqueda(texto));
     return COCTELES.filter((c) => {
       const matchFamilia = familia === 'Todas' || c.familia === familia;
       const matchBase = base === 'Todas' || c.base === base;
       const matchBusqueda =
         !t ||
-        normalizarBusqueda(c.nombre).includes(t) ||
-        normalizarBusqueda(c.origen).includes(t) ||
-        c.ingredientes.some((i) => normalizarBusqueda(i).includes(t)) ||
-        c.perfil.some((p) => normalizarBusqueda(p).includes(t)) ||
-        normalizarBusqueda(c.descripcion).includes(t);
+        casa(c.nombre) ||
+        casa(c.origen) ||
+        c.ingredientes.some(casa) ||
+        c.perfil.some(casa) ||
+        // Hallazgo 4772: «sin alcohol» daba 5 de las 7, aunque las 7 lo llevan en su cabecera
+        casa(c.graduacion);
       return matchFamilia && matchBase && matchBusqueda;
     });
   }, [busqueda, familia, base]);
@@ -949,16 +962,16 @@ export default function GuiaCocteles() {
             <strong><span aria-hidden="true">🥂</span> Aperitivo antes de cenar</strong>
             <p>
               Aperol Spritz, Campari Spritz, Negroni, Americano o Bellini. El aperitivo
-              debe ser ligero, estimular el apetito (bitter o cítrico) y no superar los
-              2 unidades de alcohol. Evita los cócteles muy dulces o cremosos antes de comer.
+              clásico es ligero, con notas amargas o cítricas, y de graduación baja o media.
+              Los cócteles muy dulces o cremosos suelen dejarse para después de comer.
             </p>
           </div>
           <div className={styles.escenarioCard}>
             <strong><span aria-hidden="true">🌙</span> Sobremesa de noche</strong>
             <p>
               Old Fashioned, Manhattan, Rob Roy o Irish Coffee. Los cócteles de sobremesa
-              son más intensos, con más alcohol y sin gas. El whisky y los bitters
-              facilitan la digestión y acompañan perfectamente la conversación larga.
+              son más intensos, con más alcohol y sin gas, pensados para tomar despacio
+              en una conversación larga.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -982,14 +995,8 @@ export default function GuiaCocteles() {
         <h3>Preguntas frecuentes</h3>
         <ul className={styles.faqList}>
           <li className={styles.faqItem}>
-            <strong>¿Por qué el Martini se revuelve y no se agita?</strong>
-            <p>
-              Agitar un cóctel solo de espirituosos (sin zumos) introduce burbujas de
-              aire y fragmentos de hielo que "rompen" la textura sedosa del cóctel.
-              Revolver en vaso mezclador enfría y diluye con precisión sin aeration.
-              Agitar el Martini, como pedía James Bond, es técnicamente incorrecto
-              y produce un resultado inferior. Fleming lo sabía y era la peculiaridad del personaje.
-            </p>
+            <strong>{PREGUNTA_MARTINI}</strong>
+            <p>{RESPUESTA_MARTINI}</p>
             <span className={styles.faqTip}>
               <span aria-hidden="true">🍸</span> Regla práctica: si el cóctel lleva zumo de cítrico o huevo → shaker.
               Si solo lleva espirituosos → vaso mezclador.
