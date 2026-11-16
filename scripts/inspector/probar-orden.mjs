@@ -25,6 +25,8 @@
  *   8. EL UMBRAL DE LAS PRIMERAS (16/11/2026): con 101 medios abiertos → 1 /reparar medio y luego
  *      el Inspector; con 100 justos, no. Un alto sigue yendo antes, y los cabos urgentes también.
  *      Con el paso cerrado, la nota de lo que puede esperar habla solo de bajos.
+ *   9. Un alto que nombra un cabo de destino usuario o que está reservado por una tanda apartada no
+ *      pone /reparar primero (16/11/2026, tras la recogida de las 09:30: 4868 y 4869).
  *
  * Ninguna toca las bases reales: van por `INSPECTOR_DB` y `CABOS_DB`, creadas vacías.
  */
@@ -51,20 +53,21 @@ let campanaAntigua = null;
  * Bases nuevas para cada caso: `hallazgos` = [[slug, severidad, estado]], `cabos` = { viejos, nuevos, cerradosHoy },
  * `campanas` = [[días de antigüedad, abierta]] en orden de alta; deja en `campanaAntigua` el código de la abierta más vieja
  */
-function escenario({ hallazgos = [], cabos = {}, campanas = [] }) {
+function escenario({ hallazgos = [], cabos = {}, campanas = [], usuario = [], apartados = [] }) {
   n += 1;
   const rutaIns = path.join(TMP, `inspector-${n}.db`);
   const rutaCabos = path.join(TMP, `cabos-${n}.db`);
   // Crea las tablas igual que la base real: abriéndola con db.mjs
   execFileSync(process.execPath, ['-e', `import('./db.mjs').then(m => m.abrir().close())`], { cwd: AQUI, env: { ...process.env, INSPECTOR_DB: rutaIns } });
   const ins = new DatabaseSync(rutaIns);
-  for (const [slug, severidad, estado = 'abierto'] of hallazgos) {
-    ins.prepare("INSERT INTO hallazgos (slug, severidad, descripcion, caso, estado) VALUES (?, ?, 'prueba', 'prueba', ?)").run(slug, severidad, estado);
+  for (const [slug, severidad, estado = 'abierto', id = null] of hallazgos) {
+    ins.prepare("INSERT INTO hallazgos (id, slug, severidad, descripcion, caso, estado) VALUES (?, ?, ?, 'prueba', 'prueba', ?)").run(id, slug, severidad, estado);
   }
   ins.close();
   const cdb = abrirCabos(rutaCabos);
   const { viejos = 0, nuevos = 0, cerradosHoy = 0 } = cabos;
   const dar = (i, fecha) => alta(cdb, { sujeto: `scripts/prueba-${n}-${i}.mjs`, texto: 'prueba', origen: 'probar-orden', destino: 'reparar', fecha }).id;
+  usuario.forEach((texto, i) => alta(cdb, { sujeto: `decision-${n}-${i}`, texto, origen: 'probar-orden', destino: 'usuario' }));
   for (let i = 0; i < viejos; i++) dar(`v${i}`, haceDias(20));
   for (let i = 0; i < nuevos; i++) dar(`n${i}`, haceDias(1));
   for (let i = 0; i < cerradosHoy; i++) cerrar(cdb, dar(`c${i}`, haceDias(20)), { como: 'resuelto', motivo: 'prueba' });
@@ -76,7 +79,10 @@ function escenario({ hallazgos = [], cabos = {}, campanas = [] }) {
     else if (dias > diasAntigua) { diasAntigua = dias; campanaAntigua = codigo(id); }
   });
   cdb.close();
-  return execFileSync(process.execPath, [ORDEN], { encoding: 'utf8', env: { ...process.env, INSPECTOR_DB: rutaIns, CABOS_DB: rutaCabos } }).trim();
+  // Cada escenario, su propio registro de apartadas: nunca el real
+  const rutaApartadas = path.join(TMP, `apartadas-${n}.json`);
+  fs.writeFileSync(rutaApartadas, JSON.stringify(apartados.length ? [{ id: 'x', estado: 'abierta', hallazgos: apartados }] : []));
+  return execFileSync(process.execPath, [ORDEN], { encoding: 'utf8', env: { ...process.env, INSPECTOR_DB: rutaIns, CABOS_DB: rutaCabos, APARTADAS_JSON: rutaApartadas } }).trim();
 }
 const primero = (linea) => (linea.match(/Orden sugerido: 1 (\/[a-z]+(?: cabos| medio)?)/) ?? [])[1];
 
@@ -134,6 +140,14 @@ l = escenario({ hallazgos: [...medios(101), ['app-alto', 'alto']] });
 ok(/1 \/reparar \(.*2 \/reparar medio \(/.test(l), '  un alto sigue yendo antes');
 l = escenario({ hallazgos: medios(101), cabos: { nuevos: 4 } });
 ok(/1 \/reparar cabos \(.*2 \/reparar medio \(/.test(l), '  y los cabos urgentes también');
+
+console.log('\n9 · Un alto que espera tu decisión o está apartado no pone /reparar primero (16/11/2026)');
+// Con ids de verdad (cuatro cifras): 4868 es el alto de la decisión, 4869 el reservado
+l = escenario({ hallazgos: [['app-decision', 'alto', 'abierto', 4868], ['app-apartada', 'alto', 'abierto', 4869], ['app-b', 'bajo']], usuario: ['Hallazgo 4868 (fiscal, nivel 3): espera tu OK'], apartados: [4869] });
+ok(primero(l) === '/inspector', `con sus dos altos fuera, empieza por /inspector («${l.slice(0, 70)}…»)`);
+ok(l.includes('2 altos esperan tu decisión o están apartados'), '  y lo dice');
+l = escenario({ hallazgos: [['app-decision', 'alto', 'abierto', 4879], ['app-libre', 'alto', 'abierto', 4881]], usuario: ['Hallazgos 4879 y 4880: espera tu OK'] });
+ok(primero(l) === '/reparar' && l.includes('app-libre') && !/\/reparar \([^)]*app-decision/.test(l), '  un alto libre sigue poniendo /reparar, nombrando solo el suyo');
 
 fs.rmSync(TMP, { recursive: true, force: true });
 console.log(fallos ? `\n✗ ${fallos} comprobaciones FALLAN` : '\n✓ todas las comprobaciones pasan');

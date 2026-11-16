@@ -41,19 +41,54 @@
  * Prueba: `npm run inspector:probar-orden`.
  */
 
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { abrir, UMBRAL_PRIMERAS, umbralPrimeras } from './db.mjs';
 import { abrir as abrirCabos, resumen, listar, codigo } from '../cabos/cabos.mjs';
 
 const UMBRAL_CABOS = 30;
+/** Lo apartado por la recogida de /reparar (reparar-tarea.mjs, 16/11/2026). APARTADAS_JSON: la prueba. */
+const RUTA_APARTADAS = process.env.APARTADAS_JSON
+  || path.join(os.homedir(), 'Mis Desarrollos', 'Vigilancia', 'ActasNocturnas', 'salida', 'reparar-apartadas.json');
 
 const nAltosDe = (altos) => altos.reduce((s, a) => s + a.n, 0);
 
+/**
+ * Hallazgos que ninguna tanda puede tocar (16/11/2026): los reservados por una tanda apartada y los
+ * que nombra un cabo abierto de destino `usuario` («Hallazgo 4868», «Hallazgos 4714 y 4717»). Un alto
+ * así no pone /reparar primero: la cadena lanzaría tandas una tras otra para algo que espera al
+ * usuario. Caso de origen: tras la recogida del 16/11 09:30, los dos únicos altos eran 4868 (decisión
+ * fiscal, C0791) y 4869 (reservado), y el orden decía «1 /reparar».
+ */
+function bloqueados(cdb) {
+  const ids = new Set();
+  try {
+    for (const a of JSON.parse(fs.readFileSync(RUTA_APARTADAS, 'utf8'))) {
+      if (a.estado === 'abierta') for (const h of a.hallazgos || []) ids.add(Number(h));
+    }
+  } catch { /* sin apartadas */ }
+  for (const c of listar(cdb, { destino: 'usuario' })) {
+    for (const m of String(c.texto || '').matchAll(/\bhallazgos?\s+(\d{4,5}(?:\s*(?:,|y)\s*\d{4,5})*)/gi)) {
+      for (const n of m[1].matchAll(/\d{4,5}/g)) ids.add(Number(n[0]));
+    }
+  }
+  return ids;
+}
+
 function ordenDelDia() {
+  const cdb0 = abrirCabos();
+  const fuera = bloqueados(cdb0);
+  cdb0.close();
   const db = abrir();
-  const altos = db.prepare(`
-    SELECT slug, COUNT(*) n FROM hallazgos
-    WHERE estado = 'abierto' AND severidad IN ('critico', 'alto')
-    GROUP BY slug ORDER BY n DESC, slug`).all();
+  const filasAltos = db.prepare(`
+    SELECT id, slug FROM hallazgos
+    WHERE estado = 'abierto' AND severidad IN ('critico', 'alto') ORDER BY slug`).all();
+  const totalAltos = filasAltos.length;
+  const porApp = new Map();
+  for (const h of filasAltos.filter((x) => !fuera.has(x.id))) porApp.set(h.slug, (porApp.get(h.slug) ?? 0) + 1);
+  const altos = [...porApp].map(([slug, n]) => ({ slug, n })).sort((a, b) => b.n - a.n || a.slug.localeCompare(b.slug));
+  const altosFuera = totalAltos - nAltosDe(altos);
   const menores = db.prepare(`
     SELECT COUNT(*) n FROM hallazgos WHERE estado = 'abierto' AND severidad NOT IN ('critico', 'alto')`).get().n;
   const umbral = umbralPrimeras(db);
@@ -74,7 +109,7 @@ function ordenDelDia() {
   const deCabos = `${cabos} cabos técnicos; ${crecen ? 'la bandeja crece' : 'se vacían'}: en 7 días entran ${entran} y salen ${salen}`;
   const deMedios = `${umbral.abiertos} medios y altos abiertos: el Inspector no abre primeras por encima de ${UMBRAL_PRIMERAS}`;
   // Con el paso cerrado los medios ya no esperan: solo los bajos
-  const bajos = umbral.cerradas ? menores - (umbral.abiertos - nAltosDe(altos)) : menores;
+  const bajos = umbral.cerradas ? menores - (umbral.abiertos - totalAltos) : menores;
   const deMenores = bajos ? `${bajos} ${umbral.cerradas ? 'bajos' : 'bajos y medios'} abiertos pueden esperar` : null;
   const inspector = umbral.cerradas ? `/reparar medio (${deMedios})` : null;
 
@@ -96,6 +131,7 @@ function ordenDelDia() {
   const notas = [];
   if (!urgenCabos && cabos) notas.push(`/reparar cabos puede esperar (${deCabos})`);
   if (deMenores) notas.push(deMenores);
+  if (altosFuera) notas.push(`${altosFuera} alto${altosFuera === 1 ? '' : 's'} esperan tu decisión o están apartados: no cuentan (/reparar pendientes)`);
 
   const enParalelo = campanaAntigua
     ? ` · en paralelo: /campana ${codigo(campanaAntigua.id)} (${campanas} abierta${campanas === 1 ? '' : 's'})`
