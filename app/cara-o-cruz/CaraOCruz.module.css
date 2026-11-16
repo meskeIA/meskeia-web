@@ -232,12 +232,14 @@
   box-shadow: var(--shadow-md);
 }
 
-.btnLanzar:hover:not(:disabled) {
+.btnLanzar:hover:not(:disabled):not([aria-disabled='true']) {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
 }
 
-.btnLanzar:disabled {
+/* aria-disabled y no disabled: un botón deshabilitado pierde el foco (hallazgo 4255) */
+.btnLanzar:disabled,
+.btnLanzar[aria-disabled='true'] {
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;

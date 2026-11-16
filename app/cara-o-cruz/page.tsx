@@ -37,15 +37,16 @@ export default function CaraOCruzPage() {
   const [animando, setAnimando] = useState(false);
   const [resultadoActual, setResultadoActual] = useState<Resultado | null>(null);
   const [mostrandoResultado, setMostrandoResultado] = useState(false);
-  // Cabo C0716 (12/11/2026): el botón se deshabilita durante el vuelo y Chrome le quita el foco,
-  // que cae a <body>: quien lanzaba con Enter perdía su sitio y el siguiente Tab empezaba arriba
-  // (medido con reloj real: 5 de 5). Si el botón tenía el foco al lanzar, se le devuelve al aterrizar.
+  // Cabo C0716 y hallazgo 4255: con disabled durante el vuelo, Chrome le quitaba el foco al
+  // botón y caía a <body>, también mientras la moneda giraba. Ahora el botón lleva aria-disabled
+  // (la guarda `if (animando) return` de lanzarMoneda impide el segundo lanzamiento) y el foco no
+  // se mueve. El efecto que lo devolvía al aterrizar queda por si el foco se fue por otra vía.
   const botonLanzar = useRef<HTMLButtonElement>(null);
   const devolverFoco = useRef(false);
   useEffect(() => {
     if (animando || !devolverFoco.current) return;
     devolverFoco.current = false;
-    botonLanzar.current?.focus({ preventScroll: true });
+    if (document.activeElement === document.body) botonLanzar.current?.focus({ preventScroll: true });
   }, [animando]);
 
   // Calcular estadísticas
@@ -183,7 +184,7 @@ export default function CaraOCruzPage() {
           <button type="button"
             ref={botonLanzar}
             onClick={lanzarMoneda}
-            disabled={animando}
+            aria-disabled={animando}
             className={styles.btnLanzar}
           >
             {animando ? <span key="si">Lanzando...</span> : <span key="no"><span aria-hidden="true">🎲</span> Lanzar Moneda</span>}

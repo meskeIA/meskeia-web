@@ -747,4 +747,24 @@ test.describe('Cabo C0716 — el foco vuelve a «Lanzar Moneda» al aterrizar (r
     }
     await expect(page.locator('[class*="distributionLabels"] span').nth(1)).toHaveText('Total: 3 lanzamientos');
   });
+
+  test('HALLAZGO 4255 (REPARADO 16/11/2026) · el foco no se va a <body> ni con la moneda en el aire', async ({ page }) => {
+    // Con disabled={animando}, Chrome desenfocaba el botón al lanzar y el foco caía a BODY durante
+    // todo el vuelo (y el C0716 solo lo devolvía al aterrizar). Ahora aria-disabled: el foco se
+    // queda. Reloj real, como en el caso de la ficha: a los 300 ms y al aterrizar.
+    test.setTimeout(30_000);
+    await page.goto(RUTA);
+    await esperarBotonHidratado(page);
+    await botonLanzar(page).focus();
+    await page.keyboard.press('Enter');
+    const enVuelo = page.getByRole('button', { name: 'Lanzando...' });
+    await expect(enVuelo).toHaveAttribute('aria-disabled', 'true');
+    await page.waitForTimeout(300);
+    expect(await page.evaluate(() => document.activeElement?.tagName)).toBe('BUTTON');
+    await expect(enVuelo).toBeFocused();
+    // Un segundo Enter en el vuelo no lanza otra vez: la guarda del manejador lo para.
+    await page.keyboard.press('Enter');
+    await expect(botonLanzar(page)).toBeFocused({ timeout: 4000 });
+    await expect(page.locator('[class*="distributionLabels"] span').nth(1)).toHaveText(/^Total: 1 lanzamientos?$/);
+  });
 });
