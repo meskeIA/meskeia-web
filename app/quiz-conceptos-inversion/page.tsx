@@ -12,7 +12,16 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 import styles from './QuizConceptosInversion.module.css';
+
+/**
+ * Hallazgo 3754: la P15 decía a mano «19–28% según tramo». La escala del ahorro (art. 66 y 76
+ * LIRPF, redacción de la Ley 7/2024, DF 7.ª, con efectos 01/01/2025; BOE consultado el
+ * 16/11/2026) va del 19 al 30 %, y vive en data/fiscal.
+ */
+const TIPO_AHORRO_MIN = TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo;
+const TIPO_AHORRO_MAX = TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tipos
@@ -46,12 +55,18 @@ interface ResultadoCategoria {
 // Configuración de categorías
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CATEGORIAS: Record<Categoria, { label: string; icono: string; color: string }> = {
-  'riesgo-rentabilidad': { label: 'Riesgo y Rentabilidad', icono: '📊', color: '#2E86AB' },
-  'renta-fija':          { label: 'Renta Fija y Bonos',   icono: '📄', color: '#48A9A6' },
-  'fondos-etf':          { label: 'Fondos y ETF',          icono: '🏦', color: '#E07B39' },
-  'cartera-estrategia':  { label: 'Cartera y Estrategia', icono: '⚖️', color: '#8E44AD' },
-  'valoracion':          { label: 'Valoración de Activos', icono: '🔍', color: '#27AE60' },
+/**
+ * Hallazgo 3758: los colores iban en style={{…}} (los candados de contraste no los ven) y no
+ * llegaban: blanco sobre #48A9A6 2,80 · #27AE60 2,87 · #E07B39 2,97 · #2E86AB 4,11. Ahora son
+ * tokens del módulo CSS: `color` es FONDO con texto blanco encima (≥ 4,5:1 en los dos temas) y
+ * `texto` es el color como texto sobre la tarjeta, con su variante oscura.
+ */
+const CATEGORIAS: Record<Categoria, { label: string; icono: string; color: string; texto: string }> = {
+  'riesgo-rentabilidad': { label: 'Riesgo y Rentabilidad', icono: '📊', color: 'var(--inv-riesgo)',   texto: 'var(--inv-riesgo-texto)' },
+  'renta-fija':          { label: 'Renta Fija y Bonos',   icono: '📄', color: 'var(--inv-renta)',    texto: 'var(--inv-renta-texto)' },
+  'fondos-etf':          { label: 'Fondos y ETF',          icono: '🏦', color: 'var(--inv-fondos)',   texto: 'var(--inv-fondos-texto)' },
+  'cartera-estrategia':  { label: 'Cartera y Estrategia', icono: '⚖️', color: 'var(--inv-cartera)',  texto: 'var(--inv-cartera-texto)' },
+  'valoracion':          { label: 'Valoración de Activos', icono: '🔍', color: 'var(--inv-valor)',    texto: 'var(--inv-valor-texto)' },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -194,7 +209,7 @@ const PREGUNTAS: Pregunta[] = [
       'El rendimiento total del fondo antes de comisiones',
     ],
     correcta: 1,
-    explicacion: 'El TER incluye la comisión de gestión, depositaría y otros gastos operativos, expresados como % anual sobre el patrimonio. Un fondo activo típico puede tener TER del 1,5–2%; un ETF indexado, del 0,05–0,20%. A 30 años con un 7% bruto: TER 0,10% → 7,6x capital; TER 1,5% → 5,6x. La diferencia compuesta es enorme.',
+    explicacion: 'El TER incluye la comisión de gestión, depositaría y otros gastos operativos, expresados como % anual sobre el patrimonio. Un fondo activo típico puede tener TER del 1,5–2%; un ETF indexado, del 0,05–0,20%. A 30 años con un 7 % bruto, restando la comisión de la rentabilidad: TER 0,10 % → 1,069³⁰ ≈ 7,4 veces el capital; TER 1,5 % → 1,055³⁰ ≈ 5,0 veces. Con la comisión baja se acaba con casi un 50 % más de capital.',
   },
   {
     id: 12, categoria: 'fondos-etf',
@@ -242,7 +257,7 @@ const PREGUNTAS: Pregunta[] = [
       'El de distribución, porque permite compensar con minusvalías cada año',
     ],
     correcta: 2,
-    explicacion: 'En fondos de acumulación, los dividendos se reinvierten automáticamente sin generar evento fiscal. En fondos de distribución, cada reparto tributa como rendimiento del capital mobiliario (19–28% según tramo). Para quien no necesita rentas, la acumulación es más eficiente: el impuesto diferido sigue compuesto hasta la venta. Además, en España los traspasos entre fondos (no ETF) son sin coste fiscal.',
+    explicacion: `En fondos de acumulación, los dividendos se reinvierten automáticamente sin generar evento fiscal. En fondos de distribución, cada reparto tributa como rendimiento del capital mobiliario en la base del ahorro (del ${TIPO_AHORRO_MIN} al ${TIPO_AHORRO_MAX} % según tramo). Para quien no necesita rentas, la acumulación es más eficiente: el impuesto diferido sigue compuesto hasta la venta. Además, en España los traspasos entre fondos (no ETF) son sin coste fiscal.`,
   },
 
   // ── Cartera y Estrategia ──
@@ -280,7 +295,7 @@ const PREGUNTAS: Pregunta[] = [
       'Invertir en fondos gestionados por gestoras de primer nivel (factores cualitativos)',
     ],
     correcta: 1,
-    explicacion: 'El factor investing (smart beta) identifica características sistemáticas que han generado rentabilidad extra ajustada al riesgo: valor (P/B bajo), momentum (subidas recientes), calidad (alta rentabilidad sobre fondos propios), tamaño (small caps) y baja volatilidad. Fama y French documentaron los tres primeros factores. Los ETF de factores cobran entre un índice puro y un fondo activo. No garantizan alfa futuro.',
+    explicacion: 'El factor investing (smart beta) identifica características sistemáticas que han generado rentabilidad extra ajustada al riesgo: valor (P/B bajo), momentum (subidas recientes), calidad (alta rentabilidad sobre fondos propios), tamaño (small caps) y baja volatilidad. Fama y French propusieron en 1993 un modelo de tres factores (mercado, tamaño y valor); el momentum lo añadió Carhart (1997) y la rentabilidad, cercana a la «calidad», entró en el modelo de cinco factores de Fama y French (2015). Los ETF de factores cobran entre un índice puro y un fondo activo. No garantizan alfa futuro.',
   },
   {
     id: 19, categoria: 'cartera-estrategia',
@@ -342,7 +357,7 @@ const PREGUNTAS: Pregunta[] = [
       'Solo afecta al valor terminal, no a los flujos de los primeros años',
     ],
     correcta: 1,
-    explicacion: 'En un DCF, el valor actual = Σ (Flujo_t / (1 + r)^t). Cuanto mayor la tasa de descuento r, menor el denominador → menor el valor presente de cada flujo. Una empresa de alto crecimiento (con flujos lejanos en el tiempo) es especialmente sensible a cambios en la tasa: pequeñas variaciones en r producen grandes cambios en la valoración. Por eso las empresas de crecimiento caen más cuando suben los tipos.',
+    explicacion: 'En un DCF, el valor actual = Σ (Flujo_t / (1 + r)^t). Cuanto mayor la tasa de descuento r, mayor el denominador (1 + r)^t → menor el valor presente de cada flujo. Una empresa de alto crecimiento (con flujos lejanos en el tiempo) es especialmente sensible a cambios en la tasa: pequeñas variaciones en r producen grandes cambios en la valoración. Por eso las empresas de crecimiento caen más cuando suben los tipos.',
   },
   {
     id: 24, categoria: 'valoracion',
@@ -383,13 +398,24 @@ function mezclar<T>(arr: T[]): T[] {
   return a;
 }
 
+/**
+ * Hallazgo 3752: las preguntas se barajaban, pero las opciones no, y la correcta era la B en 15 de
+ * 25 y la C en 10 (las 5 de Valoración, B): «siempre la B» daba un 60 % y, en Valoración, 5/5
+ * «Experto en inversión». Ahora se barajan también las opciones y la correcta se recoloca.
+ */
+function barajarOpciones(p: Pregunta): Pregunta {
+  const orden = mezclar(p.opciones.map((_, i) => i));
+  return { ...p, opciones: orden.map((i) => p.opciones[i]), correcta: orden.indexOf(p.correcta) };
+}
+
+// Colores de la nota: tokens con variante oscura (hallazgo 3758; antes, en claro, 2,19 · 2,87 · 2,97)
 function clasificacion(pct: number): { texto: string; icono: string; color: string } {
-  if (pct === 100) return { texto: 'Experto en inversión', icono: '🏆', color: '#F39C12' };
+  if (pct === 100) return { texto: 'Experto en inversión', icono: '🏆', color: 'var(--inv-oro-texto)' };
   // Hallazgo 3792: un nivel de conocimiento, no una invitación a invertir (app exenta de disclaimer)
-  if (pct >= 80)  return { texto: 'Nivel avanzado — dominas la mayoría de los conceptos', icono: '🌟', color: '#27AE60' };
-  if (pct >= 60)  return { texto: 'Nivel intermedio — base sólida para seguir aprendiendo', icono: '👍', color: '#2E86AB' };
-  if (pct >= 40)  return { texto: 'Nivel básico-medio — repasa los conceptos clave', icono: '📚', color: '#E07B39' };
-  return { texto: 'Nivel inicial — empieza por el quiz básico de finanzas', icono: '🌱', color: '#8E44AD' };
+  if (pct >= 80)  return { texto: 'Nivel avanzado — dominas la mayoría de los conceptos', icono: '🌟', color: 'var(--inv-valor-texto)' };
+  if (pct >= 60)  return { texto: 'Nivel intermedio — base sólida para seguir aprendiendo', icono: '👍', color: 'var(--inv-riesgo-texto)' };
+  if (pct >= 40)  return { texto: 'Nivel básico-medio — repasa los conceptos clave', icono: '📚', color: 'var(--inv-fondos-texto)' };
+  return { texto: 'Nivel inicial — empieza por el quiz básico de finanzas', icono: '🌱', color: 'var(--inv-cartera-texto)' };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -422,7 +448,7 @@ export default function QuizConceptosInversionPage() {
     const pool = modo === 'examen'
       ? mezclar(PREGUNTAS)
       : mezclar(PREGUNTAS.filter(p => p.categoria === categoriaSeleccionada));
-    setPreguntas(pool);
+    setPreguntas(pool.map(barajarOpciones));
     setIndice(0);
     setRespuestaElegida(null);
     setCorrectas(0);
@@ -632,10 +658,21 @@ export default function QuizConceptosInversionPage() {
 
             {/* Feedback */}
             {estado === 'respondida' && (
-              <div className={`${styles.feedback} ${respuestaElegida === preguntaActual.correcta ? styles.feedbackOk : styles.feedbackFail}`}>
+              // Hallazgo 3757: veredicto y explicación en una región viva (el foco salta a «Siguiente»
+              // y sin ella no se oían) y, al fallar, cuál era la buena. Receta de quiz-literatura-universal.
+              <div
+                className={`${styles.feedback} ${respuestaElegida === preguntaActual.correcta ? styles.feedbackOk : styles.feedbackFail}`}
+                role="status"
+                aria-live="polite"
+              >
                 <p className={styles.feedbackTitulo}>
                   <span aria-hidden="true">{respuestaElegida === preguntaActual.correcta ? '✅' : '❌'}</span>
                   {respuestaElegida === preguntaActual.correcta ? ' Correcto' : ' Incorrecto'}
+                  <span>
+                    {respuestaElegida !== preguntaActual.correcta
+                      ? `. La respuesta era: ${preguntaActual.opciones[preguntaActual.correcta]}`
+                      : ''}
+                  </span>
                 </p>
                 <p className={styles.feedbackExplicacion}>{preguntaActual.explicacion}</p>
                 <button type="button" onClick={siguiente} className={styles.btnSiguiente} ref={siguienteRef}>
@@ -674,7 +711,7 @@ export default function QuizConceptosInversionPage() {
                           style={{ width: `${pct}%`, backgroundColor: CATEGORIAS[cat].color }}
                         />
                       </div>
-                      <span className={styles.desgloseScore} style={{ color: CATEGORIAS[cat].color }}>
+                      <span className={styles.desgloseScore} style={{ color: CATEGORIAS[cat].texto }}>
                         {r.correctas}/{r.total}
                       </span>
                     </div>

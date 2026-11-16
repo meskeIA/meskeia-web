@@ -2,6 +2,31 @@
   min-height: 100vh;
   background: var(--bg-primary);
   color: var(--text-primary);
+  /*
+   * Colores de categoría (hallazgo 3758). Los de FONDO llevan texto blanco encima y son iguales en
+   * los dos temas (blanco sobre ellos: 5,47 · 5,15 · 4,77 · 5,87 · 5,01). Los de TEXTO van sobre la
+   * tarjeta: en claro, los mismos tonos (mismas cifras contra el blanco); en oscuro, tonos claros.
+   */
+  --inv-riesgo: #26718F;
+  --inv-renta: #327874;
+  --inv-fondos: #B35A1F;
+  --inv-cartera: #8E44AD;
+  --inv-valor: #2E7D59;
+  --inv-riesgo-texto: #26718F;
+  --inv-renta-texto: #327874;
+  --inv-fondos-texto: #B35A1F;
+  --inv-cartera-texto: #8E44AD;
+  --inv-valor-texto: #2E7D59;
+  --inv-oro-texto: #8A5A00;
+}
+
+[data-theme='dark'] .container {
+  --inv-riesgo-texto: #7FC3E0;
+  --inv-renta-texto: #7DCFC9;
+  --inv-fondos-texto: #F0A46E;
+  --inv-cartera-texto: #C9A0DC;
+  --inv-valor-texto: #7AD3A5;
+  --inv-oro-texto: #F5C04A;
 }
 
 .hero {

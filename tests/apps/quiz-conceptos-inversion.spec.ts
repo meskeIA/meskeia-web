@@ -11,7 +11,8 @@ import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '../../data/fiscal/inmuebles
  *   valoración — nivel intermedio con explicaciones detalladas» · metadata y applications.ts: «25
  *   preguntas en 5 categorías» con explicaciones tras cada respuesta.
  * · Pantalla de inicio con dos modos: «Examen completo» (las 25, barajadas) y «Práctica por
- *   categoría» (las 5 de una categoría, barajadas). Las OPCIONES no se barajan. Tras la última,
+ *   categoría» (las 5 de una categoría, barajadas). Las OPCIONES se barajan desde el hallazgo 3752
+ *   (/reparar 16/11/2026): todo se conduce por el texto de la opción. Tras la última,
  *   «Ver resultado» da «N / total», «P % de respuestas correctas», un nivel por tramos y un
  *   «Resultado por categoría». La única salida del resultado es «Volver a empezar», que vuelve a
  *   la pantalla de inicio.
@@ -136,7 +137,8 @@ async function responder(page: Page, modo: Modo): Promise<boolean> {
   const i = typeof modo === 'number' ? modo : modo === 'bien' ? iC : iC === 0 ? 1 : 0;
   await opciones(page).nth(i).click();
   // La clave de la app coincide con la cotejada a mano: «Correcto» solo si se pulsó la buena
-  await expect(veredicto(page)).toHaveText(i === iC ? /^\s*✅?\s*Correcto$/ : /^\s*❌?\s*Incorrecto$/);
+  // Al fallar, el veredicto dice cuál era la buena (hallazgo 3757)
+  await expect(veredicto(page)).toHaveText(i === iC ? /^\s*✅?\s*Correcto$/ : /^\s*❌?\s*Incorrecto\. La respuesta era: .+$/);
   return i === iC;
 }
 
@@ -502,9 +504,9 @@ test.describe('Inspector 28/10/2026 · nota, foco y accesibilidad', () => {
    * Pulsar siempre la B: examen → 15 / 25 = 60 % «Nivel intermedio»; práctica «Valoración de
    * Activos» (las 5 son B) → 5 / 5 = 100 % «Experto en inversión». Con las opciones barajadas, una
    * letra fija acierta como Binomial(25; 0,25): P(≥ 15) ≈ 2·10⁻⁵; en 5 preguntas, P(5) ≈ 0,001.
+   * REPARADO (3752, /reparar 16/11/2026): barajarOpciones en iniciar().
    */
   test('hallazgo · contestar siempre la B no da «Experto en inversión» ni «Nivel intermedio»', async ({ page }) => {
-    test.fail();
     test.setTimeout(150_000);
     await abrir(page);
     await page.getByRole('button', { name: /Práctica por categoría/ }).click();
@@ -528,10 +530,12 @@ test.describe('Inspector 28/10/2026 · nota, foco y accesibilidad', () => {
     // con lector de pantalla no se oye «Incorrecto» ni cuál era la buena. La correcta solo cambia de
     // borde y fondo verde (clase opcionCorrecta), sin texto ni aria-label (WCAG 1.4.1). La referencia
     // (quiz-literatura-universal) usa role="status" y un aria-label con la marca.
-    test.fail();
+    // REPARADO (3757, /reparar 16/11/2026): el feedback es role="status" aria-live="polite" y, al
+    // fallar, dice «La respuesta era: …»; la marca de la buena la puso el cabo C0516.
     await abrir(page);
     await empezarExamen(page);
     const { iC } = await preguntaVisible(page);
+    const buena = (await textosOpcion(page))[iC]; // antes de contestar: luego lleva su ✓
     await opciones(page).nth(iC === 0 ? 1 : 0).focus();
     await page.keyboard.press('Enter');
     await expect(veredicto(page)).toBeVisible();
@@ -539,6 +543,9 @@ test.describe('Inspector 28/10/2026 · nota, foco y accesibilidad', () => {
     const vivas = page.locator('main :is([aria-live], [role="status"], [role="alert"])');
     if ((await vivas.count()) === 0) fallos.push('sin región viva en el quiz');
     else if (!/Incorrecto/.test(await vivas.first().innerText())) fallos.push('la región viva no lleva el veredicto');
+    else if (!norm(await vivas.first().innerText()).includes(`La respuesta era: ${buena}`)) {
+      fallos.push('la región viva no dice cuál era la buena');
+    }
     const nombreCorrecta = await opciones(page)
       .nth(iC)
       .evaluate((b) => b.getAttribute('aria-label') ?? b.textContent ?? '');
@@ -551,46 +558,66 @@ test.describe('Inspector 28/10/2026 · nota, foco y accesibilidad', () => {
     // contraste no los ven. Insignia: texto blanco 12,8 px bold (pide 4,5:1) sobre #48A9A6 2,80 ·
     // #27AE60 2,87 · #E07B39 2,97 · #2E86AB 4,11 (solo #8E44AD, 5,87, cumple). Puntuación 40 px
     // (pide 3:1) en claro: #F39C12 (100 %) 2,19 · #27AE60 (≥ 80 %) 2,87 · #E07B39 (≥ 40 %) 2,97.
-    test.fail();
-    test.setTimeout(120_000);
-    await abrir(page);
-    await empezarExamen(page);
+    // Desglose 13,6 px bold (pide 4,5:1): de 2,80 a 4,11 en claro; en oscuro #8E44AD 2,35, #2E86AB 3,35.
+    // REPARADO (3758, /reparar 16/11/2026): tokens del módulo (--inv-*) con variante oscura para el
+    // texto; se mide en los dos temas, con los colores ya asentados (globals.css anima el fondo 0,3 s
+    // y los style={{…}} son ahora var(), que no se pueden leer como número).
+    test.setTimeout(300_000);
     type ConContraste = { __contraste: (e: Element) => number };
-    await page.evaluate(() => {
-      const rgb = (s: string) => (s.match(/[\d.]+/g) ?? []).map(Number).slice(0, 3);
-      const lum = ([r, g, b]: number[]) => {
-        const f = (c: number) => ((c /= 255) <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
-        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
-      };
-      // El color de destino se lee del style={{…}} del propio elemento: el calculado puede ir aún
-      // en transición desde el de la pregunta anterior.
-      (window as unknown as ConContraste).__contraste = (el: Element): number => {
-        let fondo = [255, 255, 255];
-        for (let n: Element | null = el; n; n = n.parentElement) {
-          const propio = (n as HTMLElement).style?.backgroundColor;
-          const v = ((propio || getComputedStyle(n).backgroundColor).match(/[\d.]+/g) ?? []).map(Number);
-          if (v.length === 3 || (v.length === 4 && v[3] > 0.5)) {
-            fondo = v.slice(0, 3);
-            break;
-          }
-        }
-        const [a, b] = [lum(rgb((el as HTMLElement).style?.color || getComputedStyle(el).color)), lum(fondo)];
-        return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
-      };
-    });
     const bajos: string[] = [];
-    for (let n = 1; n <= 25; n++) {
-      const { cat } = await preguntaVisible(page);
-      await expect(insignia(page)).toContainText(cat);
-      const r = await insignia(page).evaluate((el) => (window as unknown as ConContraste).__contraste(el));
-      if (r < 4.5) bajos.push(`insignia ${cat} ${r.toFixed(2)}`);
-      await responder(page, 'bien');
-      await siguiente(page).click();
+    for (const tema of ['light', 'dark'] as const) {
+      await page.addInitScript((t) => {
+        try {
+          localStorage.setItem('meskeia-theme', t);
+        } catch {
+          /* sin almacenamiento */
+        }
+      }, tema);
+      await abrir(page);
+      await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
+      await empezarExamen(page);
+      await page.evaluate(() => {
+        const rgb = (s: string) => (s.match(/[\d.]+/g) ?? []).map(Number).slice(0, 3);
+        const lum = ([r, g, b]: number[]) => {
+          const f = (c: number) => ((c /= 255) <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        (window as unknown as ConContraste).__contraste = (el: Element): number => {
+          let fondo = [255, 255, 255];
+          for (let n: Element | null = el; n; n = n.parentElement) {
+            const v = (getComputedStyle(n).backgroundColor.match(/[\d.]+/g) ?? []).map(Number);
+            if (v.length === 3 || (v.length === 4 && v[3] > 0.5)) {
+              fondo = v.slice(0, 3);
+              break;
+            }
+          }
+          const [a, b] = [lum(rgb(getComputedStyle(el).color)), lum(fondo)];
+          return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+        };
+      });
+      for (let n = 1; n <= 25; n++) {
+        const { cat } = await preguntaVisible(page);
+        await expect(insignia(page)).toContainText(cat);
+        await page.waitForTimeout(400);
+        const r = await insignia(page).evaluate((el) => (window as unknown as ConContraste).__contraste(el));
+        if (r < 4.5) bajos.push(`${tema}: insignia ${cat} ${r.toFixed(2)}`);
+        await responder(page, 'bien');
+        await siguiente(page).click();
+      }
+      await expect(tarjeta(page)).toBeVisible();
+      await page.waitForTimeout(400);
+      const rh2 = await page
+        .locator('h2[class*="_resultadoPuntuacion"]')
+        .evaluate((el) => (window as unknown as ConContraste).__contraste(el));
+      if (rh2 < 3) bajos.push(`${tema}: puntuación 25 / 25 ${rh2.toFixed(2)}`);
+      const desglose = await page
+        .locator('[class*="_desgloseScore"]')
+        .evaluateAll((els) => els.map((el) => (window as unknown as ConContraste).__contraste(el)));
+      expect(desglose, `${tema}: las cinco categorías en el desglose`).toHaveLength(5);
+      desglose.forEach((r, i) => {
+        if (r < 4.5) bajos.push(`${tema}: desglose ${i + 1} ${r.toFixed(2)}`);
+      });
     }
-    const rh2 = await page
-      .locator('h2[class*="_resultadoPuntuacion"]')
-      .evaluate((el) => (window as unknown as ConContraste).__contraste(el));
-    if (rh2 < 3) bajos.push(`puntuación 25 / 25 ${rh2.toFixed(2)}`);
     expect([...new Set(bajos)]).toEqual([]);
   });
 
@@ -635,14 +662,15 @@ test.describe('Inspector 28/10/2026 · banco', () => {
    * (1,07^30 = 7,61) y el 5,6x corresponde a un 5,9 % neto.
    */
   test('hallazgo · las cifras del TER a 30 años cuadran con el 7 % menos la comisión', async ({ page }) => {
-    test.fail();
+    // REPARADO (3753, /reparar 16/11/2026): «1,069³⁰ ≈ 7,4 veces» y «1,055³⁰ ≈ 5,0 veces». El
+    // localizador de la cifra se reescribe con el rótulo nuevo; los umbrales son los de la ficha.
     test.setTimeout(120_000);
     expect(1.069 ** 30).toBeCloseTo(7.4, 1);
     expect(1.055 ** 30).toBeCloseTo(4.98, 1);
     await abrir(page);
     const { expl } = await leerBanco(page);
     const ter = buscar(expl, /^¿Qué es el TER/);
-    const m = ter.match(/TER 0,10% → ([\d,]+)x capital; TER 1,5% → ([\d,]+)x/);
+    const m = ter.match(/TER 0,10% → (?:1,069³⁰ ≈ )?([\d,]+) ?(?:x|veces el) capital; TER 1,5% → (?:1,055³⁰ ≈ )?([\d,]+) ?(?:x|veces)/);
     expect(m, ter).not.toBeNull();
     const [bajo, alto] = [Number(m![1].replace(',', '.')), Number(m![2].replace(',', '.'))];
     expect(Math.abs(bajo - 7.4), `TER 0,10 % → ${m![1]}x`).toBeLessThanOrEqual(0.1);
@@ -653,7 +681,8 @@ test.describe('Inspector 28/10/2026 · banco', () => {
     // P «Un fondo de acumulación vs…»: «cada reparto tributa como rendimiento del capital mobiliario
     // (19–28% según tramo)». La escala del ahorro (LIRPF art. 66, redacción de la Ley 7/2024 con
     // efectos 1/1/2025) es TRAMOS_GANANCIAS_PATRIMONIALES_2025 de data/fiscal/inmuebles.ts: 19-30 %.
-    test.fail();
+    // REPARADO (3754, /reparar 16/11/2026): la app importa la escala y escribe «del 19 al 30 %»
+    // (BOE, Ley 7/2024, DF 7.ª: 9,5 + 9,5 … 15 + 15, consultado el 16/11/2026).
     test.setTimeout(120_000);
     const minimo = TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo;
     const maximo = TRAMOS_GANANCIAS_PATRIMONIALES_2025.at(-1)!.tipo;
@@ -662,18 +691,20 @@ test.describe('Inspector 28/10/2026 · banco', () => {
     const { expl } = await leerBanco(page);
     const p = buscar(expl, /^Un fondo de acumulación/);
     expect(p).toMatch(/rendimiento del capital mobiliario/);
-    expect(p).toContain(`${minimo}–${maximo}%`);
+    expect(p).toContain(`del ${minimo} al ${maximo}%`);
   });
 
   test('hallazgo · la explicación del DCF no dice que el denominador baja al subir la tasa', async ({ page }) => {
     // «Cuanto mayor la tasa de descuento r, menor el denominador → menor el valor presente»: con
     // VP = F / (1 + r)^t, subir r AGRANDA el denominador (1,10² = 1,21 > 1,05² = 1,1025).
-    test.fail();
+    // REPARADO (3755, /reparar 16/11/2026): «mayor el denominador (1 + r)^t».
     test.setTimeout(120_000);
     expect(1.1 ** 2).toBeGreaterThan(1.05 ** 2);
     await abrir(page);
     const { expl } = await leerBanco(page);
-    expect(buscar(expl, /^En un modelo DCF/)).not.toMatch(/mayor la tasa de descuento r, menor el denominador/);
+    const dcf = buscar(expl, /^En un modelo DCF/);
+    expect(dcf).not.toMatch(/mayor la tasa de descuento r, menor el denominador/);
+    expect(dcf).toMatch(/mayor la tasa de descuento r, mayor el denominador/);
   });
 
   test('hallazgo · Fama y French no «documentaron» el momentum ni la calidad', async ({ page }) => {
@@ -681,13 +712,16 @@ test.describe('Inspector 28/10/2026 · banco', () => {
     // volatilidad. Fama y French documentaron los tres primeros factores»: los tres primeros de la
     // lista son valor, momentum y calidad; el modelo de tres factores de Fama y French (1993) es
     // mercado, tamaño y valor, y el momentum lo añadió Carhart (1997).
-    test.fail();
+    // REPARADO (3756, /reparar 16/11/2026): tres factores (mercado, tamaño y valor), Carhart (1997) y
+    // el modelo de cinco factores (2015), con «propusieron».
     test.setTimeout(120_000);
     await abrir(page);
     const { expl } = await leerBanco(page);
     const p = buscar(expl, /^¿Qué es el "factor investing"/);
     expect(p).toMatch(/valor \(P\/B bajo\), momentum/);
     expect(p).not.toMatch(/Fama y French documentaron los tres primeros factores/);
+    expect(p).toMatch(/Fama y French propusieron en 1993 un modelo de tres factores \(mercado, tamaño y valor\)/);
+    expect(p).toMatch(/Carhart \(1997\)/);
   });
 
   test('hallazgo · el porcentaje va separado del número con espacio duro («35 %»)', async ({ page }) => {
