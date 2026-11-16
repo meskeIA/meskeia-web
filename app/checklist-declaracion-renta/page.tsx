@@ -572,7 +572,9 @@ export default function ChecklistDeclaracionRentaPage() {
                     fecha del contrato, la zona, la renta pactada y la edad del inquilino, y la
                     escala ha cambiado más de una vez; un «60 %» sin condiciones era falso (4624). */}
                 <li>Si es vivienda habitual para el inquilino, el rendimiento neto positivo puede tener una reducción (art. 23.2 de la Ley del IRPF) cuyo porcentaje depende de la fecha del contrato, de la zona, de la renta pactada y de la edad del inquilino: compruébalo con los datos de tu contrato en Renta Web.</li>
-                <li>Los períodos en que el inmueble estuvo vacío tributan como imputación de rentas (1,1&nbsp;% del valor catastral).</li>
+                {/* Art. 85.1 LIRPF hasta 2026: 2 % con carácter general; 1,1 % solo con valores
+                    catastrales revisados (hallazgo 4706). Desde 2027 rige la escala del RDL 29/2026. */}
+                <li>Los períodos en que el inmueble estuvo vacío tributan como imputación de rentas: el 2&nbsp;% del valor catastral con carácter general, o el 1,1&nbsp;% si los valores catastrales del municipio se han revisado en los últimos años (tus datos fiscales de la AEAT indican cuál te corresponde).</li>
               </ul>
               <p className={styles.escenarioTip}>Consejo: Guarda TODAS las facturas de reparaciones. El IBI puede ser el gasto olvidado más frecuente que la gente no deduce.</p>
             </div>
@@ -585,7 +587,8 @@ export default function ChecklistDeclaracionRentaPage() {
               <p className={styles.escenarioExample}>Ejemplo: tiene cartera en acciones españolas y un fondo indexado.</p>
               <ul>
                 <li>Pide el certificado fiscal a tu banco o bróker en enero-febrero: recoge todas las operaciones del año.</li>
-                <li>Las pérdidas de acciones compensan ganancias de otros años (hasta 4 ejercicios anteriores).</li>
+                {/* Art. 49.1.b LIRPF: «se compensará en los cuatro años siguientes» (hallazgo 4702) */}
+                <li>Las pérdidas de acciones compensan ganancias de los 4 años siguientes si no se pueden compensar en el mismo año.</li>
                 <li>Los traspasos entre fondos están exentos si no hay reembolso a cuenta corriente.</li>
                 <li>Las criptomonedas tributan como ganancias/pérdidas patrimoniales desde 2023.</li>
               </ul>

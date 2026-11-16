@@ -316,11 +316,10 @@ test.describe('checklist-declaracion-renta — cabos C0745 y C0750 (fuente: BOE 
     await abrir(page);
   });
 
-  // ABIERTO — hallazgo de C0745 (a). Esperado: las pérdidas se compensan en los cuatro años
-  // SIGUIENTES (art. 49.1.b LIRPF). La nota del checklist y la tarjeta de consejos lo dicen bien;
-  // la tarjeta del inversor dice «hasta 4 ejercicios anteriores».
+  // REPARADO (4702, 16/11/2026) — hallazgo de C0745 (a). Esperado: las pérdidas se compensan en
+  // los cuatro años SIGUIENTES (art. 49.1.b LIRPF). La nota del checklist y la tarjeta de consejos
+  // lo decían bien; la tarjeta del inversor decía «hasta 4 ejercicios anteriores».
   test('C0745 (a) — las pérdidas compensan ganancias de los 4 años siguientes, no de los anteriores', async ({ page }) => {
-    test.fail();
     await perfil(page, /^Inversor/).click();
     const nota = await texto(item(page, /^Declaraciones de años anteriores si tienes pérdidas/));
     expect(nota).toContain('4 años siguientes');
@@ -344,32 +343,33 @@ test.describe('checklist-declaracion-renta — cabos C0745 y C0750 (fuente: BOE 
     expect(nota).not.toMatch(/desde 2023/i);
   });
 
-  // ABIERTO — hallazgo de C0745 (c), el cálculo. Esperado (ET, DT 11.ª.2): en un contrato anterior
-  // al 12/02/2012 los 45 días solo cuentan por el tiempo trabajado antes de esa fecha; lo posterior,
-  // a 33 días. Caso: contrato del 12/02/2007, despido improcedente el 12/02/2025, 100 €/día:
-  // 5 × 45 + 13 × 33 = 654 días → 65.400 € exentos; la FAQ da 45 × 18 = 810 días → 81.000 €.
+  // REPARADO (4704, 16/11/2026) — hallazgo de C0745 (c), el cálculo. Esperado (ET, DT 11.ª.2): en
+  // un contrato anterior al 12/02/2012 los 45 días solo cuentan por el tiempo trabajado antes de esa
+  // fecha; lo posterior, a 33 días. Caso: contrato del 12/02/2007, despido improcedente el
+  // 12/02/2025, 100 €/día: 5 × 45 + 13 × 33 = 654 días → 65.400 € exentos; la FAQ daba 45 × 18 =
+  // 810 días → 81.000 €.
   test('C0745 (c) — despido: los 45 días solo por el tiempo anterior al 12/02/2012', async ({ page }) => {
-    test.fail();
     const faq = await respuestaFaqVisible(page, '¿Cómo tributan las indemnizaciones por despido?');
     expect(faq).toMatch(/12 de febrero de 2012|12\/02\/2012/);
     expect(faq).not.toContain('para contratos anteriores a 2012');
+    expect(faq).toMatch(/hasta esa fecha se cuenta a 45 días por año y el posterior a 33/);
+    expect(faq).toContain('720 días');
   });
 
-  // ABIERTO — hallazgo de C0745 (c), el tope. Esperado (art. 7.e LIRPF): la indemnización exenta
-  // «tendrá como límite la cantidad de 180.000 euros». Caso: contrato de 2015, 10 años, 600 €/día:
-  // 33 × 10 × 600 = 198.000 € → exentos 180.000 € y tributan 18.000 €; la FAQ los da exentos todos.
+  // REPARADO (4705, 16/11/2026) — hallazgo de C0745 (c), el tope. Esperado (art. 7.e LIRPF): la
+  // indemnización exenta «tendrá como límite la cantidad de 180.000 euros». Caso: contrato de 2015,
+  // 10 años, 600 €/día: 33 × 10 × 600 = 198.000 € → exentos 180.000 € y tributan 18.000 €; la FAQ
+  // los daba exentos todos.
   test('C0745 (c) — despido: la exención tiene un tope de 180.000 € (art. 7.e)', async ({ page }) => {
-    test.fail();
     const faq = await respuestaFaqVisible(page, '¿Cómo tributan las indemnizaciones por despido?');
     expect(faq).toMatch(/180\.?000/);
   });
 
-  // ABIERTO — hallazgo de C0745 (d). Esperado para 2025 (manual de Renta 2025; art. 85.1 LIRPF en la
-  // redacción anterior al RDL 29/2026): 2 % del valor catastral con carácter general y 1,1 % solo si
-  // los valores revisados entraron en vigor desde el 01/01/2012. Caso: piso vacío todo 2025, valor
-  // catastral 80.000 €, última revisión en vigor en 2008 → 1.600 € imputados; la app dice 1,1 % (880 €).
+  // REPARADO (4706, 16/11/2026) — hallazgo de C0745 (d). Esperado para 2025 (manual de Renta 2025;
+  // art. 85.1 LIRPF en la redacción anterior al RDL 29/2026): 2 % del valor catastral con carácter
+  // general y 1,1 % solo con valores revisados. Caso: piso vacío todo 2025, valor catastral 80.000 €,
+  // última revisión en vigor en 2008 → 1.600 € imputados; la app decía solo 1,1 % (880 €).
   test('C0745 (d) — imputación de rentas: 2 % general, 1,1 % solo con revisión catastral desde 2012', async ({ page }) => {
-    test.fail();
     const linea = await texto(page.locator('li', { hasText: 'Los períodos en que el inmueble estuvo vacío' }));
     expect(linea).toMatch(/1,1[\s ]?%/);
     expect(linea).toMatch(/(^|[^\d,])2[\s ]?%/);

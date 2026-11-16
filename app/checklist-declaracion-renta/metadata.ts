@@ -110,7 +110,11 @@ export const PREGUNTAS_FRECUENTES: FAQItem[] = [
   },
   {
     question: '¿Cómo tributan las indemnizaciones por despido?',
-    answer: 'La indemnización mínima legal por despido improcedente está exenta de IRPF hasta los límites legales (45 días por año trabajado con máximo 42 mensualidades, para contratos anteriores a 2012; o 33 días con máximo 24 mensualidades para los posteriores). La parte que supere esos límites tributa íntegramente como rendimiento del trabajo. El finiquito (salario pendiente, vacaciones no disfrutadas) siempre tributa.',
+    // Hallazgos 4704 y 4705 (16/11/2026). ET, DT 11.ª.2: en los contratos anteriores al
+    // 12/02/2012 los 45 días cuentan solo por el tiempo anterior a esa fecha, con tope de 720 días
+    // salvo que ese periodo dé más, y nunca más de 42 mensualidades. LIRPF art. 7.e: «tendrá como
+    // límite la cantidad de 180.000 euros». Las dos fuentes, consultadas en el BOE.
+    answer: 'La indemnización por despido improcedente está exenta de IRPF en la cuantía obligatoria que fija el Estatuto de los Trabajadores: 33 días de salario por año trabajado, con un máximo de 24 mensualidades. En los contratos anteriores al 12 de febrero de 2012, el tiempo trabajado hasta esa fecha se cuenta a 45 días por año y el posterior a 33; el total no puede pasar de 720 días de salario, salvo que el tiempo anterior a esa fecha dé más, y nunca de 42 mensualidades (disposición transitoria 11.ª del Estatuto). La exención tiene además un tope de 180.000 € (art. 7.e de la Ley del IRPF). La parte que supere esos límites tributa como rendimiento del trabajo. El finiquito (salario pendiente, vacaciones no disfrutadas) siempre tributa.',
   },
   {
     question: '¿Qué documentos necesito para hacer la declaración de la Renta?',
