@@ -353,8 +353,8 @@ export function orientarLimiteConjunto(inputs: InputsOrientador): ResultadoOrien
       tipo: 'descarte-bonificacion',
       aplicaItsgf,
       mensaje: aplicaItsgf
-        ? `En ${ccaa.nombre}, el Impuesto sobre el Patrimonio está bonificado al 100%, por lo que el límite conjunto del Art. 31 no aplica en tu caso. Como tu patrimonio supera los 3.000.000 €, podría aplicarte el ITSGF (Impuesto de Solidaridad de las Grandes Fortunas). Consulta con un asesor fiscal para evaluarlo.`
-        : `En ${ccaa.nombre}, el Impuesto sobre el Patrimonio está bonificado al 100%. Como en la práctica no pagas cuota de Patrimonio, no hay nada que reducir mediante el límite conjunto.`,
+        ? `En ${ccaa.nombre}, el Impuesto sobre el Patrimonio está bonificado al 100 %, por lo que el límite conjunto del Art. 31 no aplica en tu caso. Como tu patrimonio supera los 3.000.000 €, podría aplicarte el ITSGF (Impuesto de Solidaridad de las Grandes Fortunas). Consulta con un asesor fiscal para evaluarlo.`
+        : `En ${ccaa.nombre}, el Impuesto sobre el Patrimonio está bonificado al 100 %. Como en la práctica no pagas cuota de Patrimonio, no hay nada que reducir mediante el límite conjunto.`,
     };
   }
 
@@ -367,7 +367,7 @@ export function orientarLimiteConjunto(inputs: InputsOrientador): ResultadoOrien
     return {
       tipo: 'descarte-no-supera-limite',
       excesoOMargen: -exceso, // margen positivo (cuánto te falta para superar)
-      mensaje: `La suma de tu cuota íntegra IRPF más la cuota íntegra de Patrimonio (${formatoEuros(sumaCuotas)}) no supera el 60% de tu base imponible IRPF (${formatoEuros(limite60)}). La reducción del Art. 31 no se activa en tu caso.`,
+      mensaje: `La suma de tu cuota íntegra IRPF más la cuota íntegra de Patrimonio (${formatoEuros(sumaCuotas)}) no supera el ${Math.round(LIMITE_CONJUNTO_PORCENTAJE * 100)} % de tu base imponible IRPF (${formatoEuros(limite60)}). La reducción del Art. 31 no se activa en tu caso.`,
     };
   }
 

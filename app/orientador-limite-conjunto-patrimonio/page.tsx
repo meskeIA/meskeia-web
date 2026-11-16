@@ -289,7 +289,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 <option value="">Selecciona tu CCAA…</option>
                 {BONIFICACIONES_CCAA_PATRIMONIO.map(c => (
                   <option key={c.id} value={c.id}>
-                    {`${c.nombre}${c.bonificacion === 'total' ? ' (bonificación 100%)' : ''}${c.bonificacion === 'parcial' ? ' (bonificación parcial)' : ''}`}
+                    {`${c.nombre}${c.bonificacion === 'total' ? ' (bonificación 100 %)' : ''}${c.bonificacion === 'parcial' ? ' (bonificación parcial)' : ''}`}
                   </option>
                 ))}
               </select>
@@ -472,7 +472,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
 
             {resultado.tipo === 'descarte-bonificacion' && resultado.aplicaItsgf && (
               <div className={styles.ctaAsesor}>
-                <strong><span aria-hidden="true">⚠️</span> Atención al ITSGF:</strong> aunque tu CCAA bonifique el Patrimonio al 100%, los patrimonios
+                <strong><span aria-hidden="true">⚠️</span> Atención al ITSGF:</strong> aunque tu CCAA bonifique el Patrimonio al 100{' '}%, los patrimonios
                 netos superiores a {formatCurrency(ITSGF_UMBRAL)} pueden tributar por el Impuesto Temporal de
                 Solidaridad de las Grandes Fortunas (estatal). Consulta a tu asesor fiscal para evaluarlo.
               </div>
@@ -578,7 +578,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 <p><strong>Resultado:</strong> probable descarte por no superar el límite (renta significativa)</p>
               </div>
               <div className={styles.escenarioTip}>
-                Si la renta es proporcional al patrimonio, el 60% rara vez se supera.
+                Si la renta es proporcional al patrimonio, el {PCT_LIMITE} rara vez se supera.
               </div>
             </div>
 
@@ -669,7 +669,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>¿Puedo aplicar el límite si tengo bonificación 100% en mi CCAA?</h4>
+              <h4>¿Puedo aplicar el límite si tengo bonificación 100{' '}% en mi CCAA?</h4>
               <p>
                 No tiene sentido: si tu CCAA bonifica al 100{' '}%, la cuota de Patrimonio queda en 0 € → no hay nada
                 que reducir. Sin embargo, los patrimonios netos superiores a {ITSGF} pueden quedar sujetos al

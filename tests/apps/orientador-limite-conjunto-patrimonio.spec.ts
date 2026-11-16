@@ -284,9 +284,16 @@ test.describe('Hallazgos de la inspección del 16/11/2026', () => {
     expect(pregunta?.acceptedAnswer.text).toMatch(/80/);
   });
 
-  test('HALLAZGO (16/11/2026, ABIERTO) · formato: «60%» pegado en el mensaje del resultado', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4887) · formato: «60%» iba pegado en el mensaje del resultado, el selector, la FAQ y el JSON-LD', async ({ page }) => {
     await comprobar(page, { ccaa: 'aragon', bi: '50.000', irpf: '10.000', ip: '20.000' });
-    await expect(resultado(page)).toContainText('60 %');
-  });
+    expect(await resultado(page).textContent()).toContain('no supera el 60 % de tu base imponible');
+    const opciones = await page.locator('#ccaa option').allTextContents();
+    expect(opciones).toContain('Madrid (bonificación 100 %)');
+    const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+    expect(jsonLd).not.toMatch(/\d%/);
+    const guia = (await page.locator('[data-guia-educativa]').textContent()) ?? '';
+    expect(guia).not.toMatch(/\d%/);
+    await page.locator('#ccaa').selectOption('madrid');
+    await boton(page).click();
+    expect(await resultado(page).textContent()).toContain('bonificado al 100 %');  });
 });

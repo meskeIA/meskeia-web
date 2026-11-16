@@ -2,6 +2,10 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 import { LIMITE_CONJUNTO_PORCENTAJE, TOPE_REDUCCION_PORCENTAJE } from '@/data/fiscal';
 
+const PCT_LIMITE = `${Math.round(LIMITE_CONJUNTO_PORCENTAJE * 100)} %`;
+const PCT_TOPE = `${Math.round(TOPE_REDUCCION_PORCENTAJE * 100)} %`;
+const PCT_MINIMO = `${Math.round((1 - TOPE_REDUCCION_PORCENTAJE) * 100)} %`;
+
 export const metadata: Metadata = {
   title: 'Orientador Límite Conjunto IRPF-Patrimonio (Art. 31) | meskeIA',
   description: '¿Puedes reducir tu cuota del Impuesto sobre el Patrimonio gracias al límite conjunto del Art. 31? Orientador rápido que detecta si quedas excluido o si conviene consultar a tu asesor fiscal. España 2025.',
@@ -37,7 +41,7 @@ export const jsonLd = generateWebAppSchema({
   category: 'FinanceApplication',
   features: [
     'Detecta automáticamente bonificaciones autonómicas en el Impuesto sobre el Patrimonio',
-    'Comprueba si la suma IRPF + Patrimonio supera el 60% de tu base imponible',
+    `Comprueba si la suma IRPF + Patrimonio supera el ${PCT_LIMITE} de tu base imponible`,
     'Estima orientativamente la reducción aplicable según el Art. 31',
     'Avisa del posible ITSGF (Impuesto de Solidaridad de las Grandes Fortunas) en patrimonios superiores a 3M€',
     'Distingue tres resultados claros: descarte por CCAA, descarte por límite, posible beneficio',
@@ -46,10 +50,6 @@ export const jsonLd = generateWebAppSchema({
   ],
   keywords: ['Patrimonio España', 'límite conjunto IRPF', 'Art. 31 Ley 19/1991', 'reducción cuota Patrimonio', 'fiscal España'],
 });
-
-const PCT_LIMITE = `${Math.round(LIMITE_CONJUNTO_PORCENTAJE * 100)} %`;
-const PCT_TOPE = `${Math.round(TOPE_REDUCCION_PORCENTAJE * 100)} %`;
-const PCT_MINIMO = `${Math.round((1 - TOPE_REDUCCION_PORCENTAJE) * 100)} %`;
 
 /**
  * Lo que el art. 31.Uno.a de la Ley 19/1991 deja fuera de la base y de la cuota del IRPF
@@ -86,10 +86,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué comunidades autónomas bonifican el Impuesto sobre el Patrimonio al 100%?',
+      name: '¿Qué comunidades autónomas bonifican el Impuesto sobre el Patrimonio al 100 %?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Comunidades como Madrid aplican una bonificación del 100% en la cuota del Impuesto sobre el Patrimonio, lo que en la práctica anula el impuesto. En esos casos, la cuota de Patrimonio es cero y el límite conjunto del artículo 31 no resulta aplicable, ya que no hay cuota que reducir. La situación varía según la comunidad autónoma de residencia.',
+        text: 'Comunidades como Madrid aplican una bonificación del 100 % en la cuota del Impuesto sobre el Patrimonio, lo que en la práctica anula el impuesto. En esos casos, la cuota de Patrimonio es cero y el límite conjunto del artículo 31 no resulta aplicable, ya que no hay cuota que reducir. La situación varía según la comunidad autónoma de residencia.',
       },
     },
     {
