@@ -107,7 +107,7 @@ export const faqJsonLd = {
       name: '¿Qué es la amortización degresiva por porcentaje constante?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es un método (art. 12.1.b LIS) que concentra más gasto en los primeros años. Se multiplica el coeficiente lineal por 1,5 si el período es menor de 5 años, por 2 si está entre 5 y 8 años y por 2,5 si supera los 8 años, y ese porcentaje constante se aplica cada año sobre el valor pendiente de amortizar. El porcentaje resultante no puede ser inferior al 11%.',
+        text: 'Es un método (art. 12.1.b LIS) que concentra más gasto en los primeros años. Se multiplica el coeficiente lineal por 1,5 si el período es menor de 5 años, por 2 si va de 5 años a menos de 8 y por 2,5 si es de 8 años o más, y ese porcentaje constante se aplica cada año sobre el valor pendiente de amortizar. El porcentaje resultante no puede ser inferior al 11%.',
       },
     },
     {

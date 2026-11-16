@@ -8,13 +8,13 @@
  * Fuente: Ley 27/2014, de 27 de noviembre, del Impuesto sobre Sociedades,
  * artículo 12.1 (tabla de coeficientes de amortización lineal y métodos
  * de amortización degresiva admitidos: porcentaje constante y números dígitos).
- * Verificado: 2026-06-18
+ * Verificado: 2026-11-16
  * URL oficial: https://sede.agenciatributaria.gob.es/Sede/impuesto-sobre-sociedades.html
  */
 
 export const FISCAL_AMORTIZACION_META = {
   fuente: 'Ley 27/2014, de 27 de noviembre, del Impuesto sobre Sociedades (art. 12.1)',
-  verificado: '2026-06-18',
+  verificado: '2026-11-16',
   vigencia: '2026',
   urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/impuesto-sobre-sociedades.html',
   nota: 'Coeficientes de la tabla oficial de amortización del art. 12.1.a LIS (selección de los elementos más habituales). El coeficiente lineal máximo marca la amortización más rápida admitida; el período máximo, la más lenta. La amortización degresiva por porcentaje constante (art. 12.1.b) no es aplicable a edificios, mobiliario y enseres.',
@@ -49,19 +49,25 @@ export const TABLA_AMORTIZACION_2026: TipoActivoAmortizable[] = [
 // (art. 12.1.b LIS) — se aplican al coeficiente lineal según el período de
 // amortización elegido. El porcentaje constante resultante no puede ser < 11 %.
 
+// Art. 12.1.b LIS (BOE-A-2014-12328, consolidado a 02/09/2026, leído el 16/11/2026):
+// «1.º 1,5, si el elemento tiene un período de amortización inferior a 5 años.
+//  2.º 2, si el elemento tiene un período de amortización igual o superior a 5 años e inferior a 8 años.
+//  3.º 2,5, si el elemento tiene un período de amortización igual o superior a 8 años.»
+// Hasta el 16/11/2026 los 8 años exactos daban ×2 (hallazgo 4868, decidido por el usuario: ×2,5).
+// Los nombres de las claves se conservan: los leen la app, la ficha de Delegum y /api/datos.
 export const MULTIPLICADORES_DEGRESIVO_2026 = {
   menor5: 1.5,   // período de amortización < 5 años
-  entre5y8: 2.0, // período de 5 a 8 años
-  mayor8: 2.5,   // período > 8 años
+  entre5y8: 2.0, // período de 5 años a menos de 8
+  mayor8: 2.5,   // período de 8 años o más
   minimoPorcentaje: 11, // % constante mínimo aplicable
 };
 
 /**
  * Devuelve el multiplicador degresivo (porcentaje constante) según la vida útil
- * en años, conforme al art. 12.1.b LIS.
+ * en años, conforme al art. 12.1.b LIS: 8 años exactos ya son ×2,5.
  */
 export function multiplicadorDegresivo(vidaUtilAnios: number): number {
   if (vidaUtilAnios < 5) return MULTIPLICADORES_DEGRESIVO_2026.menor5;
-  if (vidaUtilAnios <= 8) return MULTIPLICADORES_DEGRESIVO_2026.entre5y8;
+  if (vidaUtilAnios < 8) return MULTIPLICADORES_DEGRESIVO_2026.entre5y8;
   return MULTIPLICADORES_DEGRESIVO_2026.mayor8;
 }

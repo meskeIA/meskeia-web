@@ -20,8 +20,8 @@ const URL_CANONICA = 'https://delegum.com/datos-fiscales/amortizacion-inmoviliza
 // Multiplicadores de la amortización degresiva por porcentaje constante (art. 12.1.b LIS)
 const MULTIPLICADORES = [
   { periodo: 'Período de amortización menor de 5 años', factor: MULTIPLICADORES_DEGRESIVO_2026.menor5 },
-  { periodo: 'Período de amortización de 5 a 8 años', factor: MULTIPLICADORES_DEGRESIVO_2026.entre5y8 },
-  { periodo: 'Período de amortización mayor de 8 años', factor: MULTIPLICADORES_DEGRESIVO_2026.mayor8 },
+  { periodo: 'Período de amortización de 5 años a menos de 8', factor: MULTIPLICADORES_DEGRESIVO_2026.entre5y8 },
+  { periodo: 'Período de amortización de 8 años o más', factor: MULTIPLICADORES_DEGRESIVO_2026.mayor8 },
 ];
 
 // Formatea un multiplicador en formato español: ×1,5

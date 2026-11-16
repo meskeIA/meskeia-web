@@ -64,10 +64,10 @@ export const RESPUESTA_FAQ_TOTAL_SEGUN_METODO =
 
 // La visible la preguntaba «¿Cómo funciona…?» con otra redacción de la misma respuesta
 // (hallazgo 4873, 16/11/2026): se queda la del JSON-LD. Los tramos del multiplicador repiten los
-// de multiplicadorDegresivo() de data/fiscal, pendientes de decisión (hallazgo 4868: el art.
-// 12.1.b LIS da 2,5 a partir de 8 años incluidos); si cambian, se corrigen aquí, en un solo sitio.
+// de multiplicadorDegresivo() de data/fiscal (art. 12.1.b LIS: 2,5 desde 8 años incluidos, hallazgo 4868;
+// decidido el 16/11/2026); si cambian, se corrigen aquí, en un solo sitio.
 export const RESPUESTA_FAQ_DEGRESIVO =
-  'Se aplica un porcentaje fijo sobre el valor pendiente de amortizar cada año, por lo que la cuota disminuye con el tiempo. En España ese porcentaje se obtiene multiplicando el coeficiente lineal por 1,5 si la vida útil es menor de 5 años, por 2 si está entre 5 y 8 años, o por 2,5 si supera los 8 años, con un mínimo del 11 %. El último año se amortiza todo el saldo pendiente. No se aplica a edificios, mobiliario y enseres.';
+  'Se aplica un porcentaje fijo sobre el valor pendiente de amortizar cada año, por lo que la cuota disminuye con el tiempo. En España ese porcentaje se obtiene multiplicando el coeficiente lineal por 1,5 si la vida útil es menor de 5 años, por 2 si va de 5 años a menos de 8, o por 2,5 si es de 8 años o más, con un mínimo del 11 %. El último año se amortiza todo el saldo pendiente. No se aplica a edificios, mobiliario y enseres.';
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',

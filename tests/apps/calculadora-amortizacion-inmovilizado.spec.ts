@@ -176,11 +176,10 @@ test.describe('calculadora-amortizacion-inmovilizado', () => {
   });
 
   test('CASO 2a (límite) · período de 8 años exacto: el art. 12.1.b LIS pondera por 2,5 → 31,25 %, 3125 € el primer año', async ({ page }) => {
-    // ABIERTO: multiplicadorDegresivo() de data/fiscal/amortizacion.ts devuelve 2 con
-    // `vidaUtilAnios <= 8`, y la ley da 2 solo «igual o superior a 5 años e inferior a 8 años» y
-    // 2,5 «igual o superior a 8 años». La app muestra «25,0 % (×2,0)», 2500 € el primer año,
-    // 1335 € el último y 68 % a mitad de vida.
-    test.fail();
+    // REPARADO (hallazgo 4868, decidido por el usuario el 16/11/2026): multiplicadorDegresivo() de
+    // data/fiscal/amortizacion.ts devolvía 2 con `vidaUtilAnios <= 8`, y la ley da 2 solo «igual
+    // o superior a 5 años e inferior a 8 años» y 2,5 «igual o superior a 8 años». La app mostraba
+    // «25,0 % (×2,0)», 2500 € el primer año, 1335 € el último y 68 % a mitad de vida.
     await escribir(page, ADQ, '10000', '10.000');
     await escribir(page, RES, '0', '0');
     await escribir(page, VIDA, '8', '8');
@@ -382,17 +381,17 @@ test.describe('calculadora-amortizacion-inmovilizado', () => {
   });
 
   test('FAQ · el JSON-LD y la FAQ visible no dicen que el coeficiente 2 llega hasta los 8 años', async ({ page }) => {
-    // ABIERTO: «por 2 si está entre 5 y 8 años, o por 2,5 si supera los 8 años» (JSON-LD) y
-    // «2 (de 5 a 8 años) o 2,5 (más de 8 años)» (visible); el art. 12.1.b da 2,5 «igual o
-    // superior a 8 años». Sigue ABIERTO con el hallazgo 4868 (dato de data/fiscal, espera la
-    // decisión del usuario); la respuesta ya es una sola (RESPUESTA_FAQ_DEGRESIVO, hallazgo 4873).
-    test.fail();
+    // REPARADO (hallazgo 4868, decidido por el usuario el 16/11/2026): decía «por 2 si está entre
+    // 5 y 8 años, o por 2,5 si supera los 8 años» (JSON-LD) y «2 (de 5 a 8 años) o 2,5 (más de 8
+    // años)» (visible); el art. 12.1.b da 2,5 «igual o superior a 8 años». La respuesta es una sola
+    // (RESPUESTA_FAQ_DEGRESIVO, hallazgo 4873) y ahora dice «de 8 años o más».
     const jsonLd = await page.evaluate(() =>
       Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
         .map((s) => s.textContent ?? '')
         .join('\n'),
     );
     expect(jsonLd).not.toMatch(/(entre 5 y 8|de 5 a 8) años/);
+    expect(jsonLd).toContain('por 2,5 si es de 8 años o más');
     await expect(page.getByText(/(entre 5 y 8|de 5 a 8) años/)).toHaveCount(0);
   });
 
