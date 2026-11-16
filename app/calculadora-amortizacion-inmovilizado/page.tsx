@@ -348,7 +348,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
 
       <LegalNotice />
 
-      <DisclaimerCard variant="financial" severity="high" collapsible={false} />
+      <DisclaimerCard variant="financial" severity="critical" collapsible={false} />
       <DataReference
         normativa="Amortización del inmovilizado (LIS art. 12.1)"
         fuente={FISCAL_AMORTIZACION_META.fuente}
@@ -512,7 +512,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
           </section>
         </>
       ) : (
-        <section className={styles.avisoVacio}>
+        <section className={styles.avisoVacio} role="alert">
           Introduce un valor de adquisición mayor que cero, una vida útil de al menos 1 año y un valor residual
           inferior al de adquisición para generar los cuadros de amortización.
         </section>
@@ -575,7 +575,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
             </div>
             <div className={styles.escenarioCard}>
               <span className={styles.escenarioIcon} aria-hidden="true">🧾</span>
-              <h3>Optimizar la base imponible</h3>
+              <h3>Adelantar el gasto deducible</h3>
               <p>Adelantar amortización reduce el beneficio de los primeros años y, con él, el impuesto. Es útil si esperas beneficios altos al inicio y prefieres diferir la tributación.</p>
             </div>
             <div className={styles.escenarioCard}>

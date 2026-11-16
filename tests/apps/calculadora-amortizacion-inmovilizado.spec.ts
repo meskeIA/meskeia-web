@@ -330,14 +330,24 @@ test.describe('calculadora-amortizacion-inmovilizado', () => {
   });
 
   test('CASO 3 bis · el aviso de datos no válidos se anuncia al lector de pantalla', async ({ page }) => {
-    // ABIERTO: el aviso es un <section> sin role="alert" ni aria-live; el cuadro desaparece y
-    // el lector de pantalla no dice nada.
-    test.fail();
+    // REPARADO (hallazgo 4874): el aviso era un <section> sin role="alert" ni aria-live; el
+    // cuadro desaparecía y el lector de pantalla no decía nada.
     await escribir(page, VIDA, '0', '0');
     await expect(aviso(page)).toBeVisible();
     await expect(
       page.locator('[role="alert"], [aria-live]').filter({ hasText: 'Introduce un valor de adquisición' }),
     ).toHaveCount(1);
+  });
+
+  test('CONTENIDO · app fiscal: disclaimer crítico y título de caso de uso sin «Optimizar»', async ({ page }) => {
+    // REPARADO (hallazgo 4872): la app trata la deducibilidad en el IS y montaba el disclaimer
+    // con severity="high"; la regla fiscal del CLAUDE.md pide nivel 1, crítico. El componente
+    // da a la severidad crítica el nombre accesible «Aviso importante».
+    await expect(page.getByRole('note', { name: 'Aviso importante' })).toHaveCount(1);
+    // REPARADO (hallazgo 4875): señal 7 de neutralidad editorial, «Optimizar X» en un título fiscal.
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.getByRole('heading', { name: 'Adelantar el gasto deducible' })).toHaveCount(1);
+    await expect(page.getByRole('heading', { name: /Optimizar/ })).toHaveCount(0);
   });
 
   test('FAQ · el JSON-LD y la FAQ visible no dicen que el coeficiente 2 llega hasta los 8 años', async ({ page }) => {
