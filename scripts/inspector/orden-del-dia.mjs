@@ -23,6 +23,11 @@
  *      últimos 7 días (entran más que salen) o pasa de UMBRAL_CABOS abiertos → /reparar cabos.
  *   3. Si no, /inspector: es el único que encuentra defectos nuevos. Después, /reparar solo si
  *      deja altos; los bajos y medios esperan a cuando venga bien (el reposo los deja esperar).
+ *   3.bis EL UMBRAL DE LAS PRIMERAS (16/11/2026, decidido por el usuario): con más de
+ *      UMBRAL_PRIMERAS medios, altos o críticos abiertos, la cola no saca primeras y el sitio del
+ *      Inspector lo ocupa `/reparar medio` (medios y superiores, de cualquier fecha). Sin esto los
+ *      medios no los drenaba nadie —el punto 3 los deja esperar— y el paso no se abriría nunca. Va
+ *      detrás de los cabos urgentes: ellos ya se adelantaban al Inspector. Cifras: `db.mjs`.
  *   4. Los cabos de destino `campana` van APARTE, «en paralelo: /campana <el más antiguo>»
  *      (01/11/2026, P003 del repaso de procesos): una campaña no choca con las tareas, que
  *      trabajan en su copia, pero sí con un /push o con otra campaña, así que no ocupa puesto en
@@ -36,10 +41,12 @@
  * Prueba: `npm run inspector:probar-orden`.
  */
 
-import { abrir } from './db.mjs';
+import { abrir, UMBRAL_PRIMERAS, umbralPrimeras } from './db.mjs';
 import { abrir as abrirCabos, resumen, listar, codigo } from '../cabos/cabos.mjs';
 
 const UMBRAL_CABOS = 30;
+
+const nAltosDe = (altos) => altos.reduce((s, a) => s + a.n, 0);
 
 function ordenDelDia() {
   const db = abrir();
@@ -49,6 +56,7 @@ function ordenDelDia() {
     GROUP BY slug ORDER BY n DESC, slug`).all();
   const menores = db.prepare(`
     SELECT COUNT(*) n FROM hallazgos WHERE estado = 'abierto' AND severidad NOT IN ('critico', 'alto')`).get().n;
+  const umbral = umbralPrimeras(db);
   db.close();
 
   const cdb = abrirCabos();
@@ -61,19 +69,26 @@ function ordenDelDia() {
   const crecen = entran > salen;
   const urgenCabos = cabos > 0 && (crecen || cabos > UMBRAL_CABOS);
 
-  const nAltos = altos.reduce((s, a) => s + a.n, 0);
+  const nAltos = nAltosDe(altos);
   const deAltos = `${nAltos} alto${nAltos === 1 ? '' : 's'} abierto${nAltos === 1 ? '' : 's'}: ${altos.slice(0, 3).map((a) => a.slug).join(', ')}${altos.length > 3 ? '…' : ''}`;
   const deCabos = `${cabos} cabos técnicos; ${crecen ? 'la bandeja crece' : 'se vacían'}: en 7 días entran ${entran} y salen ${salen}`;
-  const deMenores = menores ? `${menores} bajos y medios abiertos pueden esperar` : null;
+  const deMedios = `${umbral.abiertos} medios y altos abiertos: el Inspector no abre primeras por encima de ${UMBRAL_PRIMERAS}`;
+  // Con el paso cerrado los medios ya no esperan: solo los bajos
+  const bajos = umbral.cerradas ? menores - (umbral.abiertos - nAltosDe(altos)) : menores;
+  const deMenores = bajos ? `${bajos} ${umbral.cerradas ? 'bajos' : 'bajos y medios'} abiertos pueden esperar` : null;
+  const inspector = umbral.cerradas ? `/reparar medio (${deMedios})` : null;
 
   const pasos = [];
   if (nAltos) {
     pasos.push(`/reparar (${deAltos})`);
     if (urgenCabos) pasos.push(`/reparar cabos (${deCabos})`);
-    pasos.push('/inspector');
+    pasos.push(inspector ?? '/inspector');
   } else if (urgenCabos) {
     pasos.push(`/reparar cabos (${deCabos})`);
-    pasos.push('/inspector (0 altos abiertos)');
+    pasos.push(inspector ?? '/inspector (0 altos abiertos)');
+  } else if (inspector) {
+    pasos.push(inspector);
+    pasos.push(`/inspector (solo cambios y cabos hasta bajar de ${UMBRAL_PRIMERAS})`);
   } else {
     pasos.push('/inspector (0 altos abiertos)');
     pasos.push('/reparar, solo si el Inspector deja altos');

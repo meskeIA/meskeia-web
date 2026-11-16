@@ -28,6 +28,10 @@
  *                       caso (cabo de destino `inspector`): comprobación PUNTUAL de esa pregunta,
  *                       aparte del cupo, como mucho CABOS_POR_TANDA por tanda.
  *
+ * EL UMBRAL DE LAS PRIMERAS (16/11/2026): con más de UMBRAL_PRIMERAS medios, altos o críticos
+ * abiertos, la lista por valor no saca ninguna `primera` salvo la de una app con cabo. Por qué y
+ * cifras: cabecera de `umbralPrimeras` en `db.mjs`.
+ *
  * LOS TRES MODOS (01/11/2026, auditoría de los procesos de revisión)
  * ──────────────────────────────────────────────────────────────────
  *   primera — la inspección entera de siempre: tres casos resueltos a mano, la promesa, la FAQ.
@@ -113,7 +117,7 @@
 
 import fs from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
-import { abrir, SQL_INVALIDADA } from './db.mjs';
+import { abrir, SQL_INVALIDADA, UMBRAL_PRIMERAS, umbralPrimeras } from './db.mjs';
 import { FAMILIAS, familiaDe, slugsHuerfanos, appsDelSujeto } from './familias.mjs';
 import { clasificarHermana, baseDelCambio, rutasDeLaApp, diffVacio } from './cambio-familia.mjs';
 import { RAIZ, RUTA_BASE as RUTA_CABOS, codigo } from '../cabos/cabos.mjs';
@@ -281,6 +285,10 @@ const conModo = (f) => {
   return { ...f, modo, v: f.p + PLUS[modo] };
 };
 
+const UMBRAL = umbralPrimeras(db);
+/** Con el paso cerrado, una primera solo sale si su app tiene cabo (un cabo no espera). */
+const pasaUmbral = (f) => !(UMBRAL.cerradas && f.modo === 'primera' && !CABOS.has(f.slug));
+
 const TRAMOS = [
   {
     clave: 'ROJO',
@@ -299,7 +307,7 @@ const TRAMOS = [
     clave: 'VALOR',
     titulo: 'Por valor esperado — nunca vistas (primera) y cambiadas desde su inspección (cambio), en una lista',
     filas: () => db.prepare(`SELECT *, ${PRIORIDAD} AS p FROM apps WHERE ${SQL_LISTA_VALOR}`).all()
-      .map(conModo).sort((a, b) => b.v - a.v),
+      .map(conModo).filter(pasaUmbral).sort((a, b) => b.v - a.v),
   },
 ];
 
@@ -369,6 +377,7 @@ if (RESUMEN) {
   log(`  inspeccionadas:  ${vistas} (${(100 * vistas / t).toFixed(1)} %)`);
   log(`  con test propio: ${conTest}`);
   log(`  hallazgos abiertos: ${abiertos}`);
+  log(`  primeras:        ${UMBRAL.cerradas ? 'CERRADAS' : 'abiertas'} (${UMBRAL.abiertos} medios, altos o críticos abiertos; umbral ${UMBRAL_PRIMERAS})`);
   log(`  cola ROJO        ${cuenta(SQL_ROJO)}`);
   log(`  cola FIRMA       ${cuenta(`${SQL_FIRMA_NUEVA} AND COALESCE(test_estado, '') <> 'rojo' AND NOT ${SQL_INVALIDADA_ACTIVA}`)}`);
   log(`  por valor:       ${cuenta(`(${SQL_LISTA_VALOR}) AND ultima_inspeccion IS NULL`)} nunca vistas (primera) · ${cuenta(`(${SQL_LISTA_VALOR}) AND ultima_inspeccion IS NOT NULL`)} cambiadas (cambio)`);
@@ -429,6 +438,10 @@ if (huerfanos.length) {
 
 log(`\nRendimiento por modo (últimos ${VENTANA_DIAS} días): primera ${fmt(MODOS.primera)} · cambio ${fmt(MODOS.cambio)}`);
 log(`  → una inspección en modo cambio suma ${PLUS.cambio.toFixed(1).replace('.', ',')} a la prioridad y una primera ${PLUS.primera.toFixed(1).replace('.', ',')}`);
+if (UMBRAL.cerradas) {
+  log(`\n⛔ PRIMERAS CERRADAS: ${UMBRAL.abiertos} medios, altos o críticos abiertos (umbral ${UMBRAL_PRIMERAS}). ` +
+    'Solo salen cambios, cabos, rojos y firmas, y la primera de una app con cabo. Se abren al bajar de nuevo del umbral (/reparar medio).');
+}
 
 let quedan = CUANTAS;
 let mostradas = 0;
@@ -529,7 +542,10 @@ if (puntualesTanda.length) {
 if (JSON_SALIDA) {
   // `familias` se queda vacío: `inspector-tarea.mjs lanzar` lo leía para avisar de una familia que
   // desbordaba el cupo, y desde el 03/11/2026 ninguna sale entera
-  console.log(JSON.stringify({ pedidas: CUANTAS, apps: mostradas, familias: [], testigo: nTestigo, cabos: puntualesTanda.length }));
+  console.log(JSON.stringify({
+    pedidas: CUANTAS, apps: mostradas, familias: [], testigo: nTestigo, cabos: puntualesTanda.length,
+    primerasCerradas: UMBRAL.cerradas, abiertosUmbral: UMBRAL.abiertos,
+  }));
   process.exit(0);
 }
 

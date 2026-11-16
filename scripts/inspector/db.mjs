@@ -155,3 +155,30 @@ export const SQL_INVALIDADA = `
   AND hash_inspeccionado IS NOT NULL
   AND hash_inspeccionado <> (hash_codigo || '|' || COALESCE(hash_deps, ''))
 `;
+
+/**
+ * EL UMBRAL DE LAS PRIMERAS (16/11/2026, decidido por el usuario)
+ * ───────────────────────────────────────────────────────────────
+ * Mientras haya más de UMBRAL_PRIMERAS hallazgos medios, altos o críticos abiertos, la cola no
+ * saca inspecciones `primera` (salvo la de una app con cabo: un cabo no espera) y la línea «Orden
+ * sugerido» pone `/reparar medio` delante del Inspector. Los bajos no cuentan.
+ *
+ * Por qué: del 26/10 al 15/11 entraron 1.302 hallazgos y se cerraron 859, y la pila llegó a 487
+ * abiertos (178 medios o altos). Una primera deja 9,7 hallazgos de media y una de cambio o de cabo,
+ * 1,8: las primeras eran el grifo. Y ya no protegían uso: las 264 apps inspeccionadas suman el 89 %
+ * de los usos del catálogo (media 456); las 745 que faltan, el 11 % (media 21). Cada primera
+ * encontraba diez defectos en una app que casi nadie abre y se los pasaba a /reparar.
+ *
+ * Sin histéresis a propósito: una tanda de 5 primeras deja ~25 medios, que vuelven a cerrar el paso.
+ * La alternancia reparar → inspector → reparar es el comportamiento buscado.
+ * Prueba: `npm run inspector:probar-cola-umbral` y el caso 8 de `inspector:probar-orden`.
+ */
+export const UMBRAL_PRIMERAS = 100;
+
+/** { abiertos, cerradas }: medios, altos y críticos abiertos, y si superan el umbral. */
+export function umbralPrimeras(db) {
+  const abiertos = db.prepare(
+    "SELECT COUNT(*) n FROM hallazgos WHERE estado = 'abierto' AND severidad IN ('critico', 'alto', 'medio')",
+  ).get().n;
+  return { abiertos, cerradas: abiertos > UMBRAL_PRIMERAS };
+}

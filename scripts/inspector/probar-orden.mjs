@@ -22,6 +22,9 @@
  *   7. Con cabos de destino `campana` (P003, 01/11/2026) → «en paralelo: /campana <el más
  *      antiguo por fecha> (N abiertas)», sin quitarle el primer puesto a nadie; una cerrada no
  *      cuenta, y sin ninguna abierta la línea no la menciona.
+ *   8. EL UMBRAL DE LAS PRIMERAS (16/11/2026): con 101 medios abiertos → 1 /reparar medio y luego
+ *      el Inspector; con 100 justos, no. Un alto sigue yendo antes, y los cabos urgentes también.
+ *      Con el paso cerrado, la nota de lo que puede esperar habla solo de bajos.
  *
  * Ninguna toca las bases reales: van por `INSPECTOR_DB` y `CABOS_DB`, creadas vacías.
  */
@@ -75,7 +78,7 @@ function escenario({ hallazgos = [], cabos = {}, campanas = [] }) {
   cdb.close();
   return execFileSync(process.execPath, [ORDEN], { encoding: 'utf8', env: { ...process.env, INSPECTOR_DB: rutaIns, CABOS_DB: rutaCabos } }).trim();
 }
-const primero = (linea) => (linea.match(/Orden sugerido: 1 (\/[a-z]+(?: cabos)?)/) ?? [])[1];
+const primero = (linea) => (linea.match(/Orden sugerido: 1 (\/[a-z]+(?: cabos| medio)?)/) ?? [])[1];
 
 console.log('\n1 · CASO DE ORIGEN: sin altos y con los cabos vaciándose, primero el Inspector');
 let l = escenario({ hallazgos: [['app-a', 'bajo'], ['app-b', 'medio']], cabos: { viejos: 17, nuevos: 2, cerradosHoy: 5 } });
@@ -118,6 +121,19 @@ l = escenario({ hallazgos: [['app-alto', 'alto']], campanas: [[5]] });
 ok(primero(l) === '/reparar' && l.includes(`en paralelo: /campana ${campanaAntigua} (1 abierta)`), '  con un alto, /reparar primero y la campaña en paralelo, en singular');
 l = escenario({ campanas: [[5, false]] });
 ok(!l.includes('/campana'), '  sin ninguna abierta no la menciona');
+
+console.log('\n8 · El umbral de las primeras (16/11/2026)');
+const medios = (k) => Array.from({ length: k }, (_, i) => [`app-m${i}`, 'medio']);
+l = escenario({ hallazgos: [...medios(101), ['app-b', 'bajo']] });
+ok(primero(l) === '/reparar medio', `con 101 medios empieza por /reparar medio («${l.slice(0, 90)}…»)`);
+ok(/2 \/inspector \(solo cambios y cabos/.test(l), '  y después el Inspector, solo con cambios y cabos');
+ok(l.includes('1 bajos abiertos pueden esperar') && !l.includes('bajos y medios'), '  la nota de lo que espera habla solo de bajos');
+l = escenario({ hallazgos: medios(100) });
+ok(primero(l) === '/inspector', '  con 100 justos, no: empieza por /inspector');
+l = escenario({ hallazgos: [...medios(101), ['app-alto', 'alto']] });
+ok(/1 \/reparar \(.*2 \/reparar medio \(/.test(l), '  un alto sigue yendo antes');
+l = escenario({ hallazgos: medios(101), cabos: { nuevos: 4 } });
+ok(/1 \/reparar cabos \(.*2 \/reparar medio \(/.test(l), '  y los cabos urgentes también');
 
 fs.rmSync(TMP, { recursive: true, force: true });
 console.log(fallos ? `\n✗ ${fallos} comprobaciones FALLAN` : '\n✓ todas las comprobaciones pasan');
