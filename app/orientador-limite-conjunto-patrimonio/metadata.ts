@@ -43,7 +43,7 @@ export const jsonLd = generateWebAppSchema({
     'Detecta automáticamente bonificaciones autonómicas en el Impuesto sobre el Patrimonio',
     `Comprueba si la suma IRPF + Patrimonio supera el ${PCT_LIMITE} de tu base imponible`,
     'Estima orientativamente la reducción aplicable según el Art. 31',
-    'Avisa del posible ITSGF (Impuesto de Solidaridad de las Grandes Fortunas) en patrimonios superiores a 3M€',
+    'Avisa del posible ITSGF (Impuesto de Solidaridad de las Grandes Fortunas) con un patrimonio neto superior a 3,7 millones, en cualquier CCAA no foral',
     'Distingue tres resultados claros: descarte por CCAA, descarte por límite, posible beneficio',
     'Datos basados en Ley 19/1991 actualizados a 2025',
     'Solo orientativo — siempre deriva al asesor fiscal',
@@ -97,7 +97,7 @@ export const faqJsonLd = {
       name: '¿El Impuesto de Solidaridad de las Grandes Fortunas (ITSGF) afecta al límite conjunto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. El ITSGF (modelo 718) se aplica a patrimonios netos superiores a 3 millones de euros y actúa como complementario al Impuesto sobre el Patrimonio. Para contribuyentes que tributan por el ITSGF, el límite conjunto del artículo 31 también entra en juego, pero el cálculo se vuelve más complejo al intervenir tres impuestos. En estos casos es imprescindible la revisión de un asesor fiscal.',
+        text: 'Sí. El ITSGF (modelo 718) da cuota con un patrimonio neto superior a 3,7 millones de euros (700.000 € de mínimo exento y tipo 0 % hasta 3 millones de base liquidable) y actúa como complementario al Impuesto sobre el Patrimonio, cuya cuota pagada descuenta. Para contribuyentes que tributan por el ITSGF, el límite conjunto del artículo 31 también entra en juego, pero el cálculo se vuelve más complejo al intervenir tres impuestos. En estos casos es imprescindible la revisión de un asesor fiscal.',
       },
     },
     {

@@ -47,12 +47,25 @@ export const TOPE_REDUCCION_PORCENTAJE = 0.80;
  */
 export const ITSGF_UMBRAL = 3_000_000;
 
+/**
+ * Mínimo exento del ITSGF y patrimonio neto por debajo del cual no da cuota (16/11/2026,
+ * hallazgo 4879, decidido por el usuario). Ley 38/2022, art. 3 (BOE-A-2022-22684, leído el
+ * 16/11/2026): «Nueve. Base liquidable. La base imponible se reducirá, en concepto de mínimo
+ * exento, en 700.000 euros», y la escala del apartado Once grava al 0,00 % la base liquidable
+ * «Hasta 3.000.000,00». Con un patrimonio neto de hasta 3.700.000 € la cuota es 0.
+ * ITSGF_UMBRAL (el tramo de la escala) se conserva: lo leen otras apps y la ficha de Delegum.
+ */
+export const ITSGF_MINIMO_EXENTO = 700_000;
+export const ITSGF_PATRIMONIO_SIN_CUOTA = ITSGF_UMBRAL + ITSGF_MINIMO_EXENTO;
+
 export const ITSGF_META = {
   fuente: 'Ley 38/2022 — Impuesto Temporal de Solidaridad de las Grandes Fortunas',
-  verificado: '2025-01-15',
-  vigencia: '2025 (prorrogado)',
+  verificado: '2026-11-16',
+  // Art. 3.Veintiocho: «los dos primeros ejercicios»; prorrogado «en tanto no se produzca la
+  // revisión» del sistema de financiación autonómica (texto consolidado leído el 16/11/2026)
+  vigencia: 'prorrogado hasta la revisión de la financiación autonómica',
   urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/declaraciones-informativas-otros-impuestos-tasas/impuesto-temporal-solidaridad-grandes-fortunas.html',
-  nota: 'Aplica a patrimonios netos > 3M€. Coordinado con IP autonómico: si pagas IP, descuentas la cuota del ITSGF. Pensado para CCAA con bonificación 100%.',
+  nota: 'Mínimo exento de 700.000 € y tipo 0 % hasta 3.000.000 € de base liquidable: da cuota con un patrimonio neto superior a 3.700.000 €. De su cuota se deduce la del Impuesto sobre el Patrimonio efectivamente satisfecha, así que también puede salir a pagar en CCAA sin bonificación total.',
 };
 
 // ─── Bonificaciones autonómicas en el Impuesto sobre el Patrimonio ──
@@ -319,10 +332,13 @@ export function calcularCuotaPatrimonioEstatal(baseLiquidable: number): number {
 
 // ─── Lógica de orientación: ¿se beneficia del límite conjunto? ──
 
+// `aplicaItsgf` en los tres estados (16/11/2026, hallazgo 4880): el ITSGF deduce el Patrimonio
+// efectivamente satisfecho (art. 3.Quince), así que con un patrimonio neto alto también puede
+// salir a pagar donde el Patrimonio no está bonificado al 100 %.
 export type ResultadoOrientacion =
   | { tipo: 'descarte-bonificacion'; mensaje: string; aplicaItsgf: boolean }
-  | { tipo: 'descarte-no-supera-limite'; mensaje: string; excesoOMargen: number }
-  | { tipo: 'posible'; reduccionEstimada: number; cuotaPatrimonioEstimada: number; mensaje: string };
+  | { tipo: 'descarte-no-supera-limite'; mensaje: string; excesoOMargen: number; aplicaItsgf: boolean }
+  | { tipo: 'posible'; reduccionEstimada: number; cuotaPatrimonioEstimada: number; mensaje: string; aplicaItsgf: boolean };
 
 export interface InputsOrientador {
   ccaaId: string;
@@ -345,15 +361,17 @@ export interface InputsOrientador {
  */
 export function orientarLimiteConjunto(inputs: InputsOrientador): ResultadoOrientacion {
   const ccaa = BONIFICACIONES_CCAA_PATRIMONIO.find(c => c.id === inputs.ccaaId);
+  // Hasta el 16/11/2026: desde 3.000.000 € y solo en las CCAA con bonificación total (hallazgos
+  // 4879 y 4880). Ahora, por encima de 3.700.000 € (sin cuota por debajo) en cualquier CCAA no foral.
+  const aplicaItsgf = !ccaa?.foral && inputs.patrimonioNeto > ITSGF_PATRIMONIO_SIN_CUOTA;
 
   // Caso 1: CCAA con bonificación total
   if (ccaa?.bonificacion === 'total') {
-    const aplicaItsgf = inputs.patrimonioNeto >= ITSGF_UMBRAL;
     return {
       tipo: 'descarte-bonificacion',
       aplicaItsgf,
       mensaje: aplicaItsgf
-        ? `En ${ccaa.nombre}, el Impuesto sobre el Patrimonio está bonificado al 100 %, por lo que el límite conjunto del Art. 31 no aplica en tu caso. Como tu patrimonio supera los 3.000.000 €, podría aplicarte el ITSGF (Impuesto de Solidaridad de las Grandes Fortunas). Consulta con un asesor fiscal para evaluarlo.`
+        ? `En ${ccaa.nombre}, el Impuesto sobre el Patrimonio está bonificado al 100 %, por lo que el límite conjunto del Art. 31 no aplica en tu caso. Como tu patrimonio neto supera ${formatoEuros(ITSGF_PATRIMONIO_SIN_CUOTA)}, podría aplicarte el ITSGF (Impuesto de Solidaridad de las Grandes Fortunas). Consulta con un asesor fiscal para evaluarlo.`
         : `En ${ccaa.nombre}, el Impuesto sobre el Patrimonio está bonificado al 100 %. Como en la práctica no pagas cuota de Patrimonio, no hay nada que reducir mediante el límite conjunto.`,
     };
   }
@@ -366,6 +384,7 @@ export function orientarLimiteConjunto(inputs: InputsOrientador): ResultadoOrien
   if (exceso <= 0) {
     return {
       tipo: 'descarte-no-supera-limite',
+      aplicaItsgf,
       excesoOMargen: -exceso, // margen positivo (cuánto te falta para superar)
       mensaje: `La suma de tu cuota íntegra IRPF más la cuota íntegra de Patrimonio (${formatoEuros(sumaCuotas)}) no supera el ${Math.round(LIMITE_CONJUNTO_PORCENTAJE * 100)} % de tu base imponible IRPF (${formatoEuros(limite60)}). La reducción del Art. 31 no se activa en tu caso.`,
     };
@@ -378,6 +397,7 @@ export function orientarLimiteConjunto(inputs: InputsOrientador): ResultadoOrien
 
   return {
     tipo: 'posible',
+    aplicaItsgf,
     reduccionEstimada: reduccionAplicable,
     cuotaPatrimonioEstimada,
     mensaje: `Podrías beneficiarte del límite conjunto del Art. 31. La reducción orientativa estimada es de ${formatoEuros(reduccionAplicable)} sobre la cuota de Patrimonio. Acude a un asesor fiscal para que aplique el cálculo exacto.`,

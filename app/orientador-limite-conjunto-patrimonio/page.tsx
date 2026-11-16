@@ -17,6 +17,8 @@ import {
   BONIFICACIONES_CCAA_PATRIMONIO,
   FISCAL_PATRIMONIO_META,
   ITSGF_UMBRAL,
+  ITSGF_MINIMO_EXENTO,
+  ITSGF_PATRIMONIO_SIN_CUOTA,
   LIMITE_CONJUNTO_PORCENTAJE,
   TOPE_REDUCCION_PORCENTAJE,
   UMBRAL_OBLIGACION_DECLARAR,
@@ -83,7 +85,14 @@ const CCAA_BONIFICACION_TOTAL = enumerar(
 const PCT_LIMITE = pct(LIMITE_CONJUNTO_PORCENTAJE);
 const PCT_TOPE = pct(TOPE_REDUCCION_PORCENTAJE);
 const PCT_MINIMO = pct(1 - TOPE_REDUCCION_PORCENTAJE);
-const ITSGF = euros(ITSGF_UMBRAL);
+// El ITSGF da cuota por encima de ITSGF_PATRIMONIO_SIN_CUOTA (700.000 € de mínimo exento y 0 %
+// hasta 3.000.000 € de base liquidable) y deduce el Patrimonio pagado, así que también puede salir
+// a pagar fuera de las CCAA bonificadas al 100 % (hallazgos 4879 y 4880, 16/11/2026).
+const ITSGF = euros(ITSGF_PATRIMONIO_SIN_CUOTA);
+const ITSGF_ESCALA = euros(ITSGF_UMBRAL);
+const ITSGF_EXENTO = euros(ITSGF_MINIMO_EXENTO);
+const AVISO_ITSGF_BONIFICADA = `aunque tu CCAA bonifique el Patrimonio al 100 %, con un patrimonio neto superior a ${ITSGF} el Impuesto Temporal de Solidaridad de las Grandes Fortunas (estatal) da cuota, y se paga entera. Consulta a tu asesor fiscal para evaluarlo.`;
+const AVISO_ITSGF_OTRAS = `con un patrimonio neto superior a ${ITSGF}, el Impuesto Temporal de Solidaridad de las Grandes Fortunas (estatal) puede salir a pagar también en tu CCAA: de su cuota se descuenta el Patrimonio que pagues, y si este es menor, se paga la diferencia. Consulta a tu asesor fiscal para evaluarlo.`;
 
 // ─── Componente ───────────────────────────────────────────────────────────────
 
@@ -213,8 +222,8 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               <span className={styles.comoFuncionaIcon} aria-hidden="true">🏛️</span>
               <p className={styles.comoFuncionaTitle}>1. Tu CCAA</p>
               <p className={styles.comoFuncionaText}>
-                Si tu CCAA bonifica el Patrimonio al 100{' '}%, no pagas cuota → el límite no aplica. Patrimonios
-                superiores a {formatCurrency(ITSGF_UMBRAL)} pueden tributar por el ITSGF estatal.
+                Si tu CCAA bonifica el Patrimonio al 100{' '}%, no pagas cuota → el límite no aplica. Con un patrimonio
+                neto superior a {ITSGF}, el ITSGF estatal puede dar cuota en cualquier CCAA no foral.
               </p>
             </div>
             <div className={styles.comoFuncionaCard}>
@@ -372,7 +381,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 placeholder="Ej: 2.500.000"
               />
               <span className={styles.formHint}>
-                Solo se usa para detectar si te aplica el ITSGF (umbral {formatCurrency(ITSGF_UMBRAL)}).
+                Solo se usa para detectar si te aplica el ITSGF (da cuota por encima de {ITSGF}).
               </span>
             </div>
           </div>
@@ -470,11 +479,10 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               </>
             )}
 
-            {resultado.tipo === 'descarte-bonificacion' && resultado.aplicaItsgf && (
+            {resultado.aplicaItsgf && (
               <div className={styles.ctaAsesor}>
-                <strong><span aria-hidden="true">⚠️</span> Atención al ITSGF:</strong> aunque tu CCAA bonifique el Patrimonio al 100{' '}%, los patrimonios
-                netos superiores a {formatCurrency(ITSGF_UMBRAL)} pueden tributar por el Impuesto Temporal de
-                Solidaridad de las Grandes Fortunas (estatal). Consulta a tu asesor fiscal para evaluarlo.
+                <strong><span aria-hidden="true">⚠️</span> Atención al ITSGF:</strong>{' '}
+                <span>{resultado.tipo === 'descarte-bonificacion' ? AVISO_ITSGF_BONIFICADA : AVISO_ITSGF_OTRAS}</span>
               </div>
             )}
 
@@ -524,13 +532,13 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                   <td><strong>Descartado por límite</strong></td>
                   <td>Cuota IRPF + cuota Patrimonio NO supera el {PCT_LIMITE} de tu BI IRPF</td>
                   <td>El Art. 31 no se activa</td>
-                  <td>Revisar en años con menor renta o más patrimonio</td>
+                  <td>Revisar en años con menor renta o más patrimonio; si tu patrimonio supera {ITSGF}, evaluar el ITSGF</td>
                 </tr>
                 <tr>
                   <td><strong>Posible reducción</strong></td>
                   <td>Cuota IRPF + cuota Patrimonio supera el {PCT_LIMITE} de tu BI IRPF</td>
                   <td>Reducción orientativa hasta el {PCT_TOPE} de la cuota Patrimonio</td>
-                  <td>Asesor fiscal para cálculo exacto y aplicación</td>
+                  <td>Asesor fiscal para cálculo exacto y aplicación, y para el ITSGF si tu patrimonio supera {ITSGF}</td>
                 </tr>
                 <tr>
                   <td><strong>Caso especial: IRPF conjunto</strong></td>
@@ -610,7 +618,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 <p><strong>Resultado:</strong> descarte del límite, pero posible ITSGF estatal por superar {ITSGF}</p>
               </div>
               <div className={styles.escenarioTip}>
-                El ITSGF se diseñó para CCAA con bonificación 100{' '}%. Tu asesor coordinará IP y ITSGF.
+                El ITSGF descuenta el Patrimonio que se paga: con la bonificación del 100{' '}% se paga entero. Tu asesor coordinará IP y ITSGF.
               </div>
             </div>
 
@@ -674,7 +682,9 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 No tiene sentido: si tu CCAA bonifica al 100{' '}%, la cuota de Patrimonio queda en 0 € → no hay nada
                 que reducir. Sin embargo, los patrimonios netos superiores a {ITSGF} pueden quedar sujetos al
                 <strong> ITSGF (Impuesto Temporal de Solidaridad de las Grandes Fortunas)</strong>, que es estatal.
-                El ITSGF se diseñó precisamente para "rescatar" tributación en CCAA con bonificación 100{' '}%.
+                Con {ITSGF_EXENTO} de mínimo exento y un tipo del 0{' '}% hasta {ITSGF_ESCALA} de base liquidable, por debajo
+                de {ITSGF} no da cuota. Y como descuenta el Patrimonio pagado, también puede salir a pagar en CCAA sin
+                bonificación total.
               </p>
             </div>
 
@@ -838,8 +848,9 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               <div>
                 <h4>Vigila el ITSGF si tu patrimonio supera {ITSGF}</h4>
                 <p>
-                  Aunque tu CCAA bonifique el Patrimonio al 100{' '}%, los patrimonios netos sobre {ITSGF} pueden tributar
-                  por el ITSGF estatal. No te confíes de la bonificación autonómica si tu patrimonio es alto.
+                  Los patrimonios netos sobre {ITSGF} pueden tributar por el ITSGF estatal: entero si tu CCAA bonifica
+                  el Patrimonio al 100{' '}%, y descontando lo que pagues de Patrimonio si no. No te confíes de la
+                  bonificación autonómica si tu patrimonio es alto.
                 </p>
               </div>
             </div>

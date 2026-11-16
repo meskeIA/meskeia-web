@@ -192,24 +192,34 @@ test.describe('Hallazgos de la inspección del 16/11/2026', () => {
     expect(textoGuia).toContain('acumulando las cuotas íntegras de Patrimonio');
   });
 
-  test('HALLAZGO (16/11/2026, ABIERTO) · avisa del ITSGF con 3.500.000 € de patrimonio neto, que no dan cuota', async ({ page }) => {
+  test('REPARADO (hallazgo 4879) · con 3.500.000 € de patrimonio neto, que no dan cuota, no avisa del ITSGF', async ({ page }) => {
     // 3.500.000 − 700.000 = 2.800.000 € de base liquidable, todo en el tramo «Hasta 3.000.000,00» al
     // 0,00 %: cuota 0 y sin obligación de declarar (art. 3.Nueve, Once y Diecinueve Ley 38/2022).
-    test.fail();
+    // Decidido por el usuario el 16/11/2026 (C0792): el aviso salta por encima de 3.700.000 €.
     await comprobar(page, { ccaa: 'madrid', bi: '60.000', irpf: '15.000', ip: '1', patrimonio: '3.500.000' });
     await expect(resultado(page)).toContainText('No aplica en tu CCAA');
     await expect(resultado(page)).not.toContainText('ITSGF');
   });
 
-  test('HALLAZGO (16/11/2026, ABIERTO) · el patrimonio neto se ignora fuera de las CCAA con bonificación total: Galicia con 6.000.000 €', async ({ page }) => {
+  test('REPARADO (hallazgo 4880) · el patrimonio neto cuenta también fuera de las CCAA con bonificación total: Galicia con 6.000.000 €', async ({ page }) => {
     // Galicia (bonificación 50 % en data/fiscal), base liquidable 6.000.000 − 700.000 = 5.300.000:
     // IP con la escala estatal = 70.546,37 €, satisfecha tras el 50 % = 35.273,19 €.
     // ITSGF = (5.300.000 − 3.000.000) × 1,7 % = 39.100 € − 35.273,19 = 3.826,81 € a ingresar
     // (su límite conjunto no actúa: 450.000 + 70.546,37 + 39.100 < 0,60 × 1.000.000).
-    test.fail();
+    // Decidido por el usuario el 16/11/2026 (C0792): aviso en cualquier CCAA no foral.
     await comprobar(page, { ccaa: 'galicia', bi: '1.000.000', irpf: '450.000', ip: '70.546,37', patrimonio: '6.000.000' });
     await expect(resultado(page)).toContainText('La reducción no se activa en tu caso');
     await expect(resultado(page)).toContainText('ITSGF');
+  });
+
+  test('REPARADO (hallazgos 4879 y 4880) · los bordes: 3.700.000 € justos no avisan, 3.700.001 sí, y en Navarra (foral) no', async ({ page }) => {
+    // Base liquidable = patrimonio neto − 700.000: con 3.700.000 € queda en 3.000.000, todo al 0,00 %.
+    await comprobar(page, { ccaa: 'madrid', bi: '60.000', irpf: '15.000', ip: '1', patrimonio: '3.700.000' });
+    await expect(resultado(page)).not.toContainText('ITSGF');
+    await comprobar(page, { ccaa: 'madrid', bi: '60.000', irpf: '15.000', ip: '1', patrimonio: '3.700.001' });
+    await expect(resultado(page)).toContainText('Atención al ITSGF');
+    await comprobar(page, { ccaa: 'navarra', bi: '1.000.000', irpf: '450.000', ip: '70.546,37', patrimonio: '6.000.000' });
+    await expect(resultado(page)).not.toContainText('ITSGF');
   });
 
   test('REPARADO (hallazgo 4881) · el texto daba a Galicia por bonificada al 100 % y olvidaba La Rioja; ahora sale de data/fiscal', async ({ page }) => {
