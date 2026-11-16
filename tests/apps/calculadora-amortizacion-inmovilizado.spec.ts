@@ -280,14 +280,20 @@ test.describe('calculadora-amortizacion-inmovilizado', () => {
   });
 
   test('CASO 2f (límite) · mobiliario y enseres: la nota avisa de que tampoco admiten números dígitos', async ({ page }) => {
-    // ABIERTO: art. 12.1.c LIS, «Los edificios, mobiliario y enseres no podrán acogerse a la
-    // amortización mediante números dígitos». La app solo marca excluido el porcentaje constante
-    // (degresivoExcluido) y pinta la suma de dígitos sin aviso.
-    test.fail();
+    // REPARADO (hallazgo 4869): art. 12.1.c LIS, «Los edificios, mobiliario y enseres no podrán
+    // acogerse a la amortización mediante números dígitos». La app solo marcaba excluido el
+    // porcentaje constante y pintaba la suma de dígitos sin aviso; ahora lo dicen la nota y las
+    // tarjetas de los dos métodos degresivos (la lineal, no).
     await elegirTipo(page, 'Mobiliario y enseres');
     const nota = page.getByText(/coeficiente lineal máximo 10 %/);
     await expect(nota).toContainText('porcentaje constante');
     await expect(nota).toContainText(/d[ií]gitos/i);
+    expect(await textoCarta(page, 'Suma de dígitos')).toContain('No admitido fiscalmente');
+    expect(await textoCarta(page, 'Degresivo (% constante)')).toContain('No admitido fiscalmente');
+    expect(await textoCarta(page, 'Lineal')).not.toContain('No admitido fiscalmente');
+    // Con un activo que sí los admite, el aviso desaparece
+    await elegirTipo(page, 'Maquinaria');
+    expect(await textoCarta(page, 'Suma de dígitos')).not.toContain('No admitido fiscalmente');
   });
 
   test('CASO 3 (rechazo) · residual ≥ adquisición, residual negativo, vida 0 o negativa y adquisición 0 o negativa', async ({ page }) => {

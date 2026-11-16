@@ -375,7 +375,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
           <p className={styles.tipoNota}>
             <strong>{tipoSeleccionado.nombre}:</strong> coeficiente lineal máximo {tipoSeleccionado.coefLinealMax} % ·
             período máximo {tipoSeleccionado.periodoMax} años (vida útil elegible entre {vidaUtilMinima(tipoSeleccionado.coefLinealMax)} y {tipoSeleccionado.periodoMax} años).
-            <span>{tipoSeleccionado.degresivoExcluido && ' El método degresivo por porcentaje constante no es aplicable a este tipo de activo según la LIS.'}</span>
+            <span>{tipoSeleccionado.degresivoExcluido && ' Ni el porcentaje constante ni la suma de dígitos son aplicables a este tipo de activo según la LIS (art. 12.1.b y c): fiscalmente, solo el método lineal.'}</span>
           </p>
         )}
 
@@ -426,7 +426,10 @@ export default function CalculadoraAmortizacionInmovilizado() {
                     <dd>{formatNumber(concentracion(m), 0)} %</dd>
                   </div>
                 </dl>
-                <p className={styles.metodoFormulaNota}>{m.detalle}</p>
+                <p className={styles.metodoFormulaNota}>
+                  {m.detalle}
+                  <span>{tipoSeleccionado?.degresivoExcluido && m.id !== 'lineal' ? ' · No admitido fiscalmente para este tipo de activo (art. 12.1 LIS).' : ''}</span>
+                </p>
               </div>
             ))}
           </section>
@@ -534,7 +537,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
                   <td><strong>Suma de dígitos</strong></td>
                   <td>Cuotas decrecientes por reparto de dígitos</td>
                   <td>Adelantar el gasto de forma más suave que el degresivo</td>
-                  <td>Requiere calcular la suma de dígitos cada año</td>
+                  <td>No aplicable a edificios, mobiliario y enseres</td>
                 </tr>
               </tbody>
             </table>
@@ -664,7 +667,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
           <ul className={styles.warningList}>
             <li><strong>Amortizar sobre el valor con IVA:</strong> si el IVA es deducible, no forma parte del valor amortizable. Solo se amortiza el coste neto del activo.</li>
             <li><strong>Olvidar el valor residual:</strong> amortizar el 100 % del valor de adquisición cuando el activo tendrá un valor de venta al final sobreestima el gasto.</li>
-            <li><strong>Aplicar el degresivo a activos excluidos:</strong> edificios, mobiliario y enseres no admiten el método de porcentaje constante en la normativa española.</li>
+            <li><strong>Aplicar un método degresivo a activos excluidos:</strong> edificios, mobiliario y enseres no admiten ni el porcentaje constante ni la suma de dígitos en la normativa española (art. 12.1.b y c LIS).</li>
             <li><strong>Confundir ritmo con cuantía:</strong> ningún método amortiza «más» en total. Elegir un método degresivo adelanta el gasto, no lo aumenta.</li>
             <li><strong>Salirse del rango de vida útil:</strong> amortizar más rápido que el coeficiente máximo o más lento que el período máximo puede hacer que la AEAT no admita parte del gasto.</li>
           </ul>
