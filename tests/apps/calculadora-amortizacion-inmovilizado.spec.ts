@@ -46,10 +46,10 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *       duda de si el porcentaje va sobre el VNC o sobre la base): art. 12.1.b → ×2,5 →
  *       1/8 × 2,5 = 31,25 % (en pantalla «31,3 %»): 3125 · 2148,44 · 1477,05 · 1015,47 · 698,14 ·
  *       479,97 · 329,98 · 725,95 (resto); acumulada al año 4 = 7765,96 → 78 %.
- *     2b · ejemplo por defecto (Maquinaria, 50.000 / 2.000 / 8): lineal 48.000 / 8 = 6000 €;
- *       dígitos 48.000 × 8/36 = 10.666,67 → 10.667 €, último 48.000 / 36 = 1333 €, mitad
- *       34.666,67 / 48.000 = 72 %; los tres métodos terminan con 48.000 € acumulados y 2000 € de
- *       valor neto contable (el residual).
+ *     2b · ejemplo por defecto (Maquinaria, 50.000 / 2.000 / 9 desde el hallazgo 4870; antes 8,
+ *       por debajo de la vida mínima): lineal 48.000 / 9 = 5333 €; dígitos 48.000 × 9/45 =
+ *       9600 €, último 48.000 / 45 = 1067 €, mitad 35/45 = 78 %; los tres métodos terminan con
+ *       48.000 € acumulados y 2000 € de valor neto contable (el residual).
  *     2c · suelo del 11 %: 25 años, 10.000 / 0 → 1/25 × 2,5 = 10 % < 11 % → 11 %: 1100 € el
  *       primer año; el año 25 amortiza el resto, 10.000 × 0,89^24 = 610 €.
  *     2d · vida útil de 1 año, 10.000 / 1.000 → los tres métodos, 9000 € en el único año.
@@ -183,7 +183,7 @@ test.describe('calculadora-amortizacion-inmovilizado', () => {
     test.fail();
     await escribir(page, ADQ, '10000', '10.000');
     await escribir(page, RES, '0', '0');
-    await expect(page.locator(VIDA)).toHaveValue('8');
+    await escribir(page, VIDA, '8', '8');
 
     const degresivo = await textoCarta(page, 'Degresivo (% constante)');
     expect(degresivo).toContain('31,3 % sobre el saldo pendiente (×2,5)');
@@ -206,27 +206,32 @@ test.describe('calculadora-amortizacion-inmovilizado', () => {
     expect(await textoCarta(page, 'Degresivo (% constante)')).toContain('37,5 % sobre el saldo pendiente (×1,5)');
   });
 
-  test('CASO 2b (límite) · ejemplo por defecto, maquinaria 50.000 / 2.000 / 8: los tres métodos acaban en el residual', async ({ page }) => {
+  test('CASO 2b (límite) · ejemplo por defecto, maquinaria 50.000 / 2.000 / 9: los tres métodos acaban en el residual', async ({ page }) => {
+    // REPARADO (hallazgo 4870): el ejemplo usaba 8 años, por debajo de la vida útil mínima de la
+    // maquinaria (100 / 12 = 8,33 → 9 años enteros). Con 9 años:
+    //   lineal 48.000 / 9 = 5333,33 → 5333 €; a mitad de vida (año 5) 5/9 = 55,6 → 56 %;
+    //   dígitos suma 45: 48.000 × 9/45 = 9600 €, último 48.000 / 45 = 1066,67 → 1067 €,
+    //   mitad (9+8+7+6+5)/45 = 35/45 = 77,8 → 78 %.
     await expect(page.locator(ADQ)).toHaveValue('50.000');
     await expect(page.locator(RES)).toHaveValue('2000');
-    await expect(page.locator(VIDA)).toHaveValue('8');
+    await expect(page.locator(VIDA)).toHaveValue('9');
 
     const lineal = await textoCarta(page, 'Lineal');
-    expect(lineal).toContain('Cuota 1.er año | 6000 €');
-    expect(lineal).toContain('Cuota último año | 6000 €');
-    expect(lineal).toContain('Amortizado a mitad de vida | 50 %');
+    expect(lineal).toContain('Cuota 1.er año | 5333 €');
+    expect(lineal).toContain('Cuota último año | 5333 €');
+    expect(lineal).toContain('Amortizado a mitad de vida | 56 %');
 
     const digitos = await textoCarta(page, 'Suma de dígitos');
-    expect(digitos).toContain('Cuota 1.er año | 10.667 €');
-    expect(digitos).toContain('Cuota último año | 1333 €');
-    expect(digitos).toContain('Amortizado a mitad de vida | 72 %');
-    expect(digitos).toContain('suma = 36');
+    expect(digitos).toContain('Cuota 1.er año | 9600 €');
+    expect(digitos).toContain('Cuota último año | 1067 €');
+    expect(digitos).toContain('Amortizado a mitad de vida | 78 %');
+    expect(digitos).toContain('suma = 45');
 
     for (const metodo of ['Lineal', 'Degresivo (% constante)', 'Suma de dígitos']) {
       const filas = await filasCuadro(page, metodo);
-      expect(filas).toHaveLength(8);
+      expect(filas).toHaveLength(9);
       // RIS 3.2: lo amortizable es la adquisición menos el residual
-      expect(filas[7]).toMatch(/^8\/[\d.]+ €\/48\.000 €\/2000 €$/);
+      expect(filas[8]).toMatch(/^9\/[\d.]+ €\/48\.000 €\/2000 €$/);
     }
   });
 
@@ -255,16 +260,23 @@ test.describe('calculadora-amortizacion-inmovilizado', () => {
   });
 
   test('CASO 2e (límite) · la vida útil mínima sugerida no puede superar el coeficiente máximo (100 / 12 = 8,33 años)', async ({ page }) => {
-    // ABIERTO: seleccionarTipo() redondea 100 / coefLinealMax con Math.round: Maquinaria 8 años
-    // (12,5 % > 12 %) y la nota dice «vida útil elegible entre 8 y 18 años»; Vehículos 6 años
-    // (16,67 % > 16 %). RIS 6.1.a: el período mínimo es «el que se deduce del coeficiente».
-    test.fail();
+    // REPARADO (hallazgo 4870): seleccionarTipo() redondeaba 100 / coefLinealMax con Math.round
+    // (Maquinaria 8 años, 12,5 % > 12 %). RIS 6.1.a: el período mínimo es «el que se deduce del
+    // coeficiente»; con años enteros, hacia arriba: 9 (Maquinaria), 7 (vehículos, 100/16 = 6,25),
+    // 34 (edificios industriales, 100/3 = 33,33), 4 (software, 100/33 = 3,03) y 4 exacto
+    // (equipos, 100/25).
     await elegirTipo(page, 'Instalaciones técnicas');
     await elegirTipo(page, 'Maquinaria');
-    await expect(page.getByText(/coeficiente lineal máximo 12/)).not.toContainText('entre 8 y 18 años');
-    await expect(page.locator(VIDA)).not.toHaveValue('8');
+    await expect(page.getByText(/coeficiente lineal máximo 12/)).toContainText('entre 9 y 18 años');
+    await expect(page.locator(VIDA)).toHaveValue('9');
     await elegirTipo(page, 'Elementos de transporte (vehículos)');
-    await expect(page.locator(VIDA)).not.toHaveValue('6');
+    await expect(page.locator(VIDA)).toHaveValue('7');
+    await elegirTipo(page, 'Edificios y construcciones (uso industrial)');
+    await expect(page.locator(VIDA)).toHaveValue('34');
+    await elegirTipo(page, 'Sistemas y programas informáticos');
+    await expect(page.locator(VIDA)).toHaveValue('4');
+    await elegirTipo(page, 'Equipos para procesos de información');
+    await expect(page.locator(VIDA)).toHaveValue('4');
   });
 
   test('CASO 2f (límite) · mobiliario y enseres: la nota avisa de que tampoco admiten números dígitos', async ({ page }) => {

@@ -59,10 +59,22 @@ const COLORES: Record<MetodoKey, string> = {
 
 // ─── Datos de ejemplo (maquinaria) ──────────────────────────────────────────────
 
+/**
+ * Vida útil mínima admitida, en años enteros: el período «que se deduce del coeficiente»
+ * (RIS art. 6.1.a), redondeado HACIA ARRIBA. Con Math.round, Maquinaria (100 / 12 = 8,33)
+ * quedaba en 8 años, que dan un 12,5 % y superan el coeficiente máximo del 12 %.
+ */
+function vidaUtilMinima(coefLinealMax: number): number {
+  // El redondeo previo a 6 decimales evita que un cociente exacto (100 / 25) suba por el
+  // error de coma flotante.
+  return Math.max(1, Math.ceil(Number((100 / coefLinealMax).toFixed(6))));
+}
+
 const DATOS_EJEMPLO: InputData = {
   valorAdquisicion: '50000',
   valorResidual: '2000',
-  vidaUtil: '8',
+  // La vida útil mínima de la maquinaria (100 / 12 = 8,33 → 9 años)
+  vidaUtil: '9',
 };
 
 const TIPO_EJEMPLO = 'maquinaria';
@@ -275,8 +287,8 @@ export default function CalculadoraAmortizacionInmovilizado() {
 
   const seleccionarTipo = (t: TipoActivoAmortizable) => {
     setTipoActivo(t.id);
-    // Sugerir la vida útil más rápida admitida (100 / coef. lineal máximo)
-    const vidaSugerida = Math.max(1, Math.round(100 / t.coefLinealMax));
+    // Sugerir la vida útil más rápida admitida (100 / coef. lineal máximo, hacia arriba)
+    const vidaSugerida = vidaUtilMinima(t.coefLinealMax);
     setDatos(prev => ({ ...prev, vidaUtil: String(vidaSugerida) }));
     setRawValues(prev => {
       const next = { ...prev };
@@ -296,7 +308,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
   const campos: { campo: keyof InputData; label: string; sufijo: string; placeholder: string }[] = [
     { campo: 'valorAdquisicion', label: 'Valor de adquisición', sufijo: '€', placeholder: '50.000' },
     { campo: 'valorResidual', label: 'Valor residual', sufijo: '€', placeholder: '2.000' },
-    { campo: 'vidaUtil', label: 'Vida útil', sufijo: 'años', placeholder: '8' },
+    { campo: 'vidaUtil', label: 'Vida útil', sufijo: 'años', placeholder: '9' },
   ];
 
   const metodoActivo = metodos.find(m => m.id === metodoVista);
@@ -362,7 +374,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
         {tipoSeleccionado && (
           <p className={styles.tipoNota}>
             <strong>{tipoSeleccionado.nombre}:</strong> coeficiente lineal máximo {tipoSeleccionado.coefLinealMax} % ·
-            período máximo {tipoSeleccionado.periodoMax} años (vida útil elegible entre {Math.round(100 / tipoSeleccionado.coefLinealMax)} y {tipoSeleccionado.periodoMax} años).
+            período máximo {tipoSeleccionado.periodoMax} años (vida útil elegible entre {vidaUtilMinima(tipoSeleccionado.coefLinealMax)} y {tipoSeleccionado.periodoMax} años).
             <span>{tipoSeleccionado.degresivoExcluido && ' El método degresivo por porcentaje constante no es aplicable a este tipo de activo según la LIS.'}</span>
           </p>
         )}
