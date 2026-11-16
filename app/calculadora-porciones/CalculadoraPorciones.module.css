@@ -71,6 +71,15 @@
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  /* Es un <button> (hallazgo 4521): sin esto hereda la tipografía y el color del navegador */
+  font: inherit;
+  color: inherit;
+  width: 100%;
+}
+
+.methodCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .methodCard:hover {
@@ -91,6 +100,7 @@
 }
 
 .methodName {
+  display: block;
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
@@ -98,6 +108,7 @@
 }
 
 .methodDescription {
+  display: block;
   font-size: 0.8rem;
   color: var(--text-secondary);
   line-height: 1.4;
@@ -105,6 +116,7 @@
 }
 
 .methodEquivalent {
+  display: block;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--primary-texto);
@@ -357,10 +369,10 @@
   margin: 0.25rem 0;
 }
 
+/* Sin opacidad: el blanco al 90 % bajaba el contraste del rótulo de 12 px (hallazgo 4523) */
 .plateHalf small,
 .plateQuarter small {
   font-size: 0.75rem;
-  opacity: 0.9;
 }
 
 .plateSide {
@@ -789,8 +801,18 @@
     font-size: 0.8rem;
   }
 
+  /* Oculto a la vista, no al lector: con display:none y el icono en aria-hidden, las seis
+     pestañas se quedaban sin nombre accesible en el móvil (hallazgo 4522) */
   .categoryName {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .categoryIcon {

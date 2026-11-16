@@ -45,6 +45,9 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// Hallazgo 4520 (16/11/2026): el FAQPage daba para la grasa otra medida que la página (punta
+// del pulgar = una cucharadita de aceite; «1-2 pulgares por comida») y citaba «varios estudios»
+// sin nombrar ninguno. Ahora dice lo que la página: pulgar = 1 cucharada de aceite, 1 por comida.
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -54,7 +57,7 @@ export const faqJsonLd = {
       name: '¿Cómo se miden las porciones de comida con la mano?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La mano es una referencia práctica adaptada al tamaño de cada persona. La palma (sin dedos) equivale aproximadamente a una ración de proteína como carne o pescado; el puño cerrado equivale a una ración de hidratos como arroz o pasta cocidos; el cuenco formado por las dos manos equivale a una ración de verduras o ensalada; y la punta del pulgar equivale a una cucharadita de aceite o mantequilla.',
+        text: 'La mano es una referencia práctica adaptada al tamaño de cada persona. La palma (sin dedos) equivale aproximadamente a una ración de proteína como carne o pescado; el puño cerrado equivale a una ración de hidratos como arroz o pasta cocidos; el cuenco formado por las dos manos equivale a una ración de verduras o ensalada; el pulgar entero equivale a una cucharada de aceite, y la punta del dedo índice, a una cucharadita de mantequilla.',
       },
     },
     {
@@ -78,7 +81,7 @@ export const faqJsonLd = {
       name: '¿Cuántas porciones de proteína, hidratos y grasas se recomiendan al día?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las recomendaciones generales para un adulto activo son aproximadamente 1 palma de proteína por comida principal (2-4 al día), 1 puño de hidratos por comida (ajustando según actividad física) y 1-2 pulgares de grasas saludables por comida. Las necesidades individuales varían según edad, peso, actividad y objetivos; consulta a un dietista-nutricionista para una pauta personalizada.',
+        text: 'Las recomendaciones generales para un adulto activo son aproximadamente 1 palma de proteína por comida principal (2-4 al día), 1 puño de hidratos por comida (ajustando según actividad física) y 1 pulgar de aceite de oliva por comida, que es una cucharada sopera. Las necesidades individuales varían según edad, peso, actividad y objetivos; consulta a un dietista-nutricionista para una pauta personalizada.',
       },
     },
     {
@@ -86,7 +89,7 @@ export const faqJsonLd = {
       name: '¿El método de porciones con la mano es útil para perder peso?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Puede ser una herramienta de apoyo para controlar el volumen de comida sin obsesionarse con las calorías exactas. Varios estudios de nutrición conductual sugieren que medir porciones con la mano ayuda a reducir el tamaño de las raciones de forma sostenible. Sin embargo, para pérdida de peso, también influyen la calidad de los alimentos, el patrón de comidas y otros hábitos de vida.',
+        text: 'Puede ser una herramienta de apoyo para controlar el volumen de comida sin obsesionarse con las calorías exactas. Para la pérdida de peso, también influyen la calidad de los alimentos, el patrón de comidas y otros hábitos de vida.',
       },
     },
   ],

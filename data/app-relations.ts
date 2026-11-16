@@ -559,7 +559,7 @@ const codigosApps: RelatedApp[] = [
 // ==========================================
 const cocinaApps: RelatedApp[] = [
   { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora Cocina', description: 'Conversiones culinarias' },
-  { url: '/calculadora-porciones/', icon: '🍽️', name: 'Porciones', description: 'Ajusta recetas' },
+  { url: '/calculadora-porciones/', icon: '🍽️', name: 'Porciones', description: 'Raciones con la mano' },
   { url: '/planificador-menu/', icon: '📅', name: 'Planificador Menú', description: 'Menú semanal' },
   { url: '/lista-compras/', icon: '🛒', name: 'Lista Compras', description: 'Organiza tu compra' },
 ];

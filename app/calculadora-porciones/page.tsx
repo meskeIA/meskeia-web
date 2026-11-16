@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { traerALaVista } from '@/lib';
 import styles from './CalculadoraPorciones.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import DataReference from '@/components/DataReference';
 
 interface PortionMethod {
   id: string;
@@ -45,7 +47,7 @@ const HAND_METHODS: PortionMethod[] = [
     name: 'Palma de la mano',
     icon: '🤚',
     description: 'Tu palma sin los dedos, con el grosor de un mazo de cartas',
-    equivalent: '≈ 85-115g de proteína',
+    equivalent: '≈ 100-125 g de carne o 125-150 g de pescado',
     image: 'Para carnes, pescado, tofu',
   },
   {
@@ -82,16 +84,27 @@ const HAND_METHODS: PortionMethod[] = [
   },
 ];
 
+// Los colores de categoría son FONDO de texto blanco (pestaña activa, cabecera de la tabla y
+// sectores del plato): todos dan ≥ 4,5:1 con el blanco. Antes, #E74C3C 3,82 · #F39C12 2,19 ·
+// #27AE60 2,87 · #2E86AB 4,11 · #48A9A6 2,80; solo pasaba el morado (hallazgo 4523).
+const COLOR_PROTEINA = '#C0392B'; // 5,44:1
+const COLOR_CARBOHIDRATO = '#9A5B00'; // 5,43:1
+const COLOR_VERDURA = '#1E7E45'; // 5,09:1
+
+// Raciones cotejadas con AESAN, «Recomendaciones dietéticas saludables y sostenibles…» (2022),
+// leídas el 16/11/2026: hortalizas 150-200 g y frutas 120-200 g (p. 4) · pescado 125-150 g
+// (p. 8) · carne 100-125 g, queso fresco 85-125 g, queso curado 40-60 g (p. 10) · aceite 10 ml
+// (p. 11). Diez filas caían fuera de esos rangos (hallazgo 4518).
 const FOOD_CATEGORIES: FoodCategory[] = [
   {
     id: 'proteins',
     name: 'Proteínas',
     icon: '🥩',
-    color: '#E74C3C',
+    color: COLOR_PROTEINA,
     foods: [
       { name: 'Pechuga de pollo', portion: '1 palma', method: 'palm', grams: '100-120g', tip: 'Grosor de un mazo de cartas' },
       { name: 'Filete de ternera', portion: '1 palma', method: 'palm', grams: '100-120g' },
-      { name: 'Pescado (filete)', portion: '1 palma', method: 'palm', grams: '100-150g', tip: 'Puede ser ligeramente más grande' },
+      { name: 'Pescado (filete)', portion: '1 palma', method: 'palm', grams: '125-150g', tip: 'Puede ser ligeramente más grande' },
       { name: 'Huevos', portion: '2 unidades', method: 'palm', grams: '100g', tip: 'Equivale a una palma de proteína' },
       { name: 'Tofu', portion: '1 palma', method: 'palm', grams: '100-120g' },
       { name: 'Legumbres cocidas', portion: '1 puño', method: 'fist', grams: '150-180g' },
@@ -101,7 +114,7 @@ const FOOD_CATEGORIES: FoodCategory[] = [
     id: 'carbs',
     name: 'Carbohidratos',
     icon: '🍚',
-    color: '#F39C12',
+    color: COLOR_CARBOHIDRATO,
     foods: [
       { name: 'Arroz cocido', portion: '1 puño', method: 'fist', grams: '150-180g' },
       { name: 'Pasta cocida', portion: '1 puño', method: 'fist', grams: '150-180g' },
@@ -115,13 +128,13 @@ const FOOD_CATEGORIES: FoodCategory[] = [
     id: 'vegetables',
     name: 'Verduras',
     icon: '🥗',
-    color: '#27AE60',
+    color: COLOR_VERDURA,
     foods: [
-      { name: 'Ensalada de hojas', portion: '2 manos', method: 'two-hands', grams: '80-100g', tip: 'Puedes repetir sin problema' },
+      { name: 'Ensalada de hojas', portion: '2 manos', method: 'two-hands', grams: '150-200g', tip: 'Un plato llano de ensalada variada' },
       { name: 'Verduras cocidas', portion: '1 puño', method: 'fist', grams: '150-200g' },
-      { name: 'Verduras crudas', portion: '2 manos', method: 'two-hands', grams: '100-150g' },
+      { name: 'Verduras crudas', portion: '2 manos', method: 'two-hands', grams: '150-200g' },
       { name: 'Brócoli/Coliflor', portion: '1 puño', method: 'fist', grams: '150g' },
-      { name: 'Zanahorias', portion: '1 puño', method: 'fist', grams: '100-120g' },
+      { name: 'Zanahorias', portion: '1 puño', method: 'fist', grams: '150-200g' },
       { name: 'Tomate', portion: '1 puño', method: 'fist', grams: '150-180g' },
     ],
   },
@@ -132,24 +145,24 @@ const FOOD_CATEGORIES: FoodCategory[] = [
     color: '#9B59B6',
     foods: [
       { name: 'Manzana/Pera', portion: '1 puño', method: 'fist', grams: '150-180g', tip: '1 pieza mediana' },
-      { name: 'Plátano', portion: '1 unidad', method: 'fist', grams: '100-120g', tip: 'Tamaño medio' },
-      { name: 'Frutos rojos', portion: '1 puño', method: 'fist', grams: '100-150g' },
-      { name: 'Uvas', portion: '1 puño', method: 'fist', grams: '100-120g', tip: 'Aproximadamente 15-20 uvas' },
+      { name: 'Plátano', portion: '1 unidad', method: 'fist', grams: '120-150g', tip: 'Tamaño medio' },
+      { name: 'Frutos rojos', portion: '1 puño', method: 'fist', grams: '120-150g', tip: 'Un tazón mediano de fresas' },
+      { name: 'Uvas', portion: '1 puño', method: 'fist', grams: '120-150g', tip: 'Un racimo pequeño' },
       { name: 'Naranja', portion: '1 puño', method: 'fist', grams: '150-200g' },
-      { name: 'Sandía/Melón', portion: '2 puños', method: 'fist', grams: '200-250g' },
+      { name: 'Sandía/Melón', portion: '2 rodajas', method: 'fist', grams: '120-200g' },
     ],
   },
   {
     id: 'fats',
     name: 'Grasas',
     icon: '🥑',
-    color: '#2E86AB',
+    color: '#1F6F8B', // 5,67:1 (el --primary, #2E86AB, daba 4,11)
     foods: [
       { name: 'Aceite de oliva', portion: '1 pulgar', method: 'thumb', grams: '10-15ml', tip: '1 cucharada sopera' },
       { name: 'Aguacate', portion: '1/4 unidad', method: 'thumb', grams: '30-40g', tip: 'O 2 pulgares' },
       { name: 'Frutos secos', portion: '1 puñado', method: 'handful', grams: '25-30g', tip: 'Unas 15-20 almendras' },
       { name: 'Mantequilla', portion: '1 punta dedo', method: 'fingertip', grams: '5-10g' },
-      { name: 'Queso curado', portion: '2 pulgares', method: 'thumb', grams: '30-40g' },
+      { name: 'Queso curado', portion: '2 pulgares', method: 'thumb', grams: '40-60g', tip: '2-3 lonchas' },
       { name: 'Semillas', portion: '1 cucharada', method: 'thumb', grams: '10-15g' },
     ],
   },
@@ -157,11 +170,11 @@ const FOOD_CATEGORIES: FoodCategory[] = [
     id: 'dairy',
     name: 'Lácteos',
     icon: '🥛',
-    color: '#48A9A6',
+    color: '#2A7A78', // 5,06:1 (el --secondary, #48A9A6, daba 2,80)
     foods: [
       { name: 'Leche', portion: '1 vaso', method: 'fist', grams: '200-250ml' },
       { name: 'Yogur', portion: '1 unidad', method: 'fist', grams: '125g' },
-      { name: 'Queso fresco', portion: '1 palma', method: 'palm', grams: '80-100g' },
+      { name: 'Queso fresco', portion: '1 palma', method: 'palm', grams: '85-125g' },
       { name: 'Queso rallado', portion: '1 puñado', method: 'handful', grams: '20-30g' },
       { name: 'Requesón', portion: '1 puño', method: 'fist', grams: '100-150g' },
       { name: 'Kéfir', portion: '1 vaso', method: 'fist', grams: '200ml' },
@@ -175,6 +188,13 @@ export default function CalculadoraPorcionesPage() {
 
   const currentCategory = FOOD_CATEGORIES.find(c => c.id === selectedCategory);
   const currentMethod = selectedMethod ? HAND_METHODS.find(m => m.id === selectedMethod) : null;
+
+  // En el móvil el detalle sale debajo de las seis tarjetas, fuera de la pantalla: se trae a la
+  // vista si no se ve entero (hallazgo 4521). El foco se queda en la tarjeta.
+  const refDetalle = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (selectedMethod) traerALaVista(refDetalle.current, refDetalle.current);
+  }, [selectedMethod]);
 
   return (
     <div className={styles.container}>
@@ -197,25 +217,36 @@ export default function CalculadoraPorcionesPage() {
         </p>
 
         <div className={styles.methodsGrid}>
+          {/* <button aria-pressed> y no <div onClick>: el teclado no llegaba a las tarjetas ni el
+              lector las anunciaba como conmutadores (hallazgo 4521). Dentro de un botón solo cabe
+              contenido de frase: el nombre va en un span con aspecto de título. */}
           {HAND_METHODS.map(method => (
-            <div
+            <button
+              type="button"
               key={method.id}
               className={`${styles.methodCard} ${selectedMethod === method.id ? styles.methodSelected : ''}`}
+              aria-pressed={selectedMethod === method.id}
+              // El nombre accesible es solo el del método; el resto, su descripción. Si no, el
+              // botón se llamaba «… Para verduras y ensaladas» y chocaba con la pestaña «Verduras».
+              aria-labelledby={`metodo-${method.id}-nombre`}
+              aria-describedby={`metodo-${method.id}-detalle`}
               onClick={() => setSelectedMethod(selectedMethod === method.id ? null : method.id)}
             >
               <span className={styles.methodIcon} aria-hidden="true">{method.icon}</span>
-              <h3 className={styles.methodName}>{method.name}</h3>
-              <p className={styles.methodDescription}>{method.description}</p>
-              <div className={styles.methodEquivalent}>{method.equivalent}</div>
-              <span className={styles.methodUse}>{method.image}</span>
-            </div>
+              <span id={`metodo-${method.id}-nombre`} className={styles.methodName}>{method.name}</span>
+              <span id={`metodo-${method.id}-detalle`}>
+                <span className={styles.methodDescription}>{method.description}</span>
+                <span className={styles.methodEquivalent}>{method.equivalent}</span>
+                <span className={styles.methodUse}>{method.image}</span>
+              </span>
+            </button>
           ))}
         </div>
       </section>
 
       {/* Detalle del método seleccionado */}
       {currentMethod && (
-        <div className={styles.methodDetail} role="status" aria-live="polite" aria-atomic="true">
+        <div ref={refDetalle} className={styles.methodDetail} role="status" aria-live="polite" aria-atomic="true">
           <div className={styles.methodDetailIcon} aria-hidden="true">{currentMethod.icon}</div>
           <div className={styles.methodDetailContent}>
             <h3>{currentMethod.name}</h3>
@@ -288,20 +319,20 @@ export default function CalculadoraPorcionesPage() {
         <div className={styles.plateGuide}>
           <div className={styles.plateVisual}>
             <div className={styles.plateCircle}>
-              <div className={styles.plateHalf} style={{ backgroundColor: '#27AE60' }}>
+              <div className={styles.plateHalf} style={{ backgroundColor: COLOR_VERDURA }}>
                 <span>🥗</span>
                 <p>50%</p>
                 <small>Verduras</small>
               </div>
-              <div className={styles.plateQuarter} style={{ backgroundColor: '#E74C3C' }}>
+              <div className={styles.plateQuarter} style={{ backgroundColor: COLOR_PROTEINA }}>
                 <span>🍗</span>
                 <p>25%</p>
                 <small>Proteína</small>
               </div>
-              <div className={styles.plateQuarter} style={{ backgroundColor: '#F39C12' }}>
+              <div className={styles.plateQuarter} style={{ backgroundColor: COLOR_CARBOHIDRATO }}>
                 <span>🍚</span>
                 <p>25%</p>
-                <small>Carbos</small>
+                <small>Cereales</small>
               </div>
             </div>
             <div className={styles.plateSide}>
@@ -314,9 +345,12 @@ export default function CalculadoraPorcionesPage() {
           <div className={styles.plateDescription}>
             <h3>Composición ideal de cada comida principal:</h3>
             <ul>
-              <li><span style={{ color: '#27AE60' }}>●</span> <strong>50% Verduras:</strong> 2 manos juntas de ensalada o 1 puño de verdura cocida</li>
-              <li><span style={{ color: '#E74C3C' }}>●</span> <strong>25% Proteína:</strong> 1 palma de carne, pescado o legumbres</li>
-              <li><span style={{ color: '#F39C12' }}>●</span> <strong>25% Carbohidratos:</strong> 1 puño de arroz, pasta o patata</li>
+              {/* Plato saludable de AESAN (2022, p. 17): 50 % frutas y verduras, 25 % cereales
+                  integrales y 25 % proteínas saludables. La patata no va con los cereales: AESAN
+                  pide moderarla (p. 4). Hallazgo 4518. */}
+              <li><span style={{ color: COLOR_VERDURA }}>●</span> <strong>50% Verduras y frutas:</strong> 2 manos juntas de ensalada o 1 puño de verdura cocida</li>
+              <li><span style={{ color: COLOR_PROTEINA }}>●</span> <strong>25% Proteína:</strong> 1 palma de carne, pescado o legumbres</li>
+              <li><span style={{ color: COLOR_CARBOHIDRATO }}>●</span> <strong>25% Cereales, mejor integrales:</strong> 1 puño de arroz o pasta, o 1 palma de pan</li>
               <li><span style={{ color: 'var(--primary-texto)' }}>●</span> <strong>+ Grasa:</strong> 1 pulgar de aceite de oliva</li>
             </ul>
           </div>
@@ -353,12 +387,18 @@ export default function CalculadoraPorcionesPage() {
       
 
       <DisclaimerCard variant="medical" severity="high" collapsible={false} context="calculadora-porciones">
-        <p>Este método de porciones es una <strong>guía visual orientativa</strong> basada en recomendaciones nutricionales generales:</p>
+        <p>Este método de porciones es una <strong>guía visual orientativa</strong>; las raciones en gramos son las de la Agencia Española de Seguridad Alimentaria y Nutrición (AESAN):</p>
         <ul className={styles.disclaimerList}>
           <li><strong>Las necesidades varían individualmente</strong>: Según edad, sexo, actividad física y objetivos personales</li>
           <li><strong>Consulta con un dietista-nutricionista</strong>: Para un plan nutricional personalizado y adaptado a tu situación</li>
         </ul>
       </DisclaimerCard>
+      <DataReference
+        normativa="Raciones de referencia para la población española"
+        fuente="AESAN · Recomendaciones dietéticas saludables y sostenibles complementadas con recomendaciones de actividad física para la población española (2022)"
+        verificado="2026-11-16"
+        urlOficial="https://www.aesan.gob.es/AECOSAN/docs/documentos/nutricion/RECOMENDACIONES_DIETETICAS.pdf"
+      />
 
       <EducationalSection
         title="Conceptos nutricionales: porciones, raciones y métodos de medición"
@@ -437,7 +477,9 @@ export default function CalculadoraPorcionesPage() {
               <span className={styles.escenarioIcon} aria-hidden="true">👶</span>
               <h4>Alimentación infantil</h4>
             </div>
-            <p className={styles.escenarioDesc}>Los niños tienen manos más pequeñas, lo que ajusta automáticamente sus porciones. No presiones a terminar el plato.</p>
+            {/* AESAN 2022, p. 7, en negrita: «Evita el consumo de frutos secos por niñas y niños
+                menores de 5 años debido al riesgo de asfixia» (hallazgo 4519) */}
+            <p className={styles.escenarioDesc}>Los niños tienen manos más pequeñas, lo que reduce sus porciones de forma natural. No presiones a terminar el plato. <strong>Ojo: no des frutos secos enteros a niñas y niños menores de 5 años, por el riesgo de asfixia</strong> (AESAN).</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
@@ -452,7 +494,7 @@ export default function CalculadoraPorcionesPage() {
         <div className={styles.faqList}>
           <div className={styles.faqItem}>
             <strong>¿Cuál es la diferencia entre ración y porción?</strong>
-            <p>La ración es la cantidad recomendada por organismos de salud (OMS, EFSA). La porción es lo que realmente sirves en el plato. En restaurantes, la porción suele ser 2–3 veces mayor que la ración recomendada.</p>
+            <p>La ración es la cantidad de referencia que fijan las autoridades sanitarias (en España, la AESAN, que es la fuente de las raciones de esta página). La porción es lo que realmente sirves en el plato. En restaurantes, la porción suele ser 2–3 veces mayor que la ración recomendada.</p>
           </div>
           <div className={styles.faqItem}>
             <strong>¿Las porciones de la mano cambian con el tiempo?</strong>

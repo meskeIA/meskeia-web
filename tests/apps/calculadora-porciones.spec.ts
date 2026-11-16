@@ -143,28 +143,31 @@ interface Racion {
   fuera?: string;
 }
 
+// REPARADO (4518, 16/11/2026): las diez filas que se salían del rango de AESAN (pescado 100-150,
+// ensalada 80-100, verduras crudas 100-150, zanahorias 100-120, plátano 100-120, frutos rojos
+// 100-150, uvas 100-120, sandía 200-250, queso curado 30-40, queso fresco 80-100) ya caen dentro.
 const RACIONES: Racion[] = [
   { categoria: 'Proteínas', alimento: 'Pechuga de pollo', aesan: [100, 125], pagina: 10 },
   { categoria: 'Proteínas', alimento: 'Filete de ternera', aesan: [100, 125], pagina: 10 },
-  { categoria: 'Proteínas', alimento: 'Pescado (filete)', aesan: [125, 150], pagina: 8, fuera: 'la app da 100-150 g' },
+  { categoria: 'Proteínas', alimento: 'Pescado (filete)', aesan: [125, 150], pagina: 8 },
   { categoria: 'Carbohidratos', alimento: 'Patata', aesan: [150, 200], pagina: 4 },
   { categoria: 'Carbohidratos', alimento: 'Pan', aesan: [40, 60], pagina: 5 },
-  { categoria: 'Verduras', alimento: 'Ensalada de hojas', aesan: [150, 200], pagina: 4, fuera: 'la app da 80-100 g, la mitad' },
+  { categoria: 'Verduras', alimento: 'Ensalada de hojas', aesan: [150, 200], pagina: 4 },
   { categoria: 'Verduras', alimento: 'Verduras cocidas', aesan: [150, 200], pagina: 4 },
-  { categoria: 'Verduras', alimento: 'Verduras crudas', aesan: [150, 200], pagina: 4, fuera: 'la app da 100-150 g' },
+  { categoria: 'Verduras', alimento: 'Verduras crudas', aesan: [150, 200], pagina: 4 },
   { categoria: 'Verduras', alimento: 'Brócoli/Coliflor', aesan: [150, 200], pagina: 4 },
-  { categoria: 'Verduras', alimento: 'Zanahorias', aesan: [150, 200], pagina: 4, fuera: 'la app da 100-120 g' },
+  { categoria: 'Verduras', alimento: 'Zanahorias', aesan: [150, 200], pagina: 4 },
   { categoria: 'Verduras', alimento: 'Tomate', aesan: [150, 200], pagina: 4 },
   { categoria: 'Frutas', alimento: 'Manzana/Pera', aesan: [120, 200], pagina: 4 },
-  { categoria: 'Frutas', alimento: 'Plátano', aesan: [120, 200], pagina: 4, fuera: 'la app da 100-120 g' },
-  { categoria: 'Frutas', alimento: 'Frutos rojos', aesan: [120, 200], pagina: 4, fuera: 'la app da 100-150 g' },
-  { categoria: 'Frutas', alimento: 'Uvas', aesan: [120, 200], pagina: 4, fuera: 'la app da 100-120 g' },
+  { categoria: 'Frutas', alimento: 'Plátano', aesan: [120, 200], pagina: 4 },
+  { categoria: 'Frutas', alimento: 'Frutos rojos', aesan: [120, 200], pagina: 4 },
+  { categoria: 'Frutas', alimento: 'Uvas', aesan: [120, 200], pagina: 4 },
   { categoria: 'Frutas', alimento: 'Naranja', aesan: [120, 200], pagina: 4 },
-  { categoria: 'Frutas', alimento: 'Sandía/Melón', aesan: [120, 200], pagina: 4, fuera: 'la app da 200-250 g («2 puños»)' },
-  { categoria: 'Grasas', alimento: 'Queso curado', aesan: [40, 60], pagina: 10, fuera: 'la app da 30-40 g' },
+  { categoria: 'Frutas', alimento: 'Sandía/Melón', aesan: [120, 200], pagina: 4 },
+  { categoria: 'Grasas', alimento: 'Queso curado', aesan: [40, 60], pagina: 10 },
   { categoria: 'Lácteos', alimento: 'Leche', aesan: [200, 250], pagina: 10 },
   { categoria: 'Lácteos', alimento: 'Yogur', aesan: [125, 125], pagina: 10 },
-  { categoria: 'Lácteos', alimento: 'Queso fresco', aesan: [85, 125], pagina: 10, fuera: 'la app da 80-100 g' },
+  { categoria: 'Lácteos', alimento: 'Queso fresco', aesan: [85, 125], pagina: 10 },
 ];
 
 test.describe('Caso 2 · límite: raciones frente a AESAN 2022', () => {
@@ -187,18 +190,19 @@ test.describe('Caso 2 · límite: raciones frente a AESAN 2022', () => {
     }
   }
 
-  // ABIERTO: el aviso dice «basada en recomendaciones nutricionales generales» sin nombrar
-  // ninguna, y no hay DataReference. La reparación cita AESAN 2022.
-  test.fail('la página cita la fuente de sus raciones (AESAN)', async ({ page }) => {
+  // REPARADO (4518): el aviso decía «basada en recomendaciones nutricionales generales» sin
+  // nombrar ninguna, y no había DataReference. Ahora cita AESAN 2022.
+  test('la página cita la fuente de sus raciones (AESAN)', async ({ page }) => {
     await abrir(page);
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     await expect(page.locator('body')).toContainText(/AESAN|Agencia Española de Seguridad Alimentaria/, { timeout: 2000 });
+    await expect(page.locator('a[href*="aesan.gob.es"]').first()).toBeAttached();
   });
 
-  // ABIERTO: AESAN p. 7 avisa de no dar frutos secos a menores de 5 años (asfixia); la app da
-  // «Frutos secos: 1 puñado» y en «Alimentación infantil» dice que la mano de los niños ajusta
-  // sus porciones automáticamente, sin el aviso.
-  test.fail('la página avisa de no dar frutos secos a menores de 5 años (AESAN, p. 7)', async ({ page }) => {
+  // REPARADO (4519): AESAN p. 7 avisa de no dar frutos secos a menores de 5 años (asfixia); la app
+  // daba «Frutos secos: 1 puñado» y en «Alimentación infantil» decía que la mano de los niños
+  // ajusta sus porciones automáticamente, sin el aviso.
+  test('la página avisa de no dar frutos secos a menores de 5 años (AESAN, p. 7)', async ({ page }) => {
     await abrir(page);
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     await expect(page.locator('body')).toContainText('Alimentación infantil');
@@ -219,10 +223,11 @@ test.describe('Caso 2 · límite: raciones frente a AESAN 2022', () => {
 // CASO 3 · lo que debe rechazarse o no puede quedarse fuera
 // ─────────────────────────────────────────────────────────────────────────────
 test.describe('Caso 3 · teclado, promesa y FAQPage', () => {
-  // ABIERTO: las tarjetas de método son <div onClick> sin role, tabindex ni aria-pressed: el
-  // teclado no las alcanza y el lector no las anuncia como conmutador.
-  test.fail('las tarjetas de método se alcanzan con Tab y se abren con Enter', async ({ page }) => {
+  // REPARADO (4521): las tarjetas de método eran <div onClick> sin role, tabindex ni aria-pressed:
+  // el teclado no las alcanzaba y el lector no las anunciaba como conmutador.
+  test('las tarjetas de método se alcanzan con Tab y se abren con Enter', async ({ page }) => {
     await abrir(page);
+    await expect(page.getByRole('button', { name: /Puño cerrado/ })).toHaveAttribute('aria-pressed', 'false');
     let enTarjeta = false;
     for (let i = 0; i < 30 && !enTarjeta; i++) {
       await page.keyboard.press('Tab');
@@ -239,26 +244,29 @@ test.describe('Caso 3 · teclado, promesa y FAQPage', () => {
     await expect(page.locator('input, select, textarea')).toHaveCount(0);
   });
 
-  // ABIERTO: la tarjeta de relacionadas de las apps de cocina anuncia «Ajusta recetas» y la app
-  // no ajusta recetas (ni tiene un campo donde escribirlas).
-  test.fail('la tarjeta de relacionadas de lista-compras no promete «Ajusta recetas»', async ({ page }) => {
+  // REPARADO (4526): la tarjeta de relacionadas de las apps de cocina anunciaba «Ajusta recetas» y
+  // la app no ajusta recetas (ni tiene un campo donde escribirlas). Ahora dice lo que es.
+  test('la tarjeta de relacionadas de lista-compras no promete «Ajusta recetas»', async ({ page }) => {
     await page.goto('/lista-compras/');
     await esperarPaginaAsentada(page);
     const enlace = page.locator('a[href^="/calculadora-porciones/"]').first();
     await expect(enlace).toContainText('Porciones');
     await expect(enlace).not.toContainText('Ajusta recetas', { timeout: 2000 });
+    await expect(enlace).toContainText('Raciones con la mano');
   });
 
-  // ABIERTO: el FAQPage dice que «la punta del pulgar equivale a una cucharadita de aceite o
-  // mantequilla» y «1-2 pulgares de grasas saludables por comida»; la página da «Pulgar ≈ 1
+  // REPARADO (4520): el FAQPage decía que «la punta del pulgar equivale a una cucharadita de aceite
+  // o mantequilla» y «1-2 pulgares de grasas saludables por comida»; la página da «Pulgar ≈ 1
   // cucharada (15ml/15g)», «Aceite de oliva: 1 pulgar, 10-15ml, 1 cucharada sopera» y en el
   // plato «+ Grasa: 1 pulgar». AESAN (p. 11): ración de aceite 10 ml, 1 cucharada sopera.
-  test.fail('FAQPage: la grasa de cada comida es la de la página (1 pulgar = 1 cucharada)', async ({ page }) => {
+  test('FAQPage: la grasa de cada comida es la de la página (1 pulgar = 1 cucharada)', async ({ page }) => {
     await abrir(page);
     const faq = await jsonLd(page, 'FAQPage');
     const texto = (faq.mainEntity ?? []).map((p) => p.acceptedAnswer.text).join(' ');
     expect(texto).not.toMatch(/punta del pulgar equivale a una cucharadita de aceite/);
     expect(texto).not.toMatch(/1-2 pulgares/);
+    expect(texto).not.toMatch(/Varios estudios/);
+    expect(texto).toMatch(/pulgar entero equivale a una cucharada de aceite/);
   });
 
   // ABIERTO: featureList habla de «Cuatro métodos … cupped hand (grasas)»; la página enseña seis
@@ -307,17 +315,14 @@ test.describe('Contraste del texto blanco sobre el color de cada categoría', ()
       await expect.poll(() => contrasteSobreFondoReal(nombrePestana), { timeout: 3000 }).toBeGreaterThanOrEqual(4.5);
       await expect.poll(() => contrasteSobreFondoReal(cabecera), { timeout: 3000 }).toBeGreaterThanOrEqual(4.5);
     };
-    if (c.esperado < 4.5) {
-      // ABIERTO: blanco sobre el color de la categoría por debajo de 4,5:1
-      test.fail(`${titulo} — ABIERTO`, cuerpo);
-    } else {
-      test(titulo, cuerpo);
-    }
+    // REPARADO (4523): los colores de categoría ya dan ≥ 4,5:1 con el blanco (el título conserva
+    // la cifra de antes de la reparación).
+    test(titulo, cuerpo);
   }
 
-  // ABIERTO: rótulos de 12 px en blanco (opacidad 0,9) sobre verde 2,87, rojo 3,82 y naranja 2,19;
-  // y «50%»/«25%» (19,2 px negrita, texto grande, 3:1) sobre verde y naranja.
-  test.fail('plato: rótulos ≥ 4,5:1 y porcentajes ≥ 3:1', async ({ page }) => {
+  // REPARADO (4523): rótulos de 12 px en blanco (opacidad 0,9) sobre verde 2,87, rojo 3,82 y
+  // naranja 2,19; y «50%»/«25%» (19,2 px negrita, texto grande, 3:1) sobre verde y naranja.
+  test('plato: rótulos ≥ 4,5:1 y porcentajes ≥ 3:1', async ({ page }) => {
     await abrir(page);
     const sectores = page.locator('[class*="plateHalf"], [class*="plateQuarter"]');
     await expect(sectores).toHaveCount(3);
@@ -404,18 +409,18 @@ test.describe('Móvil (Pixel 7)', () => {
     hasTouch: true,
   });
 
-  // ABIERTO: por debajo de 600 px `.categoryName { display: none }` y el icono es aria-hidden:
-  // los seis botones se quedan sin nombre accesible («botón, pulsado»).
-  test.fail('las seis pestañas conservan su nombre accesible', async ({ page }) => {
+  // REPARADO (4522): por debajo de 600 px `.categoryName { display: none }` y el icono es
+  // aria-hidden: los seis botones se quedaban sin nombre accesible («botón, pulsado»).
+  test('las seis pestañas conservan su nombre accesible', async ({ page }) => {
     await abrir(page);
     for (const c of CATEGORIAS) {
       await expect(page.getByRole('button', { name: c.nombre })).toHaveCount(1, { timeout: 1500 });
     }
   });
 
-  // ABIERTO: el detalle se pinta debajo de las seis tarjetas (y ≈ 1.278 px con 839 px de pantalla)
-  // y la página no se desplaza.
-  test.fail('tras tocar «Puño cerrado», el detalle queda a la vista', async ({ page }) => {
+  // REPARADO (4521): el detalle se pinta debajo de las seis tarjetas (y ≈ 1.278 px con 839 px de
+  // pantalla) y la página no se desplazaba; ahora se trae a la vista.
+  test('tras tocar «Puño cerrado», el detalle queda a la vista', async ({ page }) => {
     await abrir(page);
     await tarjeta(page, 'Puño cerrado').tap();
     await expect(detalle(page)).toBeVisible();
