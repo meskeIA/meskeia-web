@@ -50,6 +50,21 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   H. Los emojis de método, copa y base se leen en voz alta en las 45 fichas.
  *   I. La guía recomienda un «Champán Spritz» que no está entre las 45.
  *
+ * CABO C0769 (16/11/2026, Opus 5.5) — las atribuciones históricas sin fuente que dejó la primera
+ * inspección y la frase de las unidades de alcohol. Ninguna atribución se pudo anclar: unesco.org
+ * y uspto.gov no están en la red de fuentes admitidas, y el buscador del BOE (para el texto de la
+ * Convención del Patrimonio Mundial de 1972) no respondió a una consulta por URL. Criterio del
+ * usuario (30/10/2026, C0203) y CLAUDE.md §1.quinquies punto 1: lo que no tiene fuente se RETIRA
+ * o se MATIZA con su fuente y año; no se da por bueno.
+ *   J. Dark & Stormy: la misma ficha dice «uno de los pocos con marca registrada» y «el único caso
+ *      conocido», y «solo puede llamarse así si usa ron Gosling's» con la receta «Gosling's Black
+ *      Seal o similar».
+ *   K. Bellini: «El Harry's Bar es Patrimonio Cultural de la Humanidad según el gobierno italiano».
+ *   L. Dirty Martini: «documentado por primera vez en 1901 por el presidente Theodore Roosevelt».
+ *   M. Arnold Palmer: «Palmer nunca cobró regalías» y la cita «Me parece bien».
+ *   N. «Los cócteles con destilados suelen superar las 2 unidades por copa»: con las recetas de la
+ *      propia app, como mucho 10 de 31 pasan de 2 unidades (cálculo en el caso «CABO C0769»).
+ *
  * LO QUE SÍ ESTÁ BIEN, y por eso se fija aquí: el aviso de alcohol (DisclaimerCard «alcohol»,
  * severity high, no plegable) está fuera de la sección educativa y se ve al cargar; la guía cita
  * el Grupo 1 de la IARC y que no hay nivel seguro (OMS, comunicado del 04/01/2023, cotejado en
@@ -118,6 +133,65 @@ async function mlDe(page: Page, coctel: string, ingrediente: RegExp): Promise<nu
   const item = items.find((t) => ingrediente.test(t));
   if (!item) throw new Error(`«${coctel}» no lleva ${ingrediente}`);
   return Number(item.match(/(\d+)\s*ml/)?.[1]);
+}
+
+/**
+ * Cabo C0769 — las 31 recetas que llevan un destilado (ron, gin, vodka, whisky, tequila, pisco),
+ * con TODOS sus ingredientes alcohólicos medidos en ml (destilados, licores, vermut, Campari) y el
+ * total que suman, contado a mano en el array COCTELES ANTES de abrir la página. Fuera: los
+ * bitters (2-3 golpes o gotas, menos de 1 ml cada uno), el Baileys con hielo (licor de crema, no
+ * destilado; ni contándolo al 40 % pasaría de 2: 60 ml → 1,89) y los Spritz con vino espumoso.
+ */
+const RECETAS_CON_DESTILADO: ReadonlyArray<readonly [string, readonly RegExp[], number]> = [
+  ['Margarita', [/tequila/i, /triple seco/i], 75],
+  ['Daiquiri', [/ron blanco/i], 60],
+  ['Whiskey Sour', [/bourbon/i], 50],
+  ['Pisco Sour', [/pisco/i], 60],
+  ['Amaretto Sour', [/de amaretto/i, /bourbon/i], 60],
+  ['Gimlet', [/de gin/i], 60],
+  ['White Lady', [/de gin/i, /triple seco/i], 60],
+  ['Cosmopolitan', [/vodka/i, /triple seco/i], 55],
+  ['Mojito', [/ron blanco/i], 50],
+  ['Gin Tonic', [/de gin/i], 50],
+  ['Cuba Libre', [/de ron/i], 50],
+  ['Moscow Mule', [/de vodka/i], 50],
+  ['Dark & Stormy', [/ron negro/i], 60],
+  ['Tom Collins', [/de gin/i], 45],
+  ['Paloma', [/tequila/i], 50],
+  ['Martini Dry', [/de gin/i, /vermut seco/i], 90],
+  ['Dirty Martini', [/vodka o gin/i, /vermut seco/i], 70],
+  ['Negroni', [/de gin/i, /vermut rojo/i, /de Campari/i], 90],
+  ['Manhattan', [/bourbon/i, /vermut rojo/i], 90],
+  ['Old Fashioned', [/bourbon/i], 60],
+  ['Rob Roy', [/Scotch/i, /vermut rojo/i], 90],
+  ['Piña Colada', [/ron blanco/i, /ron de coco/i], 80],
+  ['Mai Tai', [/jamaicano/i, /martiniqu/i, /curaçao/i], 75],
+  ['Sex on the Beach', [/de vodka/i, /schnapps/i], 60],
+  ['Tequila Sunrise', [/tequila/i], 50],
+  ['Blue Lagoon', [/de vodka/i, /curaçao azul/i], 60],
+  ['Bahama Mama', [/ron negro/i, /ron de coco/i, /licor de café/i], 80],
+  ['White Russian', [/de vodka/i, /licor de café/i], 70],
+  ['Irish Coffee', [/whisky/i], 40],
+  ['Hot Toddy', [/whisky/i], 50],
+  ['Piña Colada cremosa', [/ron blanco/i], 50],
+];
+
+/**
+ * Unidades de bebida estándar de cada receta (España: 10 g de etanol, lo dice la propia guía),
+ * tomando TODOS sus ingredientes alcohólicos al 40 % vol con la densidad del etanol, 0,789 g/ml.
+ * Es una COTA SUPERIOR a propósito: el 40 % es el mínimo legal del whisky y está por encima del
+ * mínimo del ron, el vodka y el gin (37,5 %; Reglamento (UE) 2019/787, anexo I, categorías 1 b,
+ * 2 b, 15 b y 20 b, DOUE L 130 de 17/05/2019, leído en boe.es), y licores y vermut tienen menos.
+ * Si con esta cota la mayoría no pasa de 2 unidades, con las graduaciones reales tampoco.
+ */
+async function unidadesCotaSuperior(page: Page): Promise<{ nombre: string; ml: number; unidades: number }[]> {
+  const filas: { nombre: string; ml: number; unidades: number }[] = [];
+  for (const [nombre, alcoholicos] of RECETAS_CON_DESTILADO) {
+    let ml = 0;
+    for (const patron of alcoholicos) ml += await mlDe(page, nombre, patron);
+    filas.push({ nombre, ml, unidades: (ml * 0.4 * 0.789) / 10 });
+  }
+  return filas;
 }
 
 test.describe('guia-cocteles — filtros, buscador y contenido', () => {
@@ -368,6 +442,103 @@ test.describe('guia-cocteles — filtros, buscador y contenido', () => {
     ];
     for (const nombre of recomendados) {
       await expect(ficha(page, nombre), `«${nombre}» se recomienda y no tiene ficha`).toHaveCount(1);
+    }
+  });
+
+  test('CABO C0769 (premisa, pasa hoy) — ml alcohólicos de las 31 recetas con destilado y cuántas pasan de 2 unidades', async ({ page }) => {
+    // Los totales de RECETAS_CON_DESTILADO, contados en el array, son los que pinta cada ficha.
+    const filas = await unidadesCotaSuperior(page);
+    for (const [nombre, , mlEsperado] of RECETAS_CON_DESTILADO) {
+      expect(filas.find((f) => f.nombre === nombre)?.ml, `ml alcohólicos de «${nombre}»`).toBe(mlEsperado);
+    }
+    // Cálculo a mano, cota superior (todo al 40 %): un highball de 50 ml da 50 × 0,40 × 0,789 =
+    // 15,78 g = 1,58 unidades; hacen falta más de 63,4 ml de bebida al 40 % para pasar de 2.
+    // Pasan 10: Margarita 75 ml (2,37), Martini Dry 90 (2,84), Dirty Martini 70 (2,21),
+    // Negroni 90 (2,84), Manhattan 90 (2,84), Rob Roy 90 (2,84), Piña Colada 80 (2,52),
+    // Mai Tai 75 (2,37), Bahama Mama 80 (2,52) y White Russian 70 (2,21). Las otras 21, no.
+    // Con la equivalencia de la propia guía («30 ml de destilado» = 1 unidad) salen las mismas 10:
+    // son las que pasan de 60 ml. Con graduaciones típicas (destilado al 40 %, Cointreau 40 %,
+    // amaretto 28 %, Campari 25 %, vermut 15-18 %, ron de coco 21 %, licor de café 20 %) pasan 7
+    // de 31; con el destilado al mínimo legal de 37,5 %, 5.
+    const superan = filas.filter((f) => f.unidades > 2).map((f) => f.nombre);
+    expect(superan).toEqual([
+      'Margarita',
+      'Martini Dry',
+      'Dirty Martini',
+      'Negroni',
+      'Manhattan',
+      'Rob Roy',
+      'Piña Colada',
+      'Mai Tai',
+      'Bahama Mama',
+      'White Russian',
+    ]);
+    expect(filas.filter((f) => f.ml / 30 > 2).map((f) => f.nombre)).toEqual(superan);
+  });
+
+  test('HALLAZGO J (16/11/2026, ABIERTO) — el Dark & Stormy se contradice: «uno de los pocos» y «el único caso» con marca', async ({ page }) => {
+    // Descripción: «uno de los pocos con marca registrada: solo puede llamarse así si usa ron
+    // Gosling's Black Seal». Curiosidad de la MISMA ficha: «Son el único caso conocido de una
+    // empresa que posee los derechos de nombre de un cóctel». Y su lista de ingredientes acepta
+    // «Gosling's Black Seal o similar». Ninguna de las dos versiones cita fuente (la oficina de
+    // marcas de EE. UU. no está en la red de fuentes admitidas): se retira o se matiza con fuente.
+    test.fail();
+    const texto = (await ficha(page, 'Dark & Stormy').innerText()).replace(/\s+/g, ' ');
+    const pocos = /uno de los pocos con marca registrada/i.test(texto);
+    const unico = /[úu]nico caso conocido/i.test(texto);
+    expect(pocos && unico, '«uno de los pocos» y «el único caso conocido» en la misma ficha').toBe(false);
+    const oSimilar = /Black Seal o similar/i.test(texto);
+    const soloGoslings = /solo puede llamarse as[íi] si usa ron Gosling/i.test(texto);
+    expect(oSimilar && soloGoslings, 'la receta acepta otro ron y el texto dice que entonces no es un Dark & Stormy').toBe(false);
+  });
+
+  test('HALLAZGO K (16/11/2026, ABIERTO) — «Patrimonio Cultural de la Humanidad según el gobierno italiano», sin fuente', async ({ page }) => {
+    // Curiosidad del Bellini: «El Harry's Bar es Patrimonio Cultural de la Humanidad según el
+    // gobierno italiano». «Patrimonio de la Humanidad» es la lista de la UNESCO; un gobierno
+    // nacional no la otorga. La confusión no se pudo confirmar (whc.unesco.org no está en la red
+    // de fuentes admitidas), pero la frase no cita ninguna: esperado, retirada o matizada con
+    // la declaración que sea, su autoridad y su año (§1.quinquies punto 1; criterio C0203).
+    test.fail();
+    const bellini = ficha(page, 'Bellini');
+    await expect(bellini).not.toContainText(/Humanidad seg[úu]n el gobierno/i);
+    await expect(bellini).not.toContainText(/Harry's Bar es Patrimonio/i);
+  });
+
+  test('HALLAZGO L (16/11/2026, ABIERTO) — el Dirty Martini «documentado en 1901 por el presidente Theodore Roosevelt», sin fuente', async ({ page }) => {
+    // Curiosidad: «El Dirty Martini fue documentado por primera vez en 1901 por el presidente
+    // Theodore Roosevelt, que lo pedía regularmente». Atribución histórica presentada como hecho,
+    // sin fuente ni año de la fuente; ninguna de la red admitida trata la historia de un cóctel.
+    // Esperado: retirada o matizada como anécdota atribuida, con su fuente.
+    test.fail();
+    await expect(ficha(page, 'Dirty Martini')).not.toContainText(/documentado[^.]*Roosevelt/i);
+  });
+
+  test('HALLAZGO M (16/11/2026, ABIERTO) — Arnold Palmer «nunca cobró regalías» y «Me parece bien», sin fuente', async ({ page }) => {
+    // Curiosidad: «Palmer nunca cobró regalías y no le importó que llevara su nombre: "Me parece
+    // bien"». Afirmación sobre los ingresos de una persona real y una cita entre comillas, sin
+    // fuente. Esperado: retirada o matizada con su fuente.
+    test.fail();
+    await expect(ficha(page, 'Arnold Palmer')).not.toContainText(/nunca cobr[óo] regal[íi]as/i);
+  });
+
+  test('HALLAZGO N (16/11/2026, ABIERTO) — «los cócteles con destilados suelen superar las 2 unidades por copa»: 10 de 31 como mucho', async ({ page }) => {
+    // «Consumo responsable», al final de la guía: «en España una unidad de alcohol equivale a 10 g
+    // de etanol (aprox. … 30 ml de destilado). Los cócteles con destilados suelen superar las 2
+    // unidades por copa». Con las recetas de la propia app y todo su alcohol al 40 % (cota
+    // superior, caso «CABO C0769»), pasan de 2 unidades 10 de las 31 recetas con destilado; con
+    // la equivalencia de 30 ml de la misma frase, también 10. «Suelen superar» exigiría más de la
+    // mitad. El error SOBREVALORA lo que lleva una copa (un highball de 50 ml es 1,6 unidades),
+    // no lo infravalora. Esperado: la frase retirada, o matizada con lo que sí sale (las de 50 ml
+    // rondan 1,5-1,6; las de 70-90 ml de alcohol, como el Martini Dry o el Manhattan, pasan de 2).
+    test.fail();
+    const filas = await unidadesCotaSuperior(page);
+    const superan = filas.filter((f) => f.unidades > 2).length;
+    await abrirGuia(page);
+    const guia = (await page.locator('[data-guia-educativa]').innerText()).replace(/\s+/g, ' ');
+    if (/suelen superar las 2 unidades/i.test(guia)) {
+      expect(superan, `«suelen superar las 2 unidades» y solo ${superan} de ${filas.length} pasan de 2`).toBeGreaterThan(
+        filas.length / 2,
+      );
     }
   });
 });
