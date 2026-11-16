@@ -140,7 +140,8 @@ export default function VisualizadorRecursosLiterariosPage() {
       <header className={styles.hero}>
         <h1 className={styles.heroTitle}>Recursos Literarios</h1>
         <p className={styles.heroSubtitle}>
-          27 figuras retóricas con definición, ejemplos reales y cómo distinguirlas entre sí
+          {/* La cifra sale del banco: decía 27 con 26 (hallazgo 3646 del quiz, mismo banco) */}
+          {figurasRetorica.length} figuras retóricas con definición, ejemplos reales y cómo distinguirlas entre sí
         </p>
       </header>
 

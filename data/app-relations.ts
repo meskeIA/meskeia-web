@@ -2333,7 +2333,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'errores-escritura-creativa': [
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
     { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Métrica y Estrofas', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
-    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
+    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '26 figuras retóricas con definición y ejemplos' },
     { url: '/generador-incipit/', icon: '📝', name: 'Generador de Íncipit', description: '62 primeras frases para arrancar tu novela' },
   ],
 
@@ -2350,7 +2350,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/errores-escritura-creativa/', icon: '✏️', name: 'Errores de Escritura', description: '15 fallos frecuentes con corrección explicada' },
     { url: '/configurador-narrativo/', icon: '🧭', name: 'Configurador Narrativo', description: 'Elige persona, narrador y tiempo verbal para tu historia' },
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
-    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
+    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '26 figuras retóricas con definición y ejemplos' },
   ],
 
   // NARRATOLOGÍA VISUAL
@@ -2382,14 +2382,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/quiz-metrica-estrofas/', icon: '🎶', name: 'Quiz de Métrica', description: 'Pon a prueba tipos de verso, estrofas y rima' },
     { url: '/generador-poemas/', icon: '✍️', name: 'Generador de Poemas', description: 'Escribe haiku, soneto, romance y más con guía métrica' },
     { url: '/guia-comentario-texto/', icon: '📝', name: 'Comentario de Texto', description: 'Metodología completa con plantillas y vocabulario' },
-    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
+    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '26 figuras retóricas con definición y ejemplos' },
   ],
 
   // GUÍA COMENTARIO DE TEXTO
   'guia-comentario-texto': [
     { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Guía de Métrica', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
     { url: '/generador-poemas/', icon: '✍️', name: 'Generador de Poemas', description: 'Escribe haiku, soneto, romance y más con guía métrica' },
-    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
+    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '26 figuras retóricas con definición y ejemplos' },
     { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras retóricas' },
   ],
 
@@ -2398,14 +2398,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Guía de Métrica', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
     { url: '/generador-poemas/', icon: '✍️', name: 'Generador de Poemas', description: 'Escribe haiku, soneto, romance y más con guía métrica' },
     { url: '/quiz-figuras-retoricas/', icon: '📝', name: 'Quiz Figuras Retóricas', description: 'Pon a prueba el reconocimiento de figuras retóricas' },
-    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
+    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '26 figuras retóricas con definición y ejemplos' },
   ],
 
   // GENERADOR DE POEMAS POR FORMA
   'generador-poemas': [
     { url: '/guia-metrica-estrofas/', icon: '🎵', name: 'Guía de Métrica', description: 'Contador de sílabas, tipos de verso y estrofas clásicas' },
     { url: '/quiz-metrica-estrofas/', icon: '🎶', name: 'Quiz de Métrica', description: 'Pon a prueba tipos de verso, estrofas y rima · 3 niveles' },
-    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '27 figuras retóricas con definición y ejemplos' },
+    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Recursos Literarios', description: '26 figuras retóricas con definición y ejemplos' },
     { url: '/guia-comentario-texto/', icon: '📝', name: 'Comentario de Texto', description: 'Metodología completa con plantillas y vocabulario' },
   ],
 
@@ -2991,7 +2991,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/falsos-amigos-ingles/', icon: '🇬🇧', name: 'Falsos Amigos Español-Inglés', description: 'Palabras que se parecen al español y no significan lo mismo' },
   ],
   'quiz-figuras-retoricas': [
-    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Guía de Figuras Retóricas', description: '27 figuras con definición, ejemplos y cómo distinguirlas' },
+    { url: '/visualizador-recursos-literarios/', icon: '📜', name: 'Guía de Figuras Retóricas', description: '26 figuras con definición, ejemplos y cómo distinguirlas' },
     { url: '/quiz-metrica-estrofas/', icon: '🎶', name: 'Quiz de Métrica', description: 'Tipos de verso, estrofas y rima · 3 niveles' },
     { url: '/visualizador-estilos-literarios/', icon: '📖', name: 'Estilos Literarios', description: 'Los grandes movimientos de la literatura' },
     { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz de Literatura', description: 'Autores, obras y movimientos literarios' },

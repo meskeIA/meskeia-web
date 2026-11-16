@@ -11,8 +11,9 @@ import { esperarPaginaAsentada } from './_hidratacion';
  * ──────────────────
  * · <h1> «Quiz Figuras Retóricas ✍️» · «Identifica metáforas, hipérboles, anáforas y mucho más ·
  *   ESO, Bachillerato y Selectividad».
- * · Cuatro niveles (Básico «10 figuras», Intermedio «10», Avanzado «6», Todas «27 figuras
- *   completas») y 10, 15 o 20 preguntas. Cada pregunta es un ejemplo de `data/figuras-retoricas.ts`
+ * · Cuatro niveles (Básico «10 figuras», Intermedio «10», Avanzado «6», Todas «26 figuras
+ *   completas», hasta el 16/11/2026 «27»: hallazgo 3646) y 10, 15 o 20 preguntas, hasta el número
+ *   de figuras del nivel (3645). Cada pregunta es un ejemplo de `data/figuras-retoricas.ts`
  *   y cuatro nombres de figura del MISMO nivel (`generarOpciones`); tras responder, definición,
  *   distinción y otro ejemplo de la figura.
  *
@@ -330,25 +331,35 @@ test.describe('Foco (invariante de la familia)', () => {
 
 test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
   test('hallazgo · «Precisión» no pasa del 100 %: dos aciertos de dos son 100 %, no 200 %', async ({ page }) => {
-    test.fail(); // ABIERTO — page.tsx:257 divide `correctas` (ya con la respuesta actual) entre
+    // REPARADO (3644, /reparar 16/11/2026): aciertos ÷ preguntas ya respondidas. Era: page.tsx:257
+    // dividía `correctas` (ya con la respuesta actual) entre
     // `preguntaActual` (las ANTERIORES): tras acertar la 2.ª, 2/1 = 200 %; tras acertar la 1.ª, 0 %.
     // Medido 28/10/2026: 0 %, 200 %, 150 %, 133 %, 125 %… en una partida de 7 aciertos seguidos.
     await abrir(page);
     await arrancar(page, 'Básico', 10);
+    await expect(hudValor(page, 2), 'sin responder nada, 0 %').toHaveText(porcentaje(0));
     await responder(page, 'bien');
+    await expect(hudValor(page, 2), 'una de una: 100 %').toHaveText(porcentaje(100));
     await avanzar(page);
+    await expect(hudValor(page, 2), 'al pasar a la 2.ª sin responderla, sigue 1 de 1').toHaveText(porcentaje(100));
     await responder(page, 'bien');
     await expect(hudValor(page, 1)).toHaveText('2');
     await expect(hudValor(page, 2)).toHaveText(porcentaje(100), { timeout: 2000 });
+    await avanzar(page);
+    await responder(page, 'mal');
+    await expect(hudValor(page, 2), 'dos de tres: 67 %').toHaveText(porcentaje(67));
   });
 
   test('hallazgo · el número de preguntas que anuncia «Empezar Quiz» es el que se juega', async ({ page }) => {
-    test.fail(); // ABIERTO — generarPreguntas (page.tsx:54) corta a Math.min(num, figuras del nivel)
+    // REPARADO (3645, /reparar 16/11/2026): el botón dice las que se juegan y un aviso explica el
+    // recorte. Era: generarPreguntas (page.tsx:54) cortaba a Math.min(num, figuras del nivel)
     // sin decirlo: «Empezar Quiz — 20 preguntas · Básico» juega 10; «10 preguntas · Avanzado», 6.
     await abrir(page);
     const fallos: string[] = [];
     for (const [nivel, num] of [['Básico', 20], ['Avanzado', 10]] as const) {
       await elegir(page, nivel, num);
+      const tiene = figurasRetorica.filter((f) => f.nivel === (nivel === 'Básico' ? 'basico' : 'avanzado')).length;
+      await expect(page.locator('[class*="avisoRecorte"]')).toHaveText(`${nivel} tiene ${tiene} figuras y cada pregunta es una figura distinta: la partida será de ${tiene} preguntas.`);
       const promete = Number((norm(await page.locator('[class*="btnIniciar"]').innerText()).match(/(\d+) preguntas/) ?? [])[1]);
       await page.locator('[class*="btnIniciar"]').click();
       const juega = Number((norm(await contador(page).innerText()).match(/de (\d+)$/) ?? [])[1]);
@@ -409,11 +420,14 @@ test.describe('Inspector 28/10/2026 · promesas (pantalla y metadata)', () => {
   });
 
   test('hallazgo · «27 figuras» en pantalla y en la metadata, con 26 en el banco', async ({ page }) => {
-    test.fail(); // ABIERTO — botón «⭐ Todas · 27 figuras completas» (page.tsx:29), FAQ visible
+    // REPARADO (3646, /reparar 16/11/2026): la cifra sale del banco en la página y en la metadata.
+    // Era: botón «⭐ Todas · 27 figuras completas» (page.tsx:29), FAQ visible
     // (page.tsx:595), perfil del opositor (:556, :560), description, og «24 figuras más» y features.
     const n = figurasRetorica.length; // 26
     await abrir(page);
     const fallos: string[] = [];
+    if (/\b27 figuras/.test(norm(await page.locator('body').textContent()))) fallos.push('«27 figuras» en la página');
+    if (!String(metadata.openGraph?.description).includes(`${n - 3} figuras más`)) fallos.push('og');
     const todas = norm(await page.locator('[class*="nivelGrid"] button', { hasText: 'Todas' }).innerText());
     if (!todas.includes(`${n} figuras`)) fallos.push(`botón Todas: «${todas}»`);
     if (!String(metadata.description).includes(`${n} figuras`)) fallos.push('metadata.description');
@@ -423,7 +437,8 @@ test.describe('Inspector 28/10/2026 · promesas (pantalla y metadata)', () => {
   });
 
   test('hallazgo · features no promete un «historial de errores» que la app no tiene', async ({ page }) => {
-    test.fail(); // ABIERTO — metadata.ts:46 «Historial de errores con revisión al final del quiz»; la
+    // REPARADO (3652, /reparar 16/11/2026): features lista lo que se ve en la app. Era: metadata.ts:46
+    // «Historial de errores con revisión al final del quiz»; la
     // pantalla de resultado solo da puntos, aciertos, % y tiempo (medido: 0 elementos de lista).
     test.setTimeout(90_000);
     const features = (jsonLd as unknown as { featureList?: string[] }).featureList ?? [];
@@ -437,16 +452,21 @@ test.describe('Inspector 28/10/2026 · promesas (pantalla y metadata)', () => {
   });
 
   test('hallazgo · el FAQPage no dice que el quiz cubra sinestesia y encabalgamiento', () => {
-    test.fail(); // ABIERTO — metadata.ts:67: «… sinestesia y encabalgamiento. El quiz cubre estas y
+    // REPARADO (3653, /reparar 16/11/2026): la respuesta dice que esas dos el quiz no las pregunta, y
+    // la de «cómo funciona» ya no llama «reales de textos literarios» a ejemplos escritos para el quiz.
+    // Era: metadata.ts:67: «… sinestesia y encabalgamiento. El quiz cubre estas y
     // otras 17 más»: ninguna de las dos está en el banco, y 10 + 17 = 27 ≠ 26.
     const texto = faqJsonLd.mainEntity.map((q) => q.acceptedAnswer.text).join(' ');
     const nombres = figurasRetorica.map((f) => f.nombre.toLowerCase());
     const prometidas = ['sinestesia', 'encabalgamiento'].filter((x) => new RegExp(x, 'i').test(texto) && /El quiz cubre estas/.test(texto));
     expect(prometidas.filter((x) => !nombres.includes(x))).toEqual([]);
+    expect(texto).not.toMatch(/ejemplos reales de textos literarios/);
+    expect(texto).toMatch(/que el quiz no pregunta, como la sinestesia/);
   });
 
   test('hallazgo · la pregunta de Selectividad tiene UNA respuesta en la FAQ visible y en el FAQPage', async ({ page }) => {
-    test.fail(); // ABIERTO — visible (page.tsx:601-609): metáfora, anáfora, hipérbole, hipérbaton,
+    // REPARADO (3654, /reparar 16/11/2026): las dos salen de PREGUNTAS_FRECUENTES (faq.ts). Era:
+    // visible (page.tsx:601-609): metáfora, anáfora, hipérbole, hipérbaton,
     // personificación, antítesis, paralelismo e ironía («estas 8»); FAQPage (metadata.ts:64-68):
     // metáfora, símil, hipérbole, personificación, anáfora, antítesis, oxímoron, metonimia,
     // sinestesia y encabalgamiento. Reparación: UNA constante en metadata.ts para las dos bocas.
@@ -491,7 +511,9 @@ const sinGlosa = (s: string): string => s.replace(/\s*\([^)]*\)\s*/g, ' ').repla
 
 test.describe('Inspector 28/10/2026 · contenido del banco', () => {
   test('hallazgo · los ejemplos de Gradación no son también Asíndeton (mismo nivel intermedio)', () => {
-    test.fail(); // ABIERTO — los 4 ejemplos de gradación son enumeraciones sin conjunción, que es la
+    // REPARADO (3647, /reparar 16/11/2026): cada serie lleva nexo y verbo en cada miembro, y el
+    // asíndeton cambia «Llegué, vi, vencí» por una enumeración sin progresión. Era: los 4 ejemplos
+    // de gradación eran enumeraciones sin conjunción, que es la
     // definición de asíndeton del propio banco; «Vine, vi, vencí» es gradación y «Llegué, vi,
     // vencí», asíndeton. Si Asíndeton sale entre las opciones (3 de cada 9), las dos son correctas.
     const asindetico = (s: string): boolean => {
@@ -499,10 +521,13 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
       return t.split(',').length >= 3 && !/\b(y|e|ni|o|u)\b/i.test(t);
     };
     expect(figura('gradacion').ejemplos.filter(asindetico)).toEqual([]);
+    // …y ningún ejemplo de Asíndeton es la gradación de César
+    expect(figura('asindeton').ejemplos.filter((e) => /vencí/.test(e))).toEqual([]);
   });
 
   test('hallazgo · ningún verso es a la vez ejemplo de dos figuras (Darío: Antítesis y Quiasmo)', () => {
-    test.fail(); // ABIERTO — «Cuando quiero llorar no lloro, y a veces lloro sin querer» está en
+    // REPARADO (3649, /reparar 16/11/2026): el verso de Darío queda solo en Quiasmo. Era: «Cuando
+    // quiero llorar no lloro, y a veces lloro sin querer» estaba en
     // antitesis.ejemplos[1] y en quiasmo.ejemplos[2]; en «Todas» se dan por buenas las dos según
     // qué figura tocó.
     const clave = (s: string): string => sinGlosa(s).toLowerCase().normalize('NFD').replace(/[^a-z ]/g, '').replace(/\s+/g, ' ').trim();
@@ -520,7 +545,8 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
   });
 
   test('hallazgo · «Bebió tres copas» es el continente por el contenido, no al revés', () => {
-    test.fail(); // ABIERTO — metonimia.ejemplos[0] glosa «(el contenido por el continente)»: se dice
+    // REPARADO (3650, /reparar 16/11/2026). Era: metonimia.ejemplos[0] glosaba «(el contenido por el
+    // continente)»: se dice
     // «copas» (continente) por el vino (contenido), como dice la propia definición (data:293) y
     // como leen las otras tres glosas («el autor por la obra», «el lugar por las personas»…).
     const copas = figura('metonimia').ejemplos.find((e) => /copas/.test(e));
@@ -529,7 +555,9 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
   });
 
   test('hallazgo · los ejemplos de Paronomasia no repiten la MISMA palabra', () => {
-    test.fail(); // ABIERTO — su distinción dice «No es la repetición de la misma palabra»: «Amo a mi
+    // REPARADO (3648, /reparar 16/11/2026): leyes/reyes, vendado/vendido y tienda/atienda, y la
+    // distinción ya no llama «anadiplosis» a repetir la palabra. Era: su distinción dice «No es la
+    // repetición de la misma palabra»: «Amo a mi
     // amo» y «Vino el amor con vino» repiten la misma forma; «No hay mal que por bien no venga, ni
     // bien que mal no cueste» repite mal/bien en cruz (ABBA), que es el quiasmo del mismo nivel.
     const vacias = new Set(['que', 'por', 'con', 'hay', 'los', 'las', 'del', 'una', 'uno']);
@@ -539,6 +567,7 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
       return new Set(llenas).size < llenas.length;
     };
     expect(figura('paronomasia').ejemplos.filter(repite)).toEqual([]);
+    expect(figura('paronomasia').distincion).not.toMatch(/anadiplosis/);
   });
 
   test('hallazgo · otros ejemplos que son también otra figura de su conjunto de opciones', () => {

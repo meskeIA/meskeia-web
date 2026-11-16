@@ -1,9 +1,13 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { figurasRetorica } from '@/data/figuras-retoricas';
+
+// La cifra sale del banco: decía 27 con 26 figuras (hallazgo 3646 de quiz-figuras-retoricas, mismo banco)
+const TOTAL = figurasRetorica.length;
 
 export const metadata: Metadata = {
   title: 'Recursos Literarios — Guía Visual de Figuras Retóricas | meskeIA',
-  description: 'Explora 27 figuras retóricas con definición, ejemplos reales y cómo distinguirlas. Filtra por nivel (ESO, Bachillerato, Selectividad) y categoría. Ideal para estudiar literatura.',
+  description: `Explora ${TOTAL} figuras retóricas con definición, ejemplos reales y cómo distinguirlas. Filtra por nivel (ESO, Bachillerato, Selectividad) y categoría. Ideal para estudiar literatura.`,
   keywords: 'figuras retóricas, recursos literarios, metáfora, símil, hipérbole, anáfora, ironía, metonimia, oxímoron, paradoja, figuras retóricas bachillerato, selectividad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -12,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Recursos Literarios — Guía Visual de Figuras Retóricas',
-    description: 'Explora 27 figuras retóricas con definición, ejemplos reales y cómo distinguirlas. Filtra por nivel y categoría.',
+    description: `Explora ${TOTAL} figuras retóricas con definición, ejemplos reales y cómo distinguirlas. Filtra por nivel y categoría.`,
     url: 'https://meskeia.com/visualizador-recursos-literarios',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -28,7 +32,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Recursos Literarios — Guía Visual de Figuras Retóricas',
-    description: 'Explora 27 figuras retóricas con definición, ejemplos y cómo distinguirlas. Filtra por nivel y categoría.',
+    description: `Explora ${TOTAL} figuras retóricas con definición, ejemplos y cómo distinguirlas. Filtra por nivel y categoría.`,
     images: ['https://meskeia.com/og-image.png'],
   },
   other: {
@@ -38,11 +42,11 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Recursos Literarios — Guía Visual de Figuras Retóricas',
-  description: 'Directorio visual de 27 figuras retóricas con definición, ejemplos reales, campo "cómo no confundirla" y filtros por nivel (ESO, Bachillerato, Selectividad) y grupo. Incluye sección de pares frecuentemente confundidos.',
+  description: `Directorio visual de ${TOTAL} figuras retóricas con definición, ejemplos reales, campo "cómo no confundirla" y filtros por nivel (ESO, Bachillerato, Selectividad) y grupo. Incluye sección de pares frecuentemente confundidos.`,
   url: 'https://meskeia.com/visualizador-recursos-literarios/',
   category: 'EducationalApplication',
   features: [
-    '27 figuras retóricas en 3 niveles: ESO, Bachillerato y Selectividad',
+    `${TOTAL} figuras retóricas en 3 niveles: ESO, Bachillerato y Selectividad`,
     'Filtros por nivel y por grupo (imagen, repetición, contraste, énfasis, sintaxis, contigüidad)',
     'Buscador por nombre de figura',
     'Campo "cómo no confundirla" para cada figura',
@@ -78,7 +82,7 @@ export const faqJsonLd = {
       name: '¿Qué figuras retóricas son más importantes para selectividad o examen de admisión universitaria?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En los exámenes de comentario de texto de nivel preuniversitario suelen evaluarse con mayor frecuencia: metáfora, símil, hipérbole, anáfora, antítesis, paradoja, ironía, metonimia, sinécdoque y personificación. La guía incluye las 27 figuras más habituales ordenadas por nivel de dificultad, con ejemplos extraídos de textos literarios reales y un apartado específico para no confundir figuras parecidas.',
+        text: `En los exámenes de comentario de texto de nivel preuniversitario suelen evaluarse con mayor frecuencia: metáfora, símil, hipérbole, anáfora, antítesis, paradoja, ironía, metonimia, sinécdoque y personificación. La guía incluye las ${TOTAL} figuras más habituales ordenadas por nivel de dificultad, con ejemplos extraídos de textos literarios reales y un apartado específico para no confundir figuras parecidas.`,
       },
     },
     {

@@ -152,6 +152,18 @@
   font-weight: 600;
 }
 
+/* Hallazgo 3645: aviso de que el nivel tiene menos figuras que preguntas pedidas */
+.avisoRecorte {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.avisoRecorte:empty {
+  display: none;
+}
+
 .btnIniciar {
   display: block;
   width: 100%;

@@ -97,9 +97,12 @@ export const figurasRetorica: FiguraRetorica[] = [
     distincion: 'Las ideas opuestas están en términos o frases SEPARADAS. En el oxímoron, los contrarios se funden en una sola expresión ("silencio ensordecedor").',
     grupo: 'contraste',
     nivel: 'basico',
+    // Hallazgo 3649: aquí estaba también «Cuando quiero llorar, no lloro; y a veces lloro sin
+    // querer» (Darío), que es el ejemplo de Quiasmo (querer-llorar / llorar-querer): en «Todas», el
+    // mismo verso tenía dos claves. Se queda solo en Quiasmo.
     ejemplos: [
       'Es tan corto el amor y tan largo el olvido.',
-      'Cuando quiero llorar, no lloro; y a veces lloro sin querer.',
+      'Unos ríen mientras otros lloran.',
       'Ayer naciste, mañana morirás.',
       'Lo que hoy construyes, mañana destruyes.',
     ],
@@ -205,14 +208,18 @@ export const figurasRetorica: FiguraRetorica[] = [
     id: 'gradacion',
     nombre: 'Gradación',
     definicion: 'Ordenación de palabras o ideas en serie ascendente (clímax) o descendente (anticlímax) de intensidad o importancia.',
-    distincion: 'Los elementos deben estar ordenados con una progresión clara de menor a mayor (o viceversa). Si no hay progresión, es una simple enumeración.',
+    distincion: 'Los elementos deben estar ordenados con una progresión clara de menor a mayor (o viceversa). Si no hay progresión, es una simple enumeración. La progresión es independiente de los nexos: una serie que crece y además va sin conjunciones es a la vez gradación y asíndeton.',
     grupo: 'enfasis',
     nivel: 'intermedio',
+    // Hallazgo 3647: los cuatro ejemplos eran enumeraciones sin conjunción —la definición de
+    // Asíndeton, del mismo nivel— y «Vine, vi, vencí» era aquí Gradación y allí «Llegué, vi,
+    // vencí» Asíndeton. Ahora cada serie lleva su nexo y su verbo en cada miembro (sin la elipsis
+    // del mismo nivel): lo único que la distingue es la progresión.
     ejemplos: [
-      'Vine, vi, vencí. (Julio César)',
-      'Un suspiro, un llanto, un grito desgarrador.',
-      'Acudo, me apresuro, corro, vuelo.',
-      'Lo intenté, lo logré, lo superé todo.',
+      'Paseaba, luego trotaba y al final corría con todas sus fuerzas.',
+      'La llama prendió, creció y devoró el bosque entero.',
+      'Sonrió, después rio y acabó a carcajadas.',
+      'Dudó un instante, meditó despacio y por fin decidió.',
     ],
   },
 
@@ -253,8 +260,10 @@ export const figurasRetorica: FiguraRetorica[] = [
     distincion: 'Lo opuesto al polisíndeton: AUSENCIA de conjunciones donde gramaticalmente se usarían. Crea efecto de velocidad o urgencia.',
     grupo: 'sintaxis',
     nivel: 'intermedio',
+    // Hallazgo 3647: «Llegué, vi, vencí» es también una gradación (cada verbo va más allá); se
+    // cambia por una enumeración sin progresión.
     ejemplos: [
-      'Llegué, vi, vencí.',
+      'Mesas, sillas, libros, ropa: todo estaba por el suelo.',
       'Acudieron médicos, enfermeras, bomberos, policías.',
       'Reía, lloraba, gritaba, corría sin control.',
       'Llueve, nieva, graniza, ventea.',
@@ -299,7 +308,8 @@ export const figurasRetorica: FiguraRetorica[] = [
     grupo: 'contigüidad',
     nivel: 'intermedio',
     ejemplos: [
-      'Bebió tres copas. (el contenido por el continente)',
+      // Hallazgo 3650: se nombra el continente (la copa) por el contenido (el vino), como dice la definición
+      'Bebió tres copas. (el continente por el contenido)',
       'Leer a Cervantes toda la tarde. (el autor por la obra)',
       'El Palacio no ha respondido todavía. (el lugar por las personas)',
       'Vivir de su pluma. (el instrumento por la actividad)',
@@ -321,7 +331,7 @@ export const figurasRetorica: FiguraRetorica[] = [
     ],
   },
 
-  // ── AVANZADO — 7 figuras complejas (Selectividad / Universidad) ────────
+  // ── AVANZADO — 6 figuras complejas (Selectividad / Universidad) ────────
 
   {
     id: 'alegoria',
@@ -392,14 +402,18 @@ export const figurasRetorica: FiguraRetorica[] = [
     id: 'paronomasia',
     nombre: 'Paronomasia',
     definicion: 'Uso cercano de palabras de sonido similar pero significado diferente (palabras parónimas), creando un juego de palabras.',
-    distincion: 'Las palabras se PARECEN en sonido pero tienen diferente significado. No es la repetición de la misma palabra (eso sería anadiplosis).',
+    distincion: 'Las palabras se PARECEN en sonido pero son distintas y tienen diferente significado. No es repetir la misma palabra con dos sentidos (eso es la dilogía o antanaclasis) ni repetir un mismo sonido a lo largo de la frase (aliteración).',
     grupo: 'repeticion',
     nivel: 'avanzado',
+    // Hallazgo 3648: «Amo a mi amo» y «Vino el amor con vino» repetían la misma forma con dos
+    // sentidos; «No hay mal que por bien no venga, ni bien que mal no cueste» cruzaba mal/bien en
+    // ABBA, el quiasmo del mismo nivel; y «Pobre porfiado saca mendrugo» es más aliteración de /p/.
+    // Ahora son parejas de parónimos: leyes/reyes, vendado/vendido, tienda/atienda. Sin glosa: el
+    // paréntesis iría en la pregunta y señalaría la pareja.
     ejemplos: [
-      'Amo a mi amo. (amar / amo=señor)',
-      'Pobre porfiado saca mendrugo.',
-      'Vino el amor con vino. (venir / vino=bebida)',
-      'No hay mal que por bien no venga, ni bien que mal no cueste.',
+      'Allá van leyes do quieren reyes.',
+      'Vendado que me has vendido.',
+      'Quien tiene tienda, que la atienda.',
     ],
   },
 

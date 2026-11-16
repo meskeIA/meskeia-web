@@ -562,7 +562,7 @@ export const implementedAppsUrls = [
   "/orientador-jet-lag/",                 // Calculadora jet lag: diferencia horaria, días adaptación, recomendaciones
   "/quiz-paises-capitales/",             // Quiz geografía: capitales, países por capital, identificar banderas
   "/quiz-verbos-irregulares/",           // Quiz verbos irregulares inglés: 74 verbos A1-B2, opción múltiple
-  "/quiz-figuras-retoricas/",            // Quiz figuras retóricas: 27 figuras ESO/Bach/Selectividad con feedback educativo
+  "/quiz-figuras-retoricas/",            // Quiz figuras retóricas: 26 figuras ESO/Bach/Selectividad con feedback educativo
   "/quiz-reinos-naturaleza/",            // Quiz Reinos de la Naturaleza: 43 organismos sorprendentes, clasificación por grupos
   "/guia-seguro-viaje/",                 // Coberturas recomendadas por destino/tipo de viaje + checklist 12 puntos
   "/planificador-itinerario/",           // Organiza días y actividades de viaje con horarios y notas
@@ -1301,7 +1301,7 @@ export const implementedAppsUrls = [
   "/orientador-escritura-creativa/",      // Wizard 3 pasos: género → perspectiva → guía + kit de arranque + hoja de ruta
   "/visualizador-estilos-literarios/",   // Directorio interactivo de 10 movimientos literarios con filtros, autores y fragmentos
   "/visualizador-generos-novela/",       // 11 géneros narrativos: características, autores fundacionales y obras de entrada
-  "/visualizador-recursos-literarios/",  // 27 figuras retóricas: definición, ejemplos, distinción y 6 pares confundidos
+  "/visualizador-recursos-literarios/",  // 26 figuras retóricas: definición, ejemplos, distinción y 6 pares confundidos
   "/comparador-voces-narrativas/",       // Compara el estilo de 10 novelistas: dimensiones, técnicas y fragmentos
   "/test-tipo-lector/",                  // Test 8 preguntas para descubrir tu arquetipo lector (5 perfiles)
   "/quiz-literatura-universal/",         // Quiz 15 preguntas de literatura: básico, medio, avanzado

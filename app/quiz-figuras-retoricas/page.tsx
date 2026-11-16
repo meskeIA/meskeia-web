@@ -10,6 +10,7 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { figurasRetorica, FiguraRetorica } from '@/data/figuras-retoricas';
+import { PREGUNTAS_FRECUENTES } from './faq';
 
 type Nivel = 'basico' | 'intermedio' | 'avanzado' | 'todos';
 type Pantalla = 'config' | 'quiz' | 'resultado';
@@ -22,11 +23,19 @@ interface PreguntaQuiz {
   respuestaCorrecta: string;
 }
 
+/** Figuras de cada nivel, contadas del banco (hallazgo 3646: la app decía 27 con 26 en el banco). */
+const FIGURAS_POR_NIVEL: Record<Nivel, number> = {
+  basico: figurasRetorica.filter((f) => f.nivel === 'basico').length,
+  intermedio: figurasRetorica.filter((f) => f.nivel === 'intermedio').length,
+  avanzado: figurasRetorica.filter((f) => f.nivel === 'avanzado').length,
+  todos: figurasRetorica.length,
+};
+
 const NIVEL_CONFIG: Record<Nivel, { label: string; desc: string }> = {
-  basico:      { label: '🟢 Básico',       desc: '10 figuras esenciales — ESO'       },
-  intermedio:  { label: '🟡 Intermedio',   desc: '10 figuras habituales — Bachillerato' },
-  avanzado:    { label: '🔴 Avanzado',     desc: '6 figuras complejas — Selectividad' },
-  todos:       { label: '⭐ Todas',        desc: '27 figuras completas'               },
+  basico:      { label: '🟢 Básico',       desc: `${FIGURAS_POR_NIVEL.basico} figuras esenciales — ESO` },
+  intermedio:  { label: '🟡 Intermedio',   desc: `${FIGURAS_POR_NIVEL.intermedio} figuras habituales — Bachillerato` },
+  avanzado:    { label: '🔴 Avanzado',     desc: `${FIGURAS_POR_NIVEL.avanzado} figuras complejas — Selectividad` },
+  todos:       { label: '⭐ Todas',        desc: `${FIGURAS_POR_NIVEL.todos} figuras completas` },
 };
 
 const OPCIONES_PREGUNTAS = [10, 15, 20];
@@ -108,6 +117,26 @@ export default function QuizFigurasRetoricaPage() {
   const pregunta = preguntas[preguntaActual];
   const totalPreguntas = preguntas.length;
   const esUltima = preguntaActual === totalPreguntas - 1;
+
+  /**
+   * Hallazgo 3645: cada pregunta es una figura distinta, así que una partida no puede tener más
+   * preguntas que figuras el nivel (Básico e Intermedio 10, Avanzado 6). Antes se cortaba sin
+   * avisar y el botón seguía diciendo «20 preguntas»; ahora dice las que se juegan, y un aviso
+   * explica por qué.
+   */
+  const preguntasEfectivas = Math.min(numPreguntas, FIGURAS_POR_NIVEL[nivel]);
+  const avisoRecorte =
+    preguntasEfectivas < numPreguntas
+      ? `${NIVEL_CONFIG[nivel].label.replace(/^\S+\s/, '')} tiene ${FIGURAS_POR_NIVEL[nivel]} figuras y cada pregunta es una figura distinta: la partida será de ${preguntasEfectivas} preguntas.`
+      : '';
+
+  /**
+   * Hallazgo 3644: la «Precisión» dividía los aciertos (que ya contaban la respuesta actual) entre
+   * las preguntas ANTERIORES: 0 % al acertar la 1.ª y 200 % al acertar la 2.ª. Ahora es aciertos ÷
+   * preguntas ya respondidas.
+   */
+  const respondidas = preguntaActual + (seleccionada !== null ? 1 : 0);
+  const precision = respondidas > 0 ? Math.round((correctas / respondidas) * 100) : 0;
 
   // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
   // (cabo C0082, lib/useGuardaRafaga.ts). Y en la opción: el foco a «Siguiente» sube la página y
@@ -236,8 +265,10 @@ export default function QuizFigurasRetoricaPage() {
             ))}
           </div>
 
+          <p className={styles.avisoRecorte} aria-live="polite">{avisoRecorte}</p>
+
           <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
-            Empezar Quiz — {numPreguntas} preguntas · {NIVEL_CONFIG[nivel].label}
+            {`Empezar Quiz — ${preguntasEfectivas} preguntas · ${NIVEL_CONFIG[nivel].label}`}
           </button>
         </div>
       )}
@@ -256,9 +287,7 @@ export default function QuizFigurasRetoricaPage() {
               <span className={styles.hudLabel}>Correctas</span>
             </div>
             <div className={styles.hudItem}>
-              <span className={styles.hudValor}>
-                {preguntaActual > 0 ? Math.round((correctas / preguntaActual) * 100) : 0}%
-              </span>
+              <span className={styles.hudValor}>{`${precision} %`}</span>
               <span className={styles.hudLabel}>Precisión</span>
             </div>
           </div>
@@ -565,11 +594,11 @@ export default function QuizFigurasRetoricaPage() {
               </div>
               <p className={styles.escenarioExample}>
                 <strong>Situación:</strong> Las oposiciones al cuerpo de profesores de secundaria incluyen
-                pruebas de conocimientos de lengua y literatura. El dominio completo de las 27 figuras retóricas
+                pruebas de conocimientos de lengua y literatura. El dominio completo de las {FIGURAS_POR_NIVEL.todos} figuras retóricas
                 —con ejemplos canónicos y clasificación— es imprescindible.
               </p>
               <p className={styles.escenarioTip}>
-                Practica el nivel "Todas" (27 figuras) y cronometra tus sesiones. Revisa especialmente las figuras
+                Practica el nivel «Todas» ({FIGURAS_POR_NIVEL.todos} figuras) y cronometra tus sesiones. Revisa especialmente las figuras
                 del grupo de contraste (antítesis, paradoja, oxímoron) que suelen confundirse en los exámenes.
               </p>
             </div>
@@ -599,91 +628,14 @@ export default function QuizFigurasRetoricaPage() {
         {/* SECCIÓN 3: FAQ */}
         <section className={styles.guideSection}>
           <h2>Preguntas Frecuentes sobre Figuras Retóricas</h2>
+          {/* Una sola fuente con el FAQPage (hallazgos 3653 y 3654): faq.ts */}
           <ul className={styles.faqList}>
-            <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Cuántas figuras retóricas hay en total?</div>
-              <div className={styles.faqRespuesta}>
-                La retórica clásica cataloga más de 200 figuras, pero en la práctica escolar española
-                se trabajan entre 20 y 30 figuras fundamentales. Este quiz incluye <strong>27 figuras</strong>
-                organizadas en seis grupos: imagen, repetición, contraste, énfasis, sintaxis y contigüidad.
-                Para selectividad bastan dominar unas 15-20 con ejemplos sólidos.
-              </div>
-            </li>
-            <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Cuáles caen más en selectividad?</div>
-              <div className={styles.faqRespuesta}>
-                Las figuras más frecuentes en los exámenes de EvAU/PAU son: <strong>metáfora</strong>,
-                <strong> anáfora</strong>, <strong>hipérbole</strong>, <strong>hipérbaton</strong>,
-                <strong> personificación</strong>, <strong>antítesis</strong>, <strong>paralelismo</strong>
-                e <strong>ironía</strong>. La aliteración aparece con frecuencia en textos poéticos.
-                Dominar estas 8 con al menos dos ejemplos canónicos cada una es suficiente para obtener
-                la máxima puntuación en el apartado estilístico.
-              </div>
-            </li>
-            <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Cuál es la diferencia entre metáfora y símil?</div>
-              <div className={styles.faqRespuesta}>
-                El <strong>símil</strong> (o comparación) usa nexos explícitos: <em>como</em>, <em>cual</em>,
-                <em> semejante a</em>, <em>igual que</em>. Ejemplo: <em>"Sus ojos son como el mar"</em>.
-                La <strong>metáfora</strong> identifica directamente dos realidades sin nexo: <em>"Sus ojos
-                de mar profundo"</em>. La metáfora es más intensa porque suprime la distancia comparativa
-                y funde ambas realidades en una sola expresión.
-              </div>
-            </li>
-            <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Qué diferencia hay entre metonimia y sinécdoque?</div>
-              <div className={styles.faqRespuesta}>
-                Ambas son figuras de contigüidad, pero el mecanismo difiere. La <strong>metonimia</strong>
-                sustituye por relación lógica: causa/efecto (<em>"leer a Cervantes"</em> = leer su obra),
-                continente/contenido (<em>"beber una copa"</em>), símbolo/simbolizado (<em>"la corona"</em>
-                = la monarquía). La <strong>sinécdoque</strong> opera por relación cuantitativa: parte por
-                el todo (<em>"cuatro bocas que alimentar"</em> = cuatro personas) o todo por la parte
-                (<em>"España ganó el Mundial"</em> = el equipo español).
-              </div>
-            </li>
-            <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Cómo identificar figuras retóricas en un texto?</div>
-              <div className={styles.faqRespuesta}>
-                Sigue este orden: (1) Lee el fragmento completo sin interrumpirte. (2) Marca las palabras
-                o frases que <em>llamen la atención</em> por su sonido, estructura o significado.
-                (3) Pregúntate: ¿hay repetición de sonidos? (fónica), ¿de palabras o estructuras? (sintáctica),
-                ¿hay comparación o identificación entre realidades distintas? (semántica), ¿hay exageración,
-                contradicción o juego de opuestos? (pensamiento). (4) Nombra la figura, cita el fragmento
-                textual exacto y explica el efecto que produce en el lector.
-              </div>
-            </li>
-            <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Qué es exactamente el hipérbaton?</div>
-              <div className={styles.faqRespuesta}>
-                El <strong>hipérbaton</strong> altera el orden sintáctico normativo del español (sujeto +
-                verbo + complementos). Es frecuente en poesía clásica por influencia del latín, donde el
-                orden de palabras era más libre. Ejemplo de Bécquer: <em>"Del salón en el ángulo oscuro"</em>
-                (orden normal: <em>"En el oscuro ángulo del salón"</em>). En selectividad, al identificarlo
-                debes indicar cuál sería el orden canónico y qué efecto rítmico o enfático produce la inversión.
-              </div>
-            </li>
-            <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Cuál es la diferencia entre ironía y sarcasmo?</div>
-              <div className={styles.faqRespuesta}>
-                La <strong>ironía</strong> dice lo contrario de lo que piensa con tono moderado, con intención
-                crítica o humorística pero sin agresividad explícita. El <strong>sarcasmo</strong> es una ironía
-                más mordaz, cruel o hiriente, dirigida normalmente a una persona concreta. En literatura, la
-                ironía de Larra en sus artículos costumbristas es sarcasmo social; la ironía socrática es
-                filosófica y más sutil. Para selectividad, usa el término <em>ironía</em> salvo que el contexto
-                justifique claramente el tono hiriente del sarcasmo.
-              </div>
-            </li>
-            <li className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Cómo analizar una figura retórica en un examen?</div>
-              <div className={styles.faqRespuesta}>
-                La estructura correcta para un examen tiene cuatro elementos: (1) <strong>Nombre</strong> de
-                la figura con seguridad (<em>"encontramos una metáfora"</em>). (2) <strong>Cita textual</strong>
-                exacta entre comillas. (3) <strong>Explicación del mecanismo</strong>: qué se compara con qué,
-                qué se repite, qué se exagera. (4) <strong>Efecto estético</strong>: qué sensación o significado
-                añade al texto (<em>"intensifica la idea de…"</em>, <em>"crea una sensación de…"</em>,
-                <em>"refuerza el tono melancólico de…"</em>). Omitir el punto 4 suele costar medio punto.
-              </div>
-            </li>
+            {PREGUNTAS_FRECUENTES.map((p) => (
+              <li key={p.pregunta} className={styles.faqItem}>
+                <div className={styles.faqPregunta}>{p.pregunta}</div>
+                <div className={styles.faqRespuesta}>{p.respuesta}</div>
+              </li>
+            ))}
           </ul>
         </section>
 
