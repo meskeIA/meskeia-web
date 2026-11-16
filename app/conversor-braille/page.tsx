@@ -210,7 +210,14 @@ const minutosYSegundos = (caracteres: string[]): { separador: Set<number>; cierr
   /** Comillas que ya no abren ni cierran nada: marcas de un ángulo y cierres de segundos anteriores. */
   const gastadas = new Set<number>(angulares.keys());
   for (let i = 1; i < caracteres.length; i++) {
-    if (!APOSTROFOS.has(caracteres[i]) || !ES_CIFRA.test(caracteres[i - 1])) continue;
+    /**
+     * ⚠️ 16/11/2026 (hallazgo 3828) — solo aceptaba ’ y ' como minuto: con las primas tipográficas
+     * («2′54″»), que son los signos que pide la tipografía, el tiempo salía ⠼⠃⠼⠑⠙ (dos números
+     * pegados), la ′ con el aviso genérico y la ″ como marca de pulgadas. La prima ′ (U+2032) es
+     * también el minuto, como ya admitía `medidasAngulares`.
+     */
+    const esMinuto = APOSTROFOS.has(caracteres[i]) || caracteres[i] === '′';
+    if (!esMinuto || !ES_CIFRA.test(caracteres[i - 1])) continue;
     // Hallazgo 3763: con el grado delante es un ángulo (§ 14.1), no una hora
     if (angulares.has(i)) continue;
     let j = i + 1;
@@ -510,8 +517,9 @@ const PRIMERA_SERIE = /^[a-j]$/;
  */
 const caracteresSinCelda = (texto: string): string[] => {
   const caracteres = Array.from(texto);
-  // El ″ que cierra unos segundos no se escribe a propósito (hallazgo 3588)
-  const cierres = minutosYSegundos(caracteres).cierre;
+  // El ″ que cierra unos segundos no se escribe a propósito (hallazgo 3588), y la ′ que los separa
+  // de los minutos se escribe como los dos puntos (hallazgo 3828)
+  const { cierre: cierres, separador: separadores } = minutosYSegundos(caracteres);
   // El minuto y el segundo de un ángulo (′ ″ incluidos) y la marca de pulgadas tienen su propio
   // aviso, que dice que el B 2 sí les da celda: aquí dudaba de ello (hallazgo 3797)
   const angulares = medidasAngulares(caracteres);
@@ -523,6 +531,7 @@ const caracteresSinCelda = (texto: string): string[] => {
       caracteres.filter(
         (c, i) =>
           !cierres.has(i) &&
+          !separadores.has(i) &&
           !angulares.has(i) &&
           !unidades.has(i) &&
           !ordinales.has(i) &&
@@ -1392,6 +1401,8 @@ export default function ConversorBraillePage() {
   const convertBrailleToText = (braille: string): string => {
     let result = '';
     let nextIsCapital = false;
+    /** Dos signos de mayúscula seguidos (§ 7.1, recurso 2): la palabra entera, hasta el blanco. */
+    let palabraEnMayusculas = false;
     /** Puesto por el prefijo de latina: la celda siguiente es letra, no cifra. */
     let siguienteEsLatina = false;
     let enExpresionNumerica = false;
@@ -1406,6 +1417,21 @@ export default function ConversorBraillePage() {
       const compuesto = COMPUESTOS_INVERSO[char + (celdas[i + 1] ?? '')];
       if (compuesto) {
         result += compuesto;
+        enExpresionNumerica = false;
+        i++;
+        continue;
+      }
+
+      /**
+       * ⚠️ 16/11/2026 (hallazgo 3827) — B 2 § 7.1, recurso 2: «Escribir dos signos de mayúscula
+       * antes de la primera letra de la sigla. Ejemplo: ONCE {{once». La vuelta solo entendía el
+       * recurso 1 (un ⠨ por letra): el segundo ⠨ volvía a marcar solo la letra siguiente y la
+       * sigla volvía «Once», sin aviso. Con dos ⠨ seguidos, toda la palabra va en mayúsculas,
+       * hasta el blanco.
+       */
+      if (char === CAPITAL_INDICATOR && celdas[i + 1] === CAPITAL_INDICATOR) {
+        palabraEnMayusculas = true;
+        nextIsCapital = false;
         enExpresionNumerica = false;
         i++;
         continue;
@@ -1443,6 +1469,7 @@ export default function ConversorBraillePage() {
 
       if (char === '⠀') { // Espacio Braille
         enExpresionNumerica = false;
+        palabraEnMayusculas = false;
         result += ' ';
         continue;
       }
@@ -1474,7 +1501,7 @@ export default function ConversorBraillePage() {
       }
       siguienteEsLatina = false;
 
-      if (nextIsCapital) {
+      if (nextIsCapital || palabraEnMayusculas) {
         converted = converted.toUpperCase();
         nextIsCapital = false;
       }
@@ -2292,7 +2319,7 @@ export default function ConversorBraillePage() {
                     <td>Letra por letra, sin contracciones</td>
                     <td>Lenta</td>
                     <td>Aprendizaje, principiantes</td>
-                    <td>UEB / Nacional</td>
+                    <td>Signografía básica (CBE, B 2) en español · UEB en inglés</td>
                   </tr>
                   <tr>
                     <td><strong>Braille Grado 2</strong></td>
@@ -2300,28 +2327,33 @@ export default function ConversorBraillePage() {
                     {/* Hallazgo 3458: «25-40 % más rápida» sin fuente ni año (regla 1 de neutralidad). */}
                     <td>Más rápida (menos celdas por palabra)</td>
                     <td>Lectura diaria, libros</td>
-                    <td>UEB / Nacional</td>
+                    <td>Estenografía (CBE, B 16) en español · UEB en inglés</td>
                   </tr>
+                  {/* Hallazgo 3829 (16/11/2026): presentaba Nemeth y NABCC, de EE. UU., como el estándar.
+                      Para el braille en español, según la página de documentos técnicos de la CBE
+                      (once.es): el B 5 dejó de aplicarse en marzo de 2023 y lo sustituye el «Código
+                      matemático unificado para Iberoamérica» (2.ª ed., abril de 2024); la musicografía
+                      es el B 4 y la estenografía (lo que en inglés es el grado 2), el B 16. */}
                   <tr>
-                    <td>Braille Matemático (Nemeth)</td>
+                    <td>Braille Matemático</td>
                     <td>Notación matemática y científica</td>
                     <td>Especializada</td>
                     <td>Ciencias, matemáticas</td>
-                    <td>Nemeth (EE.UU.)</td>
+                    <td>Código matemático unificado para Iberoamérica (CBE, desde 2023) · Nemeth en EE. UU.</td>
                   </tr>
                   <tr>
                     <td>Braille Musical</td>
                     <td>Notación para partituras musicales</td>
                     <td>Especializada</td>
                     <td>Música, conservatorio</td>
-                    <td>Internacional MBC</td>
+                    <td>Musicografía braille (CBE, B 4) · Internacional MBC</td>
                   </tr>
                   <tr>
                     <td>Braille Informático</td>
                     <td>Caracteres ASCII y programación</td>
                     <td>Especializada</td>
                     <td>Código, terminal</td>
-                    <td>NABCC / EE.UU.</td>
+                    <td>Tabla ANSI española para braille computarizado (CBE, V 1) · NABCC en EE. UU.</td>
                   </tr>
                 </tbody>
               </table>

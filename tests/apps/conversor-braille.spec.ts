@@ -4641,20 +4641,22 @@ test.describe('inspector 30/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO — § 7.1, recurso 2: la vuelta de una sigla con dos signos de mayúscula
+  // REPARADO (3827) — § 7.1, recurso 2: la vuelta de una sigla con dos signos de mayúscula
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // El B 2 da dos recursos para las siglas y la ida usa el 1 (válido). La vuelta solo entiende el 1:
-  // con ⠨⠨ delante pone en mayúscula la primera letra y las demás en minúscula, sin aviso. «⠨⠨⠕⠝⠉⠑»,
-  // el ejemplo literal del § 7.1, vuelve «Once» (el número once), y «⠇⠁⠀⠨⠨⠕⠝⠉⠑», «la Once».
-  test('ABIERTO — § 7.1 recurso 2: «⠨⠨⠕⠝⠉⠑» ({{once) vuelve «ONCE», no «Once»', async ({ page }) => {
-    test.fail();
+  // El B 2 da dos recursos para las siglas y la ida usa el 1 (válido). La vuelta solo entendía el 1:
+  // con ⠨⠨ delante ponía en mayúscula la primera letra y las demás en minúscula, sin aviso. «⠨⠨⠕⠝⠉⠑»,
+  // el ejemplo literal del § 7.1, volvía «Once» (el número once). Ahora ⠨⠨ vale para toda la
+  // palabra, hasta el blanco: «ONCE ya» no arrastra la mayúscula a la palabra siguiente.
+  test('REPARADO (3827) — § 7.1 recurso 2: «⠨⠨⠕⠝⠉⠑» ({{once) vuelve «ONCE», no «Once»', async ({ page }) => {
     const fallos = await fallos30(
       page,
       [
-        ['⠨⠨⠕⠝⠉⠑', 'ONCE'], // ⠨⠨ (46-46) · o ⠕ n ⠝ c ⠉ e ⠑. Hoy: «Once»
-        ['⠇⠁⠀⠨⠨⠕⠝⠉⠑', 'la ONCE'], // Hoy: «la Once»
-        ['⠨⠨⠗⠞⠧⠑', 'RTVE'], // r ⠗ (1235) t ⠞ (2345) v ⠧ (1236) e ⠑. Hoy: «Rtve»
+        ['⠨⠨⠕⠝⠉⠑', 'ONCE'], // ⠨⠨ (46-46) · o ⠕ n ⠝ c ⠉ e ⠑. Antes: «Once»
+        ['⠇⠁⠀⠨⠨⠕⠝⠉⠑', 'la ONCE'], // Antes: «la Once»
+        ['⠨⠨⠗⠞⠧⠑', 'RTVE'], // r ⠗ (1235) t ⠞ (2345) v ⠧ (1236) e ⠑. Antes: «Rtve»
+        ['⠨⠨⠕⠝⠉⠑⠀⠽⠁', 'ONCE ya'], // la mayúscula acaba en el blanco: y ⠽ (13456) a ⠁
+        ['⠨⠕⠨⠝⠨⠉⠨⠑', 'ONCE'], // el recurso 1 sigue igual
       ],
       'braille',
     );
@@ -4662,16 +4664,15 @@ test.describe('inspector 30/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO — § 14.3 con las primas tipográficas: «2′54″» no es «2’54”»
+  // REPARADO (3828) — § 14.3 con las primas tipográficas: «2′54″» es «2’54”»
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // `minutosYSegundos` solo reconoce ’ y ' como minuto; con la prima ′ (U+2032) y la doble prima ″
-  // (U+2033), los signos que la tipografía pide para minutos y segundos, el tiempo sale ⠼⠃⠼⠑⠙ (dos
+  // `minutosYSegundos` solo reconocía ’ y ' como minuto; con la prima ′ (U+2032) y la doble prima ″
+  // (U+2033), los signos que la tipografía pide para minutos y segundos, el tiempo salía ⠼⠃⠼⠑⠙ (dos
   // números pegados, sin los dos puntos), la ′ con el aviso genérico «Puede que el Código Braille
   // Español sí le asigne celda» (el § 14.1 se la da: 1256) y la ″ con el aviso de que es «la marca de
   // pulgadas». El § 14.3 escribe esta grafía con los dos puntos: «2’54” → #b:#ed».
-  test('ABIERTO — § 14.3: «2′54″» con primas sale con los dos puntos (#b:#ed), sin llamar pulgadas a la ″ ni dudar de la ′', async ({ page }) => {
-    test.fail();
+  test('REPARADO (3828) — § 14.3: «2′54″» con primas sale con los dos puntos (#b:#ed), sin llamar pulgadas a la ″ ni dudar de la ′', async ({ page }) => {
     const fallos = await fallos30(page, [
       ['2′54″', '⠼⠃⠒⠼⠑⠙'], // ⠼ 2 ⠃ · ⠒ (25) · ⠼ 5 ⠑ 4 ⠙. Hoy: ⠼⠃⠼⠑⠙
       ['Hizo 2′54″ en la final', '⠨⠓⠊⠵⠕⠀⠼⠃⠒⠼⠑⠙⠀⠑⠝⠀⠇⠁⠀⠋⠊⠝⠁⠇'],
@@ -4782,15 +4783,14 @@ test.describe('inspector 30/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO — guía, «Comparativa»: el braille matemático e informático de EE. UU. como el estándar
+  // REPARADO (3829) — guía, «Comparativa»: el braille matemático e informático de EE. UU. como el estándar
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // La tabla da «Braille Matemático (Nemeth) … Nemeth (EE.UU.)» y «Braille Informático … NABCC /
+  // La tabla daba «Braille Matemático (Nemeth) … Nemeth (EE.UU.)» y «Braille Informático … NABCC /
   // EE.UU.». Para el braille en español, la CBE aplica el «Código matemático unificado para
   // Iberoamérica» (sustituye al B 5 desde marzo de 2023, según once.es) y la «Tabla ANSI española para
   // braille computarizado» (V 1, citada en el B 1). Vale cualquier redacción que nombre los del español.
-  test('ABIERTO — guía: la tabla comparativa nombra el código matemático de Iberoamérica y la tabla ANSI española, no solo Nemeth y NABCC', async ({ page }) => {
-    test.fail();
+  test('REPARADO (3829) — guía: la tabla comparativa nombra el código matemático de Iberoamérica y la tabla ANSI española, no solo Nemeth y NABCC', async ({ page }) => {
     await page.goto(RUTA);
     const filas = await page.locator('[class*="eduTablaComparativa"] tbody tr').allTextContents();
     const matematico = filas.find((f) => f.includes('Matemático')) ?? '';
