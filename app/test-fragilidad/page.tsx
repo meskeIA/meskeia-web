@@ -4,6 +4,7 @@ import { useState } from 'react';
 import styles from './TestFragilidad.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import DataReference from '@/components/DataReference';
+import { ENFERMEDADES_FRAIL } from './metadata';
 
 // ─── Datos ────────────────────────────────────────────────────────────────────
 
@@ -22,32 +23,8 @@ export const FRAIL_META = {
   nota: 'Escala de CRIBADO, no de diagnóstico: orienta sobre la conveniencia de una valoración, no la sustituye. La enumeración exacta del ítem de enfermedades procede de las fichas clínicas que publican la escala; no ha podido contrastarse con el texto original, que está tras muro de pago, y por eso se declara aquí en vez de darse por cerrada.',
 };
 
-/**
- * El ítem «Illnesses» se cuenta sobre una lista CERRADA, no sobre cualquier comorbilidad.
- *
- * Es el hallazgo 893: la app preguntaba «¿Tiene 5 o más enfermedades crónicas?» con una lista
- * abierta de ejemplos que además añadía osteoporosis, demencia y depresión —que no están en la
- * del instrumento— y omitía infarto, angina y asma. Medido: alguien con cinco crónicas ajenas
- * a la escala (hipotiroidismo, glaucoma, migraña, reflujo, osteoporosis) salía «Frágil — Riesgo
- * alto» cuando le corresponde «Pre-frágil».
- *
- * ⚠️ Esta lista se toma de las fichas clínicas que publican la escala. El artículo original
- * está tras muro de pago y no se ha podido contrastar contra él, así que el límite se dice en
- * la propia página (ver FRAIL_META.nota) en vez de presentarse como cerrado.
- */
-const ENFERMEDADES_FRAIL = [
-  'hipertensión',
-  'diabetes',
-  'cáncer (salvo un cáncer de piel menor)',
-  'enfermedad pulmonar crónica',
-  'infarto de miocardio',
-  'insuficiencia cardíaca',
-  'angina de pecho',
-  'asma',
-  'artritis',
-  'ictus',
-  'enfermedad renal',
-];
+// La lista cerrada del ítem «Illnesses» (hallazgo 893) vive en metadata.ts, compartida con el
+// FAQPage (hallazgo 4865).
 
 interface ItemFRAIL {
   id: string;
@@ -197,7 +174,7 @@ export default function TestFragilidad() {
       setAviso(
         sinResponder.length === ITEMS_FRAIL.length
           ? 'Todavía no has respondido ninguna pregunta. Contesta Sí o No a las cinco para obtener el resultado.'
-          : `Faltan ${sinResponder.length} de 5 preguntas por responder: ${sinResponder.map(i => i.titulo).join(', ')}.`,
+          : `${sinResponder.length === 1 ? 'Falta' : 'Faltan'} ${sinResponder.length} de 5 preguntas por responder: ${sinResponder.map(i => i.titulo).join(', ')}.`,
       );
       return;
     }
@@ -252,12 +229,15 @@ export default function TestFragilidad() {
             <fieldset
               key={item.id}
               className={`${styles.itemCard} ${respuestas[item.id] === 'si' ? styles.itemActivo : ''}`}
+              // La pregunta, con su umbral, describe el grupo: con solo la <legend> el lector
+              // oía «Resistencia, Sí» sin saber qué se preguntaba (hallazgo 4863).
+              aria-describedby={`pregunta-${item.id}`}
             >
               <legend className={styles.itemHeader}>
                 <span className={styles.itemLetra} aria-hidden="true">{item.letra}</span>
                 <span className={styles.itemTitulo}>{item.titulo}</span>
               </legend>
-              <p className={styles.itemPregunta}>{item.pregunta}</p>
+              <p className={styles.itemPregunta} id={`pregunta-${item.id}`}>{item.pregunta}</p>
               <p className={styles.itemAyuda}>{item.ayuda}</p>
               {/* Dos radios nativos: «sin responder» es no tener ninguno marcado, y eso el
                   botón de evaluar sí lo distingue de un «No». */}
@@ -584,7 +564,7 @@ export default function TestFragilidad() {
         <ul className={styles.warningList}>
           <li><strong>Confundir fragilidad con vejez normal</strong>: La fragilidad no es inevitable. Aceptarla como &quot;cosas de la edad&quot; impide intervenir cuando aún es reversible.</li>
           <li><strong>Reducir la actividad por miedo a caídas</strong>: El sedentarismo agrava la fragilidad. El miedo a caer lleva a reducir la actividad, lo que a su vez debilita más la musculatura y el equilibrio.</li>
-          <li><strong>No informar al médico de la pérdida de peso no intencionada</strong>: perder más del 5 % del peso en un año sin proponérselo —unos 3,5 kg en una persona de 70— es el umbral que usa este test y una señal que conviene consultar. Los criterios de Fried, que son otra escala, fijan el suyo en 4,5 kg (10 libras) con independencia del peso de partida: si has visto esa cifra en otro sitio, viene de ahí.</li>
+          <li><strong>No informar al médico de la pérdida de peso no intencionada</strong>: perder más del 5 % del peso en un año sin proponérselo —unos 3,5 kg en una persona de 70 kg— es el umbral que usa este test y una señal que conviene consultar. Los criterios de Fried, que son otra escala, fijan el suyo en 4,5 kg (10 libras) con independencia del peso de partida: si has visto esa cifra en otro sitio, viene de ahí.</li>
           <li><strong>Ignorar el estado nutricional</strong>: Muchas personas mayores frágiles están desnutridas sin saberlo. Una dieta monótona o escasa en proteínas contribuye directamente a la pérdida muscular.</li>
           <li><strong>No revisar la medicación periódicamente</strong>: Algunos fármacos prescritos hace años pueden ser contraproducentes en la actualidad. La revisión anual de la medicación es fundamental.</li>
           <li><strong>Esperar a la hospitalización para actuar</strong>: La fragilidad multiplica el riesgo de complicaciones graves tras una hospitalización. Intervenir antes reduce drásticamente ese riesgo.</li>

@@ -1,6 +1,36 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
+/**
+ * El ítem «Illnesses» se cuenta sobre una lista CERRADA, no sobre cualquier comorbilidad.
+ *
+ * Es el hallazgo 893: la app preguntaba «¿Tiene 5 o más enfermedades crónicas?» con una lista
+ * abierta de ejemplos que además añadía osteoporosis, demencia y depresión —que no están en la
+ * del instrumento— y omitía infarto, angina y asma. Medido: alguien con cinco crónicas ajenas
+ * a la escala (hipotiroidismo, glaucoma, migraña, reflujo, osteoporosis) salía «Frágil — Riesgo
+ * alto» cuando le corresponde «Pre-frágil».
+ *
+ * Vive aquí, y no en page.tsx, para que la usen la pregunta de la página y el FAQPage (hallazgo
+ * 4865: el JSON-LD seguía con el criterio abierto).
+ *
+ * ⚠️ Esta lista se toma de las fichas clínicas que publican la escala. El artículo original
+ * está tras muro de pago y no se ha podido contrastar contra él, así que el límite se dice en
+ * la propia página (ver FRAIL_META.nota) en vez de presentarse como cerrado.
+ */
+export const ENFERMEDADES_FRAIL = [
+  'hipertensión',
+  'diabetes',
+  'cáncer (salvo un cáncer de piel menor)',
+  'enfermedad pulmonar crónica',
+  'infarto de miocardio',
+  'insuficiencia cardíaca',
+  'angina de pecho',
+  'asma',
+  'artritis',
+  'ictus',
+  'enfermedad renal',
+];
+
 export const metadata: Metadata = {
   title: 'Test de Fragilidad (Escala FRAIL) - Evaluación para mayores | meskeIA',
   description: 'Test validado de 5 preguntas basado en la escala FRAIL para detectar fragilidad en personas mayores. Orientación preventiva sobre riesgo de caídas, dependencia y pérdida de autonomía.',
@@ -70,7 +100,7 @@ export const faqJsonLd = {
       name: '¿Qué es la escala FRAIL y cómo evalúa la fragilidad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La escala FRAIL es un instrumento de cribado breve con 5 ítems: Fatiga (cansancio habitual), Resistencia (dificultad para subir un piso de escaleras), Ambulación (dificultad para caminar una manzana), Illnesses (presencia de 5 o más enfermedades crónicas) y Loss of weight (pérdida de más del 5% del peso en el último año). Cada ítem puntúa 1 punto: 0 = robusto, 1-2 = pre-frágil, 3-5 = frágil.',
+        text: `La escala FRAIL es un instrumento de cribado breve con 5 ítems: Fatiga (cansancio habitual), Resistencia (dificultad para subir un piso de escaleras), Ambulación (dificultad para caminar una manzana), Illnesses (5 o más de una lista cerrada de ${ENFERMEDADES_FRAIL.length} enfermedades: ${ENFERMEDADES_FRAIL.join(', ')}; ninguna otra cuenta) y Loss of weight (pérdida de más del 5 % del peso en el último año). Cada ítem puntúa 1 punto: 0 = robusto, 1-2 = pre-frágil, 3-5 = frágil.`,
       },
     },
     {

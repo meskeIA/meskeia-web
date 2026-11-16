@@ -280,7 +280,10 @@
 
 .nivelIcono { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
 .nivelTitulo { font-size: 1.2rem; font-weight: 700; }
-.nivelDescripcion { font-size: 0.88rem; opacity: 0.9; margin-top: 0.35rem; }
+/* Sin opacidad (hallazgo 4864): al 85-90 % el color del nivel caía por debajo de 4,5:1 sobre su
+   tinte en tema claro (salvedad Robusto 4,35:1, Pre-frágil 4,12:1; descripción Pre-frágil en el
+   filo, 4,498:1). El color pleno da 5,93 y 5,30:1. */
+.nivelDescripcion { font-size: 0.88rem; margin-top: 0.35rem; }
 /* La salvedad viaja con el veredicto: es el bloque que se captura y se enseña. */
 .nivelSalvedad {
   font-size: 0.82rem;
@@ -288,7 +291,6 @@
   margin: 0.7rem 0 0;
   padding-top: 0.6rem;
   border-top: 1px solid currentColor;
-  opacity: 0.85;
 }
 
 .puntuacionRow {

@@ -568,7 +568,7 @@ test('CASO 13 — los radios se manejan con el teclado', async ({ page }) => {
 
 // Medido el 16/11/2026, con la opacidad 0,85 de `.nivelSalvedad` (texto de 13,12 px, así que el
 // mínimo es 4,5:1): oscuro 6,98 · 6,35 · 6,36; claro en Frágil, 4,74. Robusto y Pre-frágil en
-// claro NO llegan: son el HALLAZGO de contraste de abajo.
+// claro NO llegaban: hallazgo 4864, REPARADO quitando la opacidad.
 test('CASO 14 — la salvedad del veredicto se lee en oscuro, en los tres niveles', async ({ page }) => {
   await abrirConTema(page, 'dark');
   for (const nivel of Object.values(RESPUESTAS_POR_NIVEL)) {
@@ -618,7 +618,7 @@ test.describe('CASO 15 — en móvil', () => {
 
 // ── Hallazgos de la re-inspección del 16/11/2026 ──
 
-test('HALLAZGO (16/11/2026, ABIERTO) · cada grupo Sí/No se anuncia sin su pregunta', async ({
+test('REPARADO (hallazgo 4863) · cada grupo Sí/No se anunciaba sin su pregunta', async ({
   page,
 }) => {
   // Antes del cambio la casilla llevaba `aria-label={item.pregunta}`; ahora el <fieldset> tiene
@@ -627,8 +627,8 @@ test('HALLAZGO (16/11/2026, ABIERTO) · cada grupo Sí/No se anuncia sin su preg
   // «Resistencia, agrupación, Sí, botón de opción», sin «10 escalones», «100 metros», «5 de
   // estas enfermedades» ni «más del 5 % en el último año», que son los umbrales del ítem.
   // Esperado: la pregunta llega en el nombre o la descripción accesible del grupo o de sus
-  // radios. Hoy: grupo «Resistencia» sin descripción, radios «Sí»/«No» sin descripción.
-  test.fail();
+  // radios. Antes: grupo «Resistencia» sin descripción. Ahora el <fieldset> lleva
+  // aria-describedby a la pregunta.
   await abrir(page);
   const cdp = await page.context().newCDPSession(page);
   const { nodes } = (await cdp.send('Accessibility.getFullAXTree')) as {
@@ -643,7 +643,7 @@ test('HALLAZGO (16/11/2026, ABIERTO) · cada grupo Sí/No se anuncia sin su preg
   }
 });
 
-test('HALLAZGO (16/11/2026, ABIERTO) · la salvedad del veredicto no llega a 4,5:1 en claro en Robusto y Pre-frágil', async ({
+test('REPARADO (hallazgo 4864) · la salvedad del veredicto no llegaba a 4,5:1 en claro en Robusto y Pre-frágil', async ({
   page,
 }) => {
   // `.nivelSalvedad` hereda el color de la caja (--verde-texto #136E35 / --naranja-texto
@@ -651,8 +651,8 @@ test('HALLAZGO (16/11/2026, ABIERTO) · la salvedad del veredicto no llega a 4,5
   // texto al 85 % sobre el tinte. Medido el 16/11/2026: Robusto 4,35:1 (4,41 por píxel) y
   // Pre-frágil 4,12:1 (4,16 por píxel), con texto de 13,12 px que pide 4,5:1. Es el aviso
   // «No es un diagnóstico» que la reparación del hallazgo 897 puso ahí para que viajara con el
-  // veredicto. check:semanticos-claro mide el color de la regla y no ve la opacidad.
-  test.fail();
+  // veredicto. check:semanticos-claro mide el color de la regla y no ve la opacidad. Reparado
+  // quitando la opacidad (también la de .nivelDescripcion, en el filo con 4,498:1).
   await abrirConTema(page, 'light');
   for (const nivel of [RESPUESTAS_POR_NIVEL.robusto, RESPUESTAS_POR_NIVEL.prefragil]) {
     await responderTodo(page, nivel.conSi);
@@ -662,7 +662,7 @@ test('HALLAZGO (16/11/2026, ABIERTO) · la salvedad del veredicto no llega a 4,5
   }
 });
 
-test('HALLAZGO (16/11/2026, ABIERTO) · el FAQPage sigue contando cualquier enfermedad crónica', async ({
+test('REPARADO (hallazgo 4865) · el FAQPage seguía contando cualquier enfermedad crónica', async ({
   page,
 }) => {
   // La reparación del hallazgo 893 cerró el ítem de enfermedades a la lista del instrumento en
@@ -670,8 +670,7 @@ test('HALLAZGO (16/11/2026, ABIERTO) · el FAQPage sigue contando cualquier enfe
   // enfermedad cuenta para este ítem»), pero la respuesta del FAQPage —lo que leen buscadores
   // y asistentes— sigue diciendo «Illnesses (presencia de 5 o más enfermedades crónicas)».
   // Con cinco crónicas ajenas a la lista más Fatiga y Resistencia, el FAQPage da 3 → frágil y
-  // la página 2 → pre-frágil.
-  test.fail();
+  // la página 2 → pre-frágil. Ahora sale de la misma constante ENFERMEDADES_FRAIL.
   await page.goto(RUTA);
   const faq = await page
     .locator('script[type="application/ld+json"]')
@@ -689,13 +688,12 @@ test('HALLAZGO (16/11/2026, ABIERTO) · el FAQPage sigue contando cualquier enfe
   expect(frail?.acceptedAnswer.text ?? '').toMatch(/lista|\b11\b/);
 });
 
-test('HALLAZGO (16/11/2026, ABIERTO) · «Faltan 1 de 5 preguntas»: la concordancia falla con una sola', async ({
+test('REPARADO (hallazgo 4866) · «Faltan 1 de 5 preguntas»: la concordancia fallaba con una sola', async ({
   page,
 }) => {
   // El aviso se construye siempre en plural: con una sola sin responder dice «Faltan 1 de 5
   // preguntas por responder: Pérdida de peso.». Esperado en singular: «Falta 1 …» (o «Falta
   // una …»).
-  test.fail();
   await abrir(page);
   for (const id of IDS.slice(0, 4)) await opcion(page, id, 'no').click();
   await botonEvaluar(page).click();
@@ -704,13 +702,12 @@ test('HALLAZGO (16/11/2026, ABIERTO) · «Faltan 1 de 5 preguntas»: la concorda
   await expect(aviso).toHaveText(/^Falta (1|una)\b/);
 });
 
-test('HALLAZGO (16/11/2026, ABIERTO) · «unos 3,5 kg en una persona de 70» no dice 70 qué', async ({
+test('REPARADO (hallazgo 4867) · «unos 3,5 kg en una persona de 70» no decía 70 qué', async ({
   page,
 }) => {
   // En un test para mayores, «una persona de 70» se lee como edad, y el 5 % depende del PESO:
   // es justo la confusión que el párrafo quiere deshacer frente a los 4,5 kg fijos de Fried.
   // La ayuda del propio ítem lo dice bien: «más de 3,5 kg si se pesa 70 kg» (5 % de 70 kg).
-  test.fail();
   await abrir(page);
   await page.getByRole('button', { name: /Ver guía|guía educativa/i }).first().click();
   const parrafo = page.getByText(/unos 3,5 kg/).first();
