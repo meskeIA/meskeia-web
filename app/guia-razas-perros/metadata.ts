@@ -49,26 +49,38 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+/**
+ * Las dos preguntas que están también en la FAQ visible de page.tsx (hallazgo 4676, 16/11/2026):
+ * la visible y el FAQPage daban listas de razas distintas, la visible callaba el aviso de las razas
+ * de guarda y hablaba de «un Whippet grande» (su ficha dice Mediano). Una sola respuesta, que leen
+ * las dos (check:faq-unica). Las razas citadas salen de las fichas: apto apartamento con energía
+ * baja o media, y apto con niños.
+ */
+export const PREGUNTAS_FRECUENTES: { pregunta: string; respuesta: string }[] = [
+  {
+    pregunta: '¿Qué raza de perro es más adecuada para vivir en un apartamento?',
+    respuesta:
+      'Las razas de energía baja o media y tamaño pequeño o mediano se adaptan mejor a la vida en piso: en esta guía, el Bulldog Francés, el Shih Tzu, el Bichón Frisé, el Cavalier King Charles Spaniel, el Chihuahua o el Basset Hound. El factor clave no es solo el tamaño sino la necesidad de ejercicio diario: el Galgo Español, por ejemplo, es grande y, según su ficha, se adapta al piso si recibe su ejercicio diario. La guía incluye el filtro «Solo apto apartamento» para facilitar esta búsqueda.',
+  },
+  {
+    pregunta: '¿Cuáles son las razas de perros más recomendadas para familias con niños pequeños?',
+    respuesta:
+      'El Labrador Retriever, el Golden Retriever, el Beagle y el Boxer destacan por su paciencia, sociabilidad y tolerancia con los niños. En general, las razas de los grupos FCI de cobradores, levantadores y perros de agua, así como los pastores de carácter equilibrado, suelen mostrar una alta tolerancia. Se recomienda evitar razas con alta tendencia al territorio o a la guarda intensa si hay niños muy pequeños en casa y no hay experiencia previa con perros. La ficha de cada raza dice si es apta con niños, y el filtro «Solo apto con niños» las reúne.',
+  },
+];
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
-    {
+    ...PREGUNTAS_FRECUENTES.map((p) => ({
       '@type': 'Question',
-      name: '¿Qué raza de perro es más adecuada para vivir en un apartamento?',
+      name: p.pregunta,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las razas de nivel de energía bajo o medio y tamaño pequeño o mediano se adaptan mejor a la vida en piso: Bichón Frisé, Shih Tzu, Bulldog Francés, Cavalier King Charles Spaniel o el Basset Hound son buenas opciones. El factor clave no es solo el tamaño sino la necesidad de ejercicio diario: un Greyhound, por ejemplo, es grande pero descansa la mayor parte del día. La guía incluye un filtro específico de "apto apartamento" para facilitar esta búsqueda.',
+        text: p.respuesta,
       },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Cuáles son las razas de perros más recomendadas para familias con niños pequeños?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'El Labrador Retriever, el Golden Retriever, el Beagle y el Boxer destacan por su paciencia, sociabilidad y tolerancia con los niños. En general, las razas de los grupos FCI de cobradores, levantadores y perros de agua, así como los pastores de carácter equilibrado, suelen mostrar una alta tolerancia. Se recomienda evitar razas con alta tendencia al territorio o a la guarda intensa si hay niños muy pequeños en casa y no hay experiencia previa con perros.',
-      },
-    },
+    })),
     {
       '@type': 'Question',
       name: '¿Qué significan los grupos FCI y cómo me ayudan a elegir raza?',

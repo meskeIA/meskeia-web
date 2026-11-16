@@ -295,6 +295,8 @@
   font-weight: 600;
   border: 1px solid;
   letter-spacing: 0.02em;
+  /* El color del grupo queda en el tinte y el borde; el texto, el del tema (hallazgo 4675) */
+  color: var(--text-primary);
 }
 
 /* ─── Badges tamaño + energía ─────────────────────────────────────────────── */
@@ -483,34 +485,60 @@
   font-weight: 700;
 }
 
+/* Hallazgo 4675 (16/11/2026): el texto llevaba en línea #f44336 / #FF9800 / #4CAF50 sobre estos
+   tintes (1,88:1 el «Medio»). Ahora el color va aquí, con su variante oscura, por encima de 4,5:1. */
 .mantenimientoAlto {
   background: #fee2e2;
+  color: #991B1B;
   border-radius: 8px;
   padding: 0.15rem 0.5rem;
 }
 
 .mantenimientoMedio {
   background: #ffedd5;
+  color: #9A3412;
   border-radius: 8px;
   padding: 0.15rem 0.5rem;
 }
 
 .mantenimientoBajo {
   background: #d1fae5;
+  color: #065F46;
   border-radius: 8px;
   padding: 0.15rem 0.5rem;
 }
 
 [data-theme='dark'] .mantenimientoAlto {
   background: #450a0a;
+  color: #FCA5A5;
 }
 
 [data-theme='dark'] .mantenimientoMedio {
   background: #431407;
+  color: #FDBA74;
 }
 
 [data-theme='dark'] .mantenimientoBajo {
   background: #052e16;
+  color: #86EFAC;
+}
+
+/* ─── Aviso de perro potencialmente peligroso (hallazgo 4674) ───────────── */
+.avisoPpp {
+  margin: 0 1.25rem 0.8rem;
+  padding: 0.6rem 0.8rem;
+  border-left: 3px solid #B45309;
+  border-radius: 6px;
+  background: #fef3c7;
+  color: #78350F;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+[data-theme='dark'] .avisoPpp {
+  background: #3b2a0a;
+  border-left-color: #F59E0B;
+  color: #FDE68A;
 }
 
 /* ─── Curiosidad ────────────────────────────────────────────────────────── */

@@ -302,10 +302,9 @@ test.describe('hallazgos abiertos', () => {
     await abrir(page);
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) [contenido/medio] · Dálmata, Shar Pei y Mastín Español, en un grupo FCI que no es el suyo', async ({
+  test('HALLAZGO 4672 (REPARADO) [contenido/medio] · Dálmata, Shar Pei y Mastín Español, en su grupo FCI', async ({
     page,
   }) => {
-    test.fail();
     // FCI: Dálmata, estándar 153, grupo 6 (sabuesos, sección 3); Shar Pei, 309, grupo 2 (molosos);
     // Mastín Español, 91, grupo 2 (molosos, tipo montaña). Del grupo 9 (compañía) quedan, de las
     // 40, estas siete; del grupo 1 (pastoreo), estas tres.
@@ -318,36 +317,44 @@ test.describe('hallazgos abiertos', () => {
       'Bichón Frisé',
       'Maltés',
       'Cavalier King Charles Spaniel',
-    ]); // hoy: 9, con Dálmata y Shar Pei
+    ]); // antes: 9, con Dálmata y Shar Pei
     await buscar(page, 'pastoreo');
-    await expect(fichas(page)).toHaveText(['Pastor Alemán', 'Border Collie', 'Malinois Belga']); // hoy: + Mastín Español
+    await expect(fichas(page)).toHaveText(['Pastor Alemán', 'Border Collie', 'Malinois Belga']); // antes: + Mastín Español
+    // El grupo 2 se rotula con sus molosos, como lo llama el FAQPage («molosos (II)»): antes «moloso» daba 0.
+    await buscar(page, 'moloso');
+    await expect(fichas(page)).toContainText(['Shar Pei', 'Mastín Español']);
+    await expect(ficha(page, 'Dálmata')).toHaveCount(0);
+    await buscar(page, 'Dálmata');
+    await expect(ficha(page, 'Dálmata')).toContainText('Sabueso');
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) [dato/medio] · el seguro de RC es obligatorio para todo perro, no «en varias comunidades»', async ({
+  test('HALLAZGO 4673 (REPARADO) [dato/medio] · el seguro de RC es obligatorio para todo perro, no «en varias comunidades»', async ({
     page,
   }) => {
-    test.fail();
     // Ley 7/2023, art. 30.3: el titular de un perro «deberá contratar y mantener en vigor un seguro
     // de responsabilidad civil por daños a terceros» (cuantía, por reglamento). En vigor desde el
     // 29/09/2023. La guía (consejo y FAQ visible) lo limita a algunas comunidades autónomas.
     await abrirGuia(page);
-    await expect(page.getByText(/obligatorio en (varias|muchas) comunidades/)).toHaveCount(0); // hoy: 2
+    await expect(page.getByText(/obligatorio en (varias|muchas) comunidades/)).toHaveCount(0); // antes: 2
+    await expect(guia(page)).toContainText('obligatorio para todo titular de un perro desde la Ley 7/2023');
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) [dato/medio] · las fichas del Rottweiler y el Akita no dicen que son perros potencialmente peligrosos', async ({
+  test('HALLAZGO 4674 (REPARADO) [dato/medio] · las fichas del Rottweiler y el Akita dicen que son perros potencialmente peligrosos', async ({
     page,
   }) => {
-    test.fail();
     // Real Decreto 287/2002, anexo I, letras d) Rottweiler y h) Akita Inu: licencia, registro y
     // seguro obligatorios. La guía solo dice que la licencia «es obligatoria para algunas razas».
     await expect(ficha(page, 'Rottweiler')).toContainText(/potencialmente peligros/i);
     await expect(ficha(page, 'Akita')).toContainText(/potencialmente peligros/i);
+    await expect(ficha(page, 'Rottweiler')).toContainText('anexo I, letra d');
+    await expect(ficha(page, 'Akita')).toContainText('anexo I, letra h');
+    // Solo ellos dos: ninguna otra de las 40 está en el anexo I (a-h)
+    await expect(page.locator('main article').filter({ hasText: /potencialmente peligros/i })).toHaveCount(2);
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) [accesibilidad/medio] · el grupo FCI y el mantenimiento, por debajo de 4,5:1 en claro', async ({
+  test('HALLAZGO 4675 (REPARADO) [accesibilidad/medio] · el grupo FCI y el mantenimiento, por encima de 4,5:1 en claro', async ({
     page,
   }) => {
-    test.fail();
     // Colores puestos en línea desde COLOR_GRUPO y COLOR_MANTENIMIENTO (texto de 11,5-12,8 px).
     // Medido el 14/11/2026: Teckel 1,93:1 · Sabueso 1,95:1 · mantenimiento «Medio» 1,88:1.
     expect(await contraste(ficha(page, 'Dachshund').getByText('Teckel', { exact: true }))).toBeGreaterThanOrEqual(4.5);
@@ -355,33 +362,35 @@ test.describe('hallazgos abiertos', () => {
     expect(await contraste(ficha(page, 'Shar Pei').getByText('Medio', { exact: true }))).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) [accesibilidad/medio] · el grupo FCI, por debajo de 4,5:1 en oscuro', async ({
+  test('HALLAZGO 4675 (REPARADO) [accesibilidad/medio] · el grupo FCI y el mantenimiento, por encima de 4,5:1 en oscuro', async ({
     page,
   }) => {
-    test.fail();
     await page.addInitScript(() => window.localStorage.setItem('meskeia-theme', 'dark'));
     await abrir(page);
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    // Medido el 14/11/2026: Lebrel 2,01:1 · Pinscher-Schnauzer 2,14:1.
+    // Medido el 14/11/2026: Lebrel 2,01:1 · Pinscher-Schnauzer 2,14:1 (hoy rotulado con sus molosos).
     expect(await contraste(ficha(page, 'Whippet').getByText('Lebrel', { exact: true }))).toBeGreaterThanOrEqual(4.5);
-    expect(await contraste(ficha(page, 'Boxer').getByText('Pinscher-Schnauzer', { exact: true }))).toBeGreaterThanOrEqual(4.5);
+    expect(await contraste(ficha(page, 'Boxer').getByText('Pinscher, Schnauzer y Molosos', { exact: true }))).toBeGreaterThanOrEqual(4.5);
+    expect(await contraste(ficha(page, 'Shar Pei').getByText('Medio', { exact: true }))).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) [contenido/medio] · la FAQ visible y el FAQPage responden distinto a las mismas dos preguntas', async ({
+  test('HALLAZGO 4676 (REPARADO) [contenido/medio] · la FAQ visible y el FAQPage responden lo mismo a las mismas dos preguntas', async ({
     page,
   }) => {
-    test.fail();
     // «¿Qué raza de perro es más adecuada para vivir en un apartamento?» / «¿Qué raza es mejor para
     // un piso pequeño?» y las dos de «niños pequeños»: listas de razas distintas, y la visible calla
     // el aviso de evitar razas de guarda con niños muy pequeños. Reparada, es UNA constante que
     // leen las dos, y la respuesta del FAQPage está en la página.
     await abrirGuia(page);
     const visible = (await guia(page).innerText()).replace(/\s+/g, ' ');
-    for (const q of await faqJsonLd(page)) {
-      if (/apartamento|niños/.test(q.name)) {
-        expect(visible, q.name).toContain(q.acceptedAnswer.text.replace(/\s+/g, ' '));
-      }
+    const compartidas = (await faqJsonLd(page)).filter((q) => /apartamento|niños/.test(q.name));
+    expect(compartidas).toHaveLength(2);
+    for (const q of compartidas) {
+      expect(visible, q.name).toContain(q.name);
+      expect(visible, q.name).toContain(q.acceptedAnswer.text.replace(/\s+/g, ' '));
     }
+    // El ejemplo grande y apto piso es una raza de la guía con ese tamaño (no «un Whippet grande»)
+    expect(visible).toContain('el Galgo Español, por ejemplo, es grande');
   });
 
   test('HALLAZGO (14/11/2026, ABIERTO) [contenido/bajo] · el FAQPage promete una escala de mantenimiento de 1 a 5', async ({

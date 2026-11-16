@@ -12,10 +12,11 @@ import {
 } from '@/components';
 import styles from './GuiaRazasPerros.module.css';
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 type GrupoFCI =
   | 'Pastoreo'
-  | 'Pinscher-Schnauzer'
+  | 'Pinscher, Schnauzer y Molosos'
   | 'Terrier'
   | 'Teckel'
   | 'Spitz'
@@ -50,6 +51,8 @@ interface RazaPerro {
   esperanzaVida: string;
   descripcion: string;
   curiosidad: string;
+  /** Letra del anexo I del RD 287/2002 si la raza es perro potencialmente peligroso en España (hallazgo 4674) */
+  anexoPpp?: string;
 }
 
 const RAZAS: RazaPerro[] = [
@@ -204,7 +207,7 @@ const RAZAS: RazaPerro[] = [
     id: 'boxer',
     nombre: 'Boxer',
     nombreIngles: 'Boxer',
-    grupo: 'Pinscher-Schnauzer',
+    grupo: 'Pinscher, Schnauzer y Molosos',
     origen: 'Alemania',
     tamano: 'Grande',
     pesoMin: 25,
@@ -225,7 +228,7 @@ const RAZAS: RazaPerro[] = [
     id: 'schnauzer-mediano',
     nombre: 'Schnauzer Mediano',
     nombreIngles: 'Standard Schnauzer',
-    grupo: 'Pinscher-Schnauzer',
+    grupo: 'Pinscher, Schnauzer y Molosos',
     origen: 'Alemania',
     tamano: 'Mediano',
     pesoMin: 14,
@@ -267,7 +270,8 @@ const RAZAS: RazaPerro[] = [
     id: 'dalmata',
     nombre: 'Dálmata',
     nombreIngles: 'Dalmatian',
-    grupo: 'Compañía',
+    // Hallazgo 4672: FCI, estándar 153, grupo 6 (sección 3); la app lo ponía en Compañía
+    grupo: 'Sabueso',
     origen: 'Croacia',
     tamano: 'Grande',
     pesoMin: 24,
@@ -351,7 +355,8 @@ const RAZAS: RazaPerro[] = [
     id: 'rottweiler',
     nombre: 'Rottweiler',
     nombreIngles: 'Rottweiler',
-    grupo: 'Pinscher-Schnauzer',
+    anexoPpp: 'd',
+    grupo: 'Pinscher, Schnauzer y Molosos',
     origen: 'Alemania',
     tamano: 'Grande',
     pesoMin: 35,
@@ -372,7 +377,7 @@ const RAZAS: RazaPerro[] = [
     id: 'dobermann',
     nombre: 'Dobermann',
     nombreIngles: 'Dobermann',
-    grupo: 'Pinscher-Schnauzer',
+    grupo: 'Pinscher, Schnauzer y Molosos',
     origen: 'Alemania',
     tamano: 'Grande',
     pesoMin: 32,
@@ -477,7 +482,7 @@ const RAZAS: RazaPerro[] = [
     id: 'san-bernardo',
     nombre: 'San Bernardo',
     nombreIngles: 'Saint Bernard',
-    grupo: 'Pinscher-Schnauzer',
+    grupo: 'Pinscher, Schnauzer y Molosos',
     origen: 'Suiza',
     tamano: 'Gigante',
     pesoMin: 64,
@@ -498,7 +503,7 @@ const RAZAS: RazaPerro[] = [
     id: 'gran-danes',
     nombre: 'Gran Danés',
     nombreIngles: 'Great Dane',
-    grupo: 'Pinscher-Schnauzer',
+    grupo: 'Pinscher, Schnauzer y Molosos',
     origen: 'Alemania',
     tamano: 'Gigante',
     pesoMin: 45,
@@ -645,6 +650,7 @@ const RAZAS: RazaPerro[] = [
     id: 'akita',
     nombre: 'Akita',
     nombreIngles: 'Akita',
+    anexoPpp: 'h',
     grupo: 'Spitz',
     origen: 'Japón',
     tamano: 'Grande',
@@ -687,7 +693,8 @@ const RAZAS: RazaPerro[] = [
     id: 'shar-pei',
     nombre: 'Shar Pei',
     nombreIngles: 'Shar Pei',
-    grupo: 'Compañía',
+    // Hallazgo 4672: FCI, estándar 309, grupo 2 (sección 2.1, molosos); la app lo ponía en Compañía
+    grupo: 'Pinscher, Schnauzer y Molosos',
     origen: 'China',
     tamano: 'Mediano',
     pesoMin: 18,
@@ -834,7 +841,8 @@ const RAZAS: RazaPerro[] = [
     id: 'mastin-espanol',
     nombre: 'Mastín Español',
     nombreIngles: 'Spanish Mastiff',
-    grupo: 'Pastoreo',
+    // Hallazgo 4672: FCI, estándar 91, grupo 2 (sección 2.2, tipo montaña); la app lo ponía en Pastoreo
+    grupo: 'Pinscher, Schnauzer y Molosos',
     origen: 'España',
     tamano: 'Gigante',
     pesoMin: 52,
@@ -896,7 +904,7 @@ const RAZAS: RazaPerro[] = [
 ];
 
 const GRUPOS_FCI: GrupoFCI[] = [
-  'Pastoreo', 'Pinscher-Schnauzer', 'Terrier', 'Teckel', 'Spitz',
+  'Pastoreo', 'Pinscher, Schnauzer y Molosos', 'Terrier', 'Teckel', 'Spitz',
   'Sabueso', 'Perros de muestra', 'Cobrador-Levantador', 'Compañía', 'Lebrel',
 ];
 
@@ -905,7 +913,7 @@ const ENERGIAS: NivelEnergia[] = ['Muy alta', 'Alta', 'Media', 'Baja'];
 
 const COLOR_GRUPO: Record<GrupoFCI, string> = {
   'Pastoreo': '#2196F3',
-  'Pinscher-Schnauzer': '#9C27B0',
+  'Pinscher, Schnauzer y Molosos': '#9C27B0',
   'Terrier': '#FF5722',
   'Teckel': '#8BC34A',
   'Spitz': '#607D8B',
@@ -921,12 +929,6 @@ const COLOR_ENERGIA: Record<NivelEnergia, string> = {
   'Alta': '#FF9800',
   'Media': '#FFC107',
   'Baja': '#4CAF50',
-};
-
-const COLOR_MANTENIMIENTO: Record<NivelMantenimiento, string> = {
-  'Alto': '#f44336',
-  'Medio': '#FF9800',
-  'Bajo': '#4CAF50',
 };
 
 function getMantenimientoClass(m: NivelMantenimiento, s: Record<string, string>): string {
@@ -1104,7 +1106,7 @@ export default function GuiaRazasPerrosPage() {
                 <div className={styles.grupoBadgeWrap}>
                   <span
                     className={styles.grupoBadge}
-                    style={{ backgroundColor: COLOR_GRUPO[raza.grupo] + '20', color: COLOR_GRUPO[raza.grupo], borderColor: COLOR_GRUPO[raza.grupo] + '60' }}
+                    style={{ backgroundColor: COLOR_GRUPO[raza.grupo] + '20', borderColor: COLOR_GRUPO[raza.grupo] }}
                   >
                     {raza.grupo}
                   </span>
@@ -1141,6 +1143,15 @@ export default function GuiaRazasPerrosPage() {
                 {/* Descripción */}
                 <p className={styles.descripcion}>{raza.descripcion}</p>
 
+                {/* RD 287/2002, anexo I (BOE-A-2002-6016): Rottweiler (d) y Akita Inu (h) */}
+                {raza.anexoPpp && (
+                  <p className={styles.avisoPpp}>
+                    <strong>En España, perro potencialmente peligroso</strong> (Real Decreto 287/2002,
+                    anexo I, letra {raza.anexoPpp}): su tenencia exige licencia administrativa del
+                    ayuntamiento. Consulta los requisitos en el tuyo.
+                  </p>
+                )}
+
                 {/* Temperamento */}
                 <div className={styles.temperamentoSection}>
                   <span className={styles.infoLabel}>Temperamento</span>
@@ -1156,7 +1167,6 @@ export default function GuiaRazasPerrosPage() {
                   <span className={styles.infoLabel}>Mantenimiento</span>
                   <span
                     className={`${styles.mantenimientoBadge} ${getMantenimientoClass(raza.mantenimiento, styles)}`}
-                    style={{ color: COLOR_MANTENIMIENTO[raza.mantenimiento] }}
                   >
                     {raza.mantenimiento}
                   </span>
@@ -1298,13 +1308,8 @@ export default function GuiaRazasPerrosPage() {
             <h2 className={styles.eduTitle}>Preguntas frecuentes</h2>
             <ul className={styles.faqList}>
               <li className={styles.faqItem}>
-                <strong>¿Qué raza es mejor para un piso pequeño?</strong>
-                <p>
-                  Las razas más adaptadas son el Bulldog Francés, el Shih Tzu, el Chihuahua,
-                  el Bichón Frisé y el Cavalier King Charles. Lo más importante no es el tamaño
-                  del perro sino su nivel de energía: un Whippet grande puede vivir tranquilo
-                  en un piso si recibe su ejercicio diario.
-                </p>
+                <strong>{PREGUNTAS_FRECUENTES[0].pregunta}</strong>
+                <p>{PREGUNTAS_FRECUENTES[0].respuesta}</p>
               </li>
               <li className={styles.faqItem}>
                 <strong>¿Existen razas hipoalergénicas?</strong>
@@ -1325,13 +1330,8 @@ export default function GuiaRazasPerrosPage() {
                 </p>
               </li>
               <li className={styles.faqItem}>
-                <strong>¿Cuál es la mejor raza para niños pequeños?</strong>
-                <p>
-                  El Labrador Retriever y el Golden Retriever son los más recomendados por
-                  veterinarios para familias con niños. Son pacientes, casi nunca muerden por
-                  accidente y disfrutan del juego activo. El Beagle y el Cavalier también son
-                  excelentes opciones para familias con espacio.
-                </p>
+                <strong>{PREGUNTAS_FRECUENTES[1].pregunta}</strong>
+                <p>{PREGUNTAS_FRECUENTES[1].respuesta}</p>
               </li>
               <li className={styles.faqItem}>
                 <strong>¿Es mejor adoptar o comprar un perro?</strong>
@@ -1348,7 +1348,7 @@ export default function GuiaRazasPerrosPage() {
                   Depende del tamaño y la raza, pero un presupuesto orientativo en España
                   es de 60-150€/mes para razas pequeñas (comida, veterinario, peluquería)
                   y 150-300€/mes para razas grandes. A esto hay que sumar el seguro de
-                  responsabilidad civil (obligatorio en muchas comunidades) y los imprevistos
+                  responsabilidad civil (en España, obligatorio para todo perro: Ley 7/2023, art. 30.3) y los imprevistos
                   veterinarios.
                 </p>
               </li>
@@ -1448,7 +1448,8 @@ export default function GuiaRazasPerrosPage() {
                 <p>
                   <strong>Chip, vacunas y licencia.</strong> El microchip es obligatorio
                   en España desde los 3 meses. La licencia de perro potencialmente peligroso
-                  es obligatoria para algunas razas. Mantén el calendario vacunal al día.
+                  es obligatoria para las razas del anexo I del Real Decreto 287/2002; de las de
+                  esta guía, el Rottweiler y el Akita. Mantén el calendario vacunal al día.
                 </p>
               </div>
               <div className={styles.tipCard}>
@@ -1462,9 +1463,12 @@ export default function GuiaRazasPerrosPage() {
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
                 <p>
-                  <strong>Seguro de responsabilidad civil.</strong> Es obligatorio en varias
-                  comunidades autónomas y recomendable en todo caso. Cubre daños a terceros
-                  causados por tu perro. Los costes de un accidente pueden ser cuantiosos.
+                  {/* Hallazgo 4673: decía «obligatorio en varias comunidades autónomas». BOE-A-2023-7936,
+                      art. 30.3, consultado el 16/11/2026: lo debe contratar todo titular de un perro. */}
+                  <strong>Seguro de responsabilidad civil.</strong> En España es obligatorio para
+                  todo titular de un perro desde la Ley 7/2023 de bienestar animal (art. 30.3), que
+                  deja la cuantía mínima a un reglamento. Cubre daños a terceros causados por tu
+                  perro. Los costes de un accidente pueden ser cuantiosos.
                 </p>
               </div>
             </div>
