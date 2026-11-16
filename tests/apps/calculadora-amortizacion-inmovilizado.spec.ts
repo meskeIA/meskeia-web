@@ -285,7 +285,7 @@ test.describe('calculadora-amortizacion-inmovilizado', () => {
     // porcentaje constante y pintaba la suma de dígitos sin aviso; ahora lo dicen la nota y las
     // tarjetas de los dos métodos degresivos (la lineal, no).
     await elegirTipo(page, 'Mobiliario y enseres');
-    const nota = page.getByText(/coeficiente lineal máximo 10 %/);
+    const nota = page.getByText(/coeficiente lineal máximo 10\s%/);
     await expect(nota).toContainText('porcentaje constante');
     await expect(nota).toContainText(/d[ií]gitos/i);
     expect(await textoCarta(page, 'Suma de dígitos')).toContain('No admitido fiscalmente');
@@ -350,10 +350,42 @@ test.describe('calculadora-amortizacion-inmovilizado', () => {
     await expect(page.getByRole('heading', { name: /Optimizar/ })).toHaveCount(0);
   });
 
+  test('FAQ · la pregunta del degresivo tiene UNA respuesta para la FAQ visible y el JSON-LD; el % lleva espacio duro', async ({ page }) => {
+    // REPARADO (hallazgo 4873): la misma pregunta estaba escrita dos veces con dos redacciones.
+    // REPARADO (hallazgo 4876): CLAUDE.md §2, «15 %» con U+00A0 (en las features iba pegado).
+    const jsonLd = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map((s) => s.textContent ?? ''),
+    );
+    const faq = jsonLd.map((t) => JSON.parse(t)).find((o) => o['@type'] === 'FAQPage');
+    const pregunta = faq.mainEntity.find((q: { name: string }) => /método degresivo/.test(q.name));
+    const respuestaJsonLd: string = pregunta.acceptedAnswer.text;
+    const visible = await page
+      .locator('dt', { hasText: '¿Cómo funciona el método degresivo de porcentaje constante?' })
+      .locator('xpath=following-sibling::dd[1]')
+      .textContent();
+    expect(visible).toBe(respuestaJsonLd);
+    expect(respuestaJsonLd).toContain('mínimo del 11 %');
+    const webApp = jsonLd.map((t) => JSON.parse(t)).find((o) => o['@type'] === 'WebApplication');
+    expect(JSON.stringify(webApp)).toContain('100 % en el navegador');
+    expect(JSON.stringify(webApp)).not.toMatch(/\d%/);
+    // En pantalla: la nota del tipo, el porcentaje degresivo y «Amortizado a mitad de vida»
+    const textoPagina = await page.evaluate(() => {
+      const copia = document.body.cloneNode(true) as HTMLElement;
+      copia.querySelectorAll('script, style').forEach((n) => n.remove());
+      return copia.textContent ?? '';
+    });
+    expect(textoPagina).toContain('coeficiente lineal máximo 12 %');
+    expect(textoPagina).toMatch(/\d % sobre el saldo pendiente/);
+    expect(textoPagina).toContain('Amortizado a mitad de vida56 %');
+    expect(textoPagina).toContain('el 100 % del valor');
+    expect(textoPagina).not.toMatch(/\d %/);
+  });
+
   test('FAQ · el JSON-LD y la FAQ visible no dicen que el coeficiente 2 llega hasta los 8 años', async ({ page }) => {
     // ABIERTO: «por 2 si está entre 5 y 8 años, o por 2,5 si supera los 8 años» (JSON-LD) y
     // «2 (de 5 a 8 años) o 2,5 (más de 8 años)» (visible); el art. 12.1.b da 2,5 «igual o
-    // superior a 8 años». Además es la misma pregunta escrita dos veces.
+    // superior a 8 años». Sigue ABIERTO con el hallazgo 4868 (dato de data/fiscal, espera la
+    // decisión del usuario); la respuesta ya es una sola (RESPUESTA_FAQ_DEGRESIVO, hallazgo 4873).
     test.fail();
     const jsonLd = await page.evaluate(() =>
       Array.from(document.querySelectorAll('script[type="application/ld+json"]'))

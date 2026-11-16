@@ -48,7 +48,7 @@ export const jsonLd = generateWebAppSchema({
     'Selector de tipo de activo con coeficientes orientativos de las tablas AEAT',
     'Cálculo automático del porcentaje degresivo según la vida útil',
     'Valor residual configurable',
-    'Gratuito, sin registro, funciona 100% en el navegador',
+    'Gratuito, sin registro, funciona 100 % en el navegador',
   ],
 });
 
@@ -61,6 +61,13 @@ export const RESPUESTA_FAQ_QUE_ES =
 // misma respuesta (C0570, 13/11/2026): se queda la del JSON-LD.
 export const RESPUESTA_FAQ_TOTAL_SEGUN_METODO =
   'No. Los tres métodos amortizan exactamente la misma cantidad total a lo largo de la vida útil del activo: el valor de adquisición menos el valor residual. Lo único que cambia es la distribución temporal, es decir, cuánto gasto se reconoce cada año. Por eso elegir entre lineal, degresivo o suma de dígitos es una decisión sobre el momento del gasto y la tesorería fiscal, no sobre la cuantía total.';
+
+// La visible la preguntaba «¿Cómo funciona…?» con otra redacción de la misma respuesta
+// (hallazgo 4873, 16/11/2026): se queda la del JSON-LD. Los tramos del multiplicador repiten los
+// de multiplicadorDegresivo() de data/fiscal, pendientes de decisión (hallazgo 4868: el art.
+// 12.1.b LIS da 2,5 a partir de 8 años incluidos); si cambian, se corrigen aquí, en un solo sitio.
+export const RESPUESTA_FAQ_DEGRESIVO =
+  'Se aplica un porcentaje fijo sobre el valor pendiente de amortizar cada año, por lo que la cuota disminuye con el tiempo. En España ese porcentaje se obtiene multiplicando el coeficiente lineal por 1,5 si la vida útil es menor de 5 años, por 2 si está entre 5 y 8 años, o por 2,5 si supera los 8 años, con un mínimo del 11 %. El último año se amortiza todo el saldo pendiente. No se aplica a edificios, mobiliario y enseres.';
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -95,7 +102,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula el método degresivo de porcentaje constante?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Se aplica un porcentaje fijo sobre el valor pendiente de amortizar cada año, por lo que la cuota disminuye con el tiempo. En España ese porcentaje se obtiene multiplicando el coeficiente lineal por 1,5 si la vida útil es menor de 5 años, por 2 si está entre 5 y 8 años, o por 2,5 si supera los 8 años, con un mínimo del 11 %. El último año se amortiza todo el saldo pendiente. No se aplica a edificios, mobiliario y enseres.',
+        text: RESPUESTA_FAQ_DEGRESIVO,
       },
     },
     {

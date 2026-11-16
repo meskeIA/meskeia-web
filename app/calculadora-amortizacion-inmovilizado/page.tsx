@@ -21,7 +21,7 @@ import {
   FISCAL_AMORTIZACION_META,
   type TipoActivoAmortizable,
 } from '@/data/fiscal';
-import { RESPUESTA_FAQ_QUE_ES, RESPUESTA_FAQ_TOTAL_SEGUN_METODO } from './metadata';
+import { RESPUESTA_FAQ_QUE_ES, RESPUESTA_FAQ_TOTAL_SEGUN_METODO, RESPUESTA_FAQ_DEGRESIVO } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -167,7 +167,7 @@ function calcularMetodos(datos: InputData): { metodos: ResultadoMetodo[]; valido
       filas: fDegresivo,
       cuotaPrimerAnio: fDegresivo[0].cuota,
       cuotaUltimoAnio: fDegresivo[fDegresivo.length - 1].cuota,
-      detalle: `${formatNumber(pct * 100, 1)} % sobre el saldo pendiente (×${formatNumber(mult, 1)})`,
+      detalle: `${formatNumber(pct * 100, 1)} % sobre el saldo pendiente (×${formatNumber(mult, 1)})`,
     },
     {
       id: 'digitos',
@@ -382,7 +382,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
         </div>
         {tipoSeleccionado && (
           <p className={styles.tipoNota}>
-            <strong>{tipoSeleccionado.nombre}:</strong> coeficiente lineal máximo {tipoSeleccionado.coefLinealMax} % ·
+            <strong>{tipoSeleccionado.nombre}:</strong> coeficiente lineal máximo {tipoSeleccionado.coefLinealMax}{' '}% ·
             período máximo {tipoSeleccionado.periodoMax} años (vida útil elegible entre {vidaUtilMinima(tipoSeleccionado.coefLinealMax)} y {tipoSeleccionado.periodoMax} años).
             <span>{tipoSeleccionado.degresivoExcluido && ' Ni el porcentaje constante ni la suma de dígitos son aplicables a este tipo de activo según la LIS (art. 12.1.b y c): fiscalmente, solo el método lineal.'}</span>
           </p>
@@ -439,7 +439,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
                   </div>
                   <div className={styles.metodoFila}>
                     <dt>Amortizado a mitad de vida</dt>
-                    <dd>{formatNumber(concentracion(m), 0)} %</dd>
+                    <dd>{formatNumber(concentracion(m), 0)}{' '}%</dd>
                   </div>
                 </dl>
                 <p className={styles.metodoFormulaNota}>
@@ -599,7 +599,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
             </div>
             <div className={styles.faqItem}>
               <dt>¿Cómo funciona el método degresivo de porcentaje constante?</dt>
-              <dd>Se aplica un porcentaje fijo sobre el valor pendiente de amortizar cada año, por lo que la cuota va disminuyendo. En España, ese porcentaje se obtiene multiplicando el coeficiente lineal por 1,5 (vida útil menor de 5 años), 2 (de 5 a 8 años) o 2,5 (más de 8 años), con un mínimo del 11 %. El último año se amortiza todo el saldo pendiente. No es aplicable a edificios, mobiliario y enseres.</dd>
+              <dd>{RESPUESTA_FAQ_DEGRESIVO}</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Qué es la suma de dígitos?</dt>
@@ -682,7 +682,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
           </div>
           <ul className={styles.warningList}>
             <li><strong>Amortizar sobre el valor con IVA:</strong> si el IVA es deducible, no forma parte del valor amortizable. Solo se amortiza el coste neto del activo.</li>
-            <li><strong>Olvidar el valor residual:</strong> amortizar el 100 % del valor de adquisición cuando el activo tendrá un valor de venta al final sobreestima el gasto.</li>
+            <li><strong>Olvidar el valor residual:</strong> amortizar el 100{' '}% del valor de adquisición cuando el activo tendrá un valor de venta al final sobreestima el gasto.</li>
             <li><strong>Aplicar un método degresivo a activos excluidos:</strong> edificios, mobiliario y enseres no admiten ni el porcentaje constante ni la suma de dígitos en la normativa española (art. 12.1.b y c LIS).</li>
             <li><strong>Confundir ritmo con cuantía:</strong> ningún método amortiza «más» en total. Elegir un método degresivo adelanta el gasto, no lo aumenta.</li>
             <li><strong>Salirse del rango de vida útil:</strong> amortizar más rápido que el coeficiente máximo o más lento que el período máximo puede hacer que la AEAT no admita parte del gasto.</li>
