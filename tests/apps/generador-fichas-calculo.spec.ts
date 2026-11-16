@@ -400,12 +400,12 @@ test('CASO 3 (rechazo) · sin ninguna operación marcada no hay ficha, y un n.º
 // hoy no se cumple, de ahí el test.fail().
 // ─────────────────────────────────────────────────────────────────────────────
 
-test('HALLAZGO (09/11/2026, ABIERTO) · el mismo n.º con los mismos ajustes da otra hoja si las operaciones se marcaron en otro orden', async ({ page }) => {
+test('HALLAZGO 4271 (REPARADO) · el mismo n.º con los mismos ajustes da la misma hoja aunque las operaciones se marquen en otro orden', async ({ page }) => {
   // La FAQ promete «introduciéndolo de nuevo con los mismos ajustes se obtienen exactamente las
-  // mismas operaciones». generarFicha alterna `operaciones[i % n]` en el orden en que se
-  // pulsaron los botones, y ese orden no se ve: desmarcar y volver a marcar «Sumas» deja los
-  // mismos botones pulsados y la hoja empieza por una resta. Hoy: «1. 9 + 17» frente a «1. 9 − 8».
-  test.fail();
+  // mismas operaciones». generarFicha alternaba `operaciones[i % n]` en el orden en que se
+  // pulsaron los botones, y ese orden no se ve: desmarcar y volver a marcar «Sumas» dejaba los
+  // mismos botones pulsados y la hoja empezaba por una resta («1. 9 + 17» frente a «1. 9 − 8»).
+  // Ahora se alternan en el orden fijo de los botones.
   await numeroDeFicha(page, '123456');
   await generar(page);
   const primera = await ficha(page);
@@ -420,44 +420,60 @@ test('HALLAZGO (09/11/2026, ABIERTO) · el mismo n.º con los mismos ajustes da 
   await numeroDeFicha(page, '123456');
   await generar(page);
   expect(await ficha(page)).toBe(primera);
+  // Y el orden de la hoja es el de los botones: suma primero, como en el CASO 1.
+  expect(primera).toMatch(/^1\.\s*9\s*\+\s*17/);
 });
 
-test('HALLAZGO (09/11/2026, ABIERTO) · tras cambiar de nivel sin regenerar, la hoja impresa dice el nivel nuevo', async ({ page }) => {
-  // El resumen y el pie leen el nivel SELECCIONADO, no el de la ficha: una hoja de Básico sale
+test('HALLAZGO 4272 (REPARADO) · tras cambiar de nivel sin regenerar, la hoja sigue diciendo el nivel con que se generó', async ({ page }) => {
+  // El resumen y el pie leían el nivel SELECCIONADO, no el de la ficha: una hoja de Básico salía
   // con «nivel Experto» en el pie, y con ese dato (Experto + 123456) se obtiene otra ficha.
-  test.fail();
   await numeroDeFicha(page, '123456');
   await generar(page);
   const hoja = await ficha(page);
   await elegirNivel(page, 'Experto');
   expect(await ficha(page)).toBe(hoja);
   await expect(pieDeHoja(page)).toContainText('nivel Básico');
+  await expect(page.locator('p', { hasText: 'operaciones de nivel' }).first()).toContainText('nivel Básico');
+  // Al regenerar, ya sí: Experto
+  await generar(page);
+  await expect(pieDeHoja(page)).toContainText('nivel Experto');
 });
 
-test('HALLAZGO (09/11/2026, ABIERTO) · «Otra distinta» repite la misma hoja si hay un n.º de ficha escrito', async ({ page }) => {
-  // generar() toma la semilla del campo si tiene cifras; «Otra distinta» llama a la misma
-  // función, así que con 123456 escrito vuelve a salir la ficha 123456.
-  test.fail();
+test('HALLAZGO 4273 (REPARADO) · «Otra distinta» da otra hoja aunque haya un n.º de ficha escrito', async ({ page }) => {
+  // generar() tomaba la semilla del campo si tenía cifras; «Otra distinta» llamaba a la misma
+  // función, así que con 123456 escrito volvía a salir la ficha 123456. Ahora sortea un número
+  // distinto y vacía el campo.
   await numeroDeFicha(page, '123456');
   await generar(page);
   const primera = await ficha(page);
   await page.getByRole('button', { name: /Otra distinta/ }).click();
   await expect.poll(() => ficha(page), { timeout: 2000 }).not.toBe(primera);
+  const resumen = page.locator('p', { hasText: 'operaciones de nivel' }).first();
+  await expect(resumen).not.toContainText('123456');
+  await expect(resumen).toHaveText(/Ficha n\.º [1-9]\d{5}\.$/);
+  await expect(page.getByPlaceholder('Al azar')).toHaveValue('');
 });
 
-test('HALLAZGO (09/11/2026, ABIERTO) · Intermedio promete «dividendo de dos cifras» y saca dividendos de tres', async ({ page }) => {
-  // Divisor 2-9 y cociente 2-99 dan dividendos de hasta 891 (+ resto). En el barrido, 537 de
-  // 675 divisiones de Intermedio (79,6 %) no tenían dos cifras: 276 : 6, 4 : 2…
-  test.fail();
+test('HALLAZGO 4274 (REPARADO) · Intermedio cumple el «dividendo de dos cifras», con resto y sin él', async ({ page }) => {
+  // Divisor 2-9 y cociente 2-99 daban dividendos de hasta 891 (+ resto). En el barrido, 537 de
+  // 675 divisiones de Intermedio (79,6 %) no tenían dos cifras: 276 : 6, 4 : 2… Ahora el cociente
+  // se acota para que divisor × cociente + resto quede entre 10 y 99.
+  await sembrarValor(page, 'input[type="range"]', 60);
   await marcarSolo(page, ['division']);
   await elegirNivel(page, 'Intermedio');
-  await numeroDeFicha(page, '123456');
-  await generar(page);
-  await enHorizontal(page);
-  await verSoluciones(page);
-  for (const c of await leerCuentas(page)) {
-    comprobarSolucion(c);
-    expect(String(c.a).length, `${c.linea}: el dividendo no tiene dos cifras`).toBe(2);
+  for (const conResto of [false, true]) {
+    await ponerAjuste(page, /^División con resto$/, conResto);
+    await numeroDeFicha(page, '123456');
+    await generar(page);
+    await enHorizontal(page);
+    await verSoluciones(page);
+    const cuentas = await leerCuentas(page);
+    expect(cuentas).toHaveLength(60);
+    for (const c of cuentas) {
+      comprobarSolucion(c);
+      expect(String(c.a).length, `${c.linea}: el dividendo no tiene dos cifras`).toBe(2);
+      expect(c.b, c.linea).toBeLessThanOrEqual(9);
+    }
   }
 });
 
@@ -480,23 +496,26 @@ test('HALLAZGO (09/11/2026, ABIERTO) · «tres cifras por dos» y «divisor de d
   }
 });
 
-test('HALLAZGO (09/11/2026, ABIERTO) · una ficha «de restas con llevadas» lleva sobre todo restas sin llevada', async ({ page }) => {
-  // El bloque educativo («Refuerzo puntual») propone: «si el fallo está en las llevadas, se
-  // genera una ficha de restas con llevadas y nada más» para no diluir el error entre
-  // operaciones que ya se dominan. «Con llevadas» solo las PERMITE: en Básico, 55 de 225 restas
-  // (24 %) tenían llevada; en Iniciación, 28 de 225 (12 %). Si la reparación cambia el texto en
-  // vez del generador, este caso se reescribe.
-  test.fail();
+test('HALLAZGO 4275 (REPARADO, por el texto) · la página ya no promete una ficha «de restas con llevadas» que el generador no hace', async ({ page }) => {
+  // El bloque educativo («Refuerzo puntual») proponía: «si el fallo está en las llevadas, se
+  // genera una ficha de restas con llevadas y nada más». «Con llevadas» solo las PERMITE: en
+  // Básico, 55 de 225 restas (24 %) tenían llevada; en Iniciación, 28 de 225 (12 %). Se reparó
+  // el texto, no el generador: este caso comprueba que la ficha de Básico sigue mezclando restas
+  // con y sin llevada (lo que dice ahora la página) y que la página lo dice.
   await marcarSolo(page, ['resta']);
   await ponerAjuste(page, /^Con llevadas$/, true);
+  await expect(page.getByText('«Con llevadas» permite que salgan llevadas; no las pone en todas las cuentas.')).toBeVisible();
   await numeroDeFicha(page, '123456');
   await generar(page);
   await enHorizontal(page);
   await verSoluciones(page);
-  for (const c of await leerCuentas(page)) {
+  const llevadas = (await leerCuentas(page)).map((c) => {
     comprobarSolucion(c);
-    expect(llevadaEnResta(c.a, c.b), `${c.linea}: sin llevada`).toBe(true);
-  }
+    return llevadaEnResta(c.a, c.b);
+  });
+  expect(llevadas).toContain(true);
+  expect(llevadas).toContain(false);
+  await expect(page.getByText('se genera una ficha de restas con llevadas y nada más')).toHaveCount(0);
 });
 
 test('HALLAZGO (09/11/2026, ABIERTO) · Básico «hasta 20» sin llevadas no saca ningún número de dos cifras', async ({ page }) => {

@@ -54,6 +54,8 @@ interface Nivel {
   /** Divisor y cociente máximos */
   maxDivisor: number;
   maxCociente: number;
+  /** Dividendo mínimo y máximo, resto incluido, si el nivel lo anuncia («dividendo de dos cifras») */
+  rangoDividendo?: [number, number];
 }
 
 const NIVELES: Nivel[] = [
@@ -86,6 +88,9 @@ const NIVELES: Nivel[] = [
     maxFactorB: 9,
     maxDivisor: 9,
     maxCociente: 99,
+    // Hallazgo 4274: con divisor 2-9 y cociente 2-99, cuatro de cada cinco dividendos salían de
+    // tres cifras (hasta 887) y alguno de una (4 : 2), y la tabla promete «dividendo de dos cifras».
+    rangoDividendo: [10, 99],
   },
   {
     id: 'avanzado',
@@ -205,8 +210,21 @@ function generarCuenta(
     case 'division':
     default: {
       const divisor = entero(aleatorio, 2, nivel.maxDivisor);
-      const cociente = entero(aleatorio, 2, nivel.maxCociente);
-      const resto = divisionConResto ? entero(aleatorio, 0, divisor - 1) : 0;
+      let cociente: number;
+      let resto: number;
+      if (nivel.rangoDividendo) {
+        // El resto se sortea antes y el cociente se acota para que divisor × cociente + resto caiga
+        // en el rango (con divisor ≤ 9 y dividendo 10-99 siempre cabe un cociente ≥ 2).
+        const [minDividendo, maxDividendo] = nivel.rangoDividendo;
+        resto = divisionConResto ? entero(aleatorio, 0, divisor - 1) : 0;
+        const cocienteMin = Math.max(2, Math.ceil((minDividendo - resto) / divisor));
+        const cocienteMax = Math.min(nivel.maxCociente, Math.floor((maxDividendo - resto) / divisor));
+        cociente = entero(aleatorio, cocienteMin, cocienteMax);
+      } else {
+        // Mismo orden de sorteo que siempre: un n.º de ficha de otro nivel da la hoja de antes
+        cociente = entero(aleatorio, 2, nivel.maxCociente);
+        resto = divisionConResto ? entero(aleatorio, 0, divisor - 1) : 0;
+      }
       return {
         tipo: 'entera',
         a: divisor * cociente + resto,
@@ -230,10 +248,13 @@ function generarFicha(
 ): Cuenta[] {
   const aleatorio = crearAleatorio(semilla);
   const cuentas: Cuenta[] = [];
+  // Hallazgo 4271: se alternaban en el orden de los clics, que no se ve ni se imprime, y el mismo
+  // n.º con los mismos botones pulsados daba otra hoja. Ahora, siempre en el orden de los botones.
+  const enOrden = (Object.keys(ETIQUETAS_OPERACION) as Operacion[]).filter((o) => operaciones.includes(o));
 
   for (let i = 0; i < cantidad; i++) {
     // Las operaciones se alternan en orden para que la ficha quede repartida
-    const operacion = operaciones[i % operaciones.length];
+    const operacion = enOrden[i % enOrden.length];
     cuentas.push(generarCuenta(operacion, nivel, conLlevadas, divisionConResto, tipoFraccion, aleatorio));
   }
 
@@ -284,6 +305,8 @@ export default function GeneradorFichasCalculoPage() {
   const [semillaManual, setSemillaManual] = useState('');
   const [ficha, setFicha] = useState<Cuenta[]>([]);
   const [semilla, setSemilla] = useState(0);
+  /** El nivel con el que se generó la ficha: el seleccionado puede cambiar sin regenerar (hallazgo 4272). */
+  const [nivelFicha, setNivelFicha] = useState<Nivel>(NIVELES[1]);
   const [mostrarSoluciones, setMostrarSoluciones] = useState(false);
   const [aviso, setAviso] = useState('');
 
@@ -297,21 +320,31 @@ export default function GeneradorFichasCalculoPage() {
     );
   };
 
-  const generar = useCallback(() => {
+  /**
+   * `otraDistinta`: «Otra distinta» sortea siempre un número nuevo, distinto del de la ficha
+   * actual, y vacía el campo. Antes tomaba la semilla del campo como «Generar» y, con un n.º
+   * escrito, repetía la misma hoja (hallazgo 4273).
+   */
+  const generar = useCallback((otraDistinta: boolean) => {
     if (operaciones.length === 0) {
       setAviso('Selecciona al menos un tipo de operación.');
       setFicha([]);
       return;
     }
 
-    const base = Number(semillaManual.replace(/\D/g, ''));
-    const nuevaSemilla = base > 0 ? base : Math.floor(Math.random() * 900000) + 100000;
+    const base = otraDistinta ? 0 : Number(semillaManual.replace(/\D/g, ''));
+    let nuevaSemilla = base;
+    while (nuevaSemilla <= 0 || (otraDistinta && nuevaSemilla === semilla)) {
+      nuevaSemilla = Math.floor(Math.random() * 900000) + 100000;
+    }
+    if (otraDistinta) setSemillaManual('');
 
     setFicha(generarFicha(operaciones, nivel, cantidad, conLlevadas, divisionConResto, tipoFraccion, nuevaSemilla));
     setSemilla(nuevaSemilla);
+    setNivelFicha(nivel);
     setMostrarSoluciones(false);
     setAviso('');
-  }, [operaciones, nivel, cantidad, conLlevadas, divisionConResto, tipoFraccion, semillaManual]);
+  }, [operaciones, nivel, cantidad, conLlevadas, divisionConResto, tipoFraccion, semillaManual, semilla]);
 
   return (
     <div className={`${styles.container} ${impresion.lienzo}`}>
@@ -449,6 +482,10 @@ export default function GeneradorFichasCalculoPage() {
                   {presentacion === 'columna' ? 'En columna' : 'Horizontal'}
                 </button>
               </div>
+              {/* Hallazgo 4275: el ajuste no fuerza la llevada, y la guía lo daba a entender */}
+              <p className={styles.notaCampo}>
+                «Con llevadas» permite que salgan llevadas; no las pone en todas las cuentas.
+              </p>
             </div>
 
             <label className={styles.campo}>
@@ -464,7 +501,7 @@ export default function GeneradorFichasCalculoPage() {
               />
             </label>
 
-            <button type="button" className={styles.btnPrimary} onClick={generar}>
+            <button type="button" className={styles.btnPrimary} onClick={() => generar(false)}>
               <span aria-hidden="true">✨</span> Generar ficha
             </button>
 
@@ -488,7 +525,7 @@ export default function GeneradorFichasCalculoPage() {
             ) : (
               <>
                 <p className={styles.resumen}>
-                  <strong>{ficha.length}</strong> operaciones de nivel <strong>{nivel.nombre}</strong>.
+                  <strong>{ficha.length}</strong> operaciones de nivel <strong>{nivelFicha.nombre}</strong>.
                   Ficha n.º <strong>{semilla}</strong>.
                 </p>
                 <p className={styles.pista}>
@@ -511,7 +548,7 @@ export default function GeneradorFichasCalculoPage() {
                     <span aria-hidden="true">🖨️</span> Imprimir esta vista
                   </button>
 
-                  <button type="button" className={styles.btnSecundario} onClick={generar}>
+                  <button type="button" className={styles.btnSecundario} onClick={() => generar(true)}>
                     <span aria-hidden="true">🔄</span> Otra distinta
                   </button>
                 </div>
@@ -597,7 +634,7 @@ export default function GeneradorFichasCalculoPage() {
           </ol>
 
           <p className={styles.pieHoja}>
-            Ficha n.º {semilla} · nivel {nivel.nombre} · {ficha.length} operaciones ·{' '}
+            Ficha n.º {semilla} · nivel {nivelFicha.nombre} · {ficha.length} operaciones ·{' '}
             {mostrarSoluciones ? 'PLANTILLA DE CORRECCIÓN' : 'para resolver'} · meskeia.com
           </p>
         </div>
@@ -721,9 +758,11 @@ export default function GeneradorFichasCalculoPage() {
                   <h3>Refuerzo puntual</h3>
                 </div>
                 <p>
-                  Si el fallo está en las llevadas, se genera una ficha de restas con llevadas y nada más.
-                  Aislar la dificultad concreta rinde mucho más que una hoja mixta donde el error se
-                  diluye entre operaciones que ya se dominan.
+                  Si el fallo está en las restas, se genera una ficha solo de restas y nada más. Aislar
+                  la dificultad concreta rinde mucho más que una hoja mixta donde el error se diluye
+                  entre operaciones que ya se dominan. Ojo: «Con llevadas» permite que salgan llevadas,
+                  pero no las pone en todas las cuentas; en los niveles bajos la mayoría de las restas
+                  salen sin ellas, y cuanto más alto es el nivel, más restas con llevada aparecen.
                 </p>
               </div>
               <div className={styles.escenarioCard}>
