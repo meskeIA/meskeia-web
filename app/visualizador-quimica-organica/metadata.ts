@@ -50,6 +50,11 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La pregunta del benceno está también en la FAQ visible: una sola respuesta para las dos
+// (check:faq-unica; hallazgo 4832). Se queda la del JSON-LD, más completa.
+export const RESPUESTA_FAQ_BENCENO =
+  'El benceno (C₆H₆) tiene seis electrones π deslocalizados en un anillo de seis carbonos, lo que le confiere una estabilidad extra llamada aromaticidad. Según la regla de Hückel, una molécula cíclica y plana es aromática si tiene 4n+2 electrones π (n entero), siendo el benceno el caso más sencillo con 6 electrones (n=1). Esta estabilidad hace que el benceno prefiera reacciones de sustitución electrófila aromática (SEA) en lugar de adición, preservando el anillo.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -67,7 +72,7 @@ export const faqJsonLd = {
       name: '¿Cómo funciona una reacción de esterificación?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La esterificación es la reacción entre un ácido carboxílico y un alcohol para formar un éster y agua: R-COOH + R\'-OH → R-COO-R\' + H₂O. Se cataliza con ácido (H₂SO₄ concentrado) y es reversible. Los ésteres tienen aromas fructales característicos —el acetato de etilo huele a acetona, el acetato de isoamilo a plátano— y son la base de perfumes, aromatizantes y disolventes industriales.',
+        text: 'La esterificación es la reacción entre un ácido carboxílico y un alcohol para formar un éster y agua: R-COOH + R\'-OH ⇌ R-COO-R\' + H₂O. Se cataliza con ácido (H₂SO₄ concentrado) y es reversible. Muchos ésteres tienen aromas frutales característicos —el acetato de isoamilo huele a plátano, el butanoato de etilo a piña— y son la base de perfumes, aromatizantes y disolventes industriales.',
       },
     },
     {
@@ -75,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Qué hace especial al benceno y por qué se dice que es aromático?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El benceno (C₆H₆) tiene seis electrones π deslocalizados en un anillo de seis carbonos, lo que le confiere una estabilidad extra llamada aromaticidad. Según la regla de Hückel, una molécula cíclica y plana es aromática si tiene 4n+2 electrones π (n entero), siendo el benceno el caso más sencillo con 6 electrones (n=1). Esta estabilidad hace que el benceno prefiera reacciones de sustitución electrófila aromática (SEA) en lugar de adición, preservando el anillo.',
+        text: RESPUESTA_FAQ_BENCENO,
       },
     },
     {
@@ -91,7 +96,7 @@ export const faqJsonLd = {
       name: '¿Para qué nivel educativo es útil este visualizador de química orgánica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Está pensado principalmente para estudiantes de Bachillerato (2.º curso, asignatura Química) y primeros cursos universitarios de Química, Farmacia, Biología o Ingeniería Química. También resulta útil para cualquier persona que quiera entender cómo funcionan sustancias cotidianas como el vinagre (ácido acético), el jabón (ésteres y jabones), la aspirina (ácido acetilsalicílico) o el nylon (poliamida). Todo funciona en el navegador sin necesidad de instalación.',
+        text: 'Está pensado principalmente para estudiantes de Bachillerato (2.º curso, asignatura Química) y primeros cursos universitarios de Química, Farmacia, Biología o Ingeniería Química. También resulta útil para cualquier persona que quiera entender cómo funcionan sustancias cotidianas como el vinagre (ácido acético), el jabón (sales de ácidos grasos que se obtienen al saponificar las grasas, que son ésteres), la aspirina (ácido acetilsalicílico) o el nylon (poliamida). Todo funciona en el navegador sin necesidad de instalación.',
       },
     },
   ],

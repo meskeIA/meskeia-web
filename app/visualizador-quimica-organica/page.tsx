@@ -1,8 +1,9 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useState, useRef, type KeyboardEvent } from 'react';
 import styles from './QuimicaOrganica.module.css';
+import { RESPUESTA_FAQ_BENCENO } from './metadata';
 import {
   MeskeiaLogo,
   Footer,
@@ -109,7 +110,9 @@ const GRUPOS: GrupoFuncional[] = [
     formula: "R−COO−R'",
     grupo: '−COO−',
     ejemplo: 'Acetato de etilo (CH₃COOC₂H₅)',
-    polar: false,
+    // Polares aunque no den puentes de hidrógeno entre sí: el acetato de etilo se disuelve
+    // en agua, 80 g/L a 25 °C (PubChem CID 8857) (hallazgo 4826)
+    polar: true,
     aplicacion: 'Aromas frutales, disolventes, grasas, poliésteres',
     ebullicion: 'Moderado (77 °C acetato etilo)',
     color: '#20c997',
@@ -313,8 +316,9 @@ const REACCIONES: Reaccion[] = [
     ecuacion: 'R−Br + OH⁻ → R−OH + Br⁻',
     tipo: 'Sustitución',
     condiciones: 'Medio básico acuoso, temperatura moderada',
-    catalizador: 'NaOH (fuente de OH⁻)',
-    ejemplo: 'Hidrólisis alcalina de halógenos de alquilo; síntesis de alcoholes',
+    // El OH⁻ se consume en la propia ecuación: es reactivo, no catalizador (hallazgo 4830)
+    catalizador: 'Ninguno: el OH⁻ es un reactivo y se consume',
+    ejemplo: 'Hidrólisis alcalina de haluros de alquilo; síntesis de alcoholes',
     descripcion: 'El nucleófilo (OH⁻) ataca por la cara opuesta al grupo saliente (Br⁻) con inversión de configuración (inversión de Walden). Mecanismo concertado: enlace nuevo se forma mientras el viejo se rompe.',
   },
   {
@@ -324,7 +328,10 @@ const REACCIONES: Reaccion[] = [
     tipo: 'Condensación (reversible)',
     condiciones: '60-120 °C, eliminar agua para desplazar equilibrio',
     catalizador: 'H₂SO₄ concentrado o HCl (gas)',
-    ejemplo: 'Aspirina (ácido salicílico + ac. acético); aromas frutales; jabones por saponificación inversa',
+    // Sin la aspirina (se fabrica con anhídrido acético, PubChem CID 2244) ni los jabones
+    // (sales de ácidos grasos; la saponificación es la hidrólisis de un éster, lo contrario)
+    // (hallazgo 4829)
+    ejemplo: 'Acetato de etilo (ácido acético + etanol), disolvente de lacas y quitaesmaltes; acetato de isoamilo, aroma de plátano',
     descripcion: 'Reacción reversible entre un ácido carboxílico y un alcohol. El catalizador ácido protoniza el grupo carbonilo facilitando el ataque del alcohol. Se elimina agua como subproducto.',
   },
   {
@@ -333,7 +340,9 @@ const REACCIONES: Reaccion[] = [
     ecuacion: 'R−CH₂OH → R−CHO → R−COOH (1°) | R−CHOH−R\' → R−CO−R\' (2°)',
     tipo: 'Oxidación',
     condiciones: 'Alcohol primario: K₂Cr₂O₇/H₂SO₄ o KMnO₄; alcohol 2°: mismo reactivo',
-    catalizador: 'Oxidante: K₂Cr₂O₇, KMnO₄ o Cu (250 °C)',
+    // K₂Cr₂O₇ y KMnO₄ se reducen al oxidar: son reactivos, ya en «condiciones». Solo el Cu
+    // de la deshidrogenación en fase gas es catalizador (hallazgo 4830)
+    catalizador: 'Con dicromato o permanganato, ninguno (son reactivos y se consumen); deshidrogenación en fase gas: Cu (250 °C)',
     ejemplo: 'Vinagre: etanol → ácido acético (oxidación bacteriana); perfumería: geraniol → geranial',
     descripcion: 'Alcoholes primarios se oxidan a aldehídos (oxidación suave) o ácidos carboxílicos (oxidación fuerte). Alcoholes secundarios dan cetonas. Los terciarios son resistentes a oxidación porque no tienen H en el carbono del OH.',
   },
@@ -348,7 +357,7 @@ const COMPUESTOS_AROMATICOS = [
   { nombre: 'Tolueno', formula: 'C₆H₅CH₃', n: 1, electrones: 6, aromatico: true, uso: 'Disolvente, pintura, TNT' },
   { nombre: 'Naftaleno', formula: 'C₁₀H₈', n: 2, electrones: 10, aromatico: true, uso: 'Bolas de naftalina (antipolillas)' },
   { nombre: 'Fenol', formula: 'C₆H₅OH', n: 1, electrones: 6, aromatico: true, uso: 'Antiséptico, resinas fenólicas' },
-  { nombre: 'Anilina', formula: 'C₆H₅NH₂', n: 1, electrones: 6, aromatico: true, uso: 'Colorantes, fármacos, nylon' },
+  { nombre: 'Anilina', formula: 'C₆H₅NH₂', n: 1, electrones: 6, aromatico: true, uso: 'Colorantes, fármacos, caucho, espumas de poliuretano' },
   { nombre: 'Ciclobutadieno', formula: 'C₄H₄', n: 1, electrones: 4, aromatico: false, uso: 'Antiaromático (inestable)' },
 ];
 
@@ -446,7 +455,9 @@ const TIPOS_ISOMERIA: TipoIsomeria[] = [
     id: 'geometrica',
     nombre: 'Isomería Geométrica (cis/trans)',
     descripcion: 'Existe en compuestos con doble enlace C=C que impide la libre rotación. Los sustituyentes pueden quedar en el mismo lado (cis) o en lados opuestos (trans).',
-    ejemplo: '2-buteno cis: dos CH₃ en el mismo lado → más polar, menor punto de ebullición.\n2-buteno trans: CH₃ en lados opuestos → menos polar, más simétrico.',
+    // cis 3,72 °C frente a trans 0,88 °C (PubChem CID 5287573 y 62695): el cis, más polar,
+    // hierve MÁS alto (hallazgo 4827)
+    ejemplo: '2-buteno cis: dos CH₃ en el mismo lado → más polar, mayor punto de ebullición.\n2-buteno trans: CH₃ en lados opuestos → menos polar, más simétrico, hierve algo más bajo.',
   },
   {
     id: 'optica',
@@ -585,6 +596,7 @@ export default function VisualizadorQuimicaOrganica() {
   const [reaccionSeleccionada, setReaccionSeleccionada] = useState<ReaccionId>('esterificacion');
   const [isomeriaSeleccionada, setIsomeriaSeleccionada] = useState<IsomeriaId>('estructural');
   const [bencenoVista, setBencenoVista] = useState<'kekule' | 'resonancia'>('kekule');
+  const refsPestanas = useRef<(HTMLButtonElement | null)[]>([]);
 
   const grupo = GRUPOS.find((g) => g.id === grupoSeleccionado) ?? GRUPOS[0];
   const reaccion = REACCIONES.find((r) => r.id === reaccionSeleccionada) ?? REACCIONES[0];
@@ -596,6 +608,19 @@ export default function VisualizadorQuimicaOrganica() {
     { id: 'aromaticidad', label: 'Aromaticidad', icono: '⬡' },
     { id: 'isomeria', label: 'Isomería', icono: '🔀' },
   ];
+
+  const moverConTeclado = (e: KeyboardEvent<HTMLButtonElement>, i: number) => {
+    const n = tabs.length;
+    let destino: number | null = null;
+    if (e.key === 'ArrowRight') destino = (i + 1) % n;
+    else if (e.key === 'ArrowLeft') destino = (i - 1 + n) % n;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = n - 1;
+    if (destino === null) return;
+    e.preventDefault();
+    setTabActiva(tabs[destino].id);
+    refsPestanas.current[destino]?.focus();
+  };
 
   return (
     <div className={styles.container}>
@@ -611,13 +636,20 @@ export default function VisualizadorQuimicaOrganica() {
       <LegalNotice />
 
       {/* ── Pestañas ── */}
+      {/* Patrón de pestañas de la WAI-ARIA: cada pestaña controla su tabpanel, solo la activa
+          entra en el orden de tabulación y las flechas, Inicio y Fin las recorren (hallazgo 4834) */}
       <div className={styles.tabBar} role="tablist" aria-label="Secciones de química orgánica">
-        {tabs.map((t) => (
+        {tabs.map((t, i) => (
           <button
             key={t.id}
+            ref={(el) => { refsPestanas.current[i] = el; }}
             type="button"
             role="tab"
+            id={`pestana-${t.id}`}
+            aria-controls={`panel-${t.id}`}
             aria-selected={tabActiva === t.id}
+            tabIndex={tabActiva === t.id ? 0 : -1}
+            onKeyDown={(e) => moverConTeclado(e, i)}
             onClick={() => setTabActiva(t.id)}
             className={`${styles.tab} ${tabActiva === t.id ? styles.tabActive : ''}`}
           >
@@ -630,7 +662,7 @@ export default function VisualizadorQuimicaOrganica() {
           TAB 1: Grupos Funcionales
       ════════════════════════════════════════ */}
       {tabActiva === 'grupos' && (
-        <section className={styles.content} aria-label="Grupos funcionales">
+        <section className={styles.content} role="tabpanel" id="panel-grupos"aria-label="Grupos funcionales">
           <div className={styles.gruposLayout}>
             <div className={styles.gruposGrid}>
               {GRUPOS.map((g) => (
@@ -689,7 +721,7 @@ export default function VisualizadorQuimicaOrganica() {
           TAB 2: Reacciones
       ════════════════════════════════════════ */}
       {tabActiva === 'reacciones' && (
-        <section className={styles.content} aria-label="Reacciones orgánicas básicas">
+        <section className={styles.content} role="tabpanel" id="panel-reacciones"aria-label="Reacciones orgánicas básicas">
           <div className={styles.reaccionSelector}>
             {REACCIONES.map((r) => (
               <button
@@ -743,7 +775,7 @@ export default function VisualizadorQuimicaOrganica() {
           TAB 3: Aromaticidad
       ════════════════════════════════════════ */}
       {tabActiva === 'aromaticidad' && (
-        <section className={styles.content} aria-label="Aromaticidad y regla de Hückel">
+        <section className={styles.content} role="tabpanel" id="panel-aromaticidad"aria-label="Aromaticidad y regla de Hückel">
           <h2 className={styles.seccionTitulo}>Aromaticidad y Regla de Hückel</h2>
           <p className={styles.seccionDesc}>
             Un compuesto es aromático si es cíclico, plano, completamente conjugado y cumple la regla de Hückel:
@@ -822,7 +854,7 @@ export default function VisualizadorQuimicaOrganica() {
           TAB 4: Isomería
       ════════════════════════════════════════ */}
       {tabActiva === 'isomeria' && (
-        <section className={styles.content} aria-label="Tipos de isomería">
+        <section className={styles.content} role="tabpanel" id="panel-isomeria"aria-label="Tipos de isomería">
           <h2 className={styles.seccionTitulo}>Isomería en Química Orgánica</h2>
           <p className={styles.seccionDesc}>
             Los isómeros tienen la misma fórmula molecular pero difieren en cómo están unidos los átomos o en su disposición espacial.
@@ -902,7 +934,7 @@ export default function VisualizadorQuimicaOrganica() {
                 <td>Éster (-COO-)</td>
                 <td>R-COO-R&apos;</td>
                 <td>Polar (sin puente H)</td>
-                <td>Aromas de frutas, grasas, nylon</td>
+                <td>Aromas de frutas, grasas, poliésteres (PET)</td>
               </tr>
               <tr>
                 <td>Amina (-NH₂)</td>
@@ -938,7 +970,7 @@ export default function VisualizadorQuimicaOrganica() {
         <div className={styles.faqList}>
           <div className={styles.faqItem}>
             <strong>¿Por qué el carbono forma tantos compuestos?</strong>
-            <p>El carbono tiene 4 electrones de valencia y puede formar 4 enlaces covalentes. Puede unirse a sí mismo en cadenas lineales, ramificadas y cíclicas (catenación), y combinarse con H, O, N, S, P, halogens... Esta flexibilidad da millones de estructuras posibles.</p>
+            <p>El carbono tiene 4 electrones de valencia y puede formar 4 enlaces covalentes. Puede unirse a sí mismo en cadenas lineales, ramificadas y cíclicas (catenación), y combinarse con H, O, N, S, P, halógenos... Esta flexibilidad da millones de estructuras posibles.</p>
           </div>
           <div className={styles.faqItem}>
             <strong>¿Cómo sé si una molécula orgánica es polar?</strong>
@@ -955,7 +987,7 @@ export default function VisualizadorQuimicaOrganica() {
           </div>
           <div className={styles.faqItem}>
             <strong>¿Qué hace especial al benceno respecto a otros compuestos insaturados?</strong>
-            <p>El benceno tiene 6 electrones π deslocalizados en el anillo (cumple la regla de Hückel: 4n+2 con n=1). Esta deslocalización lo estabiliza enormemente. No reacciona por adición (como los alquenos) sino por sustitución aromática electrófila, preservando el anillo.</p>
+            <p>{RESPUESTA_FAQ_BENCENO}</p>
           </div>
         </div>
 
@@ -997,7 +1029,7 @@ export default function VisualizadorQuimicaOrganica() {
             <span className={styles.tipIcon} aria-hidden="true">🔍</span>
             <div>
               <strong>Identifica primero el grupo funcional</strong>
-              <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>En química orgánica, el grupo funcional determina el 90% de la reactividad. Ignora momentáneamente la cadena carbonada y localiza el grupo R-X que dicta el comportamiento.</p>
+              <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>En química orgánica, el grupo funcional marca casi toda la reactividad de la molécula. Ignora momentáneamente la cadena carbonada y localiza el grupo R-X que dicta el comportamiento.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
@@ -1011,7 +1043,7 @@ export default function VisualizadorQuimicaOrganica() {
             <span className={styles.tipIcon} aria-hidden="true">🧪</span>
             <div>
               <strong>Polar vs apolar: regla de miscibilidad</strong>
-              <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>El agua es polar: los compuestos con -OH, -COOH, -NH₂ se disuelven en ella. Los alcanos y ésteres no. Esto determina la formulación de medicamentos, cosméticos y alimentos.</p>
+              <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>El agua es polar: los compuestos con -OH, -COOH, -NH₂ se disuelven en ella. Los alcanos no. Los ésteres son polares pero no dan puentes de hidrógeno: los pequeños, como el acetato de etilo, se disuelven en parte, y los de cadena larga, como las grasas, no. Esto determina la formulación de medicamentos, cosméticos y alimentos.</p>
             </div>
           </div>
           <div className={styles.tipCard}>

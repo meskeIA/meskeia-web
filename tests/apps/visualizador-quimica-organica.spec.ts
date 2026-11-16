@@ -38,8 +38,8 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *   (Casos de uso) y «el nylon (poliamida)» (FAQ del JSON-LD); la tabla educativa dice «Éster …
  *   Polar (sin puente H)».
  *
- * Los casos «HALLAZGO (…, ABIERTO)» afirman lo CORRECTO y llevan test.fail() mientras el hallazgo
- * siga abierto: al repararlo, se quita la marca.
+ * Los casos «HALLAZGO (…)» afirman lo CORRECTO. Reparados todos en /reparar del 16/11/2026
+ * (hallazgos 4826-4834): sin test.fail().
  */
 
 const RUTA = '/visualizador-quimica-organica/';
@@ -122,7 +122,8 @@ async function elegirReaccion(page: Page, nombre: string): Promise<Locator> {
 
 function tarjetaAromatica(page: Page, nombre: string): Locator {
   return page
-    .getByRole('region', { name: 'Aromaticidad y regla de Hückel' })
+    // Los paneles son role="tabpanel" desde el hallazgo 4834 (antes, <section aria-label>: region)
+    .getByRole('tabpanel', { name: 'Aromaticidad y regla de Hückel' })
     .getByText(nombre, { exact: true })
     .locator('xpath=..');
 }
@@ -173,7 +174,7 @@ test.describe('Caso 1 · ficha de un grupo funcional', () => {
   });
 
   test('la fórmula del ejemplo de cada grupo es la del compuesto que nombra', async ({ page }) => {
-    const pulsados = page.getByRole('region', { name: 'Grupos funcionales', exact: true }).locator('button[aria-pressed="true"]');
+    const pulsados = page.getByRole('tabpanel', { name: 'Grupos funcionales', exact: true }).locator('button[aria-pressed="true"]');
     for (const [grupo, esperado] of Object.entries(EJEMPLOS_GRUPO)) {
       const ficha = await elegirGrupo(page, grupo);
       await expect(pulsados).toHaveCount(1);
@@ -195,7 +196,7 @@ test.describe('Caso 1 · ficha de un grupo funcional', () => {
     for (const [pestana, region] of secciones) {
       await irAPestana(page, pestana);
       await expect(page.locator('[role="tab"][aria-selected="true"]')).toHaveCount(1);
-      await expect(page.getByRole('region', { name: region, exact: true })).toBeVisible();
+      await expect(page.getByRole('tabpanel', { name: region, exact: true })).toBeVisible();
     }
   });
 
@@ -254,19 +255,17 @@ test.describe('Caso 2 · límites: naftaleno (n = 2) y ésteres', () => {
     await expect(page.getByText(/1,40 Å/)).toBeVisible();
   });
 
-  // HALLAZGO [alto] (16/11/2026, ABIERTO): la ficha de los ésteres dice «Apolar». El acetato de
+  // HALLAZGO [alto] (16/11/2026, REPARADO): la ficha de los ésteres dice «Apolar». El acetato de
   // etilo se disuelve en agua (PubChem CID 8857: 80 g/L a 25 °C) y la tabla de la propia guía
   // dice «Éster … Polar (sin puente H)».
-  test('HALLAZGO (16/11/2026, ABIERTO) · la ficha de los ésteres dice que son polares', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (16/11/2026, REPARADO) · la ficha de los ésteres dice que son polares', async ({ page }) => {
     const ficha = await elegirGrupo(page, 'Ésteres');
     await expect(valorDe(ficha, 'Polaridad')).toHaveText('Polar');
   });
 
-  // HALLAZGO [alto] (16/11/2026, ABIERTO, segundo sitio): «Los alcanos y ésteres no [se disuelven
+  // HALLAZGO [alto] (16/11/2026, REPARADO, segundo sitio): «Los alcanos y ésteres no [se disuelven
   // en agua]» en «Mejores prácticas».
-  test('HALLAZGO (16/11/2026, ABIERTO) · la guía no pone a los ésteres con los alcanos como insolubles en agua', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (16/11/2026, REPARADO) · la guía no pone a los ésteres con los alcanos como insolubles en agua', async ({ page }) => {
     await abrirGuia(page);
     await expect(page.getByText('Polar vs apolar: regla de miscibilidad').locator('xpath=..')).not.toContainText('alcanos y ésteres no');
   });
@@ -304,10 +303,9 @@ test.describe('Caso 3 · avisos y afirmaciones que no deben salir', () => {
     await expect(ciclo).toContainText('Antiaromático');
   });
 
-  // HALLAZGO [medio] (16/11/2026, ABIERTO): «2-buteno cis … más polar, menor punto de ebullición».
+  // HALLAZGO [medio] (16/11/2026, REPARADO): «2-buteno cis … más polar, menor punto de ebullición».
   // PubChem: cis-2-buteno 3,72 °C, trans-2-buteno 0,88 °C (CRC): el cis hierve MÁS alto.
-  test('HALLAZGO (16/11/2026, ABIERTO) · el cis-2-buteno no tiene menor punto de ebullición que el trans', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (16/11/2026, REPARADO) · el cis-2-buteno no tiene menor punto de ebullición que el trans', async ({ page }) => {
     await irAPestana(page, /Isomería/);
     await page.getByRole('button', { name: 'Isomería Geométrica (cis/trans)', exact: true }).click();
     const cis = page.getByText(/^2-buteno cis/);
@@ -316,53 +314,49 @@ test.describe('Caso 3 · avisos y afirmaciones que no deben salir', () => {
     await expect(page.getByText(/^2-buteno trans/)).not.toContainText('mayor punto de ebullición');
   });
 
-  // HALLAZGO [medio] (16/11/2026, ABIERTO): la tabla de la guía da el nylon como aplicación de
+  // HALLAZGO [medio] (16/11/2026, REPARADO): la tabla de la guía da el nylon como aplicación de
   // los ésteres. Es una poliamida (la propia app: «amidación»; FAQ del JSON-LD: «poliamida»).
-  test('HALLAZGO (16/11/2026, ABIERTO) · la tabla de la guía no da el nylon como aplicación de los ésteres', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (16/11/2026, REPARADO) · la tabla de la guía no da el nylon como aplicación de los ésteres', async ({ page }) => {
     await abrirGuia(page);
     await expect(page.getByRole('row', { name: /^Éster/ })).not.toContainText('nylon');
   });
 
-  // HALLAZGO [medio] (16/11/2026, ABIERTO, segundo sitio): la tarjeta de la anilina lista «nylon».
+  // HALLAZGO [medio] (16/11/2026, REPARADO, segundo sitio): la tarjeta de la anilina lista «nylon».
   // PubChem CID 6115 (usos): colorantes, caucho, fármacos, isocianatos; ni nylon ni poliamida.
-  test('HALLAZGO (16/11/2026, ABIERTO) · la tarjeta aromática de la anilina no le atribuye el nylon', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (16/11/2026, REPARADO) · la tarjeta aromática de la anilina no le atribuye el nylon', async ({ page }) => {
     await irAPestana(page, /Aromaticidad/);
     await expect(tarjetaAromatica(page, 'Anilina')).not.toContainText('nylon');
   });
 
-  // HALLAZGO [medio] (16/11/2026, ABIERTO): «Ejemplo real» de la esterificación de Fischer.
+  // HALLAZGO [medio] (16/11/2026, REPARADO): «Ejemplo real» de la esterificación de Fischer.
   // Un jabón es la sal de un ácido graso (PubChem CID 2724691: ácido esteárico + NaOH); la
   // saponificación es la hidrólisis de un éster, lo contrario de esterificar.
-  test('HALLAZGO (16/11/2026, ABIERTO) · la esterificación no presenta los jabones como producto suyo', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (16/11/2026, REPARADO) · la esterificación no presenta los jabones como producto suyo', async ({ page }) => {
     const caja = await elegirReaccion(page, 'Esterificación de Fischer');
     await expect(caja).not.toContainText('saponificación inversa');
   });
 
-  // HALLAZGO [medio] (16/11/2026, ABIERTO, mismo campo): la aspirina se fabrica con anhídrido
+  // HALLAZGO [medio] (16/11/2026, REPARADO, mismo campo): la aspirina se fabrica con anhídrido
   // acético (PubChem CID 2244: Ullmann y Merck), no con ácido acético por Fischer.
-  test('HALLAZGO (16/11/2026, ABIERTO) · la aspirina no sale de ácido salicílico + ácido acético', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (16/11/2026, REPARADO) · la aspirina no sale de ácido salicílico + ácido acético', async ({ page }) => {
     const caja = await elegirReaccion(page, 'Esterificación de Fischer');
     await expect(caja).not.toContainText(/salicílico \+ ac\. acético/);
   });
 
-  // HALLAZGO [medio] (16/11/2026, ABIERTO, tercer sitio): FAQ del JSON-LD, «el jabón (ésteres y
+  // HALLAZGO [medio] (16/11/2026, REPARADO, tercer sitio): FAQ del JSON-LD, «el jabón (ésteres y
   // jabones)».
-  test('HALLAZGO (16/11/2026, ABIERTO) · la FAQ del JSON-LD no explica el jabón como «ésteres y jabones»', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (16/11/2026, REPARADO) · la FAQ del JSON-LD no explica el jabón como «ésteres y jabones»', async ({ page }) => {
     const respuestas = await faqLd(page);
     const nivel = Object.entries(respuestas).find(([q]) => q.includes('nivel educativo'))?.[1] ?? '';
     expect(nivel).not.toContain('ésteres y jabones');
   });
 
-  // HALLAZGO [bajo] (16/11/2026, ABIERTO): «Catalizador: NaOH» en la SN2, cuya propia ecuación
+  // HALLAZGO [bajo] (16/11/2026, REPARADO): «Catalizador: NaOH» en la SN2, cuya propia ecuación
   // consume el OH⁻; y «Catalizador: Oxidante: K₂Cr₂O₇, KMnO₄» en la oxidación. Son reactivos.
-  test('HALLAZGO (16/11/2026, ABIERTO) · un reactivo que se consume no figura como catalizador', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (16/11/2026, REPARADO) · un reactivo que se consume no figura como catalizador', async ({ page }) => {
     const sn2 = await elegirReaccion(page, 'Sustitución nucleófila (SN2)');
+    // Mismo hallazgo (4830): el término es «haluros de alquilo», no «halógenos de alquilo»
+    await expect(sn2).toContainText('haluros de alquilo');
     if (await sn2.getByText('Catalizador', { exact: true }).count()) {
       await expect(valorDe(sn2, 'Catalizador')).not.toContainText('NaOH');
     }
@@ -390,20 +384,18 @@ test.describe('Guía y FAQ', () => {
     expect(Object.keys(await faqLd(page))).toHaveLength(5);
   });
 
-  // HALLAZGO [bajo] (16/11/2026, ABIERTO): «halogens» (inglés) en la FAQ visible y «fructales»
+  // HALLAZGO [bajo] (16/11/2026, REPARADO): «halogens» (inglés) en la FAQ visible y «fructales»
   // en la FAQ del JSON-LD.
-  test('HALLAZGO (16/11/2026, ABIERTO) · sin «halogens» en la FAQ visible ni «fructales» en la del JSON-LD', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (16/11/2026, REPARADO) · sin «halogens» en la FAQ visible ni «fructales» en la del JSON-LD', async ({ page }) => {
     const respuestas = await faqLd(page);
     expect(Object.values(respuestas).join(' ')).not.toContain('fructales');
     await abrirGuia(page);
     await expect(respuestaVisible(page, '¿Por qué el carbono forma tantos compuestos?')).not.toContainText('halogens');
   });
 
-  // HALLAZGO [bajo] (16/11/2026, ABIERTO): la pregunta del benceno está en las dos FAQ con dos
+  // HALLAZGO [bajo] (16/11/2026, REPARADO): la pregunta del benceno está en las dos FAQ con dos
   // respuestas escritas aparte. Si está en las dos, la respuesta debe ser la misma (una constante).
-  test('HALLAZGO (16/11/2026, ABIERTO) · la pregunta del benceno no tiene dos respuestas distintas', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (16/11/2026, REPARADO) · la pregunta del benceno no tiene dos respuestas distintas', async ({ page }) => {
     const respuestas = await faqLd(page);
     const enLd = Object.entries(respuestas).find(([q]) => /benceno/i.test(q));
     await abrirGuia(page);
@@ -413,10 +405,9 @@ test.describe('Guía y FAQ', () => {
     }
   });
 
-  // HALLAZGO [bajo] (16/11/2026, ABIERTO): «el grupo funcional determina el 90% de la
+  // HALLAZGO [bajo] (16/11/2026, REPARADO): «el grupo funcional determina el 90% de la
   // reactividad»: cifra sin fuente y con el «%» pegado (CLAUDE.md global §2, espacio duro).
-  test('HALLAZGO (16/11/2026, ABIERTO) · el consejo del grupo funcional no lleva el «%» pegado a la cifra', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (16/11/2026, REPARADO) · el consejo del grupo funcional no lleva el «%» pegado a la cifra', async ({ page }) => {
     await abrirGuia(page);
     const consejo = page.getByText('Identifica primero el grupo funcional', { exact: true }).locator('xpath=..');
     await expect(consejo).toBeVisible();
@@ -444,10 +435,9 @@ test.describe('Accesibilidad', () => {
     await expect(page.getByRole('note')).toContainText('talidomida');
   });
 
-  // HALLAZGO [bajo] (16/11/2026, ABIERTO): role="tablist"/"tab" sin role="tabpanel" ni
+  // HALLAZGO [bajo] (16/11/2026, REPARADO): role="tablist"/"tab" sin role="tabpanel" ni
   // aria-controls, y las flechas no mueven el foco entre pestañas (patrón de pestañas de la WAI-ARIA).
-  test('HALLAZGO (16/11/2026, ABIERTO) · las pestañas tienen su panel y se recorren con las flechas', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (16/11/2026, REPARADO) · las pestañas tienen su panel y se recorren con las flechas', async ({ page }) => {
     const grupos = page.getByRole('tab', { name: /Grupos Funcionales/ });
     const id = await grupos.getAttribute('aria-controls');
     expect(id).not.toBeNull();
