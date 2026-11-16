@@ -67,7 +67,17 @@ const NIVEL_MANUAL = {
   'calculadora-piscinas':       2,  // dosis de cloro/pH/alguicida — riesgo químico, no financiero
   // Herramientas financieras informativas (sin asesoramiento)
   'conversor-divisas':          3,  // conversor con tipos BCE (orientativo)
-  'presupuesto-viaje':          3,  // planificador de presupuesto de viaje
+  // Subió a nivel 1 con el hallazgo 4465 (11/11/2026): da las dietas de manutención deducibles
+  // del autónomo, un componente fiscal (regla fiscal de la política). Hasta entonces era 3.
+  'presupuesto-viaje':          1,
+  // Calcula el IRPF del rendimiento desde el 14/11/2026 (273fae609): componente fiscal → nivel 1.
+  'orientador-tarifa-freelance': 1,
+  // Prestación de la Seguridad Social con cifras de data/fiscal → nivel 1, como los visualizadores
+  // que importan data/fiscal (critical desde el 31/03/2026, sin declarar hasta el 16/11/2026).
+  'estimacion-prestacion-nacimiento': 1,
+  // Conserva casera y botulismo: nivel 3 MEDIO, plegable, decidido por el usuario el 14/11/2026
+  // en /reparar (cabo C0756), con la pauta de AESAN. Su suite daría 4.
+  'calculadora-mermelada':      3,
   'estimador-gastos-comunidad': 2,  // estimador gastos comunidad (financiero, no fiscal)
   // Herramientas de productividad/freelance generales (sin consejo profesional)
   'lista-tareas':               3,
