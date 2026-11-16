@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, DataReference, LegalNotice, ShareCard, CampoNumerico } from '@/components';
 import { formatCurrency } from '@/lib/formatters';
 import styles from './CalculadoraPropinas.module.css';
-import { SMI_2026, FISCAL_SMI_META } from '@/data/fiscal';
+import { FISCAL_SMI_META } from '@/data/fiscal';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 // Porcentaje de propina habitual por país/contexto
 const PORCENTAJE_POR_PAIS: Record<string, number> = {
@@ -23,6 +24,7 @@ export default function CalculadoraPropinas() {
   const [porcentaje, setPorcentaje] = useState<number>(15);
   const [personas, setPersonas] = useState<number>(1);
   const [paisSeleccionado, setPaisSeleccionado] = useState<string>('custom');
+  const [prefsCargadas, setPrefsCargadas] = useState(false);
 
   // Cargar preferencias guardadas
   useEffect(() => {
@@ -30,24 +32,32 @@ export default function CalculadoraPropinas() {
     if (prefs) {
       try {
         const datos = JSON.parse(prefs);
-        if (datos.porcentaje) setPorcentaje(datos.porcentaje);
+        // Un 0 % (Japón, o tecleado) es una preferencia válida: `if (datos.porcentaje)` lo
+        // tomaba por ausente y dejaba el 15 % con el país jp-0 (hallazgo 4612).
+        if (typeof datos.porcentaje === 'number' && datos.porcentaje >= 0 && datos.porcentaje <= 100) {
+          setPorcentaje(datos.porcentaje);
+        }
         if (datos.personas) setPersonas(datos.personas);
         if (datos.pais) setPaisSeleccionado(datos.pais);
       } catch (e) {
         console.error('Error al cargar preferencias:', e);
       }
     }
+    setPrefsCargadas(true);
   }, []);
 
-  // Guardar preferencias
+  // Guardar preferencias, solo cuando ya se han cargado: si no, el primer efecto escribía los
+  // valores por defecto encima de los guardados antes de leerlos (con el doble montaje de React
+  // en desarrollo, la segunda lectura ya encontraba 15 % y «custom»; hallazgo 4612).
   useEffect(() => {
+    if (!prefsCargadas) return;
     const prefs = {
       porcentaje,
       personas,
       pais: paisSeleccionado,
     };
     localStorage.setItem('prefs-propinas', JSON.stringify(prefs));
-  }, [porcentaje, personas, paisSeleccionado]);
+  }, [prefsCargadas, porcentaje, personas, paisSeleccionado]);
 
   // Cálculos
   const propina = monto * (porcentaje / 100);
@@ -104,15 +114,17 @@ export default function CalculadoraPropinas() {
             <label htmlFor="monto" className={styles.label}>
               Monto de la cuenta (€)
             </label>
-            <input
-              type="number"
+            {/* CampoNumerico, como #personas (C0081): el type="number" no admitía «1.234,56»
+                (salía 1,23 €) y calculaba con una cuenta negativa sin avisar (4610, 4611) */}
+            <CampoNumerico
               id="monto"
               className={styles.input}
-              value={monto || ''}
-              onChange={(e) => setMonto(parseFloat(e.target.value) || 0)}
+              valor={monto}
+              onCambio={setMonto}
               placeholder="0,00"
               min={0}
-              step={0.01}
+              decimales={2}
+              paso={1}
             />
           </div>
 
@@ -158,18 +170,19 @@ export default function CalculadoraPropinas() {
             <label htmlFor="porcentaje" className={styles.label}>
               Porcentaje personalizado (%)
             </label>
-            <input
-              type="number"
+            {/* Acotado a 0-100: «-10» y «150» se calculaban sin avisar (4611) */}
+            <CampoNumerico
               id="porcentaje"
               className={styles.input}
-              value={porcentaje || ''}
-              onChange={(e) => {
-                setPorcentaje(parseFloat(e.target.value) || 0);
+              valor={porcentaje}
+              onCambio={(v) => {
+                setPorcentaje(v);
                 setPaisSeleccionado('custom');
               }}
               min={0}
               max={100}
-              step={0.5}
+              decimales={2}
+              paso={0.5}
             />
           </div>
 
@@ -492,17 +505,16 @@ export default function CalculadoraPropinas() {
                   </p>
                 </details>
               </li>
-              <li className={styles.faqItem}>
-                <details>
-                  <summary>¿Cuánto dejar de propina en un restaurante español?</summary>
-                  <p>
-                    El rango habitual es 5-10 % del importe de la cuenta. Para una cena de
-                    50 € entre dos personas, entre 2,50 € y 5 € es perfectamente apropiado.
-                    Si el servicio fue excepcional o la velada especial, puedes llegar al
-                    10-15 %.
-                  </p>
-                </details>
-              </li>
+              {/* Las preguntas que también lee el FAQPage salen de PREGUNTAS_FRECUENTES (4615, 4616) */}
+              {PREGUNTAS_FRECUENTES.map((f) => (
+                <li key={f.question} className={styles.faqItem}>
+                  <details>
+                    <summary>{f.question}</summary>
+                    <p>{f.answer}</p>
+                    {f.consejo && <p className={styles.faqTip}>{f.consejo}</p>}
+                  </details>
+                </li>
+              ))}
               <li className={styles.faqItem}>
                 <details>
                   <summary>¿Qué pasa si pago con tarjeta? ¿Puedo dar propina?</summary>
@@ -539,21 +551,6 @@ export default function CalculadoraPropinas() {
               </li>
               <li className={styles.faqItem}>
                 <details>
-                  <summary>¿Las propinas tributan en el IRPF del hostelero?</summary>
-                  <p>
-                    Sí. Las propinas son rendimientos del trabajo y deben declararse en el
-                    IRPF. El empleado está obligado a comunicarlas a la empresa para su
-                    inclusión en nómina, o bien declararlas directamente en la Renta como
-                    rendimiento íntegro. En la práctica, las propinas en efectivo pequeñas
-                    suelen no declararse, aunque legalmente sí corresponde hacerlo.
-                  </p>
-                  <p className={styles.faqTip}>
-                    Referencia: art. 17 Ley IRPF (Ley 35/2006) y consultas vinculantes DGT.
-                  </p>
-                </details>
-              </li>
-              <li className={styles.faqItem}>
-                <details>
                   <summary>¿Cuándo está justificado no dejar propina?</summary>
                   <p>
                     Cuando el servicio fue manifiestamente deficiente (larga espera sin
@@ -561,19 +558,6 @@ export default function CalculadoraPropinas() {
                     si la cuenta ya incluye un recargo de servicio explícito. En Japón,
                     Corea del Sur o Singapur, dejar propina puede considerarse ofensivo o
                     innecesario culturalmente.
-                  </p>
-                </details>
-              </li>
-              <li className={styles.faqItem}>
-                <details>
-                  <summary>¿Cuáles son las diferencias entre España y EEUU?</summary>
-                  <p>
-                    En EEUU la propina es prácticamente obligatoria (15-20 %) porque el
-                    salario mínimo para camareros puede ser tan bajo como 2,13 $/hora (salario
-                    federal con propinas). En España el SMI en 2026 es de{' '}
-                    {formatCurrency(SMI_2026.mensual14)}/mes (14 pagas) y aplica a todos los
-                    trabajadores. Por eso en España la propina es un extra de reconocimiento,
-                    no una necesidad económica estructural.
                   </p>
                 </details>
               </li>

@@ -211,11 +211,10 @@ test.describe('calculadora-propinas', () => {
     expect(plano(await textoPagina(page))).toContain('En España el SMI en 2026 es de 1221,00 €/mes (14 pagas)');
   });
 
-  test('HALLAZGO A (14/11/2026, ABIERTO) · «1.234,56» se lee 1,23 € y «1.500» 1,50 €', async ({ page }) => {
-    // <input type="number"> + parseFloat: el navegador deja «1.23456» en el campo.
+  test('HALLAZGO A 4610 (14/11/2026, REPARADO 16/11) · «1.234,56» se lee 1234,56 € y «1.500» 1500 €', async ({ page }) => {
+    // <input type="number"> + parseFloat: el navegador dejaba «1.23456» en el campo.
     // Esperado: 1234,56 × 0,10 = 123,456 → 123,46 €; 1234,56 + 123,456 = 1358,016 → 1358,02 €.
-    // Hoy: cuenta 1,23 €, propina 0,12 €, total 1,36 €; y «1.500» → 1,50 €.
-    test.fail();
+    // Antes: cuenta 1,23 €, propina 0,12 €, total 1,36 €; y «1.500» → 1,50 €. Ahora CampoNumerico.
     await pulsarPorcentaje(page, 10);
     await teclear(page, MONTO, '1.234,56');
     expect(await cifra(page, 'Monto original')).toBe('1234,56 €');
@@ -225,11 +224,12 @@ test.describe('calculadora-propinas', () => {
     expect(await cifra(page, 'Monto original')).toBe('1500,00 €');
   });
 
-  test('HALLAZGO B (14/11/2026, ABIERTO) · cuenta negativa, porcentaje negativo y > 100 se calculan sin aviso', async ({ page }) => {
-    // Hoy: -50 € → propina -7,50 € y total -57,50 €; -10 % sobre 100 € → «propina» -10,00 € y
-    // total 90,00 €; 150 % (el campo declara max=100) → 150,00 € sin aviso.
-    test.fail();
+  test('HALLAZGO B 4611 (14/11/2026, REPARADO 16/11) · cuenta negativa, porcentaje negativo y > 100 ya no se calculan', async ({ page }) => {
+    // Antes: -50 € → propina -7,50 € y total -57,50 €; -10 % sobre 100 € → «propina» -10,00 € y
+    // total 90,00 €; 150 % (el campo declara max=100) → 150,00 € sin aviso. Ahora CampoNumerico
+    // acota a 0 (y marca aria-invalid) y topa en 100: 100 € al 100 % = 100,00 € de propina.
     await ponerMonto(page, '-50');
+    await expect(page.locator(MONTO)).toHaveAttribute('aria-invalid', 'true');
     await page.locator(MONTO).press('Tab');
     await esperarPaginaAsentada(page);
     expect(await cifra(page, 'Propina total')).not.toMatch(/[-−]\s?\d/);
@@ -246,13 +246,13 @@ test.describe('calculadora-propinas', () => {
     await page.locator(PORCENTAJE).press('Tab');
     await esperarPaginaAsentada(page);
     expect(await cifra(page, 'Propina total')).not.toBe('150,00 €');
+    expect(await cifra(page, 'Propina total')).toBe('100,00 €');
   });
 
-  test('HALLAZGO C (14/11/2026, ABIERTO) · con Japón guardado, al volver se calcula al 15 %', async ({ page }) => {
+  test('HALLAZGO C 4612 (14/11/2026, REPARADO 16/11) · con Japón guardado, al volver se calcula al 0 %', async ({ page }) => {
     // localStorage guarda {"porcentaje":0,"pais":"jp-0"}; al cargar, `if (datos.porcentaje)`
-    // descarta el 0 y el porcentaje queda en 15 con el desplegable en «Japón (0% - No propina)».
-    // Esperado tras recargar: 100 € → 0,00 € de propina. Hoy: 15,00 € y total 115,00 €.
-    test.fail();
+    // descartaba el 0 y el porcentaje quedaba en 15 con el desplegable en «Japón (0% - No propina)».
+    // Esperado tras recargar: 100 € → 0,00 € de propina. Antes: 15,00 € y total 115,00 €.
     await page.selectOption('#pais', 'jp-0');
     await esperarPaginaAsentada(page);
     await page.reload();
@@ -291,12 +291,11 @@ test.describe('calculadora-propinas', () => {
     }
   });
 
-  test('HALLAZGO F (14/11/2026, ABIERTO) · las dos respuestas sobre el IRPF de las propinas se contradicen', async ({ page }) => {
-    // Art. 17.1 LIRPF (BOE-A-2006-20764): «todas las contraprestaciones o utilidades, cualquiera
-    // que sea su denominación o naturaleza, dinerarias o en especie, que deriven, directa o
-    // indirectamente, del trabajo personal…». Sin condición de «habituales y cuantificables» y
-    // sin obligación del trabajador de comunicarlas a la empresa.
-    test.fail();
+  test('HALLAZGO F 4615 (14/11/2026, REPARADO 16/11) · una sola respuesta sobre el IRPF de las propinas, la del art. 17.1', async ({ page }) => {
+    // Art. 17.1 LIRPF (BOE-A-2006-20764, consultado el 16/11/2026): «todas las contraprestaciones
+    // o utilidades, cualquiera que sea su denominación o naturaleza, dinerarias o en especie, que
+    // deriven, directa o indirectamente, del trabajo personal…». Sin condición de «habituales y
+    // cuantificables» y sin obligación del trabajador de comunicarlas a la empresa.
     const jsonld = (await faqPage(page)).find((p) => /impuestos|IRPF/i.test(p.q));
     const visible = (await faqVisible(page)).find((p) => /IRPF/i.test(p.q));
     expect(jsonld, 'el FAQPage pregunta por la tributación').toBeTruthy();
@@ -305,12 +304,13 @@ test.describe('calculadora-propinas', () => {
     expect(visible!.a).not.toContain('obligado a comunicarlas a la empresa');
     // Si pregunta por la Seguridad Social, la respuesta tiene que hablar de ella
     if (/Seguridad Social/i.test(jsonld!.q)) expect(jsonld!.a).toMatch(/Seguridad Social|cotiza/i);
+    expect(jsonld!.a).toContain('cualquiera que sea su denominación o naturaleza');
+    expect(plano(visible!.a)).toContain(plano(jsonld!.a));
   });
 
-  test('HALLAZGO G (14/11/2026, ABIERTO) · tres preguntas del FAQPage repiten la FAQ visible con otra respuesta', async ({ page }) => {
+  test('HALLAZGO G 4616 (14/11/2026, REPARADO 16/11) · las preguntas del FAQPage dicen lo mismo que la FAQ visible', async ({ page }) => {
     // Restaurante en España, EEUU frente a Europa/España e impuestos: misma pregunta, dos textos.
-    // La reparación es UNA constante que pinten las dos (check:faq-unica).
-    test.fail();
+    // Reparado con UNA constante (PREGUNTAS_FRECUENTES) que pintan las dos (check:faq-unica).
     const jsonld = await faqPage(page);
     const visible = await faqVisible(page);
     for (const tema of [/restaurante (en España|español)/i, /Estados Unidos|EEUU/i, /impuestos|IRPF/i]) {

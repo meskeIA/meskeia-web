@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { generateCalculatorSchema } from '@/lib/schema-templates';
+import { formatCurrency } from '@/lib/formatters';
+import { SMI_2026 } from '@/data/fiscal';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Propinas - Calcula la propina perfecta | meskeIA',
@@ -40,51 +42,60 @@ export const metadata: Metadata = {
   },
 };
 
+/** Pregunta de la FAQ; `consejo`, si lo hay, va aparte en la visible y detrás en el JSON-LD. */
+export interface PreguntaFrecuente {
+  question: string;
+  answer: string;
+  consejo?: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// UNA sola FAQ (hallazgos 4615 y 4616, 16/11/2026): tres preguntas estaban a la vez en el
+// FAQPage y en la FAQ visible con respuestas distintas, y la de los impuestos se contradecía
+// (el FAQPage pedía declarar las propinas «si son habituales y cuantificables»; la visible, que
+// el empleado las comunicara a la empresa «para su inclusión en nómina»). Ninguna de las dos
+// condiciones está en el art. 17.1 LIRPF, y la cotización a la Seguridad Social, que el FAQPage
+// preguntaba sin contestar, sale de la pregunta. La FAQ visible y el FAQPage leen esta lista.
+// ─────────────────────────────────────────────────────────────────────────
+export const PREGUNTAS_FRECUENTES: PreguntaFrecuente[] = [
+  {
+    question: '¿Cuánto se deja de propina en un restaurante en España?',
+    answer:
+      'La propina es voluntaria y no hay un porcentaje fijo. Lo habitual es dejar entre un 5 % y un 10 % de la cuenta si el servicio ha sido satisfactorio: para una cena de 50 € entre dos personas, entre 2,50 € y 5 €. Si el servicio fue excepcional, puedes llegar al 10-15 %. En bares de barrio y menús del día no suele esperarse.',
+  },
+  {
+    question: '¿Cómo se calcula el 15 % de propina sobre una cuenta?',
+    answer:
+      'Multiplica el importe total de la cuenta por 0,15. Por ejemplo, si la cuenta es 48 €, la propina del 15 % sería 48 × 0,15 = 7,20 €. Esta calculadora lo hace automáticamente y también divide el importe entre los comensales.',
+  },
+  {
+    question: '¿Cómo se divide la cuenta de un restaurante entre varias personas con propina incluida?',
+    answer:
+      'Primero calcula el importe total con la propina (cuenta + propina) y luego divide ese total entre el número de personas. Por ejemplo, una cuenta de 60 € con un 10 % de propina suma 66 €; entre 4 personas corresponde pagar 16,50 € cada una.',
+  },
+  {
+    question: '¿Cuánto se deja de propina en Estados Unidos frente a España?',
+    answer: `En Estados Unidos la propina es prácticamente obligatoria por convención social (15-20 % en restaurantes), porque el salario mínimo federal para camareros que reciben propinas puede ser de solo 2,13 $/hora. En España el SMI en 2026 es de ${formatCurrency(SMI_2026.mensual14)}/mes (14 pagas) y se aplica a todos los trabajadores, así que la propina es voluntaria: un 5-10 % se considera generoso.`,
+  },
+  {
+    question: '¿Las propinas tributan en el IRPF?',
+    answer:
+      'Sí. El art. 17.1 de la Ley del IRPF considera rendimientos íntegros del trabajo «todas las contraprestaciones o utilidades, cualquiera que sea su denominación o naturaleza, dinerarias o en especie, que deriven, directa o indirectamente, del trabajo personal». No pone condición de habitualidad ni de importe mínimo: también las pequeñas en efectivo son rendimiento del trabajo de quien las recibe, y se declaran en su Renta.',
+    consejo: 'Referencia: art. 17.1 de la Ley 35/2006 del IRPF (BOE-A-2006-20764).',
+  },
+];
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: '¿Cuánto se deja de propina en un restaurante en España?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'En España la propina no es obligatoria y no hay un porcentaje fijo establecido. Lo habitual es dejar entre un 5% y un 10% del total de la cuenta si el servicio ha sido satisfactorio. En ciudades turísticas o restaurantes de mayor categoría es más frecuente; en bares de barrio y menús del día no suele esperarse.',
-      },
+  mainEntity: PREGUNTAS_FRECUENTES.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.consejo ? `${f.answer} ${f.consejo}` : f.answer,
     },
-    {
-      '@type': 'Question',
-      name: '¿Cómo se calcula el 15% de propina sobre una cuenta?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Multiplica el importe total de la cuenta por 0,15. Por ejemplo, si la cuenta es 48 €, la propina del 15% sería 48 × 0,15 = 7,20 €. Una calculadora de propinas hace este cálculo automáticamente y también puede dividir el importe entre los comensales.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Cómo se divide la cuenta de un restaurante entre varias personas con propina incluida?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Primero calcula el importe total incluyendo la propina (cuenta + propina), y luego divide ese total entre el número de personas. Por ejemplo, una cuenta de 60 € con un 10% de propina suma 66 €; entre 4 personas corresponde pagar 16,50 € cada una.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Cuánto se deja de propina en Estados Unidos frente a Europa?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'En Estados Unidos la propina es prácticamente obligatoria por convención social y suele oscilar entre el 15% y el 20% en restaurantes, ya que el salario base de los camareros es muy bajo. En Europa, incluida España, las propinas son opcionales y voluntarias; un 5%-10% se considera generoso.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿La propina está sujeta a impuestos o cotiza a la Seguridad Social?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'En España las propinas en efectivo tienen un tratamiento fiscal ambiguo, pero legalmente se consideran rendimientos del trabajo y deben declararse en el IRPF. Los trabajadores de hostelería están obligados a incluirlas en su base imponible si son habituales y cuantificables. El empleador, en cambio, no tiene obligación de retener IRPF sobre propinas que el cliente entrega directamente al trabajador.',
-      },
-    },
-  ],
+  })),
 };
 
 // Schema.org JSON-LD con template reutilizable
