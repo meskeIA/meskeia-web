@@ -474,15 +474,20 @@ export function calcularRecetaPan(entrada: EntradaRecetaPan): ResultadoRecetaPan
       nota: harina.nota,
     });
   } else {
-    if (harinaPrincipal_g > 0) {
+    // Si el panificable no llega a cubrir la harina del fermento (masa madre, «Esta tarde» al 7 %
+    // con la principal al 95 %), lo que falta sale de la principal, como en la rama del 100 %.
+    // Antes se omitía la fila del panificable y la principal se pesaba entera: 511 g de espelta
+    // cuando se habían pedido 500 (hallazgo 4303).
+    const complementoAPesar = harinaComplemento_g - harinaEnFermento_g;
+    const principalAPesar = harinaPrincipal_g + Math.min(0, complementoAPesar);
+    if (principalAPesar > 0) {
       harinas.push({
         nombre: harina.nombre,
-        gramos: gramos(harinaPrincipal_g),
-        porcentaje: redondear((harinaPrincipal_g / harinaTotal) * 100, 1),
+        gramos: gramos(principalAPesar),
+        porcentaje: redondear((principalAPesar / harinaTotal) * 100, 1),
         nota: harina.nota,
       });
     }
-    const complementoAPesar = harinaComplemento_g - harinaEnFermento_g;
     if (complementoAPesar > 0) {
       harinas.push({
         nombre: 'Trigo panificable',

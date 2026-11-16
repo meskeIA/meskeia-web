@@ -471,6 +471,29 @@ test.describe('Receta de pan — el camino de la harina a la fórmula', () => {
     expect(mediaEspelta.harinas.reduce((s, h) => s + h.gramos, 0)).toBe(1000);
   });
 
+  test('HALLAZGO 4303 (REPARADO 16/11/2026): si el panificable no cubre la harina de la masa madre, lo que falta sale de la principal', () => {
+    // 500 g, hogaza, espelta al 95 %, masa madre al 100 %, «Esta tarde» (7 %):
+    //   harina total = 500 / 0,93 = 537,63 · en la masa madre, 37,63
+    //   panificable = 5 % de 537,63 = 26,88 < 37,63 → faltan 10,75 g, que salen de la espelta:
+    //   espelta = 537,63 × 0,95 − 10,75 = 500 g, y ninguna fila de panificable.
+    // Antes: «Espelta blanca 511 g» (se pesaban 511 g habiendo pedido 500), y al 100 % salían 500.
+    const r = calcularRecetaPan({
+      ...base, harinaPesada_g: 500, harinaPrincipal: 'espelta', proporcionPrincipal: 95,
+      fermento: 'masa_madre', ritmo: 'normal',
+    })!;
+    expect(r.harinas.reduce((s, h) => s + h.gramos, 0)).toBe(500);
+    expect(r.harinas).toHaveLength(1);
+    expect(r.harinas[0].gramos).toBe(500);
+    // La cifra es monótona: al 100 % y al 90 % también se pesan 500 g.
+    for (const proporcionPrincipal of [90, 100]) {
+      const otra = calcularRecetaPan({
+        ...base, harinaPesada_g: 500, harinaPrincipal: 'espelta', proporcionPrincipal,
+        fermento: 'masa_madre', ritmo: 'normal',
+      })!;
+      expect(otra.harinas.reduce((s, h) => s + h.gramos, 0)).toBe(500);
+    }
+  });
+
   test('PASARSE DE PROPORCIÓN AVISA, no se calla ni se bloquea', () => {
     // El aviso es la parte útil: el número sale igual, pero con espelta al 100 % el pan sube
     // menos y conviene saberlo ANTES de amasar, no después de hornear.

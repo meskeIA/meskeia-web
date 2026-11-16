@@ -63,19 +63,39 @@ const webAppSchema = generateWebAppSchema({
   ],
 });
 
+/** Pregunta que pintan la FAQ visible y el FAQPage; `consejo` va aparte en la visible. */
+export interface PreguntaFrecuente {
+  question: string;
+  answer: string;
+  consejo?: string;
+}
+
+// Las dos preguntas que estaban en la FAQ visible y en el FAQPage, escritas dos veces y con
+// otra cifra (la visible daba «el doble», 7 g, para el pan rápido; el motor y el FAQPage, 6 g;
+// y las dos «10,5 g» de fresca, que la app muestra como 11 g). Hallazgo 4304, 16/11/2026: las
+// dos leen esta lista, con las cifras del motor (500 g × 7 % / 10 = 3,5 g seca, × 3 = 10,5 →
+// 11 g fresca; × 12 % / 10 = 6,0 g; × 2 % / 10 = 1,0 g).
+export const PREGUNTAS_FRECUENTES: PreguntaFrecuente[] = [
+  {
+    question: '¿Cuánta levadura hace falta para 500 gramos de harina?',
+    answer:
+      'Depende del tiempo que vayas a dejar fermentar, no solo del peso. Para un pan de tarde (4-6 horas a 24 °C) son unos 3,5 g de levadura seca u 11 g de fresca. Si quieres pan en 2-3 horas, sube a 6 g de seca; si lo dejas toda la noche en la nevera, con 1 g de seca sobra. Menos levadura y más tiempo dan más sabor: la prisa se paga en gusto.',
+    consejo: 'Regla práctica: la levadura fresca es el triple que la seca, siempre.',
+  },
+  {
+    question: '¿Cuántos gramos de masa madre por kilo de harina?',
+    answer:
+      'Entre 20 y 250 g según el tiempo de que dispongas, porque lo que gobierna la fermentación no son los gramos de masa madre sino la harina que lleva dentro: si tu fermento está más o menos hidratado que el de la receta, cambian los gramos pero no el ritmo. Para una fermentación de tarde con masa madre al 100 % de hidratación, unos 150 g por kilo. Esa masa madre aporta harina y agua a la receta, y hay que descontarlas del resto o la hidratación se dispara.',
+  },
+];
+
 const faqSchema = generateFAQSchema({
   url: 'https://meskeia.com/calculadora-receta-pan/',
   mainEntity: [
-    {
-      question: '¿Cuánta levadura hace falta para 500 gramos de harina?',
-      answer:
-        'Depende del tiempo que vayas a dejar fermentar, no del peso solo. Para un pan de tarde (4-6 horas a 24 °C) son unos 3,5 g de levadura seca o 10,5 g de fresca. Si quieres pan en 2-3 horas, sube a 6 g de seca; si lo dejas toda la noche en la nevera, baja a 1 g. Menos levadura y más tiempo dan más sabor: la prisa se paga en gusto.',
-    },
-    {
-      question: '¿Cuántos gramos de masa madre por kilo de harina?',
-      answer:
-        'Entre 20 y 250 g según el tiempo disponible, porque lo que gobierna la fermentación no son los gramos de masa madre sino la harina que lleva dentro. Para una fermentación de tarde con masa madre al 100 % de hidratación, unos 150 g por kilo. Esa masa madre aporta harina y agua a la receta, y hay que descontarlas del resto o la hidratación se dispara.',
-    },
+    ...PREGUNTAS_FRECUENTES.map((f) => ({
+      question: f.question,
+      answer: f.consejo ? `${f.answer} ${f.consejo}` : f.answer,
+    })),
     {
       question: '¿Se puede hacer pan solo con harina de espelta?',
       answer:

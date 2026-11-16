@@ -422,15 +422,15 @@ test.describe('Inspector 09/11/2026 — el motor, la FAQ y los avisos', () => {
     await expect(resultado.getByText('Antes de amasar')).toHaveCount(0);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · con masa madre, «esta tarde» y el 95 % de espelta se pesan 511 g de harina, no los 500 pedidos', async ({ page }) => {
+  test('HALLAZGO 4303 (09/11/2026, REPARADO 16/11) · con masa madre, «esta tarde» y el 95 % de espelta se pesan los 500 g pedidos, no 511', async ({ page }) => {
     // harina total = 500 / 0,93 = 537,63 g, de los que 37,63 g van dentro de la masa madre. El
     // motor los descuenta del trigo panificable, pero al 95 % el panificable es el 5 % (26,88 g)
     // y no llega: su fila desaparece y la espelta sale entera, 537,63 × 95 % = 510,75 g.
     // Esperado: 500 g a pesar, como promete la nota («Tú solo pesas los 500 g que pediste») y
     // como hace la rama del 100 %, que da 500 g de espelta (caso siguiente).
-    // Hoy: 511 g de espelta y ninguna otra harina; la hidratación real cae al 66,9 % (366,67 g de
-    // agua sobre 548,39 g de harina) mientras la pantalla dice 68 %.
-    test.fail();
+    // Antes: 511 g de espelta y ninguna otra harina; la hidratación real caía al 66,9 % (366,67 g
+    // de agua sobre 548,39 g de harina) mientras la pantalla decía 68 %. Ahora los 10,75 g que el
+    // panificable no cubre salen de la espelta (lib/calculadoras/recetaPan.ts).
     await irALaApp(page);
     await page.locator('#tipo-harina').selectOption('espelta');
     await page.getByRole('button', { name: /Masa madre/ }).click();
@@ -479,29 +479,33 @@ test.describe('Inspector 09/11/2026 — el motor, la FAQ y los avisos', () => {
     await expect(levadura()).toContainText('1,0 g');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · la FAQ visible dice «el doble» (7 g) para el pan rápido; la app y la FAQPage, 6 g', async ({ page }) => {
+  test('HALLAZGO 4304 (09/11/2026, REPARADO 16/11) · la FAQ visible da 6 g para el pan rápido y 11 g de fresca, como la app', async ({ page }) => {
     // «Para un pan de tarde son unos 3,5 g de levadura seca […]; si lo quieres en dos horas, el
     // doble» = 7 g. El motor da 500 × 12 % / 10 = 6,0 g (caso anterior) y la FAQPage, «sube a 6 g».
-    test.fail();
+    // Y la fresca de tarde: 3,5 × 3 = 10,5, que la app redondea a «11 g»; las FAQ decían 10,5.
     await irALaApp(page);
     const item = itemFaqVisible(page, '¿Cuánta levadura hace falta para 500 gramos de harina?');
     await expect(item).toHaveCount(1);
     await expect(item).toContainText(/(^|[^\d,])6 g/);
+    await expect(item).toContainText(/(^|[^\d,])11 g de fresca/);
+    await expect(item).not.toContainText('el doble');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · las preguntas que repiten la FAQ visible y la FAQPage tienen respuestas distintas', async ({ page }) => {
-    // check:faq-unica: una pregunta que está en las dos va en UNA constante. Hoy lo están
+  test('HALLAZGO 4304 (09/11/2026, REPARADO 16/11) · las preguntas que repiten la FAQ visible y la FAQPage tienen la misma respuesta', async ({ page }) => {
+    // check:faq-unica: una pregunta que está en las dos va en UNA constante. Lo estaban
     // «¿Cuánta levadura hace falta para 500 gramos de harina?» y «¿Cuántos gramos de masa madre
-    // por kilo de harina?», escritas dos veces, y la primera con otra cifra (caso anterior).
-    test.fail();
+    // por kilo de harina?», escritas dos veces; ahora salen de PREGUNTAS_FRECUENTES.
     await irALaApp(page);
     const faq = await faqDelJsonLd(page);
     expect(faq.length).toBeGreaterThan(0);
     for (const { pregunta, respuesta } of faq) {
       const item = itemFaqVisible(page, pregunta);
       if ((await item.count()) === 0) continue;
-      const visible = normalizar((await item.first().textContent()) ?? '');
-      expect(visible, pregunta).toContain(normalizar(respuesta));
+      // Sin espacios en la comparación: el consejo va en su propio <p> y el textContent lo pega
+      // a la respuesta («…gusto.Regla práctica»), mientras el FAQPage los une con un espacio.
+      const compactar = (s: string) => s.replace(/\s+/g, '');
+      const visible = compactar((await item.first().textContent()) ?? '');
+      expect(visible, pregunta).toContain(compactar(respuesta));
     }
   });
 

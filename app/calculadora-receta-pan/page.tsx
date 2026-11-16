@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 import {
   calcularRecetaPan,
   TIPOS_PAN,
@@ -814,26 +815,14 @@ export default function CalculadoraRecetaPanPage() {
 
           <h2>Preguntas frecuentes</h2>
           <div className={styles.faqList}>
-            <div className={styles.faqItem}>
-              <h3>¿Cuánta levadura hace falta para 500 gramos de harina?</h3>
-              <p>
-                Depende del tiempo, no solo del peso. Para un pan de tarde son unos 3,5 g de
-                levadura seca o 10,5 g de fresca; si lo quieres en dos horas, el doble; y si lo
-                dejas de un día para otro en la nevera, con 1 g de seca sobra.
-              </p>
-              <p className={styles.faqTip}>
-                Regla práctica: la levadura fresca es el triple que la seca, siempre.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Cuántos gramos de masa madre por kilo de harina?</h3>
-              <p>
-                Entre 20 y 250 g según el tiempo de que dispongas. Lo que gobierna la
-                fermentación no son los gramos de masa madre, sino la harina que lleva dentro: por
-                eso, si tu fermento está más o menos hidratado que el de la receta, cambian los
-                gramos pero no el ritmo.
-              </p>
-            </div>
+            {/* Las que también lee el FAQPage salen de PREGUNTAS_FRECUENTES (hallazgo 4304) */}
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question} className={styles.faqItem}>
+                <h3>{f.question}</h3>
+                <p>{f.answer}</p>
+                {f.consejo && <p className={styles.faqTip}>{f.consejo}</p>}
+              </div>
+            ))}
             <div className={styles.faqItem}>
               <h3>¿Por qué la calculadora suma harina cuando elijo masa madre?</h3>
               <p>
