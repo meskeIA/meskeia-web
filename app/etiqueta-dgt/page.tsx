@@ -68,7 +68,9 @@ const INFO_ETIQUETA: Record<
     descripcion:
       'Eléctrico de batería (BEV), de autonomía extendida (REEV), híbrido enchufable (PHEV) con 40 km o más de autonomía eléctrica, o de pila de combustible. Etiqueta azul: la máxima categoría ambiental de la DGT.',
     recomendaciones: [
-      'Tu vehículo tiene la máxima categoría ambiental. Accedes a todos los beneficios ZBE, carriles BUS+VAO, y parking bonificado en muchos municipios.',
+      // Hallazgo 4535 (16/11/2026): prometía «carriles BUS+VAO» sin fuente. El RGC (RD 1428/2003,
+      // art. 35.2) fija la ocupación de cada VAO por tramo y no nombra la etiqueta: no se afirma.
+      'Tu vehículo tiene la máxima categoría ambiental: es la etiqueta con menos restricciones en las ZBE, y muchos municipios le dan ventajas de aparcamiento.',
       'En Madrid puedes aparcar gratuitamente en zona SER los primeros 120 minutos (residentes de otras zonas) con autorización previa.',
       'Disfruta de bonificaciones en peajes y exención o reducción del impuesto de matriculación y del IVTM en muchos ayuntamientos.',
     ],
@@ -79,7 +81,9 @@ const INFO_ETIQUETA: Record<
       'Híbrido no enchufable (HEV), híbrido enchufable con menos de 40 km de autonomía eléctrica o vehículo de gas (GNC, GNL o GLP), que además cumpla los criterios de la etiqueta C. Etiqueta bicolor, verde y azul.',
     recomendaciones: [
       'Buena etiqueta. Accedes a la mayoría de ZBE sin restricciones y tienes beneficios en peajes y aparcamientos públicos.',
-      'En Madrid, la etiqueta ECO permite aparcar en zona SER con beneficios y acceder a carriles BUS+VAO con al menos un ocupante.',
+      // Hallazgo 4535: «acceder a carriles BUS+VAO con al menos un ocupante» (es decir, con solo el
+      // conductor) no tenía fuente, y el RGC (art. 35.2) no da el VAO a ninguna etiqueta.
+      'En Madrid, la etiqueta ECO permite aparcar en zona SER con beneficios.',
       'Considera actualizar a un PHEV con autonomía ≥40 km o un BEV para obtener la etiqueta CERO y maximizar los beneficios.',
     ],
   },

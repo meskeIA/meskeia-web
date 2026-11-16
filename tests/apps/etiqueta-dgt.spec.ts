@@ -780,14 +780,18 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * DEBERÍA: la fuente y la fecha de la autorización (qué carril, qué etiqueta, con cuántos
    * ocupantes), o no afirmarla.
    */
+  // REPARADO (hallazgo 4535, 16/11/2026): sin una autorización que citar, la app ya no lo afirma.
   test('CASO 39 · el BUS-VAO para la ECO y la CERO lleva la fuente de su autorización, o no se afirma', async ({ page }) => {
-    test.fail();
     await consultar(page, 'hev', { anio: 2018 });
     await expect(tituloResultado(page)).toHaveText('Etiqueta ECO');
+    await expect(resultado(page)).toContainText('aparcar en zona SER');
     await expect(resultado(page)).not.toContainText('con al menos un ocupante', { timeout: 3000 });
+    await expect(resultado(page)).not.toContainText(/BUS[+-]VAO/);
     await recomendacionesConFecha(page, /BUS[+-]VAO/);
     await consultar(page, 'bev');
     await expect(tituloResultado(page)).toHaveText('Etiqueta CERO');
+    await expect(resultado(page)).toContainText('la máxima categoría ambiental');
+    await expect(resultado(page)).not.toContainText(/BUS[+-]VAO/);
     await recomendacionesConFecha(page, /BUS[+-]VAO/);
   });
 
