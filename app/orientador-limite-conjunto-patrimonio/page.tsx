@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -12,7 +12,7 @@ import {
   RegionBadge,
   DataReference,
 } from '@/components';
-import { formatCurrency } from '@/lib';
+import { formatCurrency, parseSpanishNumber } from '@/lib';
 import {
   BONIFICACIONES_CCAA_PATRIMONIO,
   FISCAL_PATRIMONIO_META,
@@ -46,12 +46,12 @@ const ESTADO_INICIAL: FormState = {
   patrimonioNeto: '',
 };
 
-// Convierte un input numérico (con coma o punto decimal) a número
-function toNumber(s: string): number {
-  if (!s) return 0;
-  const limpio = s.replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
-  const n = Number(limpio);
-  return Number.isFinite(n) ? n : 0;
+// Lee un campo con el parser canónico (hallazgo 4882: el casero quitaba todos los puntos, así que
+// «35000.5» valía 350.005, y lo ilegible pasaba por 0). Vacío → 0; ilegible → NaN, que la
+// validación rechaza con su aviso.
+function leerCampo(s: string): number {
+  if (!s.trim()) return 0;
+  return parseSpanishNumber(s);
 }
 
 // ─── Componente ───────────────────────────────────────────────────────────────
@@ -67,29 +67,43 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
     setError('');
   }, []);
 
-  const formularioValido = useMemo(() => {
-    if (!form.ccaaId) return false;
-    if (toNumber(form.biIrpf) <= 0) return false;
-    if (toNumber(form.cuotaIrpf) < 0) return false;
-    if (toNumber(form.cuotaPatrimonio) <= 0) return false;
-    return true;
-  }, [form]);
-
+  // Hallazgo 4883: el botón se desactivaba en los mismos supuestos que estos avisos, así que no
+  // salían nunca. Ahora el botón está siempre activo y el aviso dice qué falta.
   const onComprobar = useCallback(() => {
     if (!form.ccaaId) {
+      setResultado(null);
       setError('Selecciona tu Comunidad Autónoma de residencia.');
       return;
     }
-    const bi = toNumber(form.biIrpf);
-    const cuotaIrpf = toNumber(form.cuotaIrpf);
-    const cuotaPatrimonio = toNumber(form.cuotaPatrimonio);
-    const patrimonio = toNumber(form.patrimonioNeto);
+    const bi = leerCampo(form.biIrpf);
+    const cuotaIrpf = leerCampo(form.cuotaIrpf);
+    const cuotaPatrimonio = leerCampo(form.cuotaPatrimonio);
+    const patrimonio = leerCampo(form.patrimonioNeto);
 
+    const campos: [number, string][] = [
+      [bi, 'la base imponible del IRPF'],
+      [cuotaIrpf, 'la cuota íntegra del IRPF'],
+      [cuotaPatrimonio, 'la cuota íntegra del Patrimonio'],
+      [patrimonio, 'el patrimonio neto'],
+    ];
+    const ilegible = campos.find(([valor]) => Number.isNaN(valor));
+    if (ilegible) {
+      setResultado(null);
+      setError(`Revisa ${ilegible[1]}: no es un número válido (por ejemplo, 35.000 o 35000,50).`);
+      return;
+    }
     if (bi <= 0) {
+      setResultado(null);
       setError('La base imponible del IRPF debe ser mayor que 0.');
       return;
     }
+    if (cuotaIrpf < 0) {
+      setResultado(null);
+      setError('La cuota íntegra del IRPF no puede ser negativa.');
+      return;
+    }
     if (cuotaPatrimonio <= 0) {
+      setResultado(null);
       setError('Indica una cuota íntegra del Impuesto sobre el Patrimonio mayor que 0. Si es 0, no hay nada que reducir.');
       return;
     }
@@ -328,14 +342,13 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
 
           {error && (
             <p role="alert" style={{ color: 'var(--color-danger)', marginTop: '1rem', fontSize: '0.95rem' }}>
-              ⚠️ {error}
+              <span aria-hidden="true">⚠️</span> {error}
             </p>
           )}
 
           <button
             type="button"
             onClick={onComprobar}
-            disabled={!formularioValido}
             className={styles.btnPrimary}
           >
             Comprobar mi situación

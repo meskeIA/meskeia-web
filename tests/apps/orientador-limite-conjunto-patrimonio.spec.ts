@@ -133,15 +133,22 @@ test.describe('Art. 31 Ley 19/1991: casos resueltos a mano', () => {
     await expect(resultado(page)).toContainText('Atención al ITSGF');
   });
 
-  test('CASO 3 (rechazo): cuota IRPF negativa o base imponible 0 no se calculan', async ({ page }) => {
+  test('CASO 3 (rechazo): cuota IRPF negativa o base imponible 0 no se calculan, y el aviso dice por qué', async ({ page }) => {
+    // Desde el hallazgo 4883 el botón no se apaga: se pulsa y sale el aviso de lo que falla.
+    const aviso = page.locator('main').getByRole('alert');
     await rellenar(page, { ccaa: 'cataluna', bi: '100.000', irpf: '-5.000', ip: '40.000' });
-    await expect(boton(page)).toBeDisabled();
+    await boton(page).click();
+    await expect(aviso).toContainText('no puede ser negativa');
+    await expect(resultado(page)).toHaveCount(0);
     await page.locator(IRPF).fill('35.000');
     await esperarValorEnReact(page, IRPF, '35.000');
-    await expect(boton(page)).toBeEnabled();
+    await boton(page).click();
+    await expect(resultado(page)).toBeVisible();
     await page.locator(BI).fill('0');
     await esperarValorEnReact(page, BI, '0');
-    await expect(boton(page)).toBeDisabled();
+    await boton(page).click();
+    await expect(aviso).toContainText('base imponible del IRPF debe ser mayor que 0');
+    await expect(resultado(page)).toHaveCount(0);
   });
 });
 
@@ -198,26 +205,26 @@ test.describe('Hallazgos de la inspección del 16/11/2026', () => {
     await expect(paso2).not.toContainText('Galicia');
   });
 
-  test('HALLAZGO (16/11/2026, ABIERTO) · «35000.5» se lee 350.005: la reducción sale 32.000 € en vez de 15.000,50 €', async ({ page }) => {
+  test('REPARADO (hallazgo 4882) · «35000.5» se leía 350.005: la reducción salía 32.000 € en vez de 15.000,50 €', async ({ page }) => {
     // parseSpanishNumber('35000.5') = 35.000,5 (un solo punto que no agrupa de tres en tres es decimal).
     // 35.000,5 + 40.000 − 60.000 = 15.000,5 < tope 32.000 → reducción 15.000,50 €, cuota 24.999,50 €.
-    test.fail();
     await comprobar(page, { ccaa: 'cataluna', bi: '100000', irpf: '35000.5', ip: '40000' });
     await expect(resultado(page)).toContainText(eur('15.000,50'));
+    await expect(resultado(page)).toContainText(eur('24.999,50'));
   });
 
-  test('HALLAZGO (16/11/2026, ABIERTO) · una cuota IRPF ilegible («abc») se calcula como 0 sin avisar', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4882) · una cuota IRPF ilegible («abc») se calculaba como 0 sin avisar', async ({ page }) => {
     await rellenar(page, { ccaa: 'cataluna', bi: '100.000', irpf: 'abc', ip: '40.000' });
-    if (await boton(page).isEnabled()) await boton(page).click();
+    await boton(page).click();
     await expect(resultado(page)).toHaveCount(0);
+    await expect(page.locator('main').getByRole('alert')).toContainText('cuota íntegra del IRPF: no es un número válido');
   });
 
-  test('HALLAZGO (16/11/2026, ABIERTO) · con cuota de IP 0 el botón se apaga sin decir por qué (el aviso que trae el código no sale nunca)', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4883) · con cuota de IP 0 el botón se apagaba sin decir por qué (el aviso que trae el código no salía nunca)', async ({ page }) => {
     await rellenar(page, { ccaa: 'aragon', bi: '50.000', irpf: '10.000', ip: '0' });
-    if (await boton(page).isEnabled()) await boton(page).click();
+    await boton(page).click();
     await expect(page.locator('main').getByRole('alert')).toContainText(/mayor que 0/);
+    await expect(resultado(page)).toHaveCount(0);
   });
 
   test('HALLAZGO (16/11/2026, ABIERTO) · la FAQ de buscadores resta «la diferencia» sin el tope del 80 %', async ({ page }) => {
