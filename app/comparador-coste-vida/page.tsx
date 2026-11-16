@@ -5,89 +5,17 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Disc
 import { formatNumber } from '@/lib/formatters';
 import styles from './ComparadorCosteVida.module.css';
 import { RESPUESTA_FAQ_COSTE_COSTO } from './metadata';
+import {
+  CIUDADES as DATOS_CIUDADES,
+  CESTA,
+  indiceDe,
+  pesoAlquiler,
+  type DatosCosteVida,
+} from './ciudades';
 
-interface DatosCosteVida {
-  ciudad: string;
-  pais: string;
-  continente: string;
-  alquiler: number;        // 1 habitación, centro ciudad, €/mes
-  cena: number;            // Cena restaurante económico, €/persona
-  supermercado: number;    // Cesta básica mensual estimada, €/mes
-  transporte: number;      // Bono transporte público mensual, €/mes
-  internet: number;        // Internet fibra mensual, €/mes
-  indice: number;          // Índice total (Madrid = 100)
-}
-
-// Fuente: estimación basada en Numbeo y otras fuentes públicas · Datos 2025-2026
-const CIUDADES: DatosCosteVida[] = [
-  // EUROPA — Ibérica
-  { ciudad: 'Madrid', pais: 'España', continente: 'Europa', alquiler: 1100, cena: 12, supermercado: 280, transporte: 55, internet: 35, indice: 100 },
-  { ciudad: 'Barcelona', pais: 'España', continente: 'Europa', alquiler: 1300, cena: 14, supermercado: 300, transporte: 80, internet: 35, indice: 115 },
-  { ciudad: 'Valencia', pais: 'España', continente: 'Europa', alquiler: 850, cena: 11, supermercado: 260, transporte: 45, internet: 32, indice: 87 },
-  { ciudad: 'Sevilla', pais: 'España', continente: 'Europa', alquiler: 800, cena: 10, supermercado: 250, transporte: 42, internet: 32, indice: 83 },
-  { ciudad: 'Lisboa', pais: 'Portugal', continente: 'Europa', alquiler: 1100, cena: 11, supermercado: 260, transporte: 40, internet: 28, indice: 94 },
-  { ciudad: 'Porto', pais: 'Portugal', continente: 'Europa', alquiler: 800, cena: 10, supermercado: 240, transporte: 35, internet: 25, indice: 82 },
-  // EUROPA — Occidental
-  { ciudad: 'París', pais: 'Francia', continente: 'Europa', alquiler: 1800, cena: 18, supermercado: 350, transporte: 90, internet: 30, indice: 155 },
-  { ciudad: 'Londres', pais: 'Reino Unido', continente: 'Europa', alquiler: 2400, cena: 18, supermercado: 380, transporte: 200, internet: 45, indice: 190 },
-  { ciudad: 'Berlín', pais: 'Alemania', continente: 'Europa', alquiler: 1400, cena: 14, supermercado: 320, transporte: 90, internet: 35, indice: 125 },
-  { ciudad: 'Múnich', pais: 'Alemania', continente: 'Europa', alquiler: 1900, cena: 16, supermercado: 340, transporte: 60, internet: 35, indice: 158 },
-  { ciudad: 'Ámsterdam', pais: 'Países Bajos', continente: 'Europa', alquiler: 1900, cena: 18, supermercado: 350, transporte: 100, internet: 45, indice: 165 },
-  { ciudad: 'Bruselas', pais: 'Bélgica', continente: 'Europa', alquiler: 1200, cena: 16, supermercado: 330, transporte: 60, internet: 40, indice: 118 },
-  { ciudad: 'Viena', pais: 'Austria', continente: 'Europa', alquiler: 1200, cena: 14, supermercado: 310, transporte: 50, internet: 25, indice: 116 },
-  { ciudad: 'Zúrich', pais: 'Suiza', continente: 'Europa', alquiler: 2800, cena: 28, supermercado: 500, transporte: 90, internet: 55, indice: 240 },
-  { ciudad: 'Dublín', pais: 'Irlanda', continente: 'Europa', alquiler: 2200, cena: 18, supermercado: 350, transporte: 140, internet: 50, indice: 188 },
-  // EUROPA — Nórdica
-  { ciudad: 'Copenhague', pais: 'Dinamarca', continente: 'Europa', alquiler: 1800, cena: 22, supermercado: 400, transporte: 90, internet: 45, indice: 172 },
-  { ciudad: 'Estocolmo', pais: 'Suecia', continente: 'Europa', alquiler: 1600, cena: 20, supermercado: 380, transporte: 100, internet: 30, indice: 158 },
-  { ciudad: 'Oslo', pais: 'Noruega', continente: 'Europa', alquiler: 1900, cena: 28, supermercado: 450, transporte: 100, internet: 45, indice: 192 },
-  // EUROPA — Sur
-  { ciudad: 'Roma', pais: 'Italia', continente: 'Europa', alquiler: 1200, cena: 14, supermercado: 310, transporte: 35, internet: 28, indice: 113 },
-  { ciudad: 'Milán', pais: 'Italia', continente: 'Europa', alquiler: 1500, cena: 16, supermercado: 330, transporte: 40, internet: 28, indice: 130 },
-  { ciudad: 'Atenas', pais: 'Grecia', continente: 'Europa', alquiler: 700, cena: 10, supermercado: 250, transporte: 30, internet: 28, indice: 71 },
-  // EUROPA — Este
-  { ciudad: 'Praga', pais: 'Rep. Checa', continente: 'Europa', alquiler: 800, cena: 9, supermercado: 240, transporte: 25, internet: 15, indice: 76 },
-  { ciudad: 'Varsovia', pais: 'Polonia', continente: 'Europa', alquiler: 800, cena: 9, supermercado: 230, transporte: 30, internet: 15, indice: 74 },
-  { ciudad: 'Budapest', pais: 'Hungría', continente: 'Europa', alquiler: 650, cena: 8, supermercado: 210, transporte: 25, internet: 12, indice: 64 },
-  { ciudad: 'Bucarest', pais: 'Rumanía', continente: 'Europa', alquiler: 550, cena: 7, supermercado: 190, transporte: 18, internet: 12, indice: 55 },
-  { ciudad: 'Estambul', pais: 'Turquía', continente: 'Europa/Asia', alquiler: 500, cena: 5, supermercado: 200, transporte: 20, internet: 10, indice: 52 },
-  // AMÉRICA — Norte
-  { ciudad: 'Nueva York', pais: 'EE.UU.', continente: 'América', alquiler: 3200, cena: 22, supermercado: 450, transporte: 130, internet: 55, indice: 250 },
-  { ciudad: 'Los Ángeles', pais: 'EE.UU.', continente: 'América', alquiler: 2800, cena: 20, supermercado: 420, transporte: 100, internet: 55, indice: 228 },
-  { ciudad: 'Miami', pais: 'EE.UU.', continente: 'América', alquiler: 2600, cena: 20, supermercado: 400, transporte: 115, internet: 55, indice: 218 },
-  { ciudad: 'Chicago', pais: 'EE.UU.', continente: 'América', alquiler: 1900, cena: 18, supermercado: 380, transporte: 100, internet: 45, indice: 175 },
-  { ciudad: 'Toronto', pais: 'Canadá', continente: 'América', alquiler: 1900, cena: 18, supermercado: 380, transporte: 130, internet: 55, indice: 172 },
-  { ciudad: 'Ciudad de México', pais: 'México', continente: 'América', alquiler: 600, cena: 6, supermercado: 200, transporte: 25, internet: 28, indice: 60 },
-  // AMÉRICA — Sur
-  { ciudad: 'Buenos Aires', pais: 'Argentina', continente: 'América', alquiler: 600, cena: 9, supermercado: 220, transporte: 20, internet: 20, indice: 60 },
-  { ciudad: 'Santiago', pais: 'Chile', continente: 'América', alquiler: 700, cena: 8, supermercado: 260, transporte: 55, internet: 30, indice: 70 },
-  { ciudad: 'Bogotá', pais: 'Colombia', continente: 'América', alquiler: 450, cena: 5, supermercado: 200, transporte: 30, internet: 18, indice: 46 },
-  { ciudad: 'Lima', pais: 'Perú', continente: 'América', alquiler: 500, cena: 5, supermercado: 200, transporte: 28, internet: 25, indice: 49 },
-  { ciudad: 'São Paulo', pais: 'Brasil', continente: 'América', alquiler: 600, cena: 6, supermercado: 220, transporte: 45, internet: 20, indice: 58 },
-  { ciudad: 'Montevideo', pais: 'Uruguay', continente: 'América', alquiler: 700, cena: 9, supermercado: 270, transporte: 40, internet: 30, indice: 68 },
-  // ASIA — Este
-  { ciudad: 'Tokio', pais: 'Japón', continente: 'Asia', alquiler: 1100, cena: 10, supermercado: 290, transporte: 90, internet: 30, indice: 105 },
-  { ciudad: 'Seúl', pais: 'Corea del Sur', continente: 'Asia', alquiler: 900, cena: 8, supermercado: 280, transporte: 55, internet: 20, indice: 86 },
-  { ciudad: 'Shanghái', pais: 'China', continente: 'Asia', alquiler: 1100, cena: 8, supermercado: 280, transporte: 35, internet: 18, indice: 98 },
-  { ciudad: 'Hong Kong', pais: 'China (RAE)', continente: 'Asia', alquiler: 2800, cena: 14, supermercado: 380, transporte: 75, internet: 25, indice: 205 },
-  { ciudad: 'Singapur', pais: 'Singapur', continente: 'Asia', alquiler: 2500, cena: 12, supermercado: 350, transporte: 90, internet: 30, indice: 198 },
-  // ASIA — Sudeste
-  { ciudad: 'Bangkok', pais: 'Tailandia', continente: 'Asia', alquiler: 550, cena: 5, supermercado: 200, transporte: 30, internet: 18, indice: 51 },
-  { ciudad: 'Bali', pais: 'Indonesia', continente: 'Asia', alquiler: 400, cena: 4, supermercado: 180, transporte: 25, internet: 15, indice: 40 },
-  { ciudad: 'Ho Chi Minh', pais: 'Vietnam', continente: 'Asia', alquiler: 500, cena: 4, supermercado: 180, transporte: 20, internet: 12, indice: 43 },
-  { ciudad: 'Kuala Lumpur', pais: 'Malasia', continente: 'Asia', alquiler: 550, cena: 5, supermercado: 200, transporte: 35, internet: 20, indice: 50 },
-  // ASIA — Próximo Oriente
-  { ciudad: 'Dubái', pais: 'EAU', continente: 'Asia', alquiler: 2000, cena: 18, supermercado: 380, transporte: 300, internet: 90, indice: 188 },
-  { ciudad: 'Tel Aviv', pais: 'Israel', continente: 'Asia', alquiler: 2200, cena: 18, supermercado: 400, transporte: 75, internet: 40, indice: 195 },
-  // OCEANÍA
-  { ciudad: 'Sídney', pais: 'Australia', continente: 'Oceanía', alquiler: 2400, cena: 20, supermercado: 420, transporte: 130, internet: 55, indice: 205 },
-  { ciudad: 'Melbourne', pais: 'Australia', continente: 'Oceanía', alquiler: 1900, cena: 18, supermercado: 380, transporte: 110, internet: 50, indice: 178 },
-  // ÁFRICA
-  { ciudad: 'El Cairo', pais: 'Egipto', continente: 'África', alquiler: 250, cena: 4, supermercado: 150, transporte: 15, internet: 12, indice: 28 },
-  { ciudad: 'Casablanca', pais: 'Marruecos', continente: 'África', alquiler: 350, cena: 5, supermercado: 170, transporte: 25, internet: 15, indice: 35 },
-  { ciudad: 'Ciudad del Cabo', pais: 'Sudáfrica', continente: 'África', alquiler: 550, cena: 8, supermercado: 220, transporte: 60, internet: 25, indice: 56 },
-  { ciudad: 'Nairobi', pais: 'Kenia', continente: 'África', alquiler: 500, cena: 6, supermercado: 200, transporte: 30, internet: 20, indice: 49 },
-];
+// El índice sale de las partidas (cesta mensual frente a Madrid): ciudades.ts, hallazgo 4503.
+type CiudadConIndice = DatosCosteVida & { indice: number };
+const CIUDADES: CiudadConIndice[] = DATOS_CIUDADES.map((c) => ({ ...c, indice: indiceDe(c) }));
 
 type OrdenRanking = 'indice' | 'alquiler' | 'ciudad';
 
@@ -109,6 +37,26 @@ const CONTINENTES = Array.from(new Set(CIUDADES.map(c => c.continente))).sort();
 const MAX_INDICE = Math.max(...CIUDADES.map(c => c.indice));
 
 const diffPct = (a: number, b: number): number => Math.round(((b - a) / a) * 100);
+
+// Las cifras de la guía salen de CIUDADES (hallazgo 4504): antes traía su propio juego de
+// cifras (Madrid ~1.400 € de alquiler frente a los 1100 del comparador) y mandaba a usar el
+// comparador para ver un 37 % que el comparador no daba.
+const NBSP = ' ';
+const ciudad = (nombre: string): CiudadConIndice => {
+  const c = CIUDADES.find((x) => x.ciudad === nombre);
+  if (!c) throw new Error(`Ciudad desconocida: ${nombre}`);
+  return c;
+};
+const MADRID = ciudad('Madrid');
+const BARCELONA = ciudad('Barcelona');
+const VALENCIA = ciudad('Valencia');
+const SEVILLA = ciudad('Sevilla');
+const ESPANOLAS = CIUDADES.filter((c) => c.pais === 'España');
+const ESPANOLAS_POR_ALQUILER = [...ESPANOLAS].sort((a, b) => b.alquiler - a.alquiler);
+const PESOS_ALQUILER = CIUDADES.map(pesoAlquiler);
+const PESO_ALQUILER_MIN = Math.min(...PESOS_ALQUILER);
+const PESO_ALQUILER_MAX = Math.max(...PESOS_ALQUILER);
+const euros = (n: number): string => `${formatNumber(n, 0)}${NBSP}€`;
 
 export default function ComparadorCosteVida() {
   const [ciudadA, setCiudadA] = useState<string>('Madrid');
@@ -321,9 +269,12 @@ export default function ComparadorCosteVida() {
         >
           <h3>¿Qué significa el índice de coste de vida?</h3>
           <p>
-            El índice toma Madrid como referencia (100). Una ciudad con índice 200 cuesta, en términos generales,
-            el doble que Madrid. El índice pondera los principales gastos de una persona sin vehículo propio:
-            vivienda, alimentación, transporte público e internet.
+            El índice compara el coste de una cesta mensual de una persona sin vehículo propio con la de
+            Madrid (= 100). La cesta suma las cinco partidas de la tabla: el alquiler de un piso de 1 habitación
+            en el centro, el supermercado del mes, el abono de transporte público, la fibra e internet y{' '}
+            {CESTA.cena} cenas en un restaurante económico (una por semana). Una ciudad con índice 200 tiene una
+            cesta que cuesta el doble que la de Madrid. El alquiler es entre el {PESO_ALQUILER_MIN}{NBSP}% y
+            el {PESO_ALQUILER_MAX}{NBSP}% de la cesta según la ciudad, así que es la partida que más mueve el índice.
           </p>
 
           <h3>¿Por qué varía tanto el coste entre ciudades?</h3>
@@ -358,10 +309,10 @@ export default function ComparadorCosteVida() {
           </p>
 
           {/* ===== SECCIÓN 1: TABLA COMPARATIVA CIUDADES ESPAÑOLAS ===== */}
-          <h3>Coste de vida en las principales ciudades españolas (2025)</h3>
+          <h3>Coste de vida en las ciudades españolas del comparador</h3>
           <p>
-            Comparativa de las ciudades más representativas de España. El índice toma Madrid como referencia (100).
-            Datos orientativos basados en estimaciones de mercado para 2025.
+            Las mismas cifras que da el comparador para las ciudades españolas de la lista. El índice compara
+            la cesta mensual de cada ciudad con la de Madrid (= 100).
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -369,66 +320,28 @@ export default function ComparadorCosteVida() {
                 <tr>
                   <th>Ciudad</th>
                   <th>Alquiler 1 hab. centro</th>
-                  <th>Cesta básica/mes</th>
+                  <th>Supermercado/mes</th>
                   <th>Transporte público/mes</th>
                   <th>Cena restaurante</th>
                   <th>Índice (Madrid=100)</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td><strong>Madrid</strong></td>
-                  <td>~1.400 €</td>
-                  <td>~290 €</td>
-                  <td>~55 €</td>
-                  <td>~12 €</td>
-                  <td><strong>100</strong></td>
-                </tr>
-                <tr>
-                  <td><strong>Barcelona</strong></td>
-                  <td>~1.550 €</td>
-                  <td>~310 €</td>
-                  <td>~80 €</td>
-                  <td>~14 €</td>
-                  <td><strong>118</strong></td>
-                </tr>
-                <tr>
-                  <td><strong>Bilbao</strong></td>
-                  <td>~1.050 €</td>
-                  <td>~280 €</td>
-                  <td>~50 €</td>
-                  <td>~13 €</td>
-                  <td><strong>95</strong></td>
-                </tr>
-                <tr>
-                  <td><strong>Valencia</strong></td>
-                  <td>~900 €</td>
-                  <td>~265 €</td>
-                  <td>~45 €</td>
-                  <td>~11 €</td>
-                  <td><strong>86</strong></td>
-                </tr>
-                <tr>
-                  <td><strong>Palma</strong></td>
-                  <td>~1.100 €</td>
-                  <td>~275 €</td>
-                  <td>~48 €</td>
-                  <td>~12 €</td>
-                  <td><strong>92</strong></td>
-                </tr>
-                <tr>
-                  <td><strong>Sevilla</strong></td>
-                  <td>~800 €</td>
-                  <td>~255 €</td>
-                  <td>~42 €</td>
-                  <td>~10 €</td>
-                  <td><strong>82</strong></td>
-                </tr>
+                {ESPANOLAS.map((c) => (
+                  <tr key={c.ciudad}>
+                    <td><strong>{c.ciudad}</strong></td>
+                    <td>{euros(c.alquiler)}</td>
+                    <td>{euros(c.supermercado)}</td>
+                    <td>{euros(c.transporte)}</td>
+                    <td>{euros(c.cena)}</td>
+                    <td><strong>{c.indice}</strong></td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
           <p className={styles.fuenteTexto}>
-            Estimaciones de mercado 2025. El alquiler corresponde a un piso de 1 dormitorio en zona céntrica. Variaciones significativas según barrio.
+            Estimación basada en Numbeo y otras fuentes públicas · Datos 2025-2026. El alquiler corresponde a un piso de 1 dormitorio en zona céntrica. Variaciones significativas según barrio.
           </p>
 
           {/* ===== SECCIÓN 2: CASOS DE USO ===== */}
@@ -443,7 +356,7 @@ export default function ComparadorCosteVida() {
                 Te ofrecen un trabajo en Barcelona con un 20% más de sueldo. ¿Compensa el traslado desde Valencia?
               </p>
               <p className={styles.escenarioTip}>
-                Usa el comparador para ver que Barcelona tiene un índice ~37% más alto que Valencia. Con ese aumento salarial, tu poder adquisitivo real disminuiría.
+                Con Valencia como ciudad A y Barcelona como B, el comparador da a Barcelona un índice un {diffPct(VALENCIA.indice, BARCELONA.indice)}{NBSP}% más alto ({VALENCIA.indice} frente a {BARCELONA.indice}). Con ese aumento salarial, lo que te sobra cada mes podría ser menor que ahora.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -455,7 +368,7 @@ export default function ComparadorCosteVida() {
                 Admisión en Madrid y en Sevilla. ¿Cuánto más necesitarás al mes en Madrid?
               </p>
               <p className={styles.escenarioTip}>
-                La diferencia en alquiler entre Sevilla (~800 €) y Madrid (~1.400 €) supone unos 600 € más al mes solo en vivienda. Un factor determinante para la beca o ayuda familiar.
+                La diferencia en alquiler entre Sevilla ({euros(SEVILLA.alquiler)}) y Madrid ({euros(MADRID.alquiler)}) supone unos {euros(MADRID.alquiler - SEVILLA.alquiler)} más al mes solo en vivienda. Un factor determinante para la beca o ayuda familiar.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -467,7 +380,7 @@ export default function ComparadorCosteVida() {
                 Jubilación de 1.500 €/mes. ¿En qué ciudad española se vive mejor con esa pensión?
               </p>
               <p className={styles.escenarioTip}>
-                Con 1.500 €, vivir en Sevilla o Valencia ofrece un margen de ahorro mensual que en Madrid resultaría imposible. El índice 82 de Sevilla frente al 100 de Madrid es determinante.
+                Con 1.500 €, vivir en Sevilla o Valencia ofrece un margen de ahorro mensual que en Madrid resultaría imposible. El índice {SEVILLA.indice} de Sevilla frente al 100 de Madrid es determinante.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -489,11 +402,11 @@ export default function ComparadorCosteVida() {
           <dl className={styles.faqList}>
             <div className={styles.faqItem}>
               <dt>¿Cómo se calcula el índice de coste de vida?</dt>
-              <dd>El índice agrega varios componentes (vivienda, alimentación, transporte, servicios) ponderados por su peso en el gasto medio de un hogar. La metodología más extendida (Numbeo, ECA International) toma una ciudad de referencia —aquí Madrid = 100— y expresa el resto de ciudades en relación a ella.</dd>
+              <dd>Aquí, el índice es el coste de la cesta mensual (alquiler de 1 habitación en el centro, supermercado, abono de transporte, internet y {CESTA.cena} cenas en un restaurante económico) dividido entre el de Madrid y multiplicado por 100. Otros índices publicados, como los de Numbeo o ECA International, usan cestas más amplias y sus propios pesos, así que sus cifras no coinciden con estas.</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Qué ciudad española es más cara en alquiler?</dt>
-              <dd>Barcelona lidera el alquiler en zona centro (~1.550 €/mes para 1 dormitorio en 2025), seguida de Madrid (~1.400 €), Palma (~1.100 €) y Bilbao (~1.050 €). En zonas periféricas, los precios pueden ser un 30-40% inferiores.</dd>
+              <dd>Entre las ciudades españolas del comparador, {ESPANOLAS_POR_ALQUILER[0].ciudad} tiene el alquiler más alto en zona centro ({euros(ESPANOLAS_POR_ALQUILER[0].alquiler)}/mes por un piso de 1 dormitorio), seguida de {ESPANOLAS_POR_ALQUILER.slice(1).map((c) => `${c.ciudad} (${euros(c.alquiler)})`).join(', ')}. Fuera del centro los precios suelen ser más bajos.</dd>
               <p className={styles.faqTip}>Consejo: compara siempre el alquiler en relación al sueldo neto medio de cada ciudad, no en valor absoluto.</p>
             </div>
             <div className={styles.faqItem}>
@@ -502,15 +415,15 @@ export default function ComparadorCosteVida() {
             </div>
             <div className={styles.faqItem}>
               <dt>¿Incluye el coste de vida los impuestos?</dt>
-              <dd>No. El índice refleja el coste de bienes y servicios de consumo directo (alquiler, comida, transporte, ocio). Los impuestos sobre la renta, que varían por Comunidad Autónoma, no están incluidos y pueden alterar significativamente el poder adquisitivo real.</dd>
+              <dd>No. El índice solo recoge las cinco partidas de la cesta mensual (alquiler, supermercado, transporte público, internet y cenas en un restaurante económico). Los impuestos sobre la renta, que varían por Comunidad Autónoma, no están incluidos y pueden alterar significativamente el poder adquisitivo real.</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Cuánto más barato es el interior de España vs la costa?</dt>
-              <dd>Las ciudades del interior como Salamanca, Valladolid, Zaragoza o Murcia suelen tener un índice entre 65 y 80 (Madrid=100). El alquiler puede ser un 40-50% inferior al de Barcelona, con una calidad de vida comparable en términos de servicios públicos, sanidad y ocio.</dd>
+              <dd>Las ciudades del interior como Salamanca, Valladolid, Zaragoza o Murcia no están entre las ciudades del comparador. El alquiler puede ser un 40-50% inferior al de Barcelona, con una calidad de vida comparable en términos de servicios públicos, sanidad y ocio.</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Cómo afecta el teletrabajo a la elección de ciudad?</dt>
-              <dd>El teletrabajo ha desacoplado el salario del lugar de residencia. Un trabajador con sueldo de empresa madrileña que se traslada a Sevilla puede ahorrar 600-900 €/mes solo en vivienda, manteniendo el mismo ingreso. Esto ha generado una migración interna notable desde 2021.</dd>
+              <dd>El teletrabajo ha desacoplado el salario del lugar de residencia. Un trabajador con sueldo de empresa madrileña que se traslada a Sevilla pagaría, según el comparador, unos {euros(MADRID.alquiler - SEVILLA.alquiler)} menos al mes solo en el alquiler de un piso de 1 habitación en el centro ({euros(SEVILLA.alquiler)} frente a {euros(MADRID.alquiler)}), manteniendo el mismo ingreso. Esto ha generado una migración interna notable desde 2021.</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Es lo mismo «coste de vida» que «costo de vida»?</dt>

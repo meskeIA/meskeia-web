@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { CIUDADES, CESTA, buscarCiudad, cestaMensual, indiceDe, pesoAlquiler, type DatosCosteVida } from './ciudades';
 
 export const metadata: Metadata = {
   title: 'Comparador de Coste de Vida (Costo de Vida) entre Ciudades del Mundo | meskeIA',
@@ -61,6 +62,22 @@ export const jsonLd = {
 export const RESPUESTA_FAQ_COSTE_COSTO =
   'Sí, son lo mismo. «Coste de vida» es la forma habitual en España y «costo de vida» la más usada en Latinoamérica; ambas miden cuánto cuesta cubrir gastos básicos (vivienda o arriendo, alimentación, transporte y servicios) en una ciudad. Este comparador funciona igual escribas coste o costo.';
 
+// Las respuestas del FAQPage salen de los datos del comparador (hallazgo 4506, 16/11/2026): antes
+// llamaban nórdica a Suiza, daban a Madrid costes «similares» a Berlín y Ámsterdam (el comparador
+// los pone muy por encima), nombraban ciudades que la app no tiene y daban horquillas sin fuente.
+const NBSP = ' ';
+const eur = (n: number): string => `${new Intl.NumberFormat('es-ES').format(n)}${NBSP}€`;
+const conCesta = (c: DatosCosteVida): string => `${c.ciudad} (${eur(cestaMensual(c))})`;
+const lista = (xs: string[]): string => `${xs.slice(0, -1).join(', ')} y ${xs[xs.length - 1]}`;
+const DEF_CESTA = `alquiler de 1 habitación en el centro, supermercado, abono de transporte público, internet y ${CESTA.cena} cenas en un restaurante económico`;
+
+const EUROPEAS = CIUDADES.filter((c) => c.continente.startsWith('Europa')).sort(
+  (a, b) => cestaMensual(a) - cestaMensual(b),
+);
+const MAD = buscarCiudad('Madrid');
+const I = (n: string): number => indiceDe(buscarCiudad(n));
+const PESOS = CIUDADES.map(pesoAlquiler);
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -70,7 +87,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la ciudad más barata para vivir en Europa?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Entre las ciudades europeas más asequibles destacan Bucarest (Rumanía), Budapest (Hungría) y Estambul (Turquía), donde el coste mensual de vida para una persona puede situarse entre 800 y 1.200 €, incluyendo alquiler en zona céntrica. En contraste, Zúrich, Ginebra o Londres superan fácilmente los 3.000 € al mes.',
+        text: `Entre las ciudades europeas del comparador, las de cesta mensual más baja son ${lista(EUROPEAS.slice(0, 3).map(conCesta))}; las más caras, ${lista(EUROPEAS.slice(-3).reverse().map(conCesta))}. La cesta suma ${DEF_CESTA}.`,
       },
     },
     {
@@ -78,7 +95,7 @@ export const faqJsonLd = {
       name: '¿Cómo se compara el coste de vida en España con el de otros países?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'España se sitúa en un nivel medio-bajo dentro de Europa occidental. Madrid y Barcelona tienen costes similares a ciudades como Berlín o Amsterdam, con alquileres de 1.000-1.800 € por un piso de un dormitorio en zona céntrica. Ciudades medianas españolas como Valencia, Sevilla o Zaragoza son notablemente más baratas, con alquileres desde 700 €.',
+        text: `Con Madrid como referencia (índice 100), Barcelona tiene un índice de ${I('Barcelona')}, por debajo de Berlín (${I('Berlín')}), París (${I('París')}) o Ámsterdam (${I('Ámsterdam')}). Valencia (${I('Valencia')}) y Sevilla (${I('Sevilla')}) quedan por debajo de Madrid, y Lisboa (${I('Lisboa')}) muy cerca. El alquiler de un piso de 1 habitación en el centro va de ${eur(buscarCiudad('Sevilla').alquiler)} en Sevilla a ${eur(buscarCiudad('Barcelona').alquiler)} en Barcelona.`,
       },
     },
     {
@@ -86,7 +103,7 @@ export const faqJsonLd = {
       name: '¿Qué ciudades tienen mejor relación entre salario y coste de vida?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La relación calidad-precio depende del perfil profesional. Para nómadas digitales con ingresos en euros o dólares, ciudades como Lisboa, Tallín, Cracovia, Ciudad de México o Medellín ofrecen excelente calidad de vida a bajo coste. Para profesionales locales, países nórdicos como Noruega o Suiza, pese a su alto coste, ofrecen salarios proporcionales y alta calidad de servicios.',
+        text: `Depende del sueldo que tengas en cada sitio, y el comparador no recoge salarios: mide lo que cuesta la cesta mensual. Si tus ingresos no dependen de la ciudad (teletrabajo en euros o dólares), una cesta más baja deja más margen: Ciudad de México, Bangkok o Ho Chi Minh tienen índices de ${I('Ciudad de México')}, ${I('Bangkok')} y ${I('Ho Chi Minh')} frente a los 100 de Madrid. Si vas a cobrar un sueldo local, compara ese sueldo con la cesta de la ciudad: en Zúrich (${I('Zúrich')}) u Oslo (${I('Oslo')}) la cesta es mucho más cara.`,
       },
     },
     {
@@ -94,7 +111,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta vivir en Ciudad de México, Buenos Aires o Bogotá?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En Ciudad de México, el coste de vida para un expatriado ronda los 900-1.400 € al mes. Buenos Aires ha experimentado variaciones importantes por la inflación, pero su coste en dólares o euros sigue siendo bajo (600-1.000 €). Bogotá y Medellín se sitúan entre 700 y 1.100 € mensuales. Los tres destinos ofrecen oferta cultural y gastronómica destacada.',
+        text: `Según el comparador, la cesta mensual (${DEF_CESTA}) cuesta unos ${eur(cestaMensual(buscarCiudad('Ciudad de México')))} en Ciudad de México, ${eur(cestaMensual(buscarCiudad('Buenos Aires')))} en Buenos Aires y ${eur(cestaMensual(buscarCiudad('Bogotá')))} en Bogotá, frente a ${eur(cestaMensual(MAD))} en Madrid. En países con inflación alta o devaluación reciente, como Argentina, la cifra en euros puede cambiar en pocos meses.`,
       },
     },
     {
@@ -102,7 +119,7 @@ export const faqJsonLd = {
       name: '¿Qué partidas pesan más en el coste de vida de una ciudad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El alquiler suele representar entre el 30% y el 50% del presupuesto mensual en la mayoría de grandes ciudades. Le siguen la alimentación (15-25%), el transporte (5-15%) y el ocio. En ciudades asiáticas como Tokio o Seúl, el transporte público es muy eficiente y barato; en ciudades norteamericanas, el coche propio puede añadir 400-600 € al mes en gastos.',
+        text: `En la cesta del comparador, el alquiler es la partida que más pesa: el ${pesoAlquiler(MAD)}${NBSP}% en Madrid y entre el ${Math.min(...PESOS)}${NBSP}% y el ${Math.max(...PESOS)}${NBSP}% según la ciudad. Le sigue el supermercado; transporte público, internet y cenas fuera pesan menos. El comparador no incluye coche propio, ocio, sanidad ni educación.`,
       },
     },
     {

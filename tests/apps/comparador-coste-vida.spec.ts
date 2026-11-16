@@ -7,6 +7,13 @@
  * de aplicar esa fórmula a los valores escritos en `CIUDADES`, resueltos antes de abrir la app
  * (.inspector-trabajo/comparador-coste-vida-datos.mjs).
  *
+ * Desde el 16/11/2026 (hallazgo 4503) el índice ya no está escrito a mano: es la cesta mensual
+ * (alquiler + supermercado + transporte + internet + 4 cenas) de la ciudad entre la de Madrid
+ * (1100 + 280 + 55 + 35 + 4 × 12 = 1518 €), × 100, redondeado. Cestas usadas abajo: Valencia
+ * 850 + 260 + 45 + 32 + 44 = 1231 → 81 · Barcelona 1300 + 300 + 80 + 35 + 56 = 1771 → 117 ·
+ * El Cairo 250 + 150 + 15 + 12 + 16 = 443 → 29 · Nueva York 3200 + 450 + 130 + 55 + 88 = 3923 → 258 ·
+ * Chicago 2497 → 164 · Toronto 2537 → 167 · Melbourne 2512 → 165.
+ *
  * Formato: las cifras de cuatro dígitos van sin punto de millar (1300 €/mes), como manda la RAE y
  * hace Intl es-ES (CLAUDE.md global §2): no es un defecto. El «%» pegado SÍ lo es (25/09/2026): los
  * casos de cifras lo normalizan y lo vigila aparte un test.fail().
@@ -88,30 +95,30 @@ test.describe('comparador-coste-vida — comparar dos ciudades (escritorio)', ()
   });
 
   test('caso normal: Valencia (A) frente a Barcelona (B)', async ({ page }) => {
-    // Índice 87 → 115: (115 − 87) / 87 = 32,18 % → 32. Partidas: 850 → 1300 = 52,94 → +53;
+    // Índice 81 → 117: (117 − 81) / 81 = 44,44 % → 44. Partidas: 850 → 1300 = 52,94 → +53;
     // 11 → 14 = 27,27 → +27; 260 → 300 = 15,38 → +15; 45 → 80 = 77,78 → +78; 32 → 35 = 9,375 → +9.
     await elegir(page, 'Valencia', 'Barcelona');
     await expect.poll(async () => normal((await resumen(page).textContent()) ?? '')).toBe(
-      'Barcelona es un 32% más cara que Valencia',
+      'Barcelona es un 44% más cara que Valencia',
     );
     expect(await celdas(page, /^Alquiler/)).toEqual(['Alquiler (1 hab, centro)', '850 €/mes', '+53%', '1300 €/mes']);
     expect(await celdas(page, /^Cena/)).toEqual(['Cena restaurante económico', '11 €/pers.', '+27%', '14 €/pers.']);
     expect(await celdas(page, /^Supermercado/)).toEqual(['Supermercado mensual est.', '260 €/mes', '+15%', '300 €/mes']);
     expect(await celdas(page, /^Transporte/)).toEqual(['Transporte público mensual', '45 €/mes', '+78%', '80 €/mes']);
     expect(await celdas(page, /^Internet/)).toEqual(['Internet fibra mensual', '32 €/mes', '+9%', '35 €/mes']);
-    expect(await celdas(page, /^Índice total/)).toEqual(['Índice total (Madrid = 100)', '87', '+32%', '115']);
+    expect(await celdas(page, /^Índice total/)).toEqual(['Índice total (Madrid = 100)', '81', '+44%', '117']);
   });
 
   test('caso normal invertido: Barcelona (A) frente a Valencia (B) da la diferencia sobre A', async ({ page }) => {
-    // (87 − 115) / 115 = −24,35 % → −24 (no −32: la base es la ciudad A). Alquiler 1300 → 850 =
+    // (81 − 117) / 117 = −30,77 % → −31 (no −44: la base es la ciudad A). Alquiler 1300 → 850 =
     // −34,62 → −35; transporte 80 → 45 = −43,75 → −44.
     await elegir(page, 'Barcelona', 'Valencia');
     await expect.poll(async () => normal((await resumen(page).textContent()) ?? '')).toBe(
-      'Valencia es un 24% más barata que Barcelona',
+      'Valencia es un 31% más barata que Barcelona',
     );
     expect(await celdas(page, /^Alquiler/)).toEqual(['Alquiler (1 hab, centro)', '1300 €/mes', '-35%', '850 €/mes']);
     expect(await celdas(page, /^Transporte/)).toEqual(['Transporte público mensual', '80 €/mes', '-44%', '45 €/mes']);
-    expect(await celdas(page, /^Índice total/)).toEqual(['Índice total (Madrid = 100)', '115', '-24%', '87']);
+    expect(await celdas(page, /^Índice total/)).toEqual(['Índice total (Madrid = 100)', '117', '-31%', '81']);
   });
 
   test('límite: la misma ciudad en A y en B da «=» en todas las filas', async ({ page }) => {
@@ -125,21 +132,21 @@ test.describe('comparador-coste-vida — comparar dos ciudades (escritorio)', ()
     }
   });
 
-  test('límite: la más barata (El Cairo, 28) frente a la más cara (Nueva York, 250), en los dos sentidos', async ({ page }) => {
-    // (250 − 28) / 28 = 792,86 % → 793; alquiler 250 → 3200 = +1180 %; transporte 15 → 130 = 766,67 → 767.
+  test('límite: la más barata (El Cairo, 29) frente a la más cara (Nueva York, 258), en los dos sentidos', async ({ page }) => {
+    // (258 − 29) / 29 = 789,66 % → 790; alquiler 250 → 3200 = +1180 %; transporte 15 → 130 = 766,67 → 767.
     await elegir(page, 'El Cairo', 'Nueva York');
     await expect.poll(async () => normal((await resumen(page).textContent()) ?? '')).toBe(
-      'Nueva York es un 793% más cara que El Cairo',
+      'Nueva York es un 790% más cara que El Cairo',
     );
     expect(await celdas(page, /^Alquiler/)).toEqual(['Alquiler (1 hab, centro)', '250 €/mes', '+1180%', '3200 €/mes']);
     expect(await celdas(page, /^Transporte/)).toEqual(['Transporte público mensual', '15 €/mes', '+767%', '130 €/mes']);
-    // Al revés: (28 − 250) / 250 = −88,8 % → −89; alquiler 3200 → 250 = −92,19 → −92.
+    // Al revés: (29 − 258) / 258 = −88,76 % → −89; alquiler 3200 → 250 = −92,19 → −92.
     await elegir(page, 'Nueva York', 'El Cairo');
     await expect.poll(async () => normal((await resumen(page).textContent()) ?? '')).toBe(
       'El Cairo es un 89% más barata que Nueva York',
     );
     expect(await celdas(page, /^Alquiler/)).toEqual(['Alquiler (1 hab, centro)', '3200 €/mes', '-92%', '250 €/mes']);
-    expect(await celdas(page, /^Índice total/)).toEqual(['Índice total (Madrid = 100)', '250', '-89%', '28']);
+    expect(await celdas(page, /^Índice total/)).toEqual(['Índice total (Madrid = 100)', '258', '-89%', '29']);
   });
 
   test('rechazo: no hay nada que teclear, solo las 55 ciudades de la lista', async ({ page }) => {
@@ -150,13 +157,13 @@ test.describe('comparador-coste-vida — comparar dos ciudades (escritorio)', ()
     await expect(page.locator('#ciudad-b option')).toHaveCount(55);
   });
 
-  test('ranking: 55 ciudades; por índice de El Cairo (28) a Nueva York (250); alfabético de Ámsterdam a Zúrich', async ({ page }) => {
+  test('ranking: 55 ciudades; por índice de El Cairo (29) a Nueva York (258); alfabético de Ámsterdam a Zúrich', async ({ page }) => {
     const items = page.getByRole('listitem').filter({ has: page.locator('[aria-label^="Índice "]') });
     await expect(items).toHaveCount(55);
     await expect(items.first()).toContainText('El Cairo');
-    await expect(items.first()).toContainText('28');
+    await expect(items.first()).toContainText('29');
     await expect(items.last()).toContainText('Nueva York');
-    await expect(items.last()).toContainText('250');
+    await expect(items.last()).toContainText('258');
     await page.locator('#orden').selectOption('ciudad');
     await esperarValorEnReact(page, '#orden', 'ciudad');
     await expect(items.first()).toContainText('Ámsterdam');
@@ -174,47 +181,65 @@ test.describe('comparador-coste-vida — comparar dos ciudades (escritorio)', ()
 
   // ─── Hallazgos abiertos ────────────────────────────────────────────────────────────────────
 
-  test('ABIERTO: el índice contradice su propia tabla (Chicago frente a Toronto)', async ({ page }) => {
-    test.fail(); // ABIERTO: el índice está escrito a mano y no se deriva de las partidas
+  test('REPARADO (4503): el índice ya no contradice su propia tabla (Chicago y Melbourne frente a Toronto)', async ({ page }) => {
     // Toronto iguala a Chicago en alquiler, cena y supermercado y la supera en transporte
-    // (100 → 130 = +30 %) e internet (45 → 55 = +22,2 % → +22). Con un índice que «pondera
-    // vivienda, alimentación, transporte público e internet» (guía), Toronto no puede ser más barata.
+    // (100 → 130 = +30 %) e internet (45 → 55 = +22,2 % → +22). Antes: «Toronto es un 2% más
+    // barata que Chicago» (índice escrito a mano, 175 → 172). Ahora la cesta da 2497 → 2537 €:
+    // índice 164 → 167, (167 − 164) / 164 = 1,83 % → 2 % MÁS CARA.
     await elegir(page, 'Chicago', 'Toronto');
     expect(await celdas(page, /^Alquiler/)).toEqual(['Alquiler (1 hab, centro)', '1900 €/mes', '=', '1900 €/mes']);
     expect(await celdas(page, /^Cena/)).toEqual(['Cena restaurante económico', '18 €/pers.', '=', '18 €/pers.']);
     expect(await celdas(page, /^Supermercado/)).toEqual(['Supermercado mensual est.', '380 €/mes', '=', '380 €/mes']);
     expect(await celdas(page, /^Transporte/)).toEqual(['Transporte público mensual', '100 €/mes', '+30%', '130 €/mes']);
     expect(await celdas(page, /^Internet/)).toEqual(['Internet fibra mensual', '45 €/mes', '+22%', '55 €/mes']);
-    // Obtenido: «Toronto es un 2% más barata que Chicago» (índice 175 → 172).
-    await expect(resumen(page)).not.toContainText('más barata');
+    await expect.poll(async () => normal((await resumen(page).textContent()) ?? '')).toBe(
+      'Toronto es un 2% más cara que Chicago',
+    );
+    expect(await celdas(page, /^Índice total/)).toEqual(['Índice total (Madrid = 100)', '164', '+2%', '167']);
+    // Melbourne → Toronto: transporte 110 → 130, internet 50 → 55, el resto igual. Antes −3 %
+    // (178 → 172); ahora 2512 → 2537 €, índice 165 → 167, (167 − 165) / 165 = 1,21 % → +1 %.
+    await elegir(page, 'Melbourne', 'Toronto');
+    expect(await celdas(page, /^Índice total/)).toEqual(['Índice total (Madrid = 100)', '165', '+1%', '167']);
   });
 
-  test('ABIERTO: la tabla de ciudades españolas de la guía da otro alquiler de Madrid que el comparador', async ({ page }) => {
-    test.fail(); // ABIERTO: dos juegos de cifras para las mismas ciudades en la misma página
+  test('REPARADO (4504): la guía da las mismas cifras que el comparador', async ({ page }) => {
     await elegir(page, 'Madrid', 'Sevilla');
     expect(await celdas(page, /^Alquiler/)).toEqual(['Alquiler (1 hab, centro)', '1100 €/mes', '-27%', '800 €/mes']);
     await abrirGuia(page);
     const tabla = page.locator('table').filter({ hasText: 'Alquiler 1 hab. centro' });
     const madrid = tabla.getByRole('row', { name: /^Madrid/ }).getByRole('cell');
     const alquilerGuia = Number(((await madrid.nth(1).textContent()) ?? '').replace(/\D/g, ''));
-    // Obtenido: «~1.400 €» frente a los 1100 €/mes del comparador.
+    // Antes: «~1.400 €» frente a los 1100 €/mes del comparador.
     expect(alquilerGuia).toBe(1100);
+    // Índice de Sevilla en la tabla: cesta 800 + 250 + 42 + 32 + 40 = 1164 → 1164 / 1518 = 76,68 → 77.
+    await expect(tabla.getByRole('row', { name: /^Sevilla/ }).getByRole('cell').last()).toHaveText('77');
+    // Valencia → Barcelona: (117 − 81) / 81 = 44,4 → 44 % (antes la guía decía «~37%»).
+    await expect(page.getByText(/índice un 44\s%\smás alto \(81 frente a 117\)/)).toBeVisible();
+    // Estudiante: 1100 − 800 = 300 € (antes «unos 600 € más al mes»).
+    await expect(page.getByText(/Sevilla \(800\s€\) y Madrid \(1100\s€\) supone unos 300\s€ más al mes/)).toBeVisible();
+    await expect(page.getByText(/600-900/)).toHaveCount(0);
   });
 
-  test('ABIERTO: el FAQPage cuenta a Suiza entre los países nórdicos', async ({ page }) => {
-    test.fail(); // ABIERTO: Suiza linda con Francia, Alemania, Austria, Liechtenstein e Italia (ficha país, MAEC, julio 2026)
+  test('REPARADO (4506): el FAQPage no cuenta a Suiza entre los nórdicos ni contradice los datos', async ({ page }) => {
+    // Suiza linda con Francia, Alemania, Austria, Liechtenstein e Italia (ficha país, MAEC, julio 2026).
     const faq = (await leerLd(page)).find((n) => n['@type'] === 'FAQPage');
     const q = faq?.mainEntity?.find((e) => e.name.startsWith('¿Qué ciudades tienen mejor relación entre salario'));
     expect(q).toBeTruthy();
-    expect(q?.acceptedAnswer.text ?? '').not.toMatch(/nórdicos como Noruega o Suiza/);
+    expect(q?.acceptedAnswer.text ?? '').not.toMatch(/nórdic/);
+    const todo = (faq?.mainEntity ?? []).map((e) => e.acceptedAnswer.text).join(' ');
+    expect(todo).not.toMatch(/similares a ciudades como Berlín/);
+    expect(todo).not.toMatch(/Tallín|Cracovia|Medellín|Ginebra|Zaragoza/);
+    // El índice de Berlín (1901 / 1518 → 125) y el de Ámsterdam (2467 / 1518 → 163), como el ranking.
+    expect(todo).toContain('Berlín (125)');
+    expect(todo).toContain('Ámsterdam (163)');
   });
 
-  test('ABIERTO: la FAQ visible mete el ocio en el índice y «Limitaciones» dice que no está', async ({ page }) => {
-    test.fail(); // ABIERTO: dos definiciones del índice en la misma guía
+  test('REPARADO (4507): la guía define el índice de una sola manera, sin el ocio', async ({ page }) => {
     await abrirGuia(page);
     await expect(page.getByText('El coste del ocio, sanidad y educación no está reflejado')).toBeVisible();
     const dd = page.locator('dt', { hasText: '¿Incluye el coste de vida los impuestos?' }).locator('xpath=following-sibling::dd[1]');
     await expect(dd).not.toContainText('ocio');
+    await expect(dd).toContainText('cinco partidas de la cesta mensual');
   });
 
   test('ABIERTO: la metadata promete «más de 55 ciudades» y la lista tiene 55', async ({ page }) => {
@@ -309,7 +334,7 @@ test.describe('comparador-coste-vida — móvil (Pixel 7)', () => {
     await elegir(page, 'Valencia', 'Barcelona');
     await expect(resumen(page)).toBeInViewport();
     await expect.poll(async () => normal((await resumen(page).textContent()) ?? '')).toBe(
-      'Barcelona es un 32% más cara que Valencia',
+      'Barcelona es un 44% más cara que Valencia',
     );
     const desborde = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(desborde).toBeLessThanOrEqual(0);
