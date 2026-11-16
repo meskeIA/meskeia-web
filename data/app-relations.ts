@@ -4734,7 +4734,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // EJE C — Química orgánica y nuclear (Roadmap v4, 2026-04-30)
   'visualizador-quimica-organica': [
-    { url: '/visualizador-termodinamica-quimica/', icon: '⚗️', name: 'Termodinámica Química', description: 'La esterificación y las reacciones orgánicas en equilibrio se rigen por el mismo ΔG que estudias aquí' },
+    { url: '/tabla-grupos-funcionales/', icon: '⚛️', name: 'Tabla de Grupos Funcionales', description: 'Busca la fórmula, el sufijo IUPAC y la prioridad de cada grupo, con ficha de ejercicios para clase' },
     { url: '/visualizador-cinetica-quimica/', icon: '⚡', name: 'Cinética Química', description: 'Las reacciones de sustitución nucleófila tienen perfiles de energía de activación explicados por la cinética' },
     { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Los orbitales atómicos y la hibridación sp³/sp² del carbono son la base de la geometría orgánica' },
     { url: '/nombrador-compuestos-organicos/', icon: '🧪', name: 'Nomenclatura Orgánica', description: 'Ponle nombre IUPAC a estas moléculas, con la numeración explicada' },
