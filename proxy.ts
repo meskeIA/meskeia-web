@@ -5,6 +5,7 @@ import {
   COQUINUM_PORTAL_SLUGS,
   COQUINUM_CATEGORIAS_RETIRADAS,
 } from './data/coquinum';
+import { rutaCanonica } from './lib/sugerirRuta';
 
 /**
  * Proxy de enrutado por host para las marcas verticales (antes "middleware",
@@ -63,6 +64,18 @@ export function proxy(req: NextRequest) {
   if (CRONICUM_HOSTS.has(host)) return handleCronicum(req);
   if (STEMUM_HOSTS.has(host)) return handleStemum(req);
   if (COQUINUM_HOSTS.has(host)) return handleCoquinum(req);
+
+  // meskeIA (dominio madre): las dos formas sistemáticas de URL fantasma van a su app con un
+  // 308 — el dominio repetido delante del slug (/meskeia.com/generador-anagramas/) y los acentos
+  // o mayúsculas del slug (/luxómetro/). Medido el 16/11/2026 (semilla S0278): 43 de las 118
+  // URLs con impresiones en Google que daban 404. Las erratas, que cambian cada vez, no se
+  // redirigen: las atiende app/not-found.tsx con una sugerencia (lib/sugerirRuta.ts).
+  const canonica = rutaCanonica(req.nextUrl.pathname);
+  if (canonica) {
+    const url = req.nextUrl.clone();
+    url.pathname = canonica;
+    return NextResponse.redirect(url, 308);
+  }
 
   // meskeIA (dominio madre): llms.txt lo sirve un Route Handler en /llms-txt, no
   // un .txt estático en public/. Así el total de apps, los counts por suite, la
@@ -276,8 +289,11 @@ export const config = {
   // Todas las rutas de página, excepto API, internos de Next y ficheros con
   // extensión (assets, og-image…). sitemap.xml, robots.txt, llms.txt y los dos
   // iconos de ruta fija se añaden explícitamente para poder enrutarlos por marca.
+  // La segunda entrada recoge el dominio repetido delante del slug (/meskeia.com/<slug>/), que
+  // la primera deja fuera por llevar un punto (S0278).
   matcher: [
     '/((?!api|_next|.*\\..*).*)',
+    '/((?:www\\.)?[Mm]eske[Ii][Aa]\\.com/.*)',
     '/sitemap.xml',
     '/robots.txt',
     '/llms.txt',

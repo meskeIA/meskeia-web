@@ -61,6 +61,11 @@ Umbral canónico, alineado con el digest: **app activa = ≥5 usos/30d** (⚠️
   `ruta`, `nombre`, `msg` y `digest`. Las filas anteriores lo tienen a `null` y **no son
   diagnosticables a posteriori**: no se sabe ni qué página cayó. El digest diario las cuenta aparte
   y lo dice.
+- **`pag:404` — nace el 16/11/2026, efectivo desde el push de ese lote** (semilla S0278,
+  `components/SugerenciaRuta.tsx`): hasta entonces no había `app/not-found.tsx` y un 404 no dejaba
+  ninguna fila. Lleva `ruta` y `sugerencia` (la app que se propuso, o `ninguna`). **Cualquier cero
+  anterior es ceguera, no ausencia de 404.** Las URLs con el dominio repetido o con acentos no
+  llegan aquí: las redirige `proxy.ts` con un 308 antes de que haya 404.
 - **`home-search` — 07/08/2026** (commit `ebeb3aa1`): la home no se medía. Afecta al share de
   RelatedApps, no al absoluto.
 - **`referral-social` y `referral-ia` — 17/10/2026, efectivo desde el push de ese lote**
