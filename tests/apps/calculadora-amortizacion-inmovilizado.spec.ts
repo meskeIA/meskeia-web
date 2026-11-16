@@ -355,10 +355,9 @@ test.describe('calculadora-amortizacion-inmovilizado', () => {
   });
 
   test('OPERATIVA · entrar con Tab en un campo de cinco cifras y teclear sustituye el valor', async ({ page }) => {
-    // ABIERTO: al enfocar, handleFocus cambia «50.000» por «50000»; el navegador pierde la
-    // selección que hace Tab y lo tecleado se añade al final: 50.000 + «10000» = 5.000.010.000.
-    // Con un campo de cuatro cifras («2000») el texto no cambia y sí funciona.
-    test.fail();
+    // REPARADO (hallazgo 4871): al enfocar, handleFocus cambia «50.000» por «50000»; el navegador
+    // perdía la selección que hace Tab y lo tecleado se añadía al final: 5.000.010.000. Ahora el
+    // campo vuelve a seleccionar su texto tras el cambio.
     const adq = page.locator(ADQ);
     await page.locator(RES).focus();
     await page.keyboard.press('Shift+Tab');

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useLayoutEffect } from 'react';
 import styles from './CalculadoraAmortizacionInmovilizado.module.css';
 import {
   MeskeiaLogo,
@@ -249,6 +249,15 @@ export default function CalculadoraAmortizacionInmovilizado() {
   const [tipoActivo, setTipoActivo] = useState<string>(TIPO_EJEMPLO);
   const [metodoVista, setMetodoVista] = useState<MetodoKey>('lineal');
   const [rawValues, setRawValues] = useState<Partial<InputData>>({});
+  const campoPorSeleccionar = useRef<HTMLInputElement | null>(null);
+
+  // Síncrono tras el commit del foco: así la selección llega antes que la primera tecla.
+  useLayoutEffect(() => {
+    const campo = campoPorSeleccionar.current;
+    if (!campo) return;
+    campoPorSeleccionar.current = null;
+    if (document.activeElement === campo) campo.select();
+  }, [rawValues]);
 
   const { metodos, valido, porcentajeDegresivo, multiplicador } = calcularMetodos(datos);
   const adquisicion = parseSpanishNumber(datos.valorAdquisicion) || 0;
@@ -390,7 +399,14 @@ export default function CalculadoraAmortizacionInmovilizado() {
                   inputMode="decimal"
                   className={styles.campoInputField}
                   value={getDisplayValue(c.campo)}
-                  onFocus={() => handleFocus(c.campo)}
+                  onFocus={e => {
+                    // Al enfocar, el texto pasa de «50.000» a «50000» y el navegador pierde la
+                    // selección que hace Tab: lo tecleado se añadía al valor. El efecto de
+                    // abajo vuelve a seleccionarlo todo en cuanto React pinta el texto sin
+                    // formato, antes de la siguiente pulsación.
+                    campoPorSeleccionar.current = e.currentTarget;
+                    handleFocus(c.campo);
+                  }}
                   onChange={e => handleChange(c.campo, e.target.value)}
                   onBlur={() => handleBlur(c.campo)}
                   placeholder={c.placeholder}
