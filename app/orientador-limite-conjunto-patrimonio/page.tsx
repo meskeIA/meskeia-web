@@ -238,8 +238,9 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               </div>
               {form.modo === 'conjunta' && (
                 <span className={styles.formHint}>
-                  En IRPF conjunta: indica los datos sumados de ambos cónyuges. El cálculo exacto requiere
-                  prorrateo individual; este orientador es agregado.
+                  En IRPF conjunta: indica los datos sumados de ambos cónyuges. Así es como lo calcula la ley:
+                  el límite se aplica acumulando las cuotas íntegras de Patrimonio de los dos, y la reducción se
+                  reparte entre ellos en proporción a esas cuotas (art. 31.Dos).
                 </span>
               )}
             </div>
@@ -420,7 +421,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                   <strong><span aria-hidden="true">👉</span> Próximo paso:</strong> acude a un asesor fiscal para que aplique el cálculo exacto.
                   El cálculo real puede variar por:
                   <ul style={{ marginTop: '0.5rem', marginBottom: 0, paddingLeft: '1.2rem' }}>
-                    <li>Prorrateo individual entre cónyuges (si IRPF conjunto)</li>
+                    <li>El reparto de la reducción entre cónyuges en proporción a sus cuotas de Patrimonio (si IRPF conjunto)</li>
                     <li>Exclusión de bienes improductivos (Art. 31.1.b)</li>
                     <li>Aplicación correcta sobre la cuota íntegra (no la líquida)</li>
                   </ul>
@@ -504,8 +505,8 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 <tr>
                   <td><strong>Caso especial: IRPF conjunto</strong></td>
                   <td>Matrimonio con IRPF conjunto y ambos declaran Patrimonio</td>
-                  <td>Cada cónyuge calcula su límite individual prorrateando IRPF</td>
-                  <td>Asesor fiscal obligatorio para el prorrateo correcto</td>
+                  <td>Un solo límite con las cuotas de Patrimonio de los dos acumuladas; la reducción se reparte en proporción a la cuota de cada uno (art. 31.Dos)</td>
+                  <td>Introduce los datos sumados; el asesor reparte la reducción en cada modelo 714</td>
                 </tr>
               </tbody>
             </table>
@@ -559,10 +560,12 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               <div className={styles.escenarioExample}>
                 <p><strong>Situación:</strong> uno trabaja y aporta la mayoría de la renta, el otro tiene gran parte del patrimonio familiar</p>
                 <p><strong>CCAA:</strong> Aragón (sin bonificación)</p>
-                <p><strong>Resultado:</strong> requiere prorrateo individual; el cónyuge con poca renta puede beneficiarse mucho</p>
+                <p><strong>Resultado:</strong> en conjunta, un solo límite con las rentas y las cuotas de Patrimonio de los dos sumadas; la reducción se reparte según la cuota de Patrimonio de cada uno</p>
               </div>
               <div className={styles.escenarioTip}>
-                El reparto desigual de renta y patrimonio entre cónyuges es donde más sentido tiene el límite.
+                Si declararan el IRPF por separado, cada uno aplicaría su propio límite con su renta: entonces sí
+                podría beneficiarse mucho el cónyuge con poca renta y mucho patrimonio. Merece la pena comparar las
+                dos opciones.
               </div>
             </div>
 
@@ -611,14 +614,15 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
             <div className={styles.faqItem}>
               <h4>¿Cómo funciona si presento IRPF conjunta con mi cónyuge?</h4>
               <p>
-                El Impuesto sobre el Patrimonio es <strong>siempre individual</strong>. Cuando hay IRPF conjunto y
-                ambos cónyuges declaran Patrimonio, cada uno calcula su propio límite individual prorrateando la
-                cuota y la base imponible del IRPF conjunto según sus rentas individuales. Esto requiere conocer
-                qué parte de cada concepto del IRPF corresponde a cada cónyuge, algo que hace el asesor fiscal con
-                los datos del programa Renta WEB.
+                El Impuesto sobre el Patrimonio es <strong>siempre individual</strong>, pero cuando la familia
+                tributa conjuntamente en el IRPF el art. 31.Dos manda calcular el límite <strong>acumulando las
+                cuotas íntegras de Patrimonio</strong> de los cónyuges frente a la base y la cuota del IRPF
+                conjunto. La reducción que salga se reparte entre ellos en proporción a sus respectivas cuotas
+                íntegras de Patrimonio.
               </p>
               <div className={styles.faqTip}>
-                Este orientador trabaja con cifras agregadas. Para el cálculo exacto siempre necesitas un asesor.
+                Ese cálculo con cifras sumadas es justo el que hace este orientador: introduce los datos de los
+                dos. Lo que no hace es repartir la reducción entre cada declaración ni excluir bienes improductivos.
               </div>
             </div>
 
@@ -728,7 +732,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               <div className={styles.stepContent}>
                 <h4>Si el resultado es "posible", consulta a tu asesor</h4>
                 <p>
-                  El cálculo exacto requiere prorrateo individual entre cónyuges, exclusión correcta de bienes
+                  El cálculo exacto requiere repartir la reducción entre cónyuges, exclusión correcta de bienes
                   improductivos, aplicación de la STS de marzo 2024 sobre acciones con dividendos y otros matices
                   técnicos. Tu asesor fiscal lo aplicará en el modelo 714.
                 </p>
@@ -814,10 +818,10 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">👫</span>
               <div>
-                <h4>Si declaras conjunta, pide prorrateo individual</h4>
+                <h4>Si declaras conjunta, compara con la individual</h4>
                 <p>
-                  El reparto entre cónyuges es donde más diferencias hay entre el cálculo orientativo y el exacto.
-                  Tu asesor fiscal aplicará el prorrateo individual obligatorio.
+                  En conjunta el límite es uno solo para los dos (art. 31.Dos). Si uno de los cónyuges tiene poca
+                  renta y mucho patrimonio, pide a tu asesor que compare con la declaración individual.
                 </p>
               </div>
             </div>
@@ -855,9 +859,9 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 al ITSGF si tu patrimonio supera 3M€.
               </li>
               <li>
-                <strong>Calcular agregadamente cuando hay IRPF conjunto y dos declarantes Patrimonio.</strong> El
-                cálculo correcto requiere prorrateo individual de cada cónyuge. Este orientador es agregado y
-                solo orientativo.
+                <strong>Calcular un límite por cónyuge cuando hay IRPF conjunto.</strong> La ley acumula las cuotas
+                de Patrimonio de los dos en un solo límite y luego reparte la reducción en proporción a esas
+                cuotas (art. 31.Dos).
               </li>
               <li>
                 <strong>Olvidar la exclusión de bienes improductivos.</strong> Obras de arte, joyas, vehículos no

@@ -180,13 +180,16 @@ test.describe('Hallazgos de la inspección del 16/11/2026', () => {
     expect(visible).toMatch(/más de un año/);
   });
 
-  test('HALLAZGO (16/11/2026, ABIERTO) · con IRPF conjunto la app dice que el cálculo exacto es individual, y la ley acumula (art. 31.Dos)', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4878) · con IRPF conjunto la app decía que el cálculo exacto es individual, y la ley acumula (art. 31.Dos)', async ({ page }) => {
     await page.getByRole('button', { name: 'Conjunta (matrimonio)' }).click();
-    await expect(page.getByText(/En IRPF conjunta: indica los datos sumados/)).toBeVisible();
-    await expect(page.getByText(/En IRPF conjunta: indica los datos sumados/)).not.toContainText(
-      'requiere prorrateo individual',
-    );
+    const pista = page.getByText(/En IRPF conjunta: indica los datos sumados/);
+    await expect(pista).toBeVisible();
+    await expect(pista).not.toContainText('requiere prorrateo individual');
+    await expect(pista).toContainText('acumulando las cuotas íntegras');
+    // Ni la FAQ, ni la tabla, ni el escenario, ni los consejos describen ya límites individuales por rentas
+    const textoGuia = (await page.locator('[data-guia-educativa]').textContent()) ?? '';
+    expect(textoGuia).not.toMatch(/prorrateando|prorrateo individual|según sus rentas individuales/);
+    expect(textoGuia).toContain('acumulando las cuotas íntegras de Patrimonio');
   });
 
   test('HALLAZGO (16/11/2026, ABIERTO) · avisa del ITSGF con 3.500.000 € de patrimonio neto, que no dan cuota', async ({ page }) => {
