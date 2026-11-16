@@ -3,7 +3,7 @@ import { CIUDADES, CESTA, buscarCiudad, cestaMensual, indiceDe, pesoAlquiler, ty
 
 export const metadata: Metadata = {
   title: 'Comparador de Coste de Vida (Costo de Vida) entre Ciudades del Mundo | meskeIA',
-  description: 'Compara el coste de vida —o costo de vida— entre más de 55 ciudades: alquiler, restaurantes, supermercado, transporte e internet. Datos de referencia 2024-2025.',
+  description: 'Compara el coste de vida —o costo de vida— entre más de 55 ciudades: alquiler, restaurantes, supermercado, transporte e internet. Datos de referencia 2025-2026.',
   keywords: [
     'coste de vida',
     'costo de vida',

@@ -249,11 +249,16 @@ test.describe('comparador-coste-vida — comparar dos ciudades (escritorio)', ()
     expect(descripcion).not.toContain('más de 55');
   });
 
-  test('ABIERTO: la metadata fecha los datos en 2024-2025 y la página en 2025-2026', async ({ page }) => {
-    test.fail(); // ABIERTO: fechas distintas para el mismo conjunto de datos
+  // REPARADO (4505): decidido por el usuario en /reparar pendientes del 16/11/2026 (C0795): se
+  // mantienen las cifras como estimación, con UNA fecha (2025-2026, también en applications.ts) y
+  // un aviso que dice lo que no se sabe de ellas: ni la fecha de consulta ni el tipo de cambio.
+  test('REPARADO (4505): una sola fecha de los datos y un aviso que dice lo que no consta', async ({ page }) => {
     await expect(page.getByText('Datos 2025-2026', { exact: false }).first()).toBeVisible();
     const descripcion = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
     expect(descripcion).toContain('2025-2026');
+    expect(descripcion).not.toContain('2024');
+    await expect(page.locator('main')).not.toContainText('2024-2025');
+    await expect(page.getByText('No consta la fecha en que se consultó cada cifra ni el tipo de cambio')).toBeVisible();
   });
 
   test('ABIERTO: el JSON-LD no declara características (features)', async ({ page }) => {

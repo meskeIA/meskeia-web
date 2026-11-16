@@ -89,7 +89,7 @@ export default function ComparadorCosteVida() {
 
       <main className={styles.main}>
         <DisclaimerCard variant="financial" severity="high" collapsible={false}>
-          <strong>Datos de referencia 2025-2026.</strong> Las cifras son estimaciones basadas en Numbeo y otras fuentes públicas. Los precios reales varían según barrio, estilo de vida y momento del año. No usar como base única para decisiones de mudanza sin contrastar con fuentes actualizadas. Los países con alta inflación o devaluación reciente (p. ej. Argentina) pueden cambiar de rango de precio en euros en pocos meses: contrasta siempre con fuentes recientes.
+          <strong>Datos de referencia 2025-2026.</strong> Las cifras son estimaciones basadas en Numbeo y otras fuentes públicas. No consta la fecha en que se consultó cada cifra ni el tipo de cambio aplicado a cada moneda, así que tómalas como un orden de magnitud. Los precios reales varían según barrio, estilo de vida y momento del año. No usar como base única para decisiones de mudanza sin contrastar con fuentes actualizadas. Los países con alta inflación o devaluación reciente (p. ej. Argentina) pueden cambiar de rango de precio en euros en pocos meses: contrasta siempre con fuentes recientes.
         </DisclaimerCard>
 
         {/* Comparador de dos ciudades */}
