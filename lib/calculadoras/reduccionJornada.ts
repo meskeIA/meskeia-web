@@ -2,39 +2,39 @@
  * Calculadora de Reducción de Jornada por Guarda Legal — lógica pura sin React ni DOM
  * Usada por: MCP server (calcular_reduccion_jornada)
  *
- * Calcula el impacto económico de la reducción de jornada por guarda legal
- * (art. 37.6 ET), cuidado de menor con discapacidad (art. 37.7 ET) y
- * otros supuestos de reducción de jornada.
+ * Calcula el impacto económico de la reducción de jornada del art. 37.6 ET:
+ * - Párrafo 1.º: cuidado directo de un menor de 12 años o de una persona con discapacidad que no
+ *   desempeñe actividad retribuida. Entre 1/8 y 1/2 de la jornada.
+ * - Párrafo 2.º: cuidado del cónyuge, pareja de hecho o familiar hasta 2.º grado que no pueda
+ *   valerse por sí mismo. Mismo rango.
+ * - Párrafo 3.º: menor con cáncer u otra enfermedad grave. Al menos la mitad de la jornada.
+ * El salario baja en proporción.
  *
- * Derechos reconocidos (art. 37.6 ET):
- * - Cuidado de hijo menor de 12 años
- * - Cuidado de persona con discapacidad que no desempeñe actividad retribuida
- * - Cuidado de familiar hasta 2.º grado con dependencia
- * - Reducción: entre 1/8 y 1/2 de la jornada habitual
- * - Salario: proporcional a la jornada reducida
+ * Seguridad Social (art. 237.3 LGSS, redacción del RDL 2/2023):
+ * - Se cotiza por la jornada REDUCIDA, pero durante los TRES primeros años (párrafos 1.º y 2.º) la
+ *   Seguridad Social computa esas cotizaciones incrementadas hasta el 100 % a efectos de
+ *   jubilación, incapacidad permanente, muerte y supervivencia, y maternidad y paternidad. La
+ *   incapacidad temporal NO está entre ellas: la baja se calcula sobre la base reducida.
+ * - En el párrafo 3.º (enfermedad grave) el cómputo al 100 % dura todo el periodo e incluye la IT.
  *
- * Impacto en prestaciones SS (art. 237 LGSS):
- * - IT (baja médica): base reguladora calculada sobre la jornada reducida
- * - Prestación por nacimiento: se calcula sobre la base de cotización actual (reducida)
- * - PERO: los primeros 24 meses de reducción por cuidado de menor se cotizan
- *   con la base de la jornada completa (protección social reforzada)
- *
- * Derecho adicional: jornada intensiva o adaptación horaria (art. 34.8 ET)
- * si hay menores de 12 años (desde Ley 17/2022 de familias).
- *
- * Fuente: ET arts. 37.6, 37.7, 34.8 + LGSS art. 237 — vigente 2025
- * Verificado: 2025-01-15
+ * Datos normativos: `REDUCCION_JORNADA_GUARDA` y `COMPUTO_COTIZACION_REDUCCION_JORNADA` de
+ * `data/fiscal/laboral.ts`, con la cita literal de cada artículo (auditoría del 16/11/2026).
+ * Hasta entonces el motor decía «24 meses» (son tres años desde el 18/03/2023), dejaba sin
+ * protección al familiar del párrafo 2.º, presentaba el cómputo como una cotización a base
+ * completa que protegía también la IT, y citaba como art. 37.7 lo que es el párrafo 3.º del 37.6.
  *
  * Encadenable con: calcular_baja_medica, calcular_permiso_parental, calcular_sueldo_neto
  */
 
+import { REDUCCION_JORNADA_GUARDA, COMPUTO_COTIZACION_REDUCCION_JORNADA } from '@/data/fiscal';
+
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
 export type MotivoReduccionJornada =
-  | 'hijo_menor_12'
-  | 'discapacidad_familiar'
-  | 'familiar_dependiente'
-  | 'hijo_discapacidad_grave'  // art. 37.7 — reducción hasta 50% sin límite inferior
+  | 'hijo_menor_12'            // art. 37.6, párrafo 1.º
+  | 'discapacidad_familiar'    // art. 37.6, párrafo 1.º (persona con discapacidad sin actividad retribuida)
+  | 'familiar_dependiente'     // art. 37.6, párrafo 2.º
+  | 'hijo_discapacidad_grave'  // art. 37.6, párrafo 3.º: menor con cáncer u otra enfermedad grave
   | 'otro';
 
 export interface ParametrosReduccionJornada {
@@ -46,10 +46,11 @@ export interface ParametrosReduccionJornada {
   horasSemanalesCompletas: number;
   /** Fracción de reducción solicitada (entre 1/8 y 1/2 para guarda legal ordinaria). Ej: 0.5 para media jornada */
   fraccionReduccion: number;
-  /** Cotización mensual SS trabajador a jornada completa (€) — para calcular impacto en prestaciones */
-  cotizacionSSMensualCompleta?: number;
-  /** ¿Lleva menos de 24 meses en reducción? (para saber si la base de cotización es la completa) */
-  menosDe24MesesEnReduccion?: boolean;
+  /**
+   * ¿Está dentro de los tres primeros años de reducción? Solo cuenta en los párrafos 1.º y 2.º del
+   * art. 37.6 (en el 3.º el cómputo al 100 % dura todo el periodo). Por defecto true.
+   */
+  enPrimeros3Anios?: boolean;
 }
 
 export interface ResultadoReduccionJornada {
@@ -69,12 +70,16 @@ export interface ResultadoReduccionJornada {
   mermaMensualBruta: number;
   /** Merma anual en salario bruto (€) */
   mermaAnualBruta: number;
-  /** ¿La cotización SS mantiene la base completa? */
-  baseSSCompleta: boolean;
+  /** ¿La Seguridad Social computa las cotizaciones al 100 % (art. 237.3 LGSS)? */
+  cotizacionComputadaAl100: boolean;
+  /** Prestaciones a las que alcanza ese cómputo (vacío si no hay cómputo al 100 %) */
+  prestacionesProtegidas: string[];
   /** Explicación sobre la cotización SS durante la reducción */
   detalleCotizacionSS: string;
-  /** Base reguladora estimada para IT/prestaciones (mensual €) */
-  baseReguladoraEstimada: number;
+  /** Salario mensual con el que computan jubilación, IP, muerte y supervivencia y nacimiento (€) */
+  baseComputadaPrestaciones: number;
+  /** Salario mensual sobre el que se calcularía una baja por IT (€) */
+  baseParaIT: number;
   /** Porcentaje de reducción mínimo permitido (%) */
   reduccionMinimaPermitida: number;
   /** Porcentaje de reducción máximo permitido (%) */
@@ -89,29 +94,22 @@ export interface ResultadoReduccionJornada {
 
 // ─── Función principal ─────────────────────────────────────────────────────────
 
+const MOTIVOS_GUARDA_ORDINARIA: MotivoReduccionJornada[] = ['hijo_menor_12', 'discapacidad_familiar', 'familiar_dependiente'];
+
 export function calcularReduccionJornada(p: ParametrosReduccionJornada): ResultadoReduccionJornada {
   if (p.salarioBrutoMensualCompleto <= 0) throw new Error('El salario bruto mensual debe ser mayor que cero.');
   if (p.horasSemanalesCompletas <= 0) throw new Error('Las horas semanales completas deben ser mayores que cero.');
   if (p.fraccionReduccion <= 0 || p.fraccionReduccion >= 1) throw new Error('La fracción de reducción debe estar entre 0 (exclusivo) y 1 (exclusivo).');
 
   const r = (n: number) => Math.round(n * 100) / 100;
+  const enfermedadGrave = p.motivo === 'hijo_discapacidad_grave';
 
-  // Límites legales según motivo
-  let reduccionMinimaPct: number;
-  let reduccionMaximaPct: number;
-
-  switch (p.motivo) {
-    case 'hijo_discapacidad_grave':
-      // Art. 37.7 ET: reducción de jornada de al menos el 50%, sin límite máximo mínimo fijado
-      reduccionMinimaPct = 50;
-      reduccionMaximaPct = 100; // Puede llegar hasta jornada completa de reducción
-      break;
-    default:
-      // Art. 37.6 ET: entre 1/8 (12,5%) y 1/2 (50%)
-      reduccionMinimaPct = 12.5; // 1/8
-      reduccionMaximaPct = 50;   // 1/2
-      break;
-  }
+  // Límites legales según motivo (art. 37.6 ET)
+  const reduccionMinimaPct = enfermedadGrave
+    ? REDUCCION_JORNADA_GUARDA.enfermedadGrave.fraccionMinima * 100
+    : REDUCCION_JORNADA_GUARDA.ordinaria.fraccionMinima * 100;
+  // El párrafo 3.º fija solo un mínimo («al menos la mitad»): no hay máximo legal.
+  const reduccionMaximaPct = enfermedadGrave ? 100 : REDUCCION_JORNADA_GUARDA.ordinaria.fraccionMaxima * 100;
 
   const fraccionReduccionPct = p.fraccionReduccion * 100;
   const dentroRangoLegal = fraccionReduccionPct >= reduccionMinimaPct && fraccionReduccionPct <= reduccionMaximaPct;
@@ -124,37 +122,40 @@ export function calcularReduccionJornada(p: ParametrosReduccionJornada): Resulta
   const mermaMensualBruta = r(p.salarioBrutoMensualCompleto - salarioBrutoMensualReducido);
   const mermaAnualBruta = r(mermaMensualBruta * 12);
 
-  // Cotización SS durante la reducción
-  // Los primeros 24 meses de reducción por cuidado de menor, la base cotización es la jornada completa (art. 237 LGSS)
-  const menosDe24Meses = p.menosDe24MesesEnReduccion ?? true;
-  const motivoConProteccionSS = ['hijo_menor_12', 'discapacidad_familiar', 'hijo_discapacidad_grave'].includes(p.motivo);
-  const baseSSCompleta = motivoConProteccionSS && menosDe24Meses;
+  // Cómputo al 100 % de las cotizaciones (art. 237.3 LGSS)
+  const C = COMPUTO_COTIZACION_REDUCCION_JORNADA;
+  const enPrimeros3Anios = p.enPrimeros3Anios ?? true;
+  const guardaOrdinariaProtegida = MOTIVOS_GUARDA_ORDINARIA.includes(p.motivo) && enPrimeros3Anios;
+  const cotizacionComputadaAl100 = enfermedadGrave || guardaOrdinariaProtegida;
+  const prestacionesProtegidas: string[] = enfermedadGrave
+    ? [...C.prestacionesEnfermedadGrave]
+    : guardaOrdinariaProtegida ? [...C.prestacionesGuardaOrdinaria] : [];
 
   let detalleCotizacionSS: string;
-  let baseReguladoraEstimada: number;
-
-  if (baseSSCompleta) {
-    detalleCotizacionSS = 'Durante los primeros 24 meses de reducción por cuidado de menor o discapacidad, la cotización SS se realiza sobre la base de jornada COMPLETA (art. 237.1 LGSS). Esto protege las futuras prestaciones (IT, maternidad/paternidad, jubilación).';
-    baseReguladoraEstimada = r(p.cotizacionSSMensualCompleta ?? p.salarioBrutoMensualCompleto);
+  if (enfermedadGrave) {
+    detalleCotizacionSS = `Se cotiza por la jornada reducida, pero durante TODO el periodo de reducción por cáncer u otra enfermedad grave del menor la Seguridad Social computa esas cotizaciones al 100 % de la jornada completa para ${prestacionesProtegidas.join(', ')} (art. 237.3 LGSS).`;
+  } else if (guardaOrdinariaProtegida) {
+    detalleCotizacionSS = `Se cotiza por la jornada reducida, pero durante los ${C.aniosGuardaOrdinaria} primeros años la Seguridad Social computa esas cotizaciones al 100 % de la jornada completa para ${prestacionesProtegidas.join(', ')} (art. 237.3 LGSS). La incapacidad temporal no está incluida: una baja se calcula sobre la base reducida.`;
+  } else if (MOTIVOS_GUARDA_ORDINARIA.includes(p.motivo)) {
+    detalleCotizacionSS = `Pasados los ${C.aniosGuardaOrdinaria} primeros años de reducción, las cotizaciones cuentan por la jornada reducida para todas las prestaciones (art. 237.3 LGSS).`;
   } else {
-    detalleCotizacionSS = 'Tras los primeros 24 meses o para otros motivos de reducción, la cotización SS se realiza sobre la base de jornada REDUCIDA. Las prestaciones futuras (IT, jubilación) se calcularán sobre la base reducida.';
-    baseReguladoraEstimada = salarioBrutoMensualReducido;
+    detalleCotizacionSS = 'Fuera de los supuestos del art. 37.6 ET no hay cómputo al 100 %: las cotizaciones cuentan por la jornada reducida para todas las prestaciones.';
   }
 
+  const baseComputadaPrestaciones = cotizacionComputadaAl100 ? r(p.salarioBrutoMensualCompleto) : salarioBrutoMensualReducido;
+  const baseParaIT = enfermedadGrave ? r(p.salarioBrutoMensualCompleto) : salarioBrutoMensualReducido;
+
   const advertencias: string[] = [
-    'El derecho a la reducción de jornada es individual e intransferible. Ambos progenitores pueden disfrutarlo simultáneamente.',
-    'La concreción horaria (qué horas se reducen) corresponde al trabajador, dentro de su jornada ordinaria y el horario de la empresa.',
-    'El empresario puede optar por concentrar la reducción o distribuirla de otra forma si acredita causa productiva justificada. En caso de desacuerdo, resolverá el Juzgado de lo Social.',
-    'Tras los 24 primeros meses, si se mantiene la reducción, la base de cotización SS pasará a ser la jornada reducida, con impacto en IT y futuras prestaciones.',
-    'La prestación por IT durante la reducción de jornada se calcula sobre la base de cotización de los últimos 6 meses (que puede ser la reducida si han pasado más de 6 meses desde el inicio de la reducción).',
+    'El derecho a la reducción de jornada es de cada persona trabajadora: cada progenitor o familiar que cumpla los requisitos puede pedirla.',
+    'La concreción horaria (qué horas se reducen) corresponde a la persona trabajadora dentro de su jornada ordinaria, con preaviso de 15 días o el que fije el convenio, que puede establecer criterios. Las discrepancias las resuelve el Juzgado de lo Social (art. 37.7 ET).',
   ];
 
   if (!dentroRangoLegal) {
-    advertencias.unshift(`⚠️ La reducción solicitada (${fraccionReduccionPct.toFixed(1)}%) está fuera del rango legal permitido (${reduccionMinimaPct}%–${reduccionMaximaPct}%) para el motivo indicado.`);
+    advertencias.unshift(`⚠️ La reducción solicitada (${fraccionReduccionPct.toFixed(1).replace('.', ',')} %) está fuera del rango legal permitido (${String(reduccionMinimaPct).replace('.', ',')} %–${reduccionMaximaPct} %) para el motivo indicado.`);
   }
 
-  if (p.motivo === 'hijo_discapacidad_grave') {
-    advertencias.push('El art. 37.7 ET permite reducción de jornada de al menos el 50% para cuidado de menor con enfermedad grave. Puede acumularse en jornadas completas si así lo permite el convenio colectivo.');
+  if (enfermedadGrave) {
+    advertencias.push('La reducción por cáncer u otra enfermedad grave del menor exige el informe del servicio público de salud y puede acumularse en jornadas completas si lo permite el convenio colectivo (art. 37.6, párrafo 3.º ET).');
   }
 
   return {
@@ -166,13 +167,15 @@ export function calcularReduccionJornada(p: ParametrosReduccionJornada): Resulta
     salarioBrutoMensualReducido,
     mermaMensualBruta,
     mermaAnualBruta,
-    baseSSCompleta,
+    cotizacionComputadaAl100,
+    prestacionesProtegidas,
     detalleCotizacionSS,
-    baseReguladoraEstimada,
+    baseComputadaPrestaciones,
+    baseParaIT,
     reduccionMinimaPermitida: reduccionMinimaPct,
     reduccionMaximaPermitida: reduccionMaximaPct,
     dentroRangoLegal,
     advertencias,
-    fuenteDatos: 'ET arts. 37.6, 37.7, 34.8 + LGSS art. 237 + Ley 17/2022 de familias — vigente 2025',
+    fuenteDatos: 'ET arts. 37.6 y 37.7 + LGSS art. 237.3 (redacción del RDL 2/2023) — verificado el 16/11/2026',
   };
 }

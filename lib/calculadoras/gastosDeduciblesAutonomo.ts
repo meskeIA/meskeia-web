@@ -24,11 +24,13 @@
  *      (RIRPF art. 22: formula 30% × % afectacion)
  *      Si hay local independiente: 100% deducibles sin formula
  *
- *   3. VEHICULO:
- *      - Autonomo en actividad NO exclusivamente de transporte: 50% deducible
- *        (IVA solo deducible al 50%; en IRPF igual)
- *      - Actividad exclusiva de transporte/alquiler veh.: 100% deducible
- *      - Si el vehiculo es de la empresa (SL): 100% si exclusivamente empresa
+ *   3. VEHICULO (art. 22.2 y 22.4 RIRPF, VEHICULOS_AFECTACION_IRPF de data/fiscal/estimacion-directa.ts):
+ *      - Turismo de uso mixto (actividad + fines privados): 0 % en IRPF. No está afecto.
+ *      - Afecto en exclusiva, o en uno de los cinco supuestos del art. 22.4 (mixtos de mercancías,
+ *        transporte de viajeros, autoescuela, representantes o agentes comerciales, cesión habitual
+ *        y onerosa): 100 %.
+ *      ⚠️ Hasta el 16/11/2026 deducía el 50 % del uso mixto «igual que en IVA». Ese 50 % es la
+ *        presunción del art. 95.3 de la Ley del IVA y no vale en el IRPF.
  *
  *   4. DIETAS Y GASTOS DE MANUTENCIÓN:
  *      Solo deducibles si se realizan fuera del municipio del local/domicilio fiscal
@@ -48,16 +50,26 @@
  *
  *   8. AMORTIZACIONES: segun tablas RIS (inmuebles 3%, mobiliario 10%, equipos 25%, etc.)
  *
- *   PROVISION DE INSOLVENCIAS (E.D. Simplificada):
- *   En E.D. Simplificada, provision global del 5% sobre saldo deudores al final del ano.
+ *   PROVISIONES Y GASTOS DE DIFICIL JUSTIFICACION (E.D. Simplificada, art. 30.2.ª RIRPF):
+ *   5 % del rendimiento neto positivo con tope de 2.000 EUR/año, de `reduccionGastosDificilJustificacion`
+ *   (data/fiscal/estimacion-directa.ts). Necesita los ingresos de la actividad.
+ *   ⚠️ Hasta el 16/11/2026 aplicaba el 5 % al SALDO DE DEUDORES al cierre, sin tope: otra base y
+ *     otra cifra para el mismo artículo que el resto del repositorio ya calculaba bien.
  *
- * Fuente: LIRPF arts. 28-30 + RIRPF art. 22 — vigente 2025
- * Verificado: 2025-01-15
+ * Fuente: LIRPF arts. 28-30 + RIRPF arts. 22 y 30
+ * Verificado: vehículo y difícil justificación, 2026-11-16 (auditoría de motores con consumidor).
+ * Los límites del seguro médico (500 / 1.500 EUR) y el 30 % de los suministros siguen escritos
+ * aquí: no se cotejaron en esa auditoría.
  *
  * Encadenable con: calcular_irpf, calcular_autonomos_cuota_ss, calcular_modelo_130
  */
 
-import { DIETAS_MANUTENCION_EXENTAS } from '@/data/fiscal';
+import {
+  DIETAS_MANUTENCION_EXENTAS,
+  VEHICULOS_AFECTACION_IRPF,
+  GASTOS_DIFICIL_JUSTIFICACION_EDS,
+  reduccionGastosDificilJustificacion,
+} from '@/data/fiscal';
 
 // --- Constantes ---
 
@@ -68,11 +80,9 @@ const NOTA_LIMITES_DIETAS =
   `${fmtEur(DIETA_EXTRANJERO.sinPernocta)} EUR / ${fmtEur(DIETA_EXTRANJERO.conPernocta)} EUR en el extranjero`;
 
 const PCT_SUMINISTROS_VIVIENDA = 30;         // % de los suministros × % afectacion
-const PCT_VEHICULO_NO_EXCLUSIVO = 50;        // % deducible si actividad no de transporte
 const LIMITE_SEGURO_MEDICO_PP = 500;         // EUR/ano por el autonomo
 const LIMITE_SEGURO_MEDICO_FAMILIAR = 500;   // EUR/ano por conyuge / cada hijo < 25a
 const LIMITE_SEGURO_MEDICO_DISCAPACIDAD = 1_500; // EUR/ano por persona con discapacidad
-const PROVISION_GLOBAL_ED_SIMPLIFICADA = 5; // % sobre saldo deudores al final del ejercicio
 
 // --- Tipos publicos ---
 
@@ -121,8 +131,11 @@ export interface ParametrosGastosDeduciblesAutonomo {
   vehiculo?: GastosVehiculo;
   /** Dietas pagadas con tarjeta (EUR/ano — ya aplicando los limites del RIRPF) */
   dietasPagadasConTarjeta?: number;
-  /** Saldo de clientes/deudores al cierre del ejercicio (EUR) — para provision ED simplificada */
-  saldoDeudoresFinAnio?: number;
+  /**
+   * Ingresos de la actividad en el año (EUR). Solo en ED simplificada: con ellos se calcula el 5 %
+   * de provisiones y gastos de difícil justificación sobre el rendimiento neto (art. 30.2.ª RIRPF).
+   */
+  ingresosAnuales?: number;
 }
 
 export interface LineaGastoDeducible {
@@ -138,10 +151,10 @@ export interface ResultadoGastosDeduciblesAutonomo {
   lineas: LineaGastoDeducible[];
   /** Total gastos deducibles fiscalmente (EUR) */
   totalGastosDeducibles: number;
-  /** Provision global ED simplificada (si aplica) */
-  provisionGlobalED5pct: number;
-  /** Total gastos deducibles incluyendo provision (EUR) */
-  totalGastosConProvision: number;
+  /** Provisiones y gastos de difícil justificación de la ED simplificada (0 si no aplica o faltan los ingresos) */
+  gastosDificilJustificacion: number;
+  /** Total gastos deducibles incluyendo los de difícil justificación (EUR) */
+  totalGastosConDificilJustificacion: number;
   advertencias: string[];
   fuenteDatos: string;
 }
@@ -223,18 +236,22 @@ export function calcularGastosDeduciblesAutonomo(
 
   // 10. Vehiculo
   if (p.vehiculo && p.vehiculo.totalGastosVehiculo > 0) {
-    const pct = p.vehiculo.tipoActividad === 'si_exclusivo' ? 100 : PCT_VEHICULO_NO_EXCLUSIVO;
+    const afecto = p.vehiculo.tipoActividad === 'si_exclusivo';
+    const pct = afecto ? VEHICULOS_AFECTACION_IRPF.pctAfecto : VEHICULOS_AFECTACION_IRPF.pctUsoMixto;
     const totalV = p.vehiculo.totalGastosVehiculo + (p.vehiculo.amortizacionVehiculo ?? 0);
     const imp = r(totalV * pct / 100);
     lineas.push({ concepto: 'Gastos de vehículo', gastoTotal: r(totalV), porcentajeDeducible: pct, importeDeducible: imp,
-      nota: pct < 100 ? `${pct}% — actividad no exclusiva de transporte (LIRPF art. 29.2)` : '100% — actividad exclusiva de transporte' });
-    if (pct === PCT_VEHICULO_NO_EXCLUSIVO) {
-      advertencias.push(
-        'VEHICULO (50%): La AEAT acepta la deduccion del 50% del vehiculo solo si se ' +
-        'puede acreditar un uso mixto (personal y profesional). Si el uso es exclusivamente ' +
-        'profesional, puede intentar acreditar el 100% pero la carga de la prueba es muy exigente.'
-      );
-    }
+      nota: afecto
+        ? '100 % — vehículo afecto en exclusiva a la actividad o en un supuesto del art. 22.4 RIRPF'
+        : '0 % en IRPF — un turismo de uso mixto no está afecto a la actividad (art. 22.2 y 22.4 RIRPF)' });
+    advertencias.push(afecto
+      ? 'VEHICULO: el 100 % exige que el vehículo se use solo para la actividad, o que sea uno de estos supuestos del ' +
+        `art. 22.4 RIRPF: ${VEHICULOS_AFECTACION_IRPF.excepciones.join('; ')}. La carga de la prueba es del autónomo.`
+      : 'VEHICULO: en el IRPF un turismo que también se usa para fines privados no es deducible (art. 22.2 RIRPF), ' +
+        'salvo los supuestos tasados del art. 22.4 (mixtos de mercancías, transporte de viajeros, autoescuela, ' +
+        'representantes o agentes comerciales y cesión habitual y onerosa). El 50 % de uso mixto es una presunción ' +
+        'del IVA (art. 95.3 de la Ley del IVA), no del IRPF.'
+    );
   }
 
   // 11. Dietas
@@ -255,19 +272,29 @@ export function calcularGastosDeduciblesAutonomo(
 
   const totalGastosDeducibles = r(lineas.reduce((s, l) => s + l.importeDeducible, 0));
 
-  // Provision global 5% (solo ED simplificada)
-  let provisionGlobalED5pct = 0;
-  if (p.modalidad === 'simplificada' && p.saldoDeudoresFinAnio && p.saldoDeudoresFinAnio > 0) {
-    provisionGlobalED5pct = r(p.saldoDeudoresFinAnio * PROVISION_GLOBAL_ED_SIMPLIFICADA / 100);
-    advertencias.push(
-      'PROVISION GLOBAL ED SIMPLIFICADA: en estimacion directa simplificada puede deducirse ' +
-      'el 5% del saldo de deudores al cierre del ejercicio como provision para insolvencias ' +
-      '(' + provisionGlobalED5pct.toLocaleString('es-ES') + ' EUR). ' +
-      'No compatible con la deduccion de insolvencias especificas del regimen general.'
-    );
+  // Provisiones y gastos de difícil justificación (solo ED simplificada, art. 30.2.ª RIRPF):
+  // un % del rendimiento neto positivo, excluido este concepto, con tope anual.
+  let gastosDificilJustificacion = 0;
+  if (p.modalidad === 'simplificada') {
+    const { porcentaje, limiteAnual } = GASTOS_DIFICIL_JUSTIFICACION_EDS;
+    if (p.ingresosAnuales !== undefined) {
+      gastosDificilJustificacion = r(reduccionGastosDificilJustificacion(p.ingresosAnuales - totalGastosDeducibles));
+      advertencias.push(
+        `DIFICIL JUSTIFICACION: en estimacion directa simplificada se deduce el ${porcentaje} % del rendimiento ` +
+        `neto positivo (ingresos menos gastos), con un maximo de ${limiteAnual.toLocaleString('es-ES')} EUR al ano ` +
+        `para todas las actividades: ${fmtEur(gastosDificilJustificacion)} EUR. Cubre las provisiones, que no se ` +
+        'deducen aparte. No se aplica si se usa la reduccion del art. 32.2.1.º LIRPF (un unico cliente no vinculado).'
+      );
+    } else {
+      advertencias.push(
+        `DIFICIL JUSTIFICACION: en estimacion directa simplificada se deduce ademas el ${porcentaje} % del ` +
+        `rendimiento neto positivo, con un maximo de ${limiteAnual.toLocaleString('es-ES')} EUR al ano; ` +
+        'indique los ingresos de la actividad para calcularlo.'
+      );
+    }
   }
 
-  const totalGastosConProvision = r(totalGastosDeducibles + provisionGlobalED5pct);
+  const totalGastosConDificilJustificacion = r(totalGastosDeducibles + gastosDificilJustificacion);
 
   if (!esLocal && pctVivienda === 0) {
     advertencias.push(
@@ -281,9 +308,9 @@ export function calcularGastosDeduciblesAutonomo(
     modalidad: p.modalidad,
     lineas,
     totalGastosDeducibles,
-    provisionGlobalED5pct,
-    totalGastosConProvision,
+    gastosDificilJustificacion,
+    totalGastosConDificilJustificacion,
     advertencias,
-    fuenteDatos: 'LIRPF arts. 28-30 + RIRPF art. 22 — vigente 2025',
+    fuenteDatos: 'LIRPF arts. 28-30 + RIRPF arts. 22 y 30 — vehículo y difícil justificación verificados el 16/11/2026',
   };
 }

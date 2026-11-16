@@ -6,28 +6,40 @@
  *
  * A) DESPIDO IMPROCEDENTE (art. 56 ET):
  *    - 33 días de salario por año trabajado, máx 24 mensualidades
- *    - Antigüedad pre-reforma 2012 (antes 12/02/2012): 45 días/año hasta esa fecha, máx 42 mensualidades
- *      ("indemnización dual" o "mochila ibérica")
+ *    - Contratos anteriores al 12/02/2012 (DT 11.ª.2 ET): 45 días/año por el tiempo anterior a esa
+ *      fecha y 33 por el posterior; tope de 720 días de salario, salvo que el tramo anterior ya dé
+ *      más días, en cuyo caso ese es el tope, sin pasar de 42 mensualidades. Se aplica por la FECHA
+ *      DE INICIO: no depende de que quien llama lo marque.
  *    - El empresario elige: readmisión o pago de indemnización
- *    - Si se elige pago: también los salarios de tramitación (si hay acto de conciliación)
+ *    - Salarios de tramitación: solo con la readmisión (art. 56.2), o siempre si es representante
  *
  * B) DESPIDO OBJETIVO (art. 52 ET — causas económicas, técnicas, organizativas o de producción):
  *    - 20 días de salario por año trabajado, máx 12 mensualidades
- *    - Preaviso: 15 días (o SMEI sustitutorio)
+ *    - Preaviso: 15 días (art. 53.1.c)
  *    - Puede ser declarado improcedente si no se cumplen las causas
  *
  * C) DESPIDO DISCIPLINARIO PROCEDENTE:
  *    - Sin indemnización
  *
- * D) EXTINCIÓN POR CAUSAS OBJETIVAS (ERE / despido colectivo art. 51 ET):
+ * D) DESPIDO COLECTIVO (ERE, art. 51 ET):
  *    - Misma indemnización que despido objetivo: 20 días/año, máx 12 mensualidades
  *    - Puede mejorar en el acuerdo de ERE
  *
- * Fuente: ET arts. 51, 52, 53, 56 — vigente 2025 (reforma laboral RDL 32/2021)
- * Verificado: 2025-01-15
+ * Datos normativos: `INDEMNIZACION_DESPIDO` y `EXENCION_INDEMNIZACION_DESPIDO_IRPF` de
+ * `data/fiscal/laboral.ts`, con la cita literal de cada artículo (auditoría del 16/11/2026).
+ * Hasta entonces las cifras vivían aquí, con sello de 15/01/2025, y el tope del improcedente con
+ * antigüedad anterior a 2012 era SIEMPRE 24 mensualidades: 30.000 €/año desde el 01/03/1990 daba
+ * 60.000 € donde la DT 11.ª da 81.191 €. Además el tramo de 45 días solo se aplicaba si quien
+ * llamaba marcaba `tieneAntiguedadPreReforma2012`, y el texto fiscal del objetivo y del colectivo
+ * eximía solo hasta 20 días por año (el art. 7.e LIRPF llega a los límites del improcedente).
+ *
+ * La antigüedad se cuenta en días (días / 365,25), no por meses como dice el «prorrateándose por
+ * meses» de la ley: la diferencia es de días de salario y no se cambió en esa auditoría.
  *
  * Encadenable con: calcular_finiquito, calcular_irpf, calcular_pension_desempleo
  */
+
+import { INDEMNIZACION_DESPIDO, EXENCION_INDEMNIZACION_DESPIDO_IRPF } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -44,7 +56,7 @@ export interface ParametrosIndemnizacionDespido {
   salarioBrutoAnual: number;
   /**
    * Fecha de inicio de la relación laboral (YYYY-MM-DD).
-   * Para calcular la antigüedad exacta.
+   * Para calcular la antigüedad exacta y decidir si aplica el régimen dual de la DT 11.ª ET.
    */
   fechaInicio: string;
   /**
@@ -52,9 +64,8 @@ export interface ParametrosIndemnizacionDespido {
    */
   fechaExtincion?: string;
   /**
-   * ¿El trabajador tenía antigüedad previa al 12/02/2012?
-   * Solo relevante para despido improcedente (indemnización dual).
-   * Por defecto false.
+   * @deprecated Se ignora desde el 16/11/2026: el régimen dual lo decide la fecha de inicio
+   * (DT 11.ª ET). Se conserva para no romper a quien aún lo pase.
    */
   tieneAntiguedadPreReforma2012?: boolean;
 }
@@ -74,7 +85,7 @@ export interface ResultadoIndemnizacionDespido {
   diasPreReforma?: number;
   /** Días de antigüedad post-reforma 12/02/2012 */
   diasPostReforma?: number;
-  /** Indemnización tramo pre-reforma (€) — 45 días/año, máx 42 mensualidades */
+  /** Indemnización tramo pre-reforma (€) — 45 días/año */
   indemnizacionPreReforma?: number;
   /** Indemnización tramo post-reforma (€) — 33 días/año */
   indemnizacionPostReforma?: number;
@@ -85,7 +96,7 @@ export interface ResultadoIndemnizacionDespido {
   maxMensualidades: number;
   /** Indemnización calculada antes de aplicar el tope (€) */
   indemnizacionSinTope: number;
-  /** Tope máximo en euros (mensualidades × salario mensual) */
+  /** Tope máximo en euros */
   topeMáximoEuros: number;
   /** **Indemnización final a percibir (€)** */
   indemnizacionFinal: number;
@@ -103,15 +114,12 @@ export interface ResultadoIndemnizacionDespido {
   fuenteDatos: string;
 }
 
-// ─── Constantes ────────────────────────────────────────────────────────────────
+// ─── Constantes (de data/fiscal/laboral.ts) ─────────────────────────────────────
 
-const FECHA_REFORMA_2012 = new Date('2012-02-12');
-const DIAS_IMPROCEDENTE_POST = 33;
-const DIAS_IMPROCEDENTE_PRE = 45;
-const DIAS_OBJETIVO = 20;
-const MAX_MENSUALIDADES_IMPROCEDENTE = 24;
-const MAX_MENSUALIDADES_IMPROCEDENTE_PRE = 42;
-const MAX_MENSUALIDADES_OBJETIVO = 12;
+const { improcedente: IMPROCEDENTE, dualPreReforma: DUAL, objetivo: OBJETIVO } = INDEMNIZACION_DESPIDO;
+const FECHA_REFORMA_2012 = new Date(DUAL.fechaReforma);
+const LIMITE_EXENCION = EXENCION_INDEMNIZACION_DESPIDO_IRPF.limite.toLocaleString('es-ES');
+const MS_DIA = 1000 * 60 * 60 * 24;
 
 // ─── Función principal ─────────────────────────────────────────────────────────
 
@@ -126,8 +134,7 @@ export function calcularIndemnizacionDespido(p: ParametrosIndemnizacionDespido):
   if (fechaFin <= fechaInicio) throw new Error('La fecha de extinción debe ser posterior a la fecha de inicio.');
 
   // Cálculo de días de antigüedad total
-  const msTotal = fechaFin.getTime() - fechaInicio.getTime();
-  const antiguedadDias = Math.floor(msTotal / (1000 * 60 * 60 * 24));
+  const antiguedadDias = Math.floor((fechaFin.getTime() - fechaInicio.getTime()) / MS_DIA);
   const antiguedadAnios = antiguedadDias / 365.25;
 
   const salarioDiario = r(p.salarioBrutoAnual / 365);
@@ -167,49 +174,48 @@ export function calcularIndemnizacionDespido(p: ParametrosIndemnizacionDespido):
         detalleFiscal: 'Sin indemnización — el despido disciplinario procedente no genera derecho a indemnización.',
         advertencias: [
           'El trabajador puede impugnar la procedencia del despido ante el SMAC y, en su caso, ante el Juzgado de lo Social en el plazo de 20 días hábiles desde la notificación.',
-          'Si el despido se declara improcedente, la empresa deberá optar entre readmisión o pago de 33 días/año con máx. 24 mensualidades.',
+          'Si el despido se declara improcedente, la empresa deberá optar entre readmisión o pago de 33 días/año con máx. 24 mensualidades (45 días/año por el tiempo anterior al 12/02/2012 en los contratos de antes de esa fecha).',
         ],
-        fuenteDatos: 'ET art. 54-55 — Real Decreto Legislativo 2/2015, vigente 2025',
+        fuenteDatos: 'ET arts. 54-55 — Real Decreto Legislativo 2/2015',
       };
 
     case 'improcedente':
-      diasPorAnio = DIAS_IMPROCEDENTE_POST;
-      maxMensualidades = MAX_MENSUALIDADES_IMPROCEDENTE;
+      diasPorAnio = IMPROCEDENTE.diasPorAnio;
+      maxMensualidades = IMPROCEDENTE.maxMensualidades;
       pravisoDias = 0;
       exentaIRPF = true;
-      detalleFiscal = 'La indemnización por despido improcedente está exenta de IRPF hasta el importe legal máximo (33 días/año, máx 24 mensualidades), con un límite absoluto de 180.000 € (art. 7.e LIRPF). El exceso pactado en convenio o acuerdo tributa en IRPF.';
+      detalleFiscal = `La indemnización por despido improcedente está exenta de IRPF en la cuantía obligatoria del Estatuto de los Trabajadores, con un límite absoluto de ${LIMITE_EXENCION} € (art. 7.e LIRPF). Lo que se pacte por encima en convenio, pacto o contrato tributa; lo acordado en la conciliación ante el servicio administrativo no cuenta como pactado.`;
 
-      if (p.tieneAntiguedadPreReforma2012 && fechaInicio < FECHA_REFORMA_2012) {
-        // Cálculo dual
-        const msPreReforma = FECHA_REFORMA_2012.getTime() - fechaInicio.getTime();
-        diasPreReforma = Math.floor(msPreReforma / (1000 * 60 * 60 * 24));
+      if (fechaInicio < FECHA_REFORMA_2012) {
+        // DT 11.ª.2 ET: 45 días/año antes del 12/02/2012 y 33 después. El tope es de 720 días de
+        // salario, salvo que el tramo anterior ya dé más días: entonces ese es el tope, sin pasar
+        // de 42 mensualidades.
+        const finTramoPre = Math.min(fechaFin.getTime(), FECHA_REFORMA_2012.getTime());
+        diasPreReforma = Math.floor((finTramoPre - fechaInicio.getTime()) / MS_DIA);
         const aniosPreReforma = diasPreReforma / 365.25;
-
-        const msPostReforma = fechaFin.getTime() - FECHA_REFORMA_2012.getTime();
-        diasPostReforma = Math.floor(msPostReforma / (1000 * 60 * 60 * 24));
+        diasPostReforma = Math.max(0, Math.floor((fechaFin.getTime() - FECHA_REFORMA_2012.getTime()) / MS_DIA));
         const aniosPostReforma = diasPostReforma / 365.25;
 
-        // Tramo pre-reforma: 45 días/año, tope 42 mensualidades
-        const topePreEuros = r(salarioMensual * MAX_MENSUALIDADES_IMPROCEDENTE_PRE);
-        indemnizacionPreReforma = Math.min(
-          r(salarioDiario * DIAS_IMPROCEDENTE_PRE * aniosPreReforma),
-          topePreEuros
-        );
+        const diasIndemnizacionPre = DUAL.diasPorAnioAntes * aniosPreReforma;
+        indemnizacionPreReforma = r(salarioDiario * diasIndemnizacionPre);
+        indemnizacionPostReforma = r(salarioDiario * DUAL.diasPorAnioDespues * aniosPostReforma);
 
-        // Tramo post-reforma: 33 días/año (sin tope propio, pero el global es 24 mensualidades)
-        indemnizacionPostReforma = r(salarioDiario * DIAS_IMPROCEDENTE_POST * aniosPostReforma);
-
-        // El tope global de 24 mensualidades aplica al TOTAL de la indemnización
-        topeMáximoEuros = r(salarioMensual * MAX_MENSUALIDADES_IMPROCEDENTE);
+        const preSuperaTope = diasIndemnizacionPre > DUAL.topeDias;
+        topeMáximoEuros = preSuperaTope
+          ? Math.min(indemnizacionPreReforma, r(salarioMensual * DUAL.maxMensualidadesExcepcion))
+          : r(salarioDiario * DUAL.topeDias);
+        if (preSuperaTope) maxMensualidades = DUAL.maxMensualidadesExcepcion;
         indemnizacionSinTope = r(indemnizacionPreReforma + indemnizacionPostReforma);
         indemnizacionFinal = Math.min(indemnizacionSinTope, topeMáximoEuros);
         topeAplicado = indemnizacionSinTope > topeMáximoEuros;
 
-        advertencias.push('Se aplica indemnización dual (mochila ibérica): tramo pre-12/02/2012 a 45 días/año y tramo post a 33 días/año. El tope total es 24 mensualidades del salario actual.');
+        advertencias.push(preSuperaTope
+          ? 'Contrato anterior al 12/02/2012 (DT 11.ª ET): el tramo anterior a esa fecha, a 45 días/año, ya supera los 720 días de salario, así que ese importe es el máximo, con un tope absoluto de 42 mensualidades. El tiempo posterior no suma más.'
+          : 'Contrato anterior al 12/02/2012 (DT 11.ª ET): 45 días/año por el tiempo anterior a esa fecha y 33 días/año por el posterior, con un tope de 720 días de salario.');
       } else {
         // Cálculo simple post-reforma
-        topeMáximoEuros = r(salarioMensual * MAX_MENSUALIDADES_IMPROCEDENTE);
-        indemnizacionSinTope = r(salarioDiario * DIAS_IMPROCEDENTE_POST * antiguedadAnios);
+        topeMáximoEuros = r(salarioMensual * IMPROCEDENTE.maxMensualidades);
+        indemnizacionSinTope = r(salarioDiario * IMPROCEDENTE.diasPorAnio * antiguedadAnios);
         indemnizacionFinal = Math.min(indemnizacionSinTope, topeMáximoEuros);
         topeAplicado = indemnizacionSinTope > topeMáximoEuros;
       }
@@ -219,14 +225,14 @@ export function calcularIndemnizacionDespido(p: ParametrosIndemnizacionDespido):
 
     case 'objetivo':
     case 'colectivo_ere':
-      diasPorAnio = DIAS_OBJETIVO;
-      maxMensualidades = MAX_MENSUALIDADES_OBJETIVO;
-      pravisoDias = p.tipoDespido === 'objetivo' ? 15 : 15;
+      diasPorAnio = OBJETIVO.diasPorAnio;
+      maxMensualidades = OBJETIVO.maxMensualidades;
+      pravisoDias = OBJETIVO.preavisoDias;
       exentaIRPF = true;
-      detalleFiscal = 'La indemnización por despido objetivo/colectivo está exenta de IRPF hasta el importe legal mínimo (20 días/año, máx 12 mensualidades), con un límite absoluto de 180.000 € (art. 7.e LIRPF).';
+      detalleFiscal = `Por causas económicas, técnicas, organizativas, de producción o fuerza mayor, la indemnización del despido objetivo (art. 52.c ET) o colectivo está exenta de IRPF hasta los límites del despido IMPROCEDENTE (33 días/año, máx. 24 mensualidades), no solo hasta los 20 días legales, con un límite absoluto de ${LIMITE_EXENCION} € (art. 7.e LIRPF). Una mejora pactada que no pase de ese límite también está exenta.`;
 
-      topeMáximoEuros = r(salarioMensual * MAX_MENSUALIDADES_OBJETIVO);
-      indemnizacionSinTope = r(salarioDiario * DIAS_OBJETIVO * antiguedadAnios);
+      topeMáximoEuros = r(salarioMensual * OBJETIVO.maxMensualidades);
+      indemnizacionSinTope = r(salarioDiario * OBJETIVO.diasPorAnio * antiguedadAnios);
       indemnizacionFinal = Math.min(indemnizacionSinTope, topeMáximoEuros);
       topeAplicado = indemnizacionSinTope > topeMáximoEuros;
 
@@ -236,7 +242,7 @@ export function calcularIndemnizacionDespido(p: ParametrosIndemnizacionDespido):
       }
       if (p.tipoDespido === 'colectivo_ere') {
         advertencias.push('En los EREs, el acuerdo colectivo puede mejorar la indemnización mínima de 20 días/año. Consultar el acuerdo de ERE suscrito.');
-        advertencias.push('Los trabajadores afectados por ERE pueden acceder al desempleo con la correspondiente exención de IRPF en la indemnización.');
+        advertencias.push('Los trabajadores afectados por un despido colectivo pueden acceder a la prestación por desempleo.');
       }
       break;
   }
@@ -260,6 +266,6 @@ export function calcularIndemnizacionDespido(p: ParametrosIndemnizacionDespido):
     exentaIRPF,
     detalleFiscal,
     advertencias,
-    fuenteDatos: 'ET arts. 51, 52, 53, 56 — Real Decreto Legislativo 2/2015, vigente 2025',
+    fuenteDatos: 'ET arts. 51, 52, 53, 56 y DT 11.ª + art. 7.e LIRPF — verificado el 16/11/2026',
   };
 }

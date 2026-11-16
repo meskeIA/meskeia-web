@@ -70,3 +70,37 @@ export function reduccionGastosDificilJustificacion(rendimientoNetoPrevio: numbe
     GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual
   );
 }
+
+// ─── Vehículos: afectación a la actividad en el IRPF (art. 22 RIRPF) ─────────
+
+/**
+ * Sello propio: este bloque se añadió el 16/11/2026, en la auditoría de los motores con
+ * consumidor. `lib/calculadoras/gastosDeduciblesAutonomo.ts` deducía en el IRPF el 50 % de los
+ * gastos de un turismo de uso mixto, «igual que en IVA»; pero el 50 % es la presunción del art.
+ * 95.3 de la Ley del IVA, y en el IRPF un turismo que se usa también para fines privados no está
+ * afecto (art. 22.2 y 22.4 RIRPF), salvo los cinco supuestos tasados. Tipo `fiscal`: el usuario
+ * dio el OK con la cita a la vista el 16/11/2026.
+ */
+export const VEHICULOS_AFECTACION_IRPF_META = {
+  fuente: 'Reglamento del IRPF (RD 439/2007), art. 22.2 y 22.4',
+  verificado: '2026-11-16',
+  vigencia: '2026',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2007-6820#a22',
+};
+
+export const VEHICULOS_AFECTACION_IRPF = {
+  /** Porcentaje deducible en el IRPF de un turismo de uso mixto que no está en las excepciones. */
+  pctUsoMixto: 0,
+  /** Porcentaje deducible con uso exclusivo para la actividad o en una de las excepciones. */
+  pctAfecto: 100,
+  /** Supuestos en que un turismo con uso privado accesorio sí se considera afecto (art. 22.4). */
+  excepciones: [
+    'vehículos mixtos destinados al transporte de mercancías',
+    'transporte de viajeros mediante contraprestación',
+    'enseñanza de conductores o pilotos mediante contraprestación',
+    'desplazamientos profesionales de representantes o agentes comerciales',
+    'cesión de uso con habitualidad y onerosidad',
+  ],
+  cita:
+    'No se entenderán afectados: 1.º Aquéllos que se utilicen simultáneamente para actividades económicas y para necesidades privadas, salvo que la utilización para estas últimas sea accesoria y notoriamente irrelevante de acuerdo con lo previsto en el apartado 4 de este artículo. […] Lo dispuesto en el párrafo anterior no será de aplicación a los automóviles de turismo y sus remolques, ciclomotores, motocicletas, aeronaves o embarcaciones deportivas o de recreo, salvo los siguientes supuestos: a) Los vehículos mixtos destinados al transporte de mercancías. b) Los destinados a la prestación de servicios de transporte de viajeros mediante contraprestación. c) Los destinados a la prestación de servicios de enseñanza de conductores o pilotos mediante contraprestación. d) Los destinados a los desplazamientos profesionales de los representantes o agentes comerciales. e) Los destinados a ser objeto de cesión de uso con habitualidad y onerosidad.',
+} as const;

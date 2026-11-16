@@ -48,3 +48,4 @@ export * from './recargos-sanciones';
 export * from './retribuciones-exentas';
 export * from './pensiones-irpf';
 export * from './legitimas';
+export * from './laboral';

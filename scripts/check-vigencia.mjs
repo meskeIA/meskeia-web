@@ -163,6 +163,45 @@ const VIGILANCIA = [
     },
   },
   {
+    modulo: 'laboral',
+    meta: 'FISCAL_LABORAL_META',
+    norma: 'BOE-A-2015-11430',
+    nombreNorma: 'Estatuto de los Trabajadores (RDLeg 2/2015)',
+    articulos: {
+      a37: 'Reducción de jornada por guarda legal (apartado 6)',
+      a53: 'Indemnización y preaviso del despido objetivo',
+      a56: 'Despido improcedente',
+      dtundecima: 'Indemnización dual de los contratos anteriores al 12/02/2012',
+    },
+  },
+  {
+    modulo: 'laboral',
+    meta: 'FISCAL_LABORAL_META',
+    norma: 'BOE-A-2015-11724',
+    nombreNorma: 'LGSS (RDL 8/2015)',
+    articulos: {
+      a237: 'Cómputo al 100 % de la cotización durante la reducción de jornada',
+    },
+  },
+  {
+    modulo: 'laboral',
+    meta: 'FISCAL_LABORAL_META',
+    norma: 'BOE-A-2006-20764',
+    nombreNorma: 'Ley 35/2006 del IRPF',
+    articulos: {
+      a7: 'Exención de la indemnización por despido (letra e)',
+    },
+  },
+  {
+    modulo: 'estimacion-directa',
+    meta: 'VEHICULOS_AFECTACION_IRPF_META',
+    norma: 'BOE-A-2007-6820',
+    nombreNorma: 'RD 439/2007 del Reglamento del IRPF',
+    articulos: {
+      a22: 'Elementos patrimoniales afectos (vehículos)',
+    },
+  },
+  {
     modulo: 'sociedades',
     meta: 'FISCAL_SOCIEDADES_META',
     norma: 'BOE-A-2014-12328',

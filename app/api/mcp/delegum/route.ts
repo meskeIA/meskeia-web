@@ -889,14 +889,14 @@ function crearServidorDelegum(): McpServer {
       fecha_despido: z.string().optional()
         .describe('Fecha del despido en formato YYYY-MM-DD. Por defecto: hoy.'),
       antiguedad_pre_2012: z.boolean().optional()
-        .describe('Si tenía antigüedad anterior al 12/02/2012 (indemnización dual, solo improcedente). Por defecto false.'),
+        .describe('Obsoleto: se ignora. El tramo de 45 días/año anterior al 12/02/2012 se aplica solo cuando fecha_inicio es anterior a esa fecha.'),
       dias_cotizados_paro: z.number().int().min(0).optional()
         .describe('Días cotizados al desempleo en los últimos 6 años (para calcular el paro). Mínimo 360 para tener derecho.'),
       num_hijos: z.number().int().min(0).max(15).optional()
         .describe('Número de hijos a cargo (afecta a los topes del paro). Por defecto 0.'),
     },
     { title: 'Consulta de despido: indemnización + finiquito + prestación por desempleo', readOnlyHint: true },
-    async ({ tipo_despido, salario_bruto_anual, fecha_inicio, fecha_despido, antiguedad_pre_2012, dias_cotizados_paro, num_hijos }, extra) => {
+    async ({ tipo_despido, salario_bruto_anual, fecha_inicio, fecha_despido, dias_cotizados_paro, num_hijos }, extra) => {
       await registrarUsoDelegum('consulta_despido', getCaller(extra));
       try {
         // Hoy en España, no en UTC (el servidor corre en UTC): entre las 00:00 y las 01:00-02:00
@@ -910,7 +910,6 @@ function crearServidorDelegum(): McpServer {
           salarioBrutoAnual: salario_bruto_anual,
           fechaInicio: fecha_inicio,
           fechaExtincion: fechaFin,
-          tieneAntiguedadPreReforma2012: antiguedad_pre_2012,
         });
 
         const motivoMap: Record<string, MotivoFiniquito> = {
@@ -934,6 +933,7 @@ function crearServidorDelegum(): McpServer {
           '',
           `💸 **1) Indemnización por despido** (${indem.diasPorAnio} días/año, máx ${indem.maxMensualidades} mensualidades)`,
           `   • **${fmt(indem.indemnizacionFinal)} €**${indem.topeAplicado ? ' (tope aplicado)' : ''}`,
+          ...(indem.diasPreReforma !== undefined ? [`   • ${indem.advertencias[0]}`] : []),
           `   • Fiscalidad: ${indem.exentaIRPF ? '✅ exenta de IRPF' : '⚠️ tributa en IRPF'} — ${indem.detalleFiscal}`,
           '',
           `🧾 **2) Finiquito** (lo que te deben aparte de la indemnización)`,
@@ -1343,10 +1343,10 @@ function crearServidorDelegum(): McpServer {
       salario_bruto_anual: z.number().positive().describe('Salario bruto anual total en euros'),
       fecha_inicio: z.string().describe('Inicio de la relación laboral (YYYY-MM-DD)'),
       fecha_despido: z.string().optional().describe('Fecha del despido (YYYY-MM-DD). Por defecto hoy.'),
-      antiguedad_pre_2012: z.boolean().optional().describe('Antigüedad anterior al 12/02/2012 (indemnización dual). Por defecto false.'),
+      antiguedad_pre_2012: z.boolean().optional().describe('Obsoleto: se ignora. El tramo de 45 días/año anterior al 12/02/2012 se aplica solo cuando fecha_inicio es anterior a esa fecha.'),
     },
     { title: 'Calcula la indemnización por despido según el Estatuto de los Trabajadores', readOnlyHint: true },
-    async ({ tipo_despido, salario_bruto_anual, fecha_inicio, fecha_despido, antiguedad_pre_2012 }, extra) => {
+    async ({ tipo_despido, salario_bruto_anual, fecha_inicio, fecha_despido }, extra) => {
       await registrarUsoDelegum('calcular_indemnizacion_despido', getCaller(extra));
       try {
         const r = calcularIndemnizacionDespido({
@@ -1354,12 +1354,12 @@ function crearServidorDelegum(): McpServer {
           salarioBrutoAnual: salario_bruto_anual,
           fechaInicio: fecha_inicio,
           fechaExtincion: fecha_despido,
-          tieneAntiguedadPreReforma2012: antiguedad_pre_2012,
         });
         const texto = [
           `💸 **Indemnización por Despido** (${tipo_despido.replace('_', ' ')})`,
           `📅 Antigüedad: ${r.antiguedadAnios} años · ${r.diasPorAnio} días/año (máx ${r.maxMensualidades} mensualidades)`,
           `💰 **Indemnización: ${fmt(r.indemnizacionFinal)} €**${r.topeAplicado ? ' (tope aplicado)' : ''}`,
+          ...(r.diasPreReforma !== undefined ? [`ℹ️ ${r.advertencias[0]}`] : []),
           `🧾 Fiscalidad: ${r.exentaIRPF ? 'exenta de IRPF' : 'tributa en IRPF'} — ${r.detalleFiscal}`,
           `📚 ${r.fuenteDatos}`,
         ].join('\n');
@@ -1898,8 +1898,9 @@ function crearServidorDelegum(): McpServer {
     'calcular_gastos_deducibles_autonomo',
     'Calcula los gastos fiscalmente deducibles en el IRPF de un autónomo en estimación directa (normal o ' +
     'simplificada). Aplica las reglas especiales: suministros de la vivienda habitual (% de afectación × 30%), ' +
-    'vehículo (50% uso mixto / 100% transporte exclusivo), seguros médicos (límite 500 €/persona), amortizaciones ' +
-    'y provisión global del 5% en estimación directa simplificada.',
+    'vehículo (en IRPF solo si está afecto en exclusiva o es de transporte, agente comercial o autoescuela; el uso ' +
+    'mixto no deduce), seguros médicos (límite 500 €/persona), amortizaciones y, en estimación directa ' +
+    'simplificada, el 5 % de difícil justificación sobre el rendimiento neto (máx. 2.000 €/año).',
     {
       modalidad: z.enum(['normal', 'simplificada']).describe('Modalidad de estimación directa'),
       tipo_local: z.enum(['local_independiente', 'vivienda_habitual']).describe('"local_independiente" (100% deducible) o "vivienda_habitual" (% por afectación)'),
@@ -1913,11 +1914,11 @@ function crearServidorDelegum(): McpServer {
       amortizaciones: z.number().min(0).optional().describe('Amortización de inmovilizado: equipos, mobiliario, software (€/año)'),
       otros_gastos: z.number().min(0).optional().describe('Otros gastos deducibles: formación, suscripciones, gestoría... (€/año)'),
       gastos_vehiculo: z.number().min(0).optional().describe('Total de gastos del vehículo: combustible, seguro, ITV, reparaciones (€/año)'),
-      vehiculo_uso_exclusivo: z.boolean().optional().describe('¿El vehículo se dedica exclusivamente a la actividad (transporte/reparto)? true=100% deducible, false=50% (uso mixto). Por defecto false.'),
-      saldo_deudores_fin_anio: z.number().min(0).optional().describe('Saldo de clientes/deudores al cierre del ejercicio (€). Solo en ED simplificada: permite deducir la provisión global del 5%.'),
+      vehiculo_uso_exclusivo: z.boolean().optional().describe('true si el vehículo está afecto en exclusiva a la actividad o es mixto de mercancías, de transporte de viajeros, de autoescuela, de representante o agente comercial o de alquiler habitual (100 % deducible). false si también se usa para fines privados: en IRPF no deduce. Por defecto false.'),
+      ingresos_anuales: z.number().min(0).optional().describe('Ingresos de la actividad en el año (€). Solo en ED simplificada: con ellos se calcula el 5 % de difícil justificación sobre el rendimiento neto (máx. 2.000 €).'),
     },
     { title: 'Calcula los gastos deducibles en el IRPF del autónomo (estimación directa)', readOnlyHint: true },
-    async ({ modalidad, tipo_local, pct_vivienda_afecta, gasto_local, gastos_suministros, cuota_autonomo, gastos_compras, gastos_personal, gastos_financieros, amortizaciones, otros_gastos, gastos_vehiculo, vehiculo_uso_exclusivo, saldo_deudores_fin_anio }, extra) => {
+    async ({ modalidad, tipo_local, pct_vivienda_afecta, gasto_local, gastos_suministros, cuota_autonomo, gastos_compras, gastos_personal, gastos_financieros, amortizaciones, otros_gastos, gastos_vehiculo, vehiculo_uso_exclusivo, ingresos_anuales }, extra) => {
       await registrarUsoDelegum('calcular_gastos_deducibles_autonomo', getCaller(extra));
       try {
         const r = calcularGastosDeduciblesAutonomo({
@@ -1938,7 +1939,7 @@ function crearServidorDelegum(): McpServer {
                 tipoActividad: (vehiculo_uso_exclusivo ? 'si_exclusivo' : 'no_exclusivo') as ActividadTransporte,
               }
             : undefined,
-          saldoDeudoresFinAnio: saldo_deudores_fin_anio,
+          ingresosAnuales: ingresos_anuales,
         });
         const lineas = [
           `📑 **Gastos deducibles del autónomo — ED ${r.modalidad}**`,
@@ -1948,8 +1949,8 @@ function crearServidorDelegum(): McpServer {
           ),
           '',
           `💰 **Total gastos deducibles: ${fmt(r.totalGastosDeducibles)} €**`,
-          r.provisionGlobalED5pct > 0 ? `  • Provisión global 5% (ED simplificada): ${fmt(r.provisionGlobalED5pct)} €` : '',
-          r.provisionGlobalED5pct > 0 ? `  • **Total con provisión: ${fmt(r.totalGastosConProvision)} €**` : '',
+          r.gastosDificilJustificacion > 0 ? `  • Difícil justificación (ED simplificada): ${fmt(r.gastosDificilJustificacion)} €` : '',
+          r.gastosDificilJustificacion > 0 ? `  • **Total con difícil justificación: ${fmt(r.totalGastosConDificilJustificacion)} €**` : '',
           '',
           ...r.advertencias.map(a => `⚠️ ${a}`),
           `📚 ${r.fuenteDatos}`,
@@ -2617,18 +2618,20 @@ function crearServidorDelegum(): McpServer {
   servidor.tool(
     'calcular_reduccion_jornada',
     'Calcula el impacto económico de una reducción de jornada por guarda legal (cuidado de hijo menor de 12 años, ' +
-    'familiar dependiente o hijo con discapacidad grave). La reducción permitida va de 1/8 a 1/2 de la jornada y el ' +
-    'salario baja proporcionalmente. Indica el salario reducido, la merma mensual/anual y cómo queda la cotización ' +
-    'a la Seguridad Social (los primeros 24 meses se mantiene la base completa).',
+    'familiar que no puede valerse por sí mismo o menor con cáncer u otra enfermedad grave). La reducción va de 1/8 a ' +
+    '1/2 de la jornada (al menos la mitad en la de enfermedad grave) y el salario baja proporcionalmente. Indica el ' +
+    'salario reducido, la merma mensual/anual y cómo cuentan las cotizaciones en la Seguridad Social (los tres ' +
+    'primeros años se computan al 100 % para jubilación, incapacidad permanente, muerte y supervivencia y nacimiento).',
     {
-      motivo: z.enum(['hijo_menor_12', 'discapacidad_familiar', 'familiar_dependiente', 'hijo_discapacidad_grave', 'otro']).describe('Motivo de la reducción de jornada'),
+      motivo: z.enum(['hijo_menor_12', 'discapacidad_familiar', 'familiar_dependiente', 'hijo_discapacidad_grave', 'otro'])
+        .describe('"hijo_menor_12" = menor de 12 años · "discapacidad_familiar" = persona con discapacidad sin actividad retribuida · "familiar_dependiente" = cónyuge, pareja o familiar hasta 2.º grado que no puede valerse · "hijo_discapacidad_grave" = menor con cáncer u otra enfermedad grave · "otro" = fuera del art. 37.6 ET'),
       salario_bruto_mensual_completo: z.number().positive().describe('Salario bruto mensual a jornada completa (€)'),
       horas_semanales_completas: z.number().positive().describe('Horas semanales a jornada completa según contrato'),
       fraccion_reduccion: z.number().min(0.01).max(0.99).describe('Fracción de reducción (entre 0 y 1). Ej: 0,5 = media jornada; 0,125 = 1/8'),
-      menos_de_24_meses: z.boolean().optional().describe('¿Lleva menos de 24 meses en reducción? (en ese tramo la cotización SS se mantiene a base completa). Por defecto true.'),
+      en_primeros_3_anios: z.boolean().optional().describe('¿Está dentro de los tres primeros años de reducción? En ese tramo las cotizaciones se computan al 100 % (art. 237.3 LGSS). No cuenta en la de enfermedad grave, protegida todo el periodo. Por defecto true.'),
     },
     { title: 'Calcula el impacto de una reducción de jornada por guarda legal', readOnlyHint: true },
-    async ({ motivo, salario_bruto_mensual_completo, horas_semanales_completas, fraccion_reduccion, menos_de_24_meses }, extra) => {
+    async ({ motivo, salario_bruto_mensual_completo, horas_semanales_completas, fraccion_reduccion, en_primeros_3_anios }, extra) => {
       await registrarUsoDelegum('calcular_reduccion_jornada', getCaller(extra));
       try {
         const r = calcularReduccionJornada({
@@ -2636,7 +2639,7 @@ function crearServidorDelegum(): McpServer {
           salarioBrutoMensualCompleto: salario_bruto_mensual_completo,
           horasSemanalesCompletas: horas_semanales_completas,
           fraccionReduccion: fraccion_reduccion,
-          menosDe24MesesEnReduccion: menos_de_24_meses,
+          enPrimeros3Anios: en_primeros_3_anios,
         });
         const lineas = [
           `⏱️ **Reducción de jornada — ${pct(r.pctJornadaReducida)}% (trabajas el ${pct(r.pctJornadaTrabajada)}%)**`,
@@ -2646,7 +2649,7 @@ function crearServidorDelegum(): McpServer {
           `💶 Salario bruto reducido: **${fmt(r.salarioBrutoMensualReducido)} €/mes**`,
           `💸 Merma: −${fmt(r.mermaMensualBruta)} €/mes (−${fmt(r.mermaAnualBruta)} €/año)`,
           '',
-          `📊 Cotización SS: ${r.baseSSCompleta ? '✅ base de jornada completa (primeros 24 meses)' : '⚠️ base reducida (tras 24 meses)'}`,
+          `📊 Cotización SS: ${r.cotizacionComputadaAl100 ? '✅ se computa al 100 % de la jornada completa' : '⚠️ cuenta por la jornada reducida'}`,
           `💡 ${r.detalleCotizacionSS}`,
           '',
           ...r.advertencias.map(a => `⚠️ ${a}`),

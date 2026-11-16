@@ -128,6 +128,16 @@ auditoría está planificada en la Agenda Operativa (`auditoria-motores-lib-calc
 > (5/10/15/20 %) por la de la Ley 11/2021. Commit `13d2181b`, con 10 casos resueltos a mano contra el
 > BOE en `tests/recargo-extemporaneo-motor.spec.ts`.
 
+> **Cerrada el 16/11/2026, sobre los 5 que quedaban con consumidor.** Los 3 del MCP de Delegum
+> tenían errores normativos, los tres corregidos con OK del usuario y casos de origen en
+> `tests/calculadoras-invariantes.spec.ts`: `indemnizacionDespido` (tope de la DT 11.ª),
+> `reduccionJornada` (tres años del art. 237.3 LGSS, no 24 meses) y `gastosDeduciblesAutonomo`
+> (vehículo de uso mixto al 0 % en IRPF y difícil justificación sobre el rendimiento neto). Sus
+> cifras pasaron a `laboral.ts` y `estimacion-directa.ts`. Los 2 de los GPTs (`modelo130`,
+> `rendimientoCapitalInmobiliario`) **no se auditaron**: su único lector son las rutas de
+> `app/api/chatgpt/`, que se retiran con los GPTs el 11/12/2026, y entonces `check:motores` obliga a
+> retirarlos también. Auditarlos habría sido la misma reparación sin destinatario que motivó el 10/09.
+
 **Regla mientras tanto**: un motor de `lib/calculadoras/` **no declara datos normativos propios**. Los
 importa de `data/fiscal/`, y si el dato no existe allí, se crea el módulo primero. Es la misma regla
 que ya rige para las apps en `CLAUDE.md`, que nadie había extendido explícitamente a los motores.
@@ -205,8 +215,9 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Vigilar**: cualquier LPGE o RDL que vuelva a elevar el porcentaje con efectos de un solo ejercicio, que es exactamente lo que pasó en 2023.
 - **Cadencia**: anual (ene), a la vez que el resto del IRPF.
 - **Alerta metodológica**: ⚠️ **el porcentaje ya ha sido temporal una vez y por eso existe este módulo.** La Ley 31/2022 (PGE 2023) lo subió del 5 % al 7 % solo para el ejercicio 2023 y no se prorrogó; el repositorio se quedó con las dos cifras a la vez —el 7 % en `deduccionAutonomoIRPF.ts` y el 5 % en otras cuatro piezas, todas citando el mismo artículo— hasta el 13/09/2026 (hallazgo 811 del Inspector). Una subida transitoria es el caso normal aquí, no la excepción: al re-sellar, comprobar SIEMPRE a qué ejercicio se refiere la cifra que se lee.
-- **Consumido por**: `lib/calculadoras/modulosVsDirecta.ts` (app `simulador-modulos-vs-directa` + tool `comparar_modulos_vs_directa` del MCP de Delegum) y `lib/calculadoras/deduccionAutonomoIRPF.ts` (tool de gastos deducibles). La prosa de `selector-regimen-fiscal-autonomo`, `checklist-cambio-regimen-autonomo` y `visualizador-estructura-costes-autonomo` cita el 5 % a mano y aún no lo importa.
-- **Verificado**: 2026-09-13.
+- **Consumido por**: `lib/calculadoras/modulosVsDirecta.ts` (app `simulador-modulos-vs-directa` + tool `comparar_modulos_vs_directa` del MCP de Delegum), `lib/calculadoras/deduccionAutonomoIRPF.ts` y, desde el 16/11/2026, `lib/calculadoras/gastosDeduciblesAutonomo.ts` (tool `calcular_gastos_deducibles_autonomo`), que hasta entonces aplicaba el 5 % al saldo de deudores. La prosa de `selector-regimen-fiscal-autonomo`, `checklist-cambio-regimen-autonomo` y `visualizador-estructura-costes-autonomo` cita el 5 % a mano y aún no lo importa.
+- **Bloque `VEHICULOS_AFECTACION_IRPF`** (sello propio, `VEHICULOS_AFECTACION_IRPF_META`, 2026-11-16): un turismo de uso mixto no está afecto en el IRPF (art. 22.2 y 22.4 RIRPF), salvo los cinco supuestos tasados, con la cita literal. Nace de la auditoría de motores: `gastosDeduciblesAutonomo` deducía el 50 % «igual que en IVA», que es la presunción del art. 95.3 de la Ley del IVA. OK del usuario con la cita a la vista. Vigilar cualquier reforma del art. 22 RIRPF o una presunción de afectación parcial en el IRPF, que hoy no existe.
+- **Verificado**: 2026-09-13 (difícil justificación; re-sellado 2026-10-20) · 2026-11-16 (vehículos).
 
 #### `pensiones.ts` — Jubilación, viudedad, mínimos, brecha de género, reclamación previa (5 bloques con META)
 - **Contiene**: edad ordinaria (tabla progresiva 2024-2027+), años mínimos, % por años cotizados, límites máx/mín del ejercicio, base reguladora, **sistema dual DT 40ª LGSS** (RDL 2/2023: elección 25/29 años en despliegue), coeficientes de anticipada, límites plan de pensiones, jubilación parcial, viudedad, complemento a mínimos, complemento brecha género (art. 60 LGSS + RDL 3/2026 + doctrina STJUE C-623/23) y el trámite de **reclamación previa** ante el INSS (`RECLAMACION_PREVIA_SS`, art. 71 LRJS).
@@ -447,6 +458,16 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Dependencias internas**: `lib/calculadoras/legitimas.ts` → `estimador-legitimas`, MCP de Delegum (`calcular_legitimas`) y `/api/chatgpt/legitimas`.
 - **Auditoría de origen (15/11/2026)**: nace del hallazgo 4738 (cabo C0763). Las 15 fracciones estaban escritas a mano en el motor; todas coincidían con su artículo (0 diferencias en 3.541.230 casos) y el usuario dio el OK a cada una con su cita.
 - **Verificado**: 2026-11-15 · vigencia 2026.
+
+#### `laboral.ts` — Indemnización por despido, su exención en el IRPF y reducción de jornada por guarda legal
+- **Contiene**: `INDEMNIZACION_DESPIDO` (33 días/24 mensualidades del improcedente, el régimen dual de la DT 11.ª con su tope de 720 días y la excepción de hasta 42 mensualidades, 20 días/12 mensualidades y 15 días de preaviso del objetivo), `EXENCION_INDEMNIZACION_DESPIDO_IRPF` (límite de 180.000 € y la exención hasta los límites del improcedente en los despidos por causas ETOP), `REDUCCION_JORNADA_GUARDA` (1/8 a 1/2, y al menos la mitad por enfermedad grave del menor) y `COMPUTO_COTIZACION_REDUCCION_JORNADA` (tres años al 100 % y para qué prestaciones). Cada dato con su cita literal. Derecho laboral y de Seguridad Social: está aquí por la regla de `data/fiscal`.
+- **Normativa**: ET (BOE-A-2015-11430, arts. 37.6, 53.1, 56.1 y DT 11.ª) · LGSS (BOE-A-2015-11724, art. 237.3, redacción del RDL 2/2023) · LIRPF (BOE-A-2006-20764, art. 7.e).
+- **Vigilar**: reformas del despido (la de 2012 creó el régimen dual; el debate sobre la indemnización «disuasoria» tras el Comité Europeo de Derechos Sociales sigue abierto) y de los derechos de conciliación del art. 37 ET, que se ha reescrito varias veces desde 2019 (RDL 6/2019, RDL 5/2023). El art. 237.3 LGSS ya cambió tres veces (Ley 3/2017, RDL 8/2019, RDL 2/2023).
+- **Cadencia**: puntual (RDL o reforma laboral); marco estable.
+- **Alerta metodológica**: que el cómputo del art. 237.3 se amplíe a la IT o cambie de duración, o que una reforma del despido toque el tope de mensualidades: el motor de despido no tiene otra fuente.
+- **Dependencias internas**: `lib/calculadoras/indemnizacionDespido.ts` → tools `calcular_indemnizacion_despido` y `consulta_despido` del MCP de Delegum · `lib/calculadoras/reduccionJornada.ts` → tool `calcular_reduccion_jornada`.
+- **Auditoría de origen (16/11/2026)**: hito `auditoria-motores-lib-calculadoras`. Los dos motores escribían las cifras a mano con sello de enero de 2025, y tres estaban mal: el improcedente con contrato anterior al 12/02/2012 se topaba siempre en 24 mensualidades (30.000 €/año desde 1990: 60.000 € donde la ley da 81.191 €) y solo aplicaba los 45 días si la IA lo marcaba; el cómputo de la reducción de jornada duraba «24 meses» en vez de tres años y dejaba fuera al familiar del párrafo 2.º; y el objetivo eximía solo hasta 20 días. El usuario dio el OK a las tres correcciones con la cita a la vista.
+- **Verificado**: 2026-11-16 · vigencia 2026.
 
 ### 3.5 Catálogos estables (marcos, no cifras)
 

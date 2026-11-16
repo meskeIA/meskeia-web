@@ -884,7 +884,11 @@ test.describe('Golden — calcularIndemnizacionDespido (Capa 1)', () => {
     expect(res.maxMensualidades).toBe(12);
   });
 
-  test('GOLDEN-C: improcedente 30k 25 años → tope 60.000 € (24 mensualidades)', () => {
+  test('GOLDEN-C: improcedente 30k 25 años, contrato de 2001 → tope de 720 días de salario (DT 11.ª.2 ET)', () => {
+    // Hasta el 16/11/2026 este caso esperaba 60.000 € (24 mensualidades), porque el motor ignoraba
+    // la DT 11.ª si quien llamaba no marcaba el booleano. Un contrato de 2001 va por la DT 11.ª.2:
+    // 45 días/año hasta el 12/02/2012 (3.900 días → 480,49 días de salario, menos de 720) y 33
+    // después (5.231 días → 472,62). Suman 953,11 > 720 → tope de 720 días × 82,19 € = 59.176,80 €.
     const res = calcularIndemnizacionDespido({
       tipoDespido: 'improcedente',
       salarioBrutoAnual: 30000,
@@ -892,9 +896,71 @@ test.describe('Golden — calcularIndemnizacionDespido (Capa 1)', () => {
       fechaExtincion: FE,
     });
     expect(res.topeAplicado).toBe(true);
-    expect(res.indemnizacionFinal).toBeCloseTo(60000, 2);
-    expect(res.topeMáximoEuros).toBeCloseTo(60000, 2);
-    expect(res.indemnizacionSinTope).toBeGreaterThan(60000);
+    expect(res.indemnizacionFinal).toBeCloseTo(59176.80, 2);
+    expect(res.topeMáximoEuros).toBeCloseTo(59176.80, 2);
+    expect(res.indemnizacionPreReforma).toBeCloseTo(39491.70, 2);
+    expect(res.indemnizacionPostReforma).toBeCloseTo(38844.31, 2);
+    expect(res.maxMensualidades).toBe(24);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// Auditoría de motores del 16/11/2026 — DT 11.ª.2 ET (indemnización dual)
+//
+// «El importe indemnizatorio resultante no podrá ser superior a setecientos veinte días de
+// salario, salvo que del cálculo de la indemnización por el periodo anterior al 12 de febrero de
+// 2012 resultase un número de días superior, en cuyo caso se aplicará este como importe
+// indemnizatorio máximo, sin que dicho importe pueda ser superior a cuarenta y dos mensualidades».
+// Casos resueltos a mano (salario diario 30.000/365 = 82,19 €; mensualidad 2.500 €).
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Caso de origen — DT 11.ª.2 ET en calcularIndemnizacionDespido', () => {
+  test('ORIGEN: desde 01/03/1990, el tramo anterior a 2012 pasa de 720 días → 81.190,89 €, no 60.000 €', () => {
+    // 8.018 días antes del 12/02/2012 × 45 / 365,25 = 987,84 días de salario > 720 → ese es el
+    // máximo: 987,84 × 82,19 = 81.190,89 €, por debajo de 42 mensualidades (105.000 €).
+    const res = calcularIndemnizacionDespido({
+      tipoDespido: 'improcedente', salarioBrutoAnual: 30000,
+      fechaInicio: '1990-03-01', fechaExtincion: '2026-11-16',
+    });
+    expect(res.indemnizacionFinal).toBeCloseTo(81190.89, 2);
+    expect(res.topeAplicado).toBe(true);
+    expect(res.maxMensualidades).toBe(42);
+  });
+
+  test('42 MENSUALIDADES: desde 1975 el tramo anterior a 2012 da 137.269,11 € → tope absoluto 105.000 €', () => {
+    const res = calcularIndemnizacionDespido({
+      tipoDespido: 'improcedente', salarioBrutoAnual: 30000,
+      fechaInicio: '1975-01-01', fechaExtincion: '2026-06-09',
+    });
+    expect(res.indemnizacionFinal).toBeCloseTo(105000, 2);
+  });
+
+  test('SIN TOPE: desde 2008, 45 + 33 días suman 657,79 días (< 720) → 54.063,81 €', () => {
+    // 1.503 días × 45 / 365,25 = 185,17 → 15.219,50 € · 5.231 días × 33 / 365,25 = 472,62 → 38.844,31 €.
+    const res = calcularIndemnizacionDespido({
+      tipoDespido: 'improcedente', salarioBrutoAnual: 30000,
+      fechaInicio: '2008-01-01', fechaExtincion: '2026-06-09',
+    });
+    expect(res.indemnizacionFinal).toBeCloseTo(54063.81, 2);
+    expect(res.topeAplicado).toBe(false);
+  });
+
+  test('LA FECHA MANDA: el booleano obsoleto no desactiva el tramo de 45 días', () => {
+    const conFalse = calcularIndemnizacionDespido({
+      tipoDespido: 'improcedente', salarioBrutoAnual: 30000,
+      fechaInicio: '2008-01-01', fechaExtincion: '2026-06-09', tieneAntiguedadPreReforma2012: false,
+    });
+    expect(conFalse.indemnizacionFinal).toBeCloseTo(54063.81, 2);
+  });
+
+  test('EXENCIÓN ETOP: el objetivo y el colectivo eximen hasta los límites del improcedente (art. 7.e LIRPF)', () => {
+    for (const tipoDespido of ['objetivo', 'colectivo_ere'] as const) {
+      const res = calcularIndemnizacionDespido({
+        tipoDespido, salarioBrutoAnual: 30000, fechaInicio: '2020-01-01', fechaExtincion: '2026-06-09',
+      });
+      expect(res.detalleFiscal).toContain('límites del despido IMPROCEDENTE');
+      expect(res.detalleFiscal).toContain('180.000');
+    }
   });
 });
 
@@ -2257,13 +2323,16 @@ test.describe('Golden — calcularTarifaFreelance (Capa 1 · aritmética)', () =
 // ────────────────────────────────────────────────────────────────────────────
 // CAPA 1 — Golden tests: calcularGastosDeduciblesAutonomo
 // LIRPF arts. 28-30 + RIRPF art. 22. Reglas aplicadas:
-//   suministros vivienda = %afecta × 30%; vehículo no exclusivo = 50%.
+//   suministros vivienda = %afecta × 30%; vehículo de uso mixto = 0 % (art. 22.2 y 22.4 RIRPF,
+//   desde el 16/11/2026; antes 50 %, que es la presunción del IVA y no vale en el IRPF);
+//   difícil justificación = 5 % del rendimiento neto, máx. 2.000 € (art. 30.2.ª RIRPF).
 // ────────────────────────────────────────────────────────────────────────────
 
 test.describe('Golden — calcularGastosDeduciblesAutonomo (Capa 1 · LIRPF art. 28-30)', () => {
 
-  test('GOLDEN-BD: local independiente — suministros 100%, cuota 100%, publicidad 100%, vehículo 50% → total 8.700 €', () => {
-    // sub=2.400(100%)=2.400, cuota=3.600, pub=1.200, veh=3.000×50%=1.500. Suma=8.700.
+  test('GOLDEN-BD: local independiente — suministros 100%, cuota 100%, publicidad 100%, vehículo de uso mixto 0% → total 7.200 €', () => {
+    // sub=2.400(100%)=2.400, cuota=3.600, pub=1.200, veh=3.000×0%=0. Suma=7.200.
+    // ORIGEN (auditoría 16/11/2026): el motor deducía 3.000×50%=1.500 € y daba 8.700 €.
     const res = calcularGastosDeduciblesAutonomo({
       modalidad: 'normal',
       tipoLocal: 'local_independiente',
@@ -2272,17 +2341,54 @@ test.describe('Golden — calcularGastosDeduciblesAutonomo (Capa 1 · LIRPF art.
       gastosPublicidad: 1200,
       vehiculo: { totalGastosVehiculo: 3000, tipoActividad: 'no_exclusivo' },
     });
-    expect(res.totalGastosDeducibles).toBeCloseTo(8700, 2);
-    expect(res.provisionGlobalED5pct).toBe(0);
-    expect(res.totalGastosConProvision).toBeCloseTo(8700, 2);
+    expect(res.totalGastosDeducibles).toBeCloseTo(7200, 2);
+    expect(res.gastosDificilJustificacion).toBe(0);   // modalidad normal
+    expect(res.totalGastosConDificilJustificacion).toBeCloseTo(7200, 2);
     // Línea de suministros al 100% (local independiente)
     const linSub = res.lineas.find(l => l.concepto.includes('Suministros'));
     expect(linSub?.porcentajeDeducible).toBe(100);
     expect(linSub?.importeDeducible).toBe(2400);
-    // Línea de vehículo al 50% (actividad no exclusiva)
+    // Línea de vehículo al 0 % (uso mixto: no afecto en el IRPF)
     const linVeh = res.lineas.find(l => l.concepto.includes('vehículo'));
-    expect(linVeh?.porcentajeDeducible).toBe(50);
-    expect(linVeh?.importeDeducible).toBeCloseTo(1500, 2);
+    expect(linVeh?.porcentajeDeducible).toBe(0);
+    expect(linVeh?.importeDeducible).toBe(0);
+    expect(res.advertencias.some(a => a.includes('art. 95.3'))).toBe(true);
+  });
+
+  test('VEHÍCULO AFECTO: uso exclusivo o supuesto del art. 22.4 RIRPF → 100 %', () => {
+    const res = calcularGastosDeduciblesAutonomo({
+      modalidad: 'normal', tipoLocal: 'local_independiente',
+      vehiculo: { totalGastosVehiculo: 3000, amortizacionVehiculo: 2000, tipoActividad: 'si_exclusivo' },
+    });
+    const linVeh = res.lineas.find(l => l.concepto.includes('vehículo'));
+    expect(linVeh?.porcentajeDeducible).toBe(100);
+    expect(linVeh?.importeDeducible).toBeCloseTo(5000, 2);
+  });
+
+  test('ORIGEN difícil justificación: 5 % del rendimiento neto, no del saldo de deudores', () => {
+    // Ingresos 40.000 − cuota 4.000 = 36.000 de rendimiento neto → 5 % = 1.800 €.
+    const res = calcularGastosDeduciblesAutonomo({
+      modalidad: 'simplificada', tipoLocal: 'local_independiente',
+      cuotaAutonomo: 4000, ingresosAnuales: 40000,
+    });
+    expect(res.gastosDificilJustificacion).toBeCloseTo(1800, 2);
+    expect(res.totalGastosConDificilJustificacion).toBeCloseTo(5800, 2);
+  });
+
+  test('TOPE difícil justificación: 100.000 − 10.000 = 90.000 × 5 % = 4.500 → 2.000 €', () => {
+    const res = calcularGastosDeduciblesAutonomo({
+      modalidad: 'simplificada', tipoLocal: 'local_independiente',
+      cuotaAutonomo: 10000, ingresosAnuales: 100000,
+    });
+    expect(res.gastosDificilJustificacion).toBeCloseTo(2000, 2);
+  });
+
+  test('NORMAL: con ingresos, la estimación directa normal no deduce difícil justificación', () => {
+    const res = calcularGastosDeduciblesAutonomo({
+      modalidad: 'normal', tipoLocal: 'local_independiente',
+      cuotaAutonomo: 4000, ingresosAnuales: 40000,
+    });
+    expect(res.gastosDificilJustificacion).toBe(0);
   });
 
   test('GOLDEN-BE: vivienda habitual 20% — suministros al 6% (RIRPF art.22), seguro médico topado → total 5.680 €', () => {
@@ -2299,7 +2405,8 @@ test.describe('Golden — calcularGastosDeduciblesAutonomo (Capa 1 · LIRPF art.
       numFamiliaresSeguroMedico: 2,
     });
     expect(res.totalGastosDeducibles).toBeCloseTo(5680, 2);
-    expect(res.provisionGlobalED5pct).toBe(0);   // saldoDeudores no proporcionado
+    expect(res.gastosDificilJustificacion).toBe(0);   // sin ingresos no se puede calcular
+    expect(res.advertencias.some(a => a.includes('indique los ingresos'))).toBe(true);
     const linSub = res.lineas.find(l => l.concepto.includes('Suministros'));
     expect(linSub?.porcentajeDeducible).toBeCloseTo(6, 2);   // 20% × 30%
     expect(linSub?.importeDeducible).toBeCloseTo(180, 2);
@@ -2318,7 +2425,8 @@ test.describe('Golden — calcularReduccionJornada (Capa 1 · ET art. 37.6)', ()
 
   test('GOLDEN-BF: hijo_menor_12, salario 2.500 €, jornada completa 40h, reducción 25% → merma 625 €/mes', () => {
     // Jornada reducida: 30h. Salario: 2.500×75%=1.875 €. Merma: 625/mes, 7.500/año.
-    // Primeros 24 meses: baseSSCompleta=true (art. 237 LGSS protege cotización a jornada completa).
+    // Primeros 3 años (art. 237.3 LGSS, RDL 2/2023): cotizaciones computadas al 100 % para
+    // jubilación, IP, muerte y supervivencia y nacimiento — NO para la IT, que va con la reducida.
     // Rango legal: 12,5%–50%; 25% ∈ rango → dentroRangoLegal=true.
     const res = calcularReduccionJornada({
       motivo: 'hijo_menor_12',
@@ -2332,15 +2440,17 @@ test.describe('Golden — calcularReduccionJornada (Capa 1 · ET art. 37.6)', ()
     expect(res.salarioBrutoMensualReducido).toBeCloseTo(1875, 2);
     expect(res.mermaMensualBruta).toBeCloseTo(625, 2);
     expect(res.mermaAnualBruta).toBeCloseTo(7500, 2);
-    expect(res.baseSSCompleta).toBe(true);
-    expect(res.baseReguladoraEstimada).toBeCloseTo(2500, 2);   // jornada completa
+    expect(res.cotizacionComputadaAl100).toBe(true);
+    expect(res.baseComputadaPrestaciones).toBeCloseTo(2500, 2);   // jornada completa
+    expect(res.baseParaIT).toBeCloseTo(1875, 2);                  // la IT no entra en el 237.3 1.er párrafo
+    expect(res.prestacionesProtegidas).not.toContain('incapacidad temporal');
     expect(res.reduccionMinimaPermitida).toBeCloseTo(12.5, 2);
     expect(res.reduccionMaximaPermitida).toBeCloseTo(50, 2);
     expect(res.dentroRangoLegal).toBe(true);
   });
 
-  test('GOLDEN-BG: hijo_discapacidad_grave (art.37.7), salario 3.200 €, reducción 50% → merma 1.600 €/mes, rango 50–100%', () => {
-    // Art. 37.7 ET: reducción mínima ≥50%, sin tope máximo. Límite inferior 50% (no 12,5%).
+  test('GOLDEN-BG: hijo_discapacidad_grave (art. 37.6 párr. 3.º), salario 3.200 €, reducción 50% → merma 1.600 €/mes, rango 50–100%', () => {
+    // Art. 37.6, párrafo 3.º ET (cáncer u otra enfermedad grave): reducción mínima ≥50%, sin tope máximo.
     // fraccion=0,50 → en el límite inferior del rango especial → dentroRangoLegal=true.
     const res = calcularReduccionJornada({
       motivo: 'hijo_discapacidad_grave',
@@ -2355,8 +2465,48 @@ test.describe('Golden — calcularReduccionJornada (Capa 1 · ET art. 37.6)', ()
     expect(res.reduccionMinimaPermitida).toBeCloseTo(50, 2);
     expect(res.reduccionMaximaPermitida).toBeCloseTo(100, 2);
     expect(res.dentroRangoLegal).toBe(true);
-    expect(res.baseSSCompleta).toBe(true);
-    expect(res.baseReguladoraEstimada).toBeCloseTo(3200, 2);
+    expect(res.cotizacionComputadaAl100).toBe(true);
+    expect(res.baseComputadaPrestaciones).toBeCloseTo(3200, 2);
+    expect(res.baseParaIT).toBeCloseTo(3200, 2);   // 237.3, 2.º párrafo: incluye la IT
+  });
+
+  // Auditoría de motores del 16/11/2026 — art. 237.3 LGSS (redacción del RDL 2/2023): «tres
+  // primeros años» y «Dicho incremento se referirá igualmente a los tres primeros años en los demás
+  // supuestos de reducción de jornada contemplados en el primer y segundo párrafo». Hasta entonces
+  // el motor decía 24 meses y dejaba sin protección al familiar del párrafo 2.º.
+  test('ORIGEN: el familiar que no puede valerse (37.6 párr. 2.º) también computa al 100 % los tres primeros años', () => {
+    const res = calcularReduccionJornada({
+      motivo: 'familiar_dependiente', salarioBrutoMensualCompleto: 2000,
+      horasSemanalesCompletas: 40, fraccionReduccion: 0.5,
+    });
+    expect(res.cotizacionComputadaAl100).toBe(true);
+    expect(res.baseComputadaPrestaciones).toBeCloseTo(2000, 2);
+    expect(res.detalleCotizacionSS).toContain('3 primeros años');
+  });
+
+  test('PASADOS LOS 3 AÑOS: la guarda ordinaria cuenta por la jornada reducida; la de enfermedad grave sigue al 100 %', () => {
+    const hijo = calcularReduccionJornada({
+      motivo: 'hijo_menor_12', salarioBrutoMensualCompleto: 2000,
+      horasSemanalesCompletas: 40, fraccionReduccion: 0.5, enPrimeros3Anios: false,
+    });
+    expect(hijo.cotizacionComputadaAl100).toBe(false);
+    expect(hijo.baseComputadaPrestaciones).toBeCloseTo(1000, 2);
+    expect(hijo.prestacionesProtegidas).toHaveLength(0);
+    const grave = calcularReduccionJornada({
+      motivo: 'hijo_discapacidad_grave', salarioBrutoMensualCompleto: 2000,
+      horasSemanalesCompletas: 40, fraccionReduccion: 0.5, enPrimeros3Anios: false,
+    });
+    expect(grave.cotizacionComputadaAl100).toBe(true);
+    expect(grave.prestacionesProtegidas).toContain('incapacidad temporal');
+  });
+
+  test('FUERA DEL 37.6: «otro» no computa al 100 %', () => {
+    const res = calcularReduccionJornada({
+      motivo: 'otro', salarioBrutoMensualCompleto: 2000,
+      horasSemanalesCompletas: 40, fraccionReduccion: 0.25,
+    });
+    expect(res.cotizacionComputadaAl100).toBe(false);
+    expect(res.baseComputadaPrestaciones).toBeCloseTo(1500, 2);
   });
 
 });
