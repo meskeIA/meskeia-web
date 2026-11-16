@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Alimentación para Perros y Gatos | meskeIA',
-  description: 'Calcula la cantidad diaria de comida para tu perro o gato según peso, edad y actividad. Incluye detector de alimentos tóxicos y guía de transición de pienso.',
+  description: 'Calcula la cantidad diaria de comida para tu perro o gato según peso, edad y actividad. Incluye lista de alimentos tóxicos y guía de transición de pienso.',
   keywords: 'alimentación perro, comida gato, cantidad pienso, gramos diarios, ración perro, dieta mascota, alimentos tóxicos perros, chocolate perro',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -33,10 +33,18 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Calculadora de Alimentación Mascotas",
-  description: "Calcula la cantidad diaria de comida para tu perro o gato según peso, edad y actividad. Incluye detector de alimentos tóxicos y guía de transición de pienso.",
+  description: "Calcula la cantidad diaria de comida para tu perro o gato según peso, edad y actividad. Incluye lista de alimentos tóxicos y guía de transición de pienso.",
   url: "https://meskeia.com/calculadora-alimentacion-mascotas/",
   category: 'UtilityApplication',
-  features: [],
+  features: [
+    'Calcula las kcal diarias de perro o gato con RER = 70 · peso^0,75 y factores de actividad, etapa de vida y esterilización',
+    'Convierte las kcal en gramos de pienso al día, con el rango para piensos de 350-400 kcal por 100 g',
+    'Ajusta la ración al peso de referencia según la condición corporal en escala de 9 puntos',
+    'Reparte la ración en 2 tomas diarias (3 o 4 en cachorros) con los gramos de cada toma',
+    'Pauta de pérdida de peso, nunca por encima de la ración de mantenimiento, con las semanas estimadas a un ritmo seguro',
+    'Lista de 12 alimentos tóxicos para mascotas con sus síntomas',
+    'Guía de cambio de pienso en 7 días con la proporción de cada etapa',
+  ],
 });
 
 export const faqJsonLd = {
@@ -48,7 +56,7 @@ export const faqJsonLd = {
       name: '¿Cuántos gramos de pienso debe comer un perro al día?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La cantidad de pienso diaria depende del peso del perro, su edad y su nivel de actividad. Como referencia general, un perro adulto de 10 kg con actividad moderada necesita entre 150 y 200 g de pienso al día. Los cachorros requieren raciones más frecuentes y los perros senior suelen necesitar menos calorías. Siempre hay que consultar también las tablas del fabricante del pienso concreto.',
+        text: 'La cantidad de pienso diaria depende del peso del perro, su edad y su nivel de actividad. Como referencia, un perro adulto de 10 kg, en su peso, entero y con actividad moderada necesita unas 550 kcal, entre 138 y 157 g al día de un pienso seco de 350 a 400 kcal por 100 g (el cálculo parte de la energía en reposo, 70 · peso^0,75, multiplicada por 1,4). Los cachorros requieren raciones más frecuentes y los perros senior suelen necesitar menos calorías. Siempre hay que consultar también las tablas del fabricante del pienso concreto.',
       },
     },
     {
@@ -56,7 +64,7 @@ export const faqJsonLd = {
       name: '¿Cuánto debe comer un gato adulto al día?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un gato adulto de tamaño medio (4-5 kg) con actividad normal necesita aproximadamente 50-70 g de pienso seco al día o entre 150 y 200 g de comida húmeda. Los gatos esterilizados tienen menor gasto energético y tienden a engordar, por lo que su ración debe reducirse entre un 20 y un 30% respecto a un gato entero.',
+        text: 'Un gato adulto de tamaño medio (4-5 kg), en su peso, entero y con actividad normal necesita unos 74-87 g de pienso seco al día, para un pienso de unas 375 kcal por 100 g (entre 280 y 330 kcal). Los gatos esterilizados gastan menos energía y tienden a engordar: la calculadora les reduce la ración un 20 %, lo que deja al mismo gato en unos 59-70 g. Con comida húmeda la cantidad en gramos es mucho mayor: hay que mirar las kcal del envase.',
       },
     },
     {
@@ -72,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Cómo se hace la transición de un pienso a otro sin que la mascota tenga problemas digestivos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El cambio de pienso debe ser gradual, en un período de 7 a 10 días. Se comienza mezclando un 25% del pienso nuevo con un 75% del antiguo los primeros días, se aumenta progresivamente hasta llegar al 100% del nuevo pienso al final del proceso. Un cambio brusco puede provocar diarrea, vómitos o rechazo del alimento.',
+        text: 'El cambio de pienso debe ser gradual, en un período de 7 a 10 días. Se comienza mezclando un 25 % del pienso nuevo con un 75 % del antiguo los primeros días, se aumenta progresivamente hasta llegar al 100 % del nuevo pienso al final del proceso. Un cambio brusco puede provocar diarrea, vómitos o rechazo del alimento.',
       },
     },
     {

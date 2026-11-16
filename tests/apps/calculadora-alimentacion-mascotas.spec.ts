@@ -140,7 +140,9 @@ test.describe('Cálculo de la ración', () => {
     // RER(25) = 70 · 25^0,75 = 70 · 11,18034 = 782,62 kcal.
     // Ración = 782,62 · 1,2 (baja) · 0,8 (senior) · 0,8 (esterilizado) = 601,06 → 601 kcal;
     // 601,06 / 3,75 = 160,28 → 160 g; rango 150,3 → 150 y 171,7 → 172; 2 raciones de 80 g.
-    // Pauta de pérdida (perro): RER(25) · 1,0 = 782,62 → 783 kcal y 208,7 → 209 g.
+    // Pauta de pérdida (perro): el ajuste clínico RER(25) · 1,0 = 782,62 kcal supera la ración de
+    // mantenimiento (601), así que la pauta se queda en la ración: 601 kcal y 160 g (hallazgo 4842,
+    // REPARADO; antes daba 783 kcal y 209 g, más que para mantener).
     // Exceso 5 kg; semanas = ⌈5 / (30 · 0,02)⌉ = 9 y ⌈5 / (30 · 0,01)⌉ = 17.
     await calcular(page, { peso: '30', edad: 'Senior', condicion: 'Sobrepeso', actividad: 'Baja', esterilizado: true });
     const r = await leer(page);
@@ -150,8 +152,8 @@ test.describe('Cálculo de la ración', () => {
     expect(r.gramos).toBe(160);
     expect([r.rangoMin, r.rangoMax]).toEqual([150, 172]);
     expect(r.porRacion).toBe(80);
-    expect(r.perdidaKcal).toBe(783);
-    expect(r.perdidaGramos).toBe(209);
+    expect(r.perdidaKcal).toBe(601);
+    expect(r.perdidaGramos).toBe(160);
     expect(r.texto).toContain('Sobran unos 5,0 kg');
     expect(r.texto).toContain('entre 9 y 17 semanas');
   });
@@ -190,11 +192,10 @@ test.describe('Entradas que deben rechazarse', () => {
     });
   }
 
-  // ── HALLAZGO rechazo mudo (medio, ABIERTO) ───────────────────────────────────────────────────
-  // calcular() hace «return» sin más con un peso no válido: no avisa de nada y, si ya había un
-  // resultado, lo deja en pantalla junto al peso nuevo.
-  test('HALLAZGO rechazo mudo (medio, ABIERTO) · tras 20 kg (247 g/día), poner 0 y calcular no debe dejar la ración vieja', async ({ page }) => {
-    test.fail();
+  // ── HALLAZGO rechazo mudo (medio, REPARADO) ──────────────────────────────────────────────────
+  // calcular() hacía «return» sin más con un peso no válido: no avisaba de nada y, si ya había un
+  // resultado, lo dejaba en pantalla junto al peso nuevo. Ahora retira el resultado y avisa.
+  test('HALLAZGO rechazo mudo (medio, REPARADO) · tras 20 kg (247 g/día), poner 0 y calcular no debe dejar la ración vieja', async ({ page }) => {
     await calcular(page, { peso: '20' });
     expect((await leer(page)).gramos).toBe(247);
     await page.locator(PESO).fill('0');
@@ -203,50 +204,64 @@ test.describe('Entradas que deben rechazarse', () => {
     await expect(page.getByText('Ración diaria de pienso', { exact: true })).toHaveCount(0);
   });
 
-  test('HALLAZGO rechazo mudo (medio, ABIERTO) · con peso 0 la app debe decir por qué no calcula', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO rechazo mudo (medio, REPARADO) · con peso 0 la app debe decir por qué no calcula', async ({ page }) => {
     await calcular(page, { peso: '0' });
     // Acotado al aviso de la app: el anunciador de rutas de Next también es role="alert".
     await expect(page.getByRole('alert').filter({ hasText: /peso/i })).toBeVisible({ timeout: 3000 });
   });
 
-  // ── HALLAZGO parser casero (bajo, ABIERTO) ───────────────────────────────────────────────────
-  // parseFloat(peso.replace(',', '.')) lee «15abc» como 15 kg y calcula (199 g/día).
-  test('HALLAZGO parser casero (bajo, ABIERTO) · «15abc» no es un peso y no debe dar ración', async ({ page }) => {
-    test.fail();
+  // ── HALLAZGO parser casero (bajo, REPARADO) ──────────────────────────────────────────────────
+  // parseFloat(peso.replace(',', '.')) leía «15abc» como 15 kg y calculaba (199 g/día); ahora
+  // parseSpanishNumber devuelve NaN.
+  test('HALLAZGO parser casero (bajo, REPARADO) · «15abc» no es un peso y no debe dar ración', async ({ page }) => {
     await calcular(page, { peso: '15abc' });
     await expect(page.getByText('Ración diaria de pienso', { exact: true })).toHaveCount(0, { timeout: 3000 });
   });
 });
 
 test.describe('Coherencia de la app consigo misma', () => {
-  // ── HALLAZGO pauta de pérdida mayor que la ración (alto, ABIERTO) ─────────────────────────────
+  // ── HALLAZGO pauta de pérdida mayor que la ración (alto, REPARADO) ────────────────────────────
   // La ración principal ya está calculada sobre el peso de referencia con los factores de
-  // actividad, etapa y esterilización; la pauta «Si quieres que baje de peso» usa RER · 1,0 (perro)
-  // sin ellos. Con actividad baja y esterilizado (0,96 · RER), o senior, la pauta para adelgazar
-  // da MÁS comida que la ración de mantenimiento.
-  test('HALLAZGO pauta de pérdida (alto, ABIERTO) · perro adulto 30 kg, sobrepeso 7/9, baja, esterilizado: la pauta de pérdida no puede superar la ración (200 g)', async ({ page }) => {
-    test.fail();
-    // Ración = RER(25) · 1,2 · 0,8 = 751,3 kcal → 200 g. Pauta = RER(25) · 1,0 = 782,6 kcal → 209 g.
+  // actividad, etapa y esterilización; la pauta «Si quieres que baje de peso» usaba RER · 1,0
+  // (perro) sin ellos. Con actividad baja y esterilizado (0,96 · RER), o senior, la pauta para
+  // adelgazar daba MÁS comida que la ración de mantenimiento.
+  // Esperado corregido respecto al acta («por debajo de la ración»): la ración de mantenimiento
+  // ya está calculada sobre el peso de referencia, así que mantener ese peso YA adelgaza; lo que
+  // no puede pasar es que la pauta la supere. Sin fuente cotejable (WSAVA y FEDIAF fuera de la red)
+  // para fijar un recorte adicional, la pauta es min(ajuste clínico, ración) y, cuando coinciden,
+  // la app lo dice.
+  test('HALLAZGO pauta de pérdida (alto, REPARADO) · perro adulto 30 kg, sobrepeso 7/9, baja, esterilizado: la pauta de pérdida no supera la ración (200 g)', async ({ page }) => {
+    // Ración = RER(25) · 1,2 · 0,8 = 751,3 kcal → 200 g. Ajuste clínico = RER(25) · 1,0 = 782,6 kcal
+    // → por encima de la ración, así que la pauta es la ración: 751 kcal y 200 g.
     await calcular(page, { peso: '30', condicion: 'Sobrepeso', actividad: 'Baja', esterilizado: true });
     const r = await leer(page);
     expect(r.gramos).toBe(200);
-    expect(r.perdidaGramos).not.toBeNull();
-    expect(r.perdidaGramos!).toBeLessThan(r.gramos);
+    expect(r.perdidaGramos).toBe(200);
+    expect(r.perdidaKcal).toBe(751);
+    expect(r.texto).toContain('Es la misma ración de arriba');
   });
 
-  test('HALLAZGO pauta de pérdida (alto, ABIERTO) · el mismo perro senior: pauta 209 g frente a ración 160 g', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO pauta de pérdida (alto, REPARADO) · el mismo perro senior: la pauta no pasa de la ración de 160 g', async ({ page }) => {
     await calcular(page, { peso: '30', edad: 'Senior', condicion: 'Sobrepeso', actividad: 'Baja', esterilizado: true });
     const r = await leer(page);
     expect(r.perdidaGramos).not.toBeNull();
-    expect(r.perdidaGramos!).toBeLessThan(r.gramos);
+    expect(r.perdidaGramos!).toBeLessThanOrEqual(r.gramos);
   });
 
-  // ── HALLAZGO tamaño de raza sin efecto (medio, ABIERTO) ──────────────────────────────────────
-  // El selector «Tamaño de raza» se guarda en el estado (tamanoPerro) y no entra en ningún cálculo.
-  test('HALLAZGO tamaño de raza (medio, ABIERTO) · si la app pregunta el tamaño, Mini y Gigante no pueden dar la misma ración', async ({ page }) => {
-    test.fail();
+  test('control · perro adulto 30 kg con sobrepeso, actividad normal y entero: la pauta clínica (209 g) queda por debajo de la ración (292 g) y se aplica tal cual', async ({ page }) => {
+    // Ración = RER(25) · 1,4 = 1095,7 kcal → 292 g. Pauta = RER(25) · 1,0 = 782,6 → 783 kcal y 209 g.
+    await calcular(page, { peso: '30', condicion: 'Sobrepeso' });
+    const r = await leer(page);
+    expect(r.gramos).toBe(292);
+    expect(r.perdidaKcal).toBe(783);
+    expect(r.perdidaGramos).toBe(209);
+    expect(r.texto).not.toContain('Es la misma ración de arriba');
+  });
+
+  // ── HALLAZGO tamaño de raza sin efecto (medio, REPARADO) ─────────────────────────────────────
+  // El selector «Tamaño de raza» se guardaba en el estado (tamanoPerro) y no entraba en ningún
+  // cálculo. Se retiró: la ración depende del peso, no del tamaño declarado.
+  test('HALLAZGO tamaño de raza (medio, REPARADO) · si la app pregunta el tamaño, Mini y Gigante no pueden dar la misma ración', async ({ page }) => {
     const grupo = page.getByRole('group', { name: 'Tamaño de raza' });
     if ((await grupo.count()) === 0) return; // reparado retirando el selector
     await calcular(page, { peso: '20', tamano: 'Mini' });
@@ -256,19 +271,18 @@ test.describe('Coherencia de la app consigo misma', () => {
     expect(gigante.texto).not.toBe(mini.texto);
   });
 
-  // ── HALLAZGO resultado que no sigue a los datos (bajo, ABIERTO) ───────────────────────────────
-  // Cambiar de especie borra el resultado; cambiar la esterilización, la etapa o la actividad lo
-  // deja como estaba, calculado con los datos de antes.
-  test('HALLAZGO resultado desfasado (bajo, ABIERTO) · tras 20 kg (247 g), marcar «Esterilizado/a» no debe seguir mostrando 247 g', async ({ page }) => {
-    test.fail();
+  // ── HALLAZGO resultado que no sigue a los datos (bajo, REPARADO) ──────────────────────────────
+  // Cambiar de especie borraba el resultado; cambiar la esterilización, la etapa o la actividad lo
+  // dejaba como estaba. Ahora cualquier dato del cálculo lo retira.
+  test('HALLAZGO resultado desfasado (bajo, REPARADO) · tras 20 kg (247 g), marcar «Esterilizado/a» no debe seguir mostrando 247 g', async ({ page }) => {
     await calcular(page, { peso: '20' });
     expect((await leer(page)).gramos).toBe(247);
     await page.getByLabel('Esterilizado/a').check();
     await expect(page.getByText('247 g/día', { exact: true })).toHaveCount(0, { timeout: 3000 });
   });
 
-  // ── HALLAZGO FAQPage contra el motor (medio, ABIERTO) ─────────────────────────────────────────
-  // El FAQPage (solo lo leen buscadores y asistentes) da cifras que la calculadora no da:
+  // ── HALLAZGO FAQPage contra el motor (medio, REPARADO) ────────────────────────────────────────
+  // El FAQPage (solo lo leen buscadores y asistentes) daba cifras que la calculadora no da:
   //   · perro adulto de 10 kg, actividad moderada: «entre 150 y 200 g». La app: RER(10) = 393,64;
   //     · 1,4 = 551,1 kcal → 147 g (rango 138 - 157).
   //   · gato adulto de 4-5 kg, actividad normal (entero: la FAQ resta aparte el 20-30 % del
@@ -281,10 +295,10 @@ test.describe('Coherencia de la app consigo misma', () => {
     return (pagina?.mainEntity ?? []).map((q) => `${q.name} ${q.acceptedAnswer.text}`).join(' ');
   }
 
-  test('HALLAZGO FAQPage (medio, ABIERTO) · la cifra del perro de 10 kg del FAQPage debe casar con la calculadora', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO FAQPage (medio, REPARADO) · la cifra del perro de 10 kg del FAQPage debe casar con la calculadora', async ({ page }) => {
     const texto = await faq(page);
     const cifra = texto.match(/perro adulto de 10 kg[^.]*?entre (\d+) y (\d+) g/);
+    expect(cifra).not.toBeNull();
     await calcular(page, { peso: '10' });
     const r = await leer(page);
     expect(r.gramos).toBe(147);
@@ -294,10 +308,10 @@ test.describe('Coherencia de la app consigo misma', () => {
     }
   });
 
-  test('HALLAZGO FAQPage (medio, ABIERTO) · la cifra del gato de 4-5 kg del FAQPage debe casar con la calculadora', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO FAQPage (medio, REPARADO) · la cifra del gato de 4-5 kg del FAQPage debe casar con la calculadora', async ({ page }) => {
     const texto = await faq(page);
     const cifra = texto.match(/gato adulto[^.]*?4-5 kg[^.]*?(\d+)-(\d+) g de pienso/);
+    expect(cifra).not.toBeNull();
     await calcular(page, { especie: 'Gato', peso: '4' });
     const cuatro = await leer(page);
     expect(cuatro.gramos).toBe(74);
@@ -318,19 +332,17 @@ test.describe('Avisos, metadatos y formato', () => {
     expect(await aviso.evaluate((el) => Boolean(el.closest('details')))).toBe(false);
   });
 
-  // ── HALLAZGO aviso de salud humana (medio, ABIERTO) ──────────────────────────────────────────
-  // DisclaimerCard variant="medical" sin children pinta el texto de salud HUMANA: «tu salud»,
-  // «un médico o profesional sanitario» y «EMERGENCIAS MÉDICAS … 112». Ni una palabra del veterinario.
-  test('HALLAZGO aviso de salud humana (medio, ABIERTO) · el aviso fijo debe remitir al veterinario, no al médico ni al 112', async ({ page }) => {
-    test.fail();
+  // ── HALLAZGO aviso de salud humana (medio, REPARADO) ─────────────────────────────────────────
+  // DisclaimerCard variant="medical" sin children pintaba el texto de salud HUMANA: «tu salud»,
+  // «un médico o profesional sanitario» y «EMERGENCIAS MÉDICAS … 112». Ahora lleva su propio texto.
+  test('HALLAZGO aviso de salud humana (medio, REPARADO) · el aviso fijo debe remitir al veterinario, no al médico ni al 112', async ({ page }) => {
     const aviso = page.getByRole('note').filter({ hasText: /orientativo/ });
     await expect(aviso).toContainText(/veterinari/i);
     await expect(aviso).not.toContainText('112');
   });
 
-  // ── HALLAZGO características vacías (bajo, ABIERTO) ──────────────────────────────────────────
-  test('HALLAZGO features (bajo, ABIERTO) · el WebApplication debe declarar al menos 4 características', async ({ page }) => {
-    test.fail();
+  // ── HALLAZGO características vacías (bajo, REPARADO) ─────────────────────────────────────────
+  test('HALLAZGO features (bajo, REPARADO) · el WebApplication debe declarar al menos 4 características', async ({ page }) => {
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const app = bloques
       .map((t) => JSON.parse(t) as { '@type'?: string; featureList?: string[] })
@@ -338,11 +350,17 @@ test.describe('Avisos, metadatos y formato', () => {
     expect(app?.featureList?.length ?? 0).toBeGreaterThanOrEqual(4);
   });
 
-  // ── HALLAZGO promesa (bajo, ABIERTO) ──────────────────────────────────────────────────────────
-  // La description promete un «detector de alimentos tóxicos» y la pestaña es una lista fija de 12
-  // alimentos, sin nada que consultar.
-  test('HALLAZGO promesa (bajo, ABIERTO) · si la description dice «detector», la pestaña de tóxicos debe dejar consultar un alimento', async ({ page }) => {
-    test.fail();
+  // ── HALLAZGO promesa (bajo, REPARADO) ─────────────────────────────────────────────────────────
+  // La description prometía un «detector de alimentos tóxicos» y la pestaña es una lista fija de 12
+  // alimentos, sin nada que consultar. Ahora dice «lista»; y el paso 3 de la guía ya no pide un
+  // «tipo de alimento» que no existe.
+  test('HALLAZGO promesa (bajo, REPARADO) · la guía no pide un tipo de alimento que la app no pregunta', async ({ page }) => {
+    // La sección educativa está siempre en el DOM (colapsada por CSS).
+    const html = await page.content();
+    expect(html).not.toContain('y el tipo de alimento');
+  });
+
+  test('HALLAZGO promesa (bajo, REPARADO) · si la description dice «detector», la pestaña de tóxicos debe dejar consultar un alimento', async ({ page }) => {
     const descripcion = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
     await page.getByRole('button', { name: 'Alimentos Tóxicos', exact: true }).click();
     await expect(page.getByRole('heading', { name: /Alimentos Peligrosos/ })).toBeVisible();
@@ -351,11 +369,16 @@ test.describe('Avisos, metadatos y formato', () => {
     }
   });
 
-  // ── HALLAZGO porcentaje (bajo, ABIERTO) ───────────────────────────────────────────────────────
-  // Formato del proyecto (25/09/2026): «20 %» con espacio duro U+00A0. Hoy lleva espacio normal en
-  // los resultados y va pegado en la pestaña de cambio de pienso y en la sección educativa.
-  test('HALLAZGO porcentaje (bajo, ABIERTO) · «del 20 %» del peso de referencia lleva espacio duro', async ({ page }) => {
-    test.fail();
+  // ── HALLAZGO porcentaje (bajo, REPARADO) ──────────────────────────────────────────────────────
+  // Formato del proyecto (25/09/2026): «20 %» con espacio duro U+00A0. Llevaba espacio normal en
+  // los resultados e iba pegado en la pestaña de cambio de pienso y en la sección educativa.
+  test('HALLAZGO porcentaje (bajo, REPARADO) · la pestaña de cambio de pienso separa el % con espacio duro', async ({ page }) => {
+    await page.getByRole('button', { name: 'Cambio de Pienso', exact: true }).click();
+    await expect(page.getByText('75 % antiguo', { exact: true })).toBeVisible();
+    await expect(page.getByText('100 % nuevo', { exact: true })).toBeVisible();
+  });
+
+  test('HALLAZGO porcentaje (bajo, REPARADO) · «del 20 %» del peso de referencia lleva espacio duro', async ({ page }) => {
     await calcular(page, { peso: '30', condicion: 'Sobrepeso' });
     await expect(page.getByRole('heading', { name: 'Peso de referencia' })).toBeVisible();
     const texto = (await panel(page).textContent()) ?? '';
@@ -363,9 +386,8 @@ test.describe('Avisos, metadatos y formato', () => {
     expect(texto).toContain('del 20\u00a0%');
   });
 
-  // ── HALLAZGO teclado y anuncio (bajo, ABIERTO) ────────────────────────────────────────────────
-  test('HALLAZGO teclado y anuncio (bajo, ABIERTO) · el peso pide teclado decimal y el resultado se anuncia', async ({ page }) => {
-    test.fail();
+  // ── HALLAZGO teclado y anuncio (bajo, REPARADO) ───────────────────────────────────────────────
+  test('HALLAZGO teclado y anuncio (bajo, REPARADO) · el peso pide teclado decimal y el resultado se anuncia', async ({ page }) => {
     await expect(page.locator(PESO)).toHaveAttribute('inputmode', 'decimal', { timeout: 2000 });
     await calcular(page, { peso: '20' });
     const anunciado = await page

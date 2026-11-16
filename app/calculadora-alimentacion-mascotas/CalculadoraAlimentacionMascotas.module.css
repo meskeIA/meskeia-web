@@ -149,6 +149,18 @@
   font-weight: 500;
 }
 
+/* Aviso de peso no válido: vacío no ocupa sitio */
+.errorPeso {
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: var(--rojo-texto, #b91c1c);
+}
+
+/* Sin display: none, que en algunos lectores impide anunciar la región al llenarse */
+.errorPeso:empty {
+  margin-top: 0;
+}
+
 .tamanoGrid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);

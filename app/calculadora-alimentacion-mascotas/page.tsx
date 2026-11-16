@@ -3,13 +3,12 @@
 import { useState } from 'react';
 import styles from './CalculadoraAlimentacionMascotas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 
 type TabType = 'calculadora' | 'toxicos' | 'transicion';
 type TipoMascota = 'perro' | 'gato';
 type EdadMascota = 'cachorro' | 'adulto' | 'senior';
 type ActividadMascota = 'baja' | 'normal' | 'alta' | 'muy_alta';
-type TamanoPerro = 'mini' | 'pequeno' | 'mediano' | 'grande' | 'gigante';
 type CondicionCorporal = 'muy_delgado' | 'delgado' | 'ideal' | 'sobrepeso' | 'obeso';
 
 interface CondicionInfo {
@@ -56,13 +55,13 @@ const alimentosToxicos: AlimentoToxico[] = [
 
 export default function CalculadoraAlimentacionMascotasPage() {
   const [activeTab, setActiveTab] = useState<TabType>('calculadora');
-  const [tipoMascota, setTipoMascota] = useState<TipoMascota>('perro');
+  const [tipoMascota, setTipoMascotaEstado] = useState<TipoMascota>('perro');
   const [peso, setPeso] = useState('');
-  const [edad, setEdad] = useState<EdadMascota>('adulto');
-  const [actividad, setActividad] = useState<ActividadMascota>('normal');
-  const [tamanoPerro, setTamanoPerro] = useState<TamanoPerro>('mediano');
-  const [esterilizado, setEsterilizado] = useState(false);
-  const [condicion, setCondicion] = useState<CondicionCorporal>('ideal');
+  const [edad, setEdadEstado] = useState<EdadMascota>('adulto');
+  const [actividad, setActividadEstado] = useState<ActividadMascota>('normal');
+  const [esterilizado, setEsterilizadoEstado] = useState(false);
+  const [condicion, setCondicionEstado] = useState<CondicionCorporal>('ideal');
+  const [errorPeso, setErrorPeso] = useState('');
   const [resultado, setResultado] = useState<{
     kcalDiarias: number;
     gramosPienso: number;
@@ -77,10 +76,20 @@ export default function CalculadoraAlimentacionMascotasPage() {
       kcal: number;
       gramos: number;
       exceso: number;
+      // La pauta clínica superaba la ración de mantenimiento: se queda en la ración
+      igualRacion: boolean;
       semanasMin: number;
       semanasMax: number;
     } | null;
   } | null>(null);
+
+  // Cualquier dato que entre en el cálculo retira el resultado: si no, quedaría en pantalla
+  // una ración calculada con los datos de antes (hallazgo 4846).
+  const setTipoMascota = (v: TipoMascota) => { setTipoMascotaEstado(v); setResultado(null); };
+  const setEdad = (v: EdadMascota) => { setEdadEstado(v); setResultado(null); };
+  const setActividad = (v: ActividadMascota) => { setActividadEstado(v); setResultado(null); };
+  const setEsterilizado = (v: boolean) => { setEsterilizadoEstado(v); setResultado(null); };
+  const setCondicion = (v: CondicionCorporal) => { setCondicionEstado(v); setResultado(null); };
 
   // Calcular RER (Resting Energy Requirement)
   const calcularRER = (pesoKg: number): number => {
@@ -124,8 +133,14 @@ export default function CalculadoraAlimentacionMascotasPage() {
   };
 
   const calcular = () => {
-    const pesoNum = parseFloat(peso.replace(',', '.'));
-    if (isNaN(pesoNum) || pesoNum <= 0 || pesoNum > 100) return;
+    const pesoNum = parseSpanishNumber(peso);
+    if (isNaN(pesoNum) || pesoNum <= 0 || pesoNum > 100) {
+      // Sin cálculo no puede quedar en pantalla la ración de un peso anterior (hallazgo 4844).
+      setResultado(null);
+      setErrorPeso('Introduce un peso válido: un número mayor que 0 y de hasta 100 kg (por ejemplo, 12,5).');
+      return;
+    }
+    setErrorPeso('');
 
     // En cachorros no se corrige por condición corporal: están creciendo y no
     // se les restringe la comida. El peso de referencia es el actual.
@@ -158,10 +173,15 @@ export default function CalculadoraAlimentacionMascotasPage() {
 
     // Pauta de pérdida gradual cuando hay exceso de peso. Se parte del RER del
     // peso ideal (sin factores de actividad) y se aplica el ajuste habitual en
-    // clínica: 1,0 en perros y 0,8 en gatos.
+    // clínica: 1,0 en perros y 0,8 en gatos. Nunca por encima de la ración de
+    // mantenimiento de arriba, que ya está calculada sobre el peso de referencia:
+    // con actividad baja, senior o esterilizado, sus factores quedan por debajo de
+    // ese ajuste, y la pauta para adelgazar daba MÁS comida que la de mantener
+    // (hallazgo 4842). En ese caso la pauta es la propia ración.
     let planPerdida = null;
     if (!esCachorro && bcs > 5) {
-      const kcalPerdida = calcularRER(pesoIdeal) * (tipoMascota === 'perro' ? 1.0 : 0.8);
+      const kcalClinica = calcularRER(pesoIdeal) * (tipoMascota === 'perro' ? 1.0 : 0.8);
+      const kcalPerdida = Math.min(kcalClinica, kcal);
       // Ritmo seguro: 1-2 % del peso por semana en perros, 0,5-1 % en gatos.
       const ritmoMin = tipoMascota === 'perro' ? 0.01 : 0.005;
       const ritmoMax = tipoMascota === 'perro' ? 0.02 : 0.01;
@@ -170,6 +190,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
         kcal: Math.round(kcalPerdida),
         gramos: Math.round((kcalPerdida / kcalPor100g) * 100),
         exceso,
+        igualRacion: kcalClinica >= kcal,
         semanasMin: Math.ceil(exceso / (pesoNum * ritmoMax)),
         semanasMax: Math.ceil(exceso / (pesoNum * ritmoMin)),
       };
@@ -191,6 +212,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
   const limpiar = () => {
     setPeso('');
     setResultado(null);
+    setErrorPeso('');
   };
 
   const tabs: { id: TabType; label: string; emoji: string }[] = [
@@ -258,41 +280,24 @@ export default function CalculadoraAlimentacionMascotasPage() {
                 <input
                   id="peso-mascota"
                   type="text"
+                  inputMode="decimal"
                   value={peso}
-                  onChange={(e) => setPeso(e.target.value)}
+                  onChange={(e) => { setPeso(e.target.value); setResultado(null); }}
                   placeholder={tipoMascota === 'perro' ? '15' : '4'}
                   className={styles.input}
+                  aria-invalid={errorPeso ? true : undefined}
+                  aria-describedby="peso-mascota-error"
                 />
                 <span className={styles.unidad}>kg</span>
               </div>
+              {/* Región siempre montada: el aviso se anuncia al aparecer (hallazgo 4844) */}
+              <div id="peso-mascota-error" role="alert" aria-live="polite" className={styles.errorPeso}>
+                {errorPeso}
+              </div>
             </div>
 
-            {/* Tamaño (solo perros) */}
-            {tipoMascota === 'perro' && (
-              <div className={styles.inputGroup}>
-                <label id="tamano-raza-label">Tamaño de raza</label>
-                <div role="group" aria-labelledby="tamano-raza-label" className={styles.tamanoGrid}>
-                  {[
-                    { id: 'mini', label: 'Mini', peso: '<5 kg' },
-                    { id: 'pequeno', label: 'Pequeño', peso: '5-10 kg' },
-                    { id: 'mediano', label: 'Mediano', peso: '10-25 kg' },
-                    { id: 'grande', label: 'Grande', peso: '25-45 kg' },
-                    { id: 'gigante', label: 'Gigante', peso: '>45 kg' },
-                  ].map((t) => (
-                    <button
-                      key={t.id}
-                      type="button"
-                      className={`${styles.tamanoBtn} ${tamanoPerro === t.id ? styles.active : ''}`}
-                      onClick={() => setTamanoPerro(t.id as TamanoPerro)}
-                      aria-pressed={tamanoPerro === t.id}
-                    >
-                      <span className={styles.tamanoLabel}>{t.label}</span>
-                      <span className={styles.tamanoPeso}>{t.peso}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* El selector «Tamaño de raza» se retiró (hallazgo 4843): no entraba en el
+                cálculo, que depende del peso, y hacía creer que el tamaño se tenía en cuenta. */}
 
             {/* Edad */}
             <div className={styles.inputGroup}>
@@ -415,7 +420,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
             </div>
           </div>
 
-          <div className={styles.resultsPanel}>
+          <div className={styles.resultsPanel} aria-live="polite">
             {resultado ? (
               <>
                 <div className={styles.resultadoPrincipal}>
@@ -456,7 +461,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
                     </p>
                     <p className={styles.pesoIdealNota}>
                       Con una condición corporal de {resultado.bcs}/9, la desviación estimada es del{' '}
-                      {formatNumber(Math.abs(resultado.bcs - 5) * 10, 0)} %. La ración de arriba está
+                      {formatNumber(Math.abs(resultado.bcs - 5) * 10, 0)}{' '}%. La ración de arriba está
                       calculada sobre ese peso de referencia, no sobre el actual: calcularla sobre el
                       peso de ahora mantendría a tu {tipoMascota} donde está.
                     </p>
@@ -471,9 +476,17 @@ export default function CalculadoraAlimentacionMascotasPage() {
                       <strong>{formatNumber(resultado.planPerdida.gramos, 0)} g/día</strong>{' '}
                       ({formatNumber(resultado.planPerdida.kcal, 0)} kcal)
                     </p>
+                    {resultado.planPerdida.igualRacion && (
+                      <p className={styles.perdidaNota}>
+                        Es la misma ración de arriba: con su actividad, su etapa y la esterilización ya
+                        queda por debajo del ajuste clínico habitual para adelgazar
+                        ({tipoMascota === 'perro' ? '1,0' : '0,8'} × la energía en reposo del peso de
+                        referencia). No la subas para que pierda peso.
+                      </p>
+                    )}
                     <p className={styles.perdidaNota}>
                       Sobran unos {formatNumber(resultado.planPerdida.exceso, 1)} kg. A un ritmo seguro
-                      ({tipoMascota === 'perro' ? '1-2' : '0,5-1'} % del peso por semana) serían entre{' '}
+                      ({tipoMascota === 'perro' ? '1-2' : '0,5-1'}{' '}% del peso por semana) serían entre{' '}
                       {resultado.planPerdida.semanasMin} y {resultado.planPerdida.semanasMax} semanas.
                       Bajar más deprisa es peligroso, sobre todo en gatos.
                     </p>
@@ -555,8 +568,8 @@ export default function CalculadoraAlimentacionMascotasPage() {
               <div className={styles.diaNumero}>Días 1-2</div>
               <div className={styles.diaContenido}>
                 <div className={styles.proporcion}>
-                  <div className={styles.barraAntiguo} style={{ width: '75%' }}>75% antiguo</div>
-                  <div className={styles.barraNuevo} style={{ width: '25%' }}>25% nuevo</div>
+                  <div className={styles.barraAntiguo} style={{ width: '75%' }}>75{' '}% antiguo</div>
+                  <div className={styles.barraNuevo} style={{ width: '25%' }}>25{' '}% nuevo</div>
                 </div>
                 <p>Introduce solo una pequeña cantidad del nuevo pienso</p>
               </div>
@@ -566,8 +579,8 @@ export default function CalculadoraAlimentacionMascotasPage() {
               <div className={styles.diaNumero}>Días 3-4</div>
               <div className={styles.diaContenido}>
                 <div className={styles.proporcion}>
-                  <div className={styles.barraAntiguo} style={{ width: '50%' }}>50% antiguo</div>
-                  <div className={styles.barraNuevo} style={{ width: '50%' }}>50% nuevo</div>
+                  <div className={styles.barraAntiguo} style={{ width: '50%' }}>50{' '}% antiguo</div>
+                  <div className={styles.barraNuevo} style={{ width: '50%' }}>50{' '}% nuevo</div>
                 </div>
                 <p>Mezcla a partes iguales ambos piensos</p>
               </div>
@@ -577,8 +590,8 @@ export default function CalculadoraAlimentacionMascotasPage() {
               <div className={styles.diaNumero}>Días 5-6</div>
               <div className={styles.diaContenido}>
                 <div className={styles.proporcion}>
-                  <div className={styles.barraAntiguo} style={{ width: '25%' }}>25% antiguo</div>
-                  <div className={styles.barraNuevo} style={{ width: '75%' }}>75% nuevo</div>
+                  <div className={styles.barraAntiguo} style={{ width: '25%' }}>25{' '}% antiguo</div>
+                  <div className={styles.barraNuevo} style={{ width: '75%' }}>75{' '}% nuevo</div>
                 </div>
                 <p>El nuevo pienso ya es la base de la alimentación</p>
               </div>
@@ -588,7 +601,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
               <div className={styles.diaNumero}>Día 7+</div>
               <div className={styles.diaContenido}>
                 <div className={styles.proporcion}>
-                  <div className={styles.barraNuevo} style={{ width: '100%' }}>100% nuevo</div>
+                  <div className={styles.barraNuevo} style={{ width: '100%' }}>100{' '}% nuevo</div>
                 </div>
                 <p>Transición completada. Solo el nuevo pienso</p>
               </div>
@@ -614,7 +627,21 @@ export default function CalculadoraAlimentacionMascotasPage() {
         severity="high"
         context="calculadora-alimentacion-mascotas"
         collapsible={false}
-      />
+      >
+        <p>
+          <strong><span aria-hidden="true">🐾</span> Esta calculadora tiene carácter orientativo.</strong>{' '}
+          La ración depende de cada animal, de su salud y del pienso concreto. Antes de cambiar su
+          alimentación o de ponerlo a dieta, consulta a tu veterinario.
+        </p>
+        <p>
+          <strong>Urgencias:</strong> si tu mascota ha comido algo tóxico, deja de comer o pierde peso
+          sin motivo, llama a tu veterinario o a un servicio de urgencias veterinarias.
+        </p>
+        <p>
+          meskeIA no asume ninguna responsabilidad por decisiones tomadas en base a los resultados de
+          esta herramienta.
+        </p>
+      </DisclaimerCard>
 
 
       <RelatedApps
@@ -703,7 +730,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
               <p>Luna pesa 6 kg cuando debería pesar 4,5 kg. El veterinario recomienda pienso de control de peso
               (menor densidad calórica), eliminar snacks entre horas y distribuir en 2 tomas medidas.
               El calculador ayuda a fijar la ración exacta para la pérdida gradual.</p>
-              <div className={styles.casoResultado}>Déficit del 20% de calorías + revisión mensual de peso</div>
+              <div className={styles.casoResultado}>Déficit del 20{' '}% de calorías + revisión mensual de peso</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
@@ -800,7 +827,9 @@ export default function CalculadoraAlimentacionMascotasPage() {
               <span className={styles.stepNumber}>3</span>
               <div className={styles.stepContent}>
                 <strong>Calcula la ración diaria con la herramienta</strong>
-                <p>Introduce el peso, la actividad y el tipo de alimento. Usa siempre una báscula de cocina
+                <p>Introduce el peso, la etapa de vida, la condición corporal y la actividad. La ración
+                se da para un pienso seco de 350-400 kcal por 100 g: si el tuyo se aparta, mira las kcal
+                del envase y ajusta. Usa siempre una báscula de cocina
                 o taza medidora para mayor precisión. Alimentar "a ojo" es la principal causa de sobrepeso
                 en mascotas domésticas.</p>
               </div>
@@ -827,7 +856,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
               <div className={styles.stepContent}>
                 <strong>Revisa el peso cada mes y ajusta la ración</strong>
                 <p>El peso ideal puede cambiar con la edad, la actividad y la estación del año. Pesa a tu mascota
-                mensualmente y ajusta la ración según la tendencia. Una pérdida o ganancia de más del 5% en un mes
+                mensualmente y ajusta la ración según la tendencia. Una pérdida o ganancia de más del 5{' '}% en un mes
                 merece consulta veterinaria.</p>
               </div>
             </li>
@@ -841,7 +870,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <strong>Usa báscula de cocina</strong>
-              <p>Una taza medidora tiene un 20-30% de error según cómo se llena. Una báscula elimina
+              <p>Una taza medidora tiene un 20-30{' '}% de error según cómo se llena. Una báscula elimina
               la variabilidad y garantiza la precisión de la ración.</p>
             </div>
             <div className={styles.tipCard}>
@@ -858,7 +887,7 @@ export default function CalculadoraAlimentacionMascotasPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🍬</span>
-              <strong>Los snacks no superan el 10% de calorías</strong>
+              <strong>Los snacks no superan el 10{' '}% de calorías</strong>
               <p>Los premios engordan más de lo que parece. Si das snacks frecuentes, reduce la ración
               diaria de pienso en proporción para mantener el equilibrio calórico.</p>
             </div>
