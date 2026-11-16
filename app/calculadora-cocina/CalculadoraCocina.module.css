@@ -814,8 +814,9 @@
   font-size: 1rem;
 }
 
+/* En oscuro, #e74c3c sobre el tinte rojo daba 3,14:1 (hallazgo 3861): el token da un rojo claro. */
 [data-theme='dark'] .warningHeader strong {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 .warningIcon {
@@ -853,7 +854,7 @@
 }
 
 [data-theme='dark'] .warningList li strong {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 /* --- Responsive — Educational v2.0 --- */

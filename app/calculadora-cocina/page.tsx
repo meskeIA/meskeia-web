@@ -7,66 +7,14 @@ import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, Legal
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { PREGUNTAS_FRECUENTES } from './metadata';
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
+import { unidadesCocina, densidadesIngredientes, gramosDeIngrediente } from './medidas';
 
 type TabActiva = 'conversor' | 'escalador' | 'tiempos' | 'sustitutos';
 
 // ==================== DATOS DE CONVERSIÓN ====================
 
-interface ConversionUnidad {
-  nombre: string;
-  aGramos: number; // Factor de conversión a gramos (o ml para líquidos)
-  categoria: 'peso' | 'volumen' | 'temperatura';
-}
-
-const unidadesCocina: Record<string, ConversionUnidad> = {
-  // Peso
-  'gramos': { nombre: 'Gramos (g)', aGramos: 1, categoria: 'peso' },
-  'kilogramos': { nombre: 'Kilogramos (kg)', aGramos: 1000, categoria: 'peso' },
-  'onzas': { nombre: 'Onzas (oz)', aGramos: 28.3495, categoria: 'peso' },
-  'libras': { nombre: 'Libras (lb)', aGramos: 453.592, categoria: 'peso' },
-  // Volumen
-  'mililitros': { nombre: 'Mililitros (ml)', aGramos: 1, categoria: 'volumen' },
-  'litros': { nombre: 'Litros (L)', aGramos: 1000, categoria: 'volumen' },
-  'tazas': { nombre: 'Tazas (cup)', aGramos: 240, categoria: 'volumen' },
-  'cucharadas': { nombre: 'Cucharadas (tbsp)', aGramos: 15, categoria: 'volumen' },
-  'cucharaditas': { nombre: 'Cucharaditas (tsp)', aGramos: 5, categoria: 'volumen' },
-  'onzas-liquidas': { nombre: 'Onzas líquidas (fl oz)', aGramos: 29.5735, categoria: 'volumen' },
-};
-
-/**
- * Densidades aproximadas para conversión peso↔volumen, en g/ml.
- *
- * Se contrastan con la tabla de pesos de King Arthur Baking, que es la referencia habitual
- * en repostería y mide «spooned & levelled» (cucharear y enrasar), no compactando.
- * Verificado: 2026-08-23.
- *
- * ⚠️ El cacao estaba en 0,52 g/ml, que da 124,80 g por taza de 240 ml: es el valor de cacao
- * COMPACTADO. King Arthur da 1/2 taza = 42 g, es decir 84 g por taza, y las demás tablas lo
- * sitúan en torno a 85 g. Se pasaba entre un 25 % y un 47 %, y era la única de las doce que
- * no cuadraba (hallazgo 144 del Inspector, 21/08/2026).
- */
-const densidadesIngredientes: Record<string, number> = {
-  'agua': 1,
-  'leche': 1.03,
-  'aceite': 0.92,
-  'harina': 0.53,
-  'azucar': 0.85,
-  'azucar-glass': 0.48,
-  'sal': 1.2,
-  'arroz': 0.75,
-  'miel': 1.42,
-  'mantequilla': 0.946,
-  'cacao': 0.35,   // 84 g por taza de 240 ml (King Arthur: 1/2 taza = 42 g)
-  'avena': 0.4,
-};
-
-/**
- * Cuántos gramos pesan `ml` de `ingrediente`, con la misma densidad que usa el conversor de
- * arriba. Las tarjetas educativas escribían estas cifras a mano y se desincronizaban del
- * motor: «1 cuchara sopera = 10 g de harina» cuando el conversor da 7,95 g (hallazgo 548).
- */
-const gramosDeIngrediente = (ml: number, ingrediente: string): number =>
-  Math.round(ml * densidadesIngredientes[ingrediente]);
+// Unidades, densidades y gramosDeIngrediente viven en ./medidas: la FAQ de metadata.ts lee las
+// mismas cifras (hallazgos 3850 y 3853).
 
 /** 30 g de avena en tazas, para que el ejemplo del texto no vuelva a divergir del conversor
  *  de arriba (hallazgo 546: el texto decía «≈ 3/4 cup» y el motor da 0,31 tazas). */
@@ -254,13 +202,28 @@ const TOPE_FRACCIONES = 20;
  *  que se pesa (hallazgo 549: formatearCantidad usaba la magnitud, no la unidad). */
 const UNIDAD_MEDIBLE = /^(g|gr|gramos?|kg|kilo(?:gramo)?s?|ml|mililitros?|l|litros?)\b/i;
 
+/** Kilos y litros: una cifra decimal son 100 g o 100 ml, y «0,25 l» salía «0,3 l» aun sin
+ *  escalar (hallazgo 3851). Con ellas se escriben hasta tres decimales, los que hagan falta. */
+const UNIDAD_GRANDE = /^(kg|kilo(?:gramo)?s?|l|litros?)\b/i;
+
+/** `n` con los decimales justos hasta `max`: 0,25 → «0,25», 1,875 → «1,875», 0,5 → «0,5». */
+const conDecimalesJustos = (n: number, max: number): string => {
+  for (let d = 1; d < max; d++) {
+    if (Math.abs(n - Math.round(n * 10 ** d) / 10 ** d) < 1e-9) return formatNumber(n, d);
+  }
+  return formatNumber(n, max);
+};
+
 const formatearCantidad = (n: number, textoResto = ''): string => {
   if (Math.abs(n % 1) < 1e-9) return formatNumber(Math.round(n), 0);
+  if (UNIDAD_GRANDE.test(textoResto.trim())) return conDecimalesJustos(n, 3);
   if (n >= TOPE_FRACCIONES || UNIDAD_MEDIBLE.test(textoResto.trim())) return formatNumber(n, 1);
   const entera = Math.floor(n);
   const parteFraccional = n - entera;
+  // Los octavos también son de receta: «3/4 taza» ×0,5 = 3/8 salía «0,4 taza» (hallazgo 3851).
   const fracciones: [number, string][] = [
-    [1 / 4, '1/4'], [1 / 3, '1/3'], [1 / 2, '1/2'], [2 / 3, '2/3'], [3 / 4, '3/4'],
+    [1 / 8, '1/8'], [1 / 4, '1/4'], [1 / 3, '1/3'], [3 / 8, '3/8'], [1 / 2, '1/2'],
+    [5 / 8, '5/8'], [2 / 3, '2/3'], [3 / 4, '3/4'], [7 / 8, '7/8'],
   ];
   const encaje = fracciones.find(([v]) => Math.abs(parteFraccional - v) < 0.02);
   if (encaje) return entera > 0 ? `${formatNumber(entera, 0)} ${encaje[1]}` : encaje[1];
@@ -620,7 +583,7 @@ export default function CalculadoraCocinaPage() {
                 <div className={styles.equivalencia}>
                   <span className={styles.eqValor}>1 fl oz</span>
                   <span className={styles.eqIgual}>=</span>
-                  <span className={styles.eqResultado}>29,57 ml</span>
+                  <span className={styles.eqResultado}>30 ml</span>
                 </div>
               </div>
             </div>
@@ -952,10 +915,10 @@ export default function CalculadoraCocinaPage() {
                   <strong>Cocinero amateur con recetas internacionales</strong>
                 </div>
                 <p className={styles.escenarioExample}>
-                  Sigue un canal de YouTube británico que usa onzas y libras. Convierte 1 lb de carne picada a 453 g o 6 fl oz de nata a 177 ml sin cálculos mentales.
+                  Sigue un canal de YouTube británico que usa onzas y libras. Convierte 1 lb de carne picada a 453 g o 6 fl oz de nata a 180 ml sin cálculos mentales.
                 </p>
                 <p className={styles.escenarioTip}>
-                  Clave: 1 oz = 28,35 g y 1 fl oz = 29,57 ml.
+                  Clave: 1 oz = 28,35 g y 1 fl oz = 30 ml (la tradicional de EE. UU. mide 29,57 ml y la imperial británica, 28,41 ml).
                 </p>
               </div>
               <div className={styles.escenarioCard}>
@@ -1022,7 +985,7 @@ export default function CalculadoraCocinaPage() {
                 <span className={styles.stepNumber} aria-hidden="true">3</span>
                 <div className={styles.stepContent}>
                   <strong>Convierte los líquidos a mililitros</strong>
-                  <p>1 cup = 240 ml, 1 fl oz = 29,57 ml, 1 pint US = 473 ml, 1 pint UK = 568 ml. Anota los mililitros junto a cada ingrediente líquido.</p>
+                  <p>1 cup = 240 ml y 1 fl oz = 30 ml (las medidas del etiquetado de EE. UU., que usa esta calculadora: 1 cup = 8 fl oz). Una pint US son 2 cups, 480 ml con esa taza (473 ml con la tradicional, de 236,6 ml); la pint UK, 568 ml. Anota los mililitros junto a cada ingrediente líquido.</p>
                 </div>
               </li>
               <li className={styles.step}>
@@ -1101,7 +1064,7 @@ export default function CalculadoraCocinaPage() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>Confundir la taza española con el cup americano.</strong> Una taza de desayuno española son 150–200 ml; el cup americano son exactamente 240 ml. Si usas tu taza del café en recetas anglosajonas, las cantidades quedarán un 20–40% por debajo.
+                <strong>Confundir la taza española con el cup americano.</strong> Una taza de desayuno española son 150–200 ml; el cup americano, 240 ml (236,6 ml la taza tradicional). Si usas tu taza del café en recetas anglosajonas, las cantidades quedarán un 20–40% por debajo.
               </li>
               <li>
                 <strong>Tratar todos los cups de sólidos como si fueran 240 g.</strong> 1 cup de agua = 240 g, pero 1 cup de harina = 120–130 g y 1 cup de azúcar glass = 120 g. La densidad del ingrediente cambia completamente el peso.

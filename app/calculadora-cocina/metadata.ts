@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema, generateFAQSchema } from '@/lib/schema-templates';
+import { gramosDeIngrediente } from './medidas';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Cocina Online - Convertir Tazas a Gramos, Escalar Recetas',
@@ -77,13 +78,13 @@ export const PREGUNTAS_FRECUENTES: PreguntaFrecuente[] = [
   },
   {
     question: '¿Cuál es la diferencia entre la taza americana y la española?',
-    answer: 'La taza americana (cup) tiene exactamente 240 ml. La taza española habitual de desayuno oscila entre 150 y 200 ml. No son equivalentes. Para recetas anglosajonas, usa siempre 240 ml.',
+    answer: 'La taza americana (cup) que usa esta calculadora es la del etiquetado nutricional de EE. UU.: 240 ml, igual a 8 fl oz de 30 ml. La taza tradicional mide 236,6 ml (8 fl oz de 29,57 ml); la diferencia, un 1,4 %, no se nota en una receta. La taza española habitual de desayuno oscila entre 150 y 200 ml: no son equivalentes.',
     consejo: 'Solución: mide con vaso medidor o usa la calculadora.',
   },
   {
     question: '¿Cómo convierto °F a °C en el horno?',
-    answer: 'Aplica la fórmula: °C = (°F − 32) × 5/9. Así, 350°F = 177°C (≈ 180°C práctico). Las referencias más usadas: 325°F = 163°C, 375°F = 190°C, 400°F = 204°C.',
-    consejo: 'Truco: divide °F entre 2 y resta 15 para una aproximación rápida.',
+    answer: 'Aplica la fórmula: °C = (°F − 32) × 5/9. Así, 350 °F = 177 °C (≈ 180 °C práctico). Las referencias más usadas: 325 °F = 163 °C, 375 °F = 191 °C, 400 °F = 204 °C.',
+    consejo: 'Sin calculadora: resta 32 y divide entre 1,8 (350 − 32 = 318; 318 ÷ 1,8 ≈ 177).',
   },
   {
     question: '¿1 cucharada son siempre 15 ml?',
@@ -102,7 +103,8 @@ export const PREGUNTAS_FRECUENTES: PreguntaFrecuente[] = [
   },
   {
     question: '¿Cómo medir ingredientes secos sin báscula?',
-    answer: 'Usa medidas de referencia: 1 vaso estándar (200 ml) ≈ 110 g harina / 180 g azúcar / 180 g arroz. Una cuchara sopera ≈ 10 g harina / 15 g azúcar / 14 g aceite. Para máxima precisión, llena y rasas el recipiente sin compactar.',
+    // Cifras del mismo motor que la tarjeta «Medidas sin báscula» (hallazgo 3853): rasas, no colmadas.
+    answer: `Usa medidas de referencia, rasas: 1 vaso estándar (200 ml) ≈ ${gramosDeIngrediente(200, 'harina')} g harina / ${gramosDeIngrediente(200, 'azucar')} g azúcar / ${gramosDeIngrediente(200, 'arroz')} g arroz. Una cuchara sopera (15 ml) ≈ ${gramosDeIngrediente(15, 'harina')} g harina / ${gramosDeIngrediente(15, 'azucar')} g azúcar / ${gramosDeIngrediente(15, 'aceite')} g aceite. Para máxima precisión, llena y rasa el recipiente sin compactar.`,
     consejo: 'Siempre rasa los ingredientes secos con el dorso de un cuchillo.',
   },
   {

@@ -29,7 +29,7 @@ import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliar
  *
  * LA TABLA QUE PUBLICA LA PROPIA APP (manda sobre cualquier memoria):
  *   1 taza = 240 ml · 1 cucharada = 15 ml · 1 cucharadita = 5 ml
- *   1 oz = 28,3495 g · 1 lb = 453,592 g · 1 fl oz = 29,5735 ml
+ *   1 oz = 28,3495 g · 1 lb = 453,592 g · 1 fl oz = 30 ml (29,5735 hasta el hallazgo 3850)
  *   densidades (g/ml): agua 1 · leche 1,03 · aceite 0,92 · harina 0,53 · azúcar 0,85 ·
  *                      azúcar glass 0,48 · sal 1,2 · arroz 0,75 · miel 1,42 ·
  *                      mantequilla 0,946 · cacao 0,35 · avena 0,4
@@ -153,8 +153,8 @@ test.describe('Conversor de unidades — lo que promete el <h1>', () => {
     page,
   }) => {
     // Agua: 240 ml × 1 g/ml = 240 g. La app define la taza como 240 ml (no como los 236,6 ml
-    // de la cup US exacta) y lo declara en su propia FAQ. Es coherente con su cucharada de
-    // 15 ml, pero NO con su onza líquida de 29,5735 ml: ver la re-inspección del 30/10/2026.
+    // de la cup US tradicional) y lo declara en su propia FAQ. Es coherente con su cucharada de
+    // 15 ml y, desde el hallazgo 3850, con su onza líquida de 30 ml.
     expect(await convertir(page, '1', 'tazas', 'gramos', 'agua')).toContain('= 240,00 Gramos (g)');
     // Azúcar blanco: 240 × 0,85 = 204 g/taza, frente a los ~200 g de referencia estándar.
     expect(await convertir(page, '1', 'tazas', 'gramos', 'azucar')).toContain('= 204,00 Gramos (g)');
@@ -212,9 +212,11 @@ test.describe('Re-inspección 30/08/2026 — los tres casos', () => {
       '1,00 Tazas (cup) = 16,00 Cucharadas (tbsp)',
     );
 
-    // 250 ml ÷ 29,5735 ml/fl oz = 8,4535 → 8,45 a dos decimales.
+    // 250 ml ÷ 30 ml/fl oz = 8,333 → 8,33 a dos decimales. Desde el hallazgo 3850 (16/11/2026)
+    // la fl oz es la del etiquetado de EE. UU. (30 ml), la que va con la taza de 240 ml; antes
+    // era la tradicional de 29,5735 ml y salía 8,45, con 1 taza = 8,12 fl oz.
     expect(await convertir(page, '250', 'mililitros', 'onzas-liquidas')).toContain(
-      '250,00 Mililitros (ml) = 8,45 Onzas líquidas (fl oz)',
+      '250,00 Mililitros (ml) = 8,33 Onzas líquidas (fl oz)',
     );
 
     // Volumen→peso con densidad. 1 taza de cacao = 240 ml × 0,35 g/ml = 84 g.
@@ -665,15 +667,14 @@ test.describe('Re-inspección 30/10/2026 — conversor y escalador', () => {
     );
   });
 
-  test('HALLAZGO (30/10/2026, ABIERTO) · la onza líquida no cuadra con la taza ni con la cucharada', async ({
+  test('HALLAZGO 3850 (30/10/2026, REPARADO 16/11) · la onza líquida cuadra con la taza y con la cucharada', async ({
     page,
   }) => {
-    // La app mezcla dos sistemas: taza de 240 ml y cucharada de 15 ml (los del etiquetado de
+    // La app mezclaba dos sistemas: taza de 240 ml y cucharada de 15 ml (los del etiquetado de
     // EE. UU., cuya fl oz es de 30 ml) con la fl oz TRADICIONAL de 29,5735 ml (cuya taza es de
     // 236,588 ml). En cualquiera de los dos, 1 taza = 8 fl oz y 1 fl oz = 2 cucharadas; la
-    // tabla comparativa de la propia app dice «8 fl oz». Hoy: 240 ÷ 29,5735 = 8,12 y
-    // 29,5735 ÷ 15 = 1,97.
-    test.fail();
+    // tabla comparativa de la propia app dice «8 fl oz». Antes: 240 ÷ 29,5735 = 8,12 y
+    // 29,5735 ÷ 15 = 1,97. Ahora la fl oz es de 30 ml: 240 ÷ 30 = 8 y 30 ÷ 15 = 2.
     expect(await convertirHidratado(page, '1', 'tazas', 'onzas-liquidas')).toMatch(
       /= 8(,0+)? Onzas líquidas/,
     );
@@ -701,20 +702,24 @@ test.describe('Re-inspección 30/10/2026 — conversor y escalador', () => {
     expect(texto).toContain('200 huevos');
   });
 
-  test('HALLAZGO (30/10/2026, ABIERTO) · el escalador redondea litros y kilos a una cifra: 0,25 l pasa a 0,3 l', async ({
+  test('HALLAZGO 3851 (30/10/2026, REPARADO 16/11) · el escalador ya no redondea litros y kilos a una cifra', async ({
     page,
   }) => {
-    // formatearCantidad escribe las unidades medibles con UNA cifra decimal (hallazgo 549).
-    // Para g y ml es 0,1 g; para kg y l son 100 g o 100 ml, y la cantidad cambia aunque no se
-    // escale. Hoy: «0,25 l nata» ×1 → «0,3 l nata» (+20 %), «0,125 kg» ×1 → «0,1 kg» (−20 %),
-    // «0,2 l aceite» ×1,25 = 0,25 → «0,3 l aceite».
-    test.fail();
+    // formatearCantidad escribía las unidades medibles con UNA cifra decimal (hallazgo 549).
+    // Para g y ml es 0,1 g; para kg y l son 100 g o 100 ml, y la cantidad cambiaba aunque no se
+    // escalara: «0,25 l nata» ×1 → «0,3 l nata» (+20 %), «0,125 kg» ×1 → «0,1 kg» (−20 %),
+    // «0,2 l aceite» ×1,25 = 0,25 → «0,3 l aceite». Ahora kg y l llevan hasta tres decimales.
     await page.getByRole('button', { name: 'Escalador' }).click();
     const identidad = await escalarHidratado(page, '4', '4', '0,25 l nata\n0,125 kg mantequilla');
     expect(identidad).toMatch(/^(0,25 l|250 ml) nata$/m);
     expect(identidad).toMatch(/^(0,125 kg|125 g) mantequilla$/m);
-    const cinco = await escalarHidratado(page, '4', '5', '0,2 l aceite');
+    // ×1,25: 0,2 l → 0,25 l · 1,5 kg → 1,875 kg (antes «1,9 kg»)
+    const cinco = await escalarHidratado(page, '4', '5', '0,2 l aceite\n1,5 kg harina');
     expect(cinco).toMatch(/^(0,25 l|250 ml) aceite$/m);
+    expect(cinco).toMatch(/^1,875 kg harina$/m);
+    // ×0,5: 3/4 taza = 3/8 taza, una fracción de receta (antes «0,4 taza»)
+    const mitad = await escalarHidratado(page, '4', '2', '3/4 taza leche');
+    expect(mitad).toMatch(/^3\/8 taza leche$/m);
   });
 
   test('HALLAZGO (30/10/2026, ABIERTO) · con dos decimales fijos, una cantidad pequeña sale doblada o a cero', async ({
@@ -793,14 +798,19 @@ test.describe('Re-inspección 30/10/2026 — bloque educativo y FAQPage', () => 
     await abrirHidratada(page);
   });
 
-  test('HALLAZGO (30/10/2026, ABIERTO) · la FAQ «secos sin báscula» conserva las cifras colmadas que el 548 quitó de la tarjeta', async ({
+  test('HALLAZGO 3853 (30/10/2026, REPARADO 16/11) · la FAQ «secos sin báscula» ya da las cifras rasas del motor', async ({
     page,
   }) => {
     // La tarjeta deriva del motor: vaso de 200 ml → harina 200 × 0,53 = 106 g, azúcar 170 g,
     // arroz 150 g; cuchara de 15 ml → harina 8 g, azúcar 13 g, aceite 14 g. La FAQ visible y
-    // el FAQPage del @graph siguen diciendo 110 / 180 / 180 g y 10 / 15 / 14 g.
-    test.fail();
+    // el FAQPage decían 110 / 180 / 180 g y 10 / 15 / 14 g; ahora leen el mismo ./medidas.
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.locator('li', { hasText: 'secos sin báscula' })).toContainText(
+      '106 g harina / 170 g azúcar / 150 g arroz',
+    );
+    await expect(page.locator('li', { hasText: 'secos sin báscula' })).toContainText(
+      '8 g harina / 13 g azúcar / 14 g aceite',
+    );
     await expect(
       page.locator('h4', { hasText: 'Con un vaso de agua' }).locator('xpath=..'),
     ).toContainText('Harina: 106');
@@ -857,30 +867,33 @@ test.describe('Re-inspección 30/10/2026 — bloque educativo y FAQPage', () => 
     expect(pechuga.respuesta).toMatch(new RegExp(`${grados![1]}\\s*°C`));
   });
 
-  test('HALLAZGO (30/10/2026, ABIERTO) · el «truco» de °F a °C da 160 °C para 350 °F, 17 °C por debajo', async ({
+  test('HALLAZGO 3856 (30/10/2026, REPARADO 16/11) · sin el «truco» de °F a °C que daba 160 °C para 350 °F', async ({
     page,
   }) => {
     // La misma respuesta da la fórmula: (350 − 32) × 5/9 = 176,7 → 177 °C. El truco
-    // «divide °F entre 2 y resta 15»: 350 ÷ 2 − 15 = 160 °C (−17 °C; a 400 °F, 185 frente a 204).
-    test.fail();
+    // «divide °F entre 2 y resta 15» daba 350 ÷ 2 − 15 = 160 °C (−17 °C; a 400 °F, 185 frente a
+    // 204). Y 375 °F = (375 − 32) × 5/9 = 190,6 → 191 °C, no «190».
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const visible = page.locator('li', { hasText: '¿Cómo convierto °F a °C en el horno?' });
     await expect(visible).toContainText(/350\s?°F = 177\s?°C/);
+    await expect(visible).toContainText(/375\s?°F = 191\s?°C/);
     await expect(visible).not.toContainText(/entre 2 y resta 15/);
     const { preguntas } = await faqPagesJsonLd(page);
     for (const p of preguntas) expect(p.respuesta).not.toMatch(/entre 2 y resta 15/);
   });
 
-  test('HALLAZGO (30/10/2026, ABIERTO, el mismo de la onza líquida) · «la taza americana tiene exactamente 240 ml», y la de la definición tiene 236,588', async ({
+  test('HALLAZGO 3850 (30/10/2026, REPARADO 16/11, el mismo de la onza líquida) · ya no dice «la taza americana tiene exactamente 240 ml»', async ({
     page,
   }) => {
     // Es la cara de texto del hallazgo de la onza líquida (bloque «conversor y escalador»):
     // 1 taza = 1/16 galón US = 236,588 ml (= 8 × 29,5735, la fl oz que usa la propia app);
     // 240 ml es la taza redondeada del etiquetado nutricional. El paso 3 de la guía dice a la
     // vez «1 cup = 240 ml» y «1 pint US = 473 ml», y una pinta son dos tazas (480 ≠ 473).
-    // Se repara eligiendo UN sistema y haciendo que motor y textos digan lo mismo.
-    test.fail();
+    // Se reparó eligiendo UN sistema (el del etiquetado: taza 240 ml, fl oz 30 ml) y haciendo
+    // que motor y textos digan lo mismo.
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.getByText(/1 fl oz = 29,57 ml/)).toHaveCount(0);
+    await expect(page.getByText(/1 pint US = 473 ml/)).toHaveCount(0);
     await expect(page.locator('li', { hasText: 'taza americana y la española' })).not.toContainText(
       /exactamente 240 ml/,
     );
@@ -928,13 +941,13 @@ test.describe('Re-inspección 30/10/2026 — contraste de los colores escritos a
     expect(m.ratio, `${m.color} sobre ${m.fondo}`).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO (30/10/2026, ABIERTO) · oscuro: el rojo #e74c3c de «Errores comunes» da 2,70:1 sobre su tinte', async ({
+  test('HALLAZGO 3861 (30/10/2026, REPARADO 16/11) · oscuro: el rojo de «Errores comunes» llega a 4,5:1 sobre su tinte', async ({
     page,
   }) => {
     // [data-theme='dark'] .warningList li strong { color: #e74c3c } sobre el tinte rojo de la
     // caja compuesto con la tarjeta: 2,70:1; el título de la caja, 3,14:1. Ninguno es texto
     // grande (13,9 px y 16 px en negrita): piden 4,5:1. En claro, #c0392b da 4,64-5,11:1.
-    test.fail();
+    // Ahora var(--rojo-texto), que en oscuro vale #FCA5A5.
     await page.goto(RUTA);
     await prepararParaMedir(page);
     await activarTema(page, 'dark');
