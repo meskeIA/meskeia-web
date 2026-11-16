@@ -745,56 +745,56 @@ export default function OrientadorEscrituraCreativaPage() {
               <p>
                 Depende de tu forma de pensar, no del género. Los escritores se dividen en <em>plotters</em> (planifican todo) y <em>pantsers</em> (escriben "a la intuición"). Ambos producen buena literatura. La recomendación para principiantes es el punto medio: responde el Kit de Arranque (protagonista, objetivo, obstáculo, clímax) pero deja que los detalles emerjan durante la escritura.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Si te bloqueas improvisando, escribe una frase resumen de cada capítulo antes de escribirlo. Si te bloqueas con el plan, escribe la escena más emocionante primero, aunque no sea la primera.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Si te bloqueas improvisando, escribe una frase resumen de cada capítulo antes de escribirlo. Si te bloqueas con el plan, escribe la escena más emocionante primero, aunque no sea la primera.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuántas palabras debería escribir al día?</h4>
               <p>
                 No existe una respuesta correcta. Stephen King recomienda 2.000 palabras diarias; muchos escritores profesionales producen 500. Lo que importa es la regularidad: escribir 300 palabras todos los días produce 109.500 palabras al año — suficientes para dos novelas. La constancia supera a la intensidad, especialmente cuando se empieza.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Elige un número alcanzable y cúmplelo el 90% de los días. Es mejor 200 palabras diarias reales que 2.000 teóricas que rara vez suceden.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Elige un número alcanzable y cúmplelo el 90% de los días. Es mejor 200 palabras diarias reales que 2.000 teóricas que rara vez suceden.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Primera persona o tercera persona: cuál es mejor para empezar?</h4>
               <p>
                 La primera persona es más natural al principio porque es la voz de tu vida diaria. La tercera persona limitada (la más usada en la ficción contemporánea) da más flexibilidad sin la complejidad de la omnisciente. Evita la segunda persona ("tú") hasta que tengas varios proyectos terminados — es técnicamente muy exigente.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Escribe la primera escena en primera persona y luego en tercera limitada. Léelas en voz alta y elige la que suene más natural para esa historia específica.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Escribe la primera escena en primera persona y luego en tercera limitada. Léelas en voz alta y elige la que suene más natural para esa historia específica.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué hago cuando me bloqueo y no sé cómo continuar?</h4>
               <p>
                 El bloqueo del escritor rara vez es falta de inspiración: casi siempre es una señal de que algo no funciona en la historia. Pregúntate: ¿Mi personaje actuaría así realmente? ¿He resuelto el conflicto demasiado pronto? ¿Me he ido por las ramas en una subtrama? El bloqueo apunta al problema antes de que lo identifiques conscientemente.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Cuando te bloquees, escribe la escena desde el punto de vista del antagonista o de un personaje secundario. A menudo eso desbloquea el problema principal.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Cuando te bloquees, escribe la escena desde el punto de vista del antagonista o de un personaje secundario. A menudo eso desbloquea el problema principal.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuándo sé que mi primer borrador está listo para ser revisado?</h4>
               <p>
                 Cuando está terminado, aunque sea imperfecto. El error más común es revisar capítulo a capítulo mientras escribes: destruye el impulso y hace que reescribas sin conocer el final. Termina el borrador completo primero, luego espera al menos dos semanas antes de revisarlo. La distancia temporal es el mejor corrector de estilo.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Consejo:</strong> En el primer borrador, permítete todo: escenas malas, diálogos planos, inconsistencias. Escribe "[arreglar esto]" en el manuscrito y sigue adelante. El momentum importa más que la perfección.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> En el primer borrador, permítete todo: escenas malas, diálogos planos, inconsistencias. Escribe "[arreglar esto]" en el manuscrito y sigue adelante. El momentum importa más que la perfección.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Necesito leer mucho para escribir bien?</h4>
               <p>
                 Sí, sin excepciones. Stephen King lo resume mejor que nadie: "Si no tienes tiempo para leer, no tienes el tiempo (ni las herramientas) para escribir." Leer en tu género te enseña estructuras, ritmos y convenciones. Leer fuera de tu género te da perspectiva y rompe clichés. Leer ficción mala te enseña exactamente qué no hacer.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Lee activamente: subraya frases que funcionan, anota qué hace el autor en los momentos de tensión, cómo construye los diálogos, cómo termina los capítulos. Léelo como escritor, no solo como lector.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Lee activamente: subraya frases que funcionan, anota qué hace el autor en los momentos de tensión, cómo construye los diálogos, cómo termina los capítulos. Léelo como escritor, no solo como lector.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cómo sé si mi historia tiene potencial?</h4>
               <p>
                 Haz la prueba del "¿y qué?": después de cada frase importante de tu sinopsis, pregúntate "¿y qué?". Si la historia responde con más tensión, consecuencias o preguntas, tiene potencial. Si se detiene o la respuesta es obvia, necesita más conflicto. Una historia con potencial siempre tiene en juego algo que el protagonista no puede perder.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Cuéntale el argumento a alguien de confianza en dos minutos. Si hace preguntas al final ("¿y qué pasa después?"), la historia tiene gancho. Si asiente cortésmente y cambia de tema, revisa el conflicto central.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Cuéntale el argumento a alguien de confianza en dos minutos. Si hace preguntas al final ("¿y qué pasa después?"), la historia tiene gancho. Si asiente cortésmente y cambia de tema, revisa el conflicto central.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Debería mostrar mi texto mientras lo escribo o esperar a terminarlo?</h4>
               <p>
                 No muestres el trabajo en progreso hasta tener al menos un borrador completo o una sección terminada. Las opiniones tempranas, aunque bienintencionadas, pueden desviar o bloquear el proceso. Sí puedes compartir la sinopsis o el concepto general para recibir feedback sobre la premisa antes de invertir meses en el desarrollo.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Encuentra un lector de confianza (beta reader) que no sea pareja ni familia cercana. La objetividad es más valiosa que el apoyo incondicional en esta etapa.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Encuentra un lector de confianza (beta reader) que no sea pareja ni familia cercana. La objetividad es más valiosa que el apoyo incondicional en esta etapa.</p>
             </div>
           </div>
         </section>

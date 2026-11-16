@@ -860,7 +860,7 @@ export default function PlanificadorMascotaPage() {
           </div>
 
           <div className={styles.enlaceRelacionado}>
-            <p>🐾 <strong>¿Quieres saber la edad de tu mascota en años humanos?</strong>{' '}
+            <p><span aria-hidden="true">🐾</span> <strong>¿Quieres saber la edad de tu mascota en años humanos?</strong>{' '}
               <a href="/calculadora-edad-mascotas/">Calculadora de Edad de Mascotas</a>
             </p>
           </div>

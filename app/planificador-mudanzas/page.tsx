@@ -1097,7 +1097,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                 Depende del tamaño y distancia. Para mudanzas locales pequeñas (estudiante), con <strong>2-3 semanas</strong> es suficiente. Para mudanzas de piso completo, lo ideal son <strong>6-8 semanas</strong>. Para mudanzas internacionales o de empresa, se recomienda <strong>3-6 meses</strong>. En temporada alta (junio-septiembre y enero-febrero), las empresas se reservan antes; planifica con el doble de tiempo habitual.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Solicita presupuestos de al menos 3-5 empresas en cuanto tengas la fecha confirmada. Las empresas suelen dar mejor precio cuando ven que estás comparando.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Solicita presupuestos de al menos 3-5 empresas en cuanto tengas la fecha confirmada. Las empresas suelen dar mejor precio cuando ven que estás comparando.
               </p>
             </div>
 
@@ -1107,7 +1107,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                 Los obligatorios por ley son: <strong>empadronamiento</strong> (30 días desde el cambio, Ayuntamiento), <strong>DNI/carnet de conducir</strong> (3 meses desde el empadronamiento), <strong>Hacienda/AEAT</strong> (antes de la siguiente declaración) y <strong>Seguridad Social</strong> (30 días). Los recomendados: banco, seguro del hogar, suscripciones (Amazon, Netflix), trabajo, médico de cabecera y colegio de los hijos.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Usa el planificador de tareas para no olvidar ninguna notificación. El cambio de empadronamiento es la base: muchos trámites posteriores lo requieren.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Usa el planificador de tareas para no olvidar ninguna notificación. El cambio de empadronamiento es la base: muchos trámites posteriores lo requieren.
               </p>
             </div>
 
@@ -1117,7 +1117,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                 Verifica estos puntos antes de contratar: <strong>CIF/NIF visible</strong> en presupuesto, <strong>seguro de responsabilidad civil</strong> (mínimo 600.000 €, pídelo por escrito), <strong>reseñas verificadas</strong> en Google Maps (mínimo 20 reseñas, media &gt;4.0), <strong>presupuesto por escrito</strong> (nunca verbal), y <strong>dirección física verificable</strong> de la empresa. Desconfía de precios muy por debajo de la media: suelen añadir extras no comunicados.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Pide al menos 3 presupuestos. Si uno es más del 30% más barato que los demás, pregunta exactamente qué no incluye.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Pide al menos 3 presupuestos. Si uno es más del 30% más barato que los demás, pregunta exactamente qué no incluye.
               </p>
             </div>
 
@@ -1127,7 +1127,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                 <strong>Nevera/congelador:</strong> Vaciar y descongelar con 48 horas de antelación (coloca toallas para absorber el agua). <strong>Lavadora:</strong> Vaciar el tambor y poner los tornillos de transporte (si los conservas). <strong>Lavavajillas:</strong> Vaciar completamente. <strong>Horno:</strong> Limpiar bien para evitar olores. Los electrodomésticos deben transportarse en vertical (lavadora, nevera). Si la empresa de mudanzas los tumbara, pueden sufrir daños internos.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Si tu lavadora ya no tiene los tornillos de transporte, puedes comprarlos genéricos online por 5-15 €. Transportarla sin ellos puede dañar el tambor.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Si tu lavadora ya no tiene los tornillos de transporte, puedes comprarlos genéricos online por 5-15 €. Transportarla sin ellos puede dañar el tambor.
               </p>
             </div>
 
@@ -1137,7 +1137,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                 Reglas básicas: <strong>objetos pesados en cajas pequeñas</strong> (libros, vajilla); <strong>objetos frágiles con papel de burbujas</strong> (mínimo 3 capas); <strong>ropa como relleno</strong> en cajas con objetos de vidrio; <strong>cajas siempre llenas</strong> (no dejar huecos, rellenar con papel periódico para que no se muevan). Etiqueta cada caja con: habitación de destino, contenido básico y si es frágil.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Supermercados y librerías regalan cajas de buena calidad. Solo compra el papel burbuja y la cinta de embalar. Ahorra 50-100 € en material de embalaje.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Supermercados y librerías regalan cajas de buena calidad. Solo compra el papel burbuja y la cinta de embalar. Ahorra 50-100 € en material de embalaje.
               </p>
             </div>
 
@@ -1147,7 +1147,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                 <strong>Sí, es fundamental si tienes contrato de alquiler.</strong> Documenta con fotos y vídeo (con fecha visible) el estado de cada habitación, electrodomésticos y paredes. Envía el archivo por email al propietario el mismo día de entrega de llaves. En caso de conflicto sobre la fianza, estas pruebas son determinantes. Si eres propietario que vende, las fotos del estado original también protegen ante posibles reclamaciones del comprador.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Fotografía especialmente los desperfectos ya existentes antes de tu mudanza de entrada. Son los que más conflictos generan al salir.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Fotografía especialmente los desperfectos ya existentes antes de tu mudanza de entrada. Son los que más conflictos generan al salir.
               </p>
             </div>
 
@@ -1157,7 +1157,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                 Para la vivienda que abandonas: solicita la <strong>baja</strong> o cambio de titular 15-30 días antes. Para la nueva vivienda: solicita el <strong>alta</strong> o cambio de titular 15-30 días antes. El día de la mudanza, anota las lecturas de los contadores (agua, luz, gas) con foto del marcador. Esto evita disputas sobre el consumo del período de transición. Los nuevos suministros pueden tardar 7-15 días laborables en darse de alta.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Compara tarifas de luz y gas antes de dar el alta en la nueva vivienda. Es el momento perfecto para cambiar a un proveedor más barato sin penalización.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Compara tarifas de luz y gas antes de dar el alta en la nueva vivienda. Es el momento perfecto para cambiar a un proveedor más barato sin penalización.
               </p>
             </div>
 
@@ -1167,7 +1167,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                 Calcula el <strong>presupuesto de la empresa + 20-30% adicional</strong> para imprevistos. Los más frecuentes: piso origen con ascensor averiado (requiere más personal: +150-300 €), furgoneta adicional por volumen mayor al estimado (+200-400 €), reparaciones urgentes en vivienda nueva (cerradura, humedades, etc.), gastos de primeros días (comidas fuera, hotel si la mudanza se retrasa). Para una mudanza media de familia, reserva mínimo 500-1.000 € de colchón.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Usa la pestaña Presupuesto de este planificador para registrar estimados y reales. Así detectas desviaciones a tiempo.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Usa la pestaña Presupuesto de este planificador para registrar estimados y reales. Así detectas desviaciones a tiempo.
               </p>
             </div>
           </div>

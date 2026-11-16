@@ -936,7 +936,7 @@ export default function ConversorFormatosPage() {
                 formatos, gráficos - solo valores).
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Regla práctica:</strong> Si tu formato destino es menos expresivo que el origen,
+                <span aria-hidden="true">💡</span> <strong>Regla práctica:</strong> Si tu formato destino es menos expresivo que el origen,
                 habrá pérdida. CSV es el menos expresivo (solo tablas planas). JSON/XML/YAML preservan
                 estructuras complejas. Siempre guarda backup del archivo original antes de convertir.
               </p>
@@ -951,7 +951,7 @@ export default function ConversorFormatosPage() {
                 a string <code>{`{nombre:Ana,edad:30}`}</code>.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Solución:</strong> Esta herramienta aplana automáticamente al convertir a CSV.
+                <span aria-hidden="true">💡</span> <strong>Solución:</strong> Esta herramienta aplana automáticamente al convertir a CSV.
                 Si necesitas preservar estructura anidada, usa JSON, XML o YAML. Para análisis en Excel
                 de datos complejos, considera aplanar manualmente en JSON primero para controlar cómo se
                 estructuran las columnas.
@@ -966,7 +966,7 @@ export default function ConversorFormatosPage() {
                 la fórmula se pierde. Esto aplica a todos los formatos destino (JSON, CSV, XML, YAML).
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Workaround:</strong> Si necesitas las fórmulas, NO uses conversión automatizada.
+                <span aria-hidden="true">💡</span> <strong>Workaround:</strong> Si necesitas las fórmulas, NO uses conversión automatizada.
                 Para datos calculados (subtotales, KPIs), esto es exactamente lo que quieres - los valores
                 finales. Para preservar lógica de cálculo, documenta fórmulas en otra hoja/archivo.
               </p>
@@ -980,7 +980,7 @@ export default function ConversorFormatosPage() {
                 Esta herramienta genera UTF-8 correctamente, pero Excel puede malinterpretarlo.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Solución Excel:</strong> No abrir CSV con doble clic. Ir a Datos → Desde texto/CSV
+                <span aria-hidden="true">💡</span> <strong>Solución Excel:</strong> No abrir CSV con doble clic. Ir a Datos → Desde texto/CSV
                 → Seleccionar archivo → Elegir encoding UTF-8 → Cargar. Alternativa: Guarda directamente
                 como Excel (.xlsx) desde esta herramienta - el encoding se preserva automáticamente.
               </p>
@@ -995,7 +995,7 @@ export default function ConversorFormatosPage() {
                 pueden causar out of memory.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Para archivos gigantes:</strong> Usa herramientas de línea de comandos (Python
+                <span aria-hidden="true">💡</span> <strong>Para archivos gigantes:</strong> Usa herramientas de línea de comandos (Python
                 pandas, <code>jq</code> para JSON, <code>csvkit</code> para CSV). También considera si
                 realmente necesitas procesar TODO el archivo - puedes dividirlo en chunks más pequeños
                 o filtrar datos innecesarios antes de convertir.
@@ -1011,7 +1011,7 @@ export default function ConversorFormatosPage() {
                 es técnicamente imposible que veamos tu información.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Ventaja adicional:</strong> Funciona offline después de cargar la página (service
+                <span aria-hidden="true">💡</span> <strong>Ventaja adicional:</strong> Funciona offline después de cargar la página (service
                 workers). Puedes procesar datos confidenciales (nóminas, contratos, datos médicos) sin
                 preocuparte por seguridad. Para paranoia máxima: desconecta WiFi y verifica que sigue
                 funcionando.
@@ -1026,7 +1026,7 @@ export default function ConversorFormatosPage() {
                 (2) Node.js con PapaParse/SheetJS, (3) Bash con <code>jq</code> (JSON) y <code>csvkit</code> (CSV).
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Cuando automatizar:</strong> Si conviertes el mismo tipo de archivo más de 5 veces
+                <span aria-hidden="true">💡</span> <strong>Cuando automatizar:</strong> Si conviertes el mismo tipo de archivo más de 5 veces
                 al mes, escribe un script. Ejemplo: cron job que convierte Excel semanal → JSON → API.
                 Para conversiones one-off o poco frecuentes, esta herramienta web es más rápida que escribir
                 código.
@@ -1043,7 +1043,7 @@ export default function ConversorFormatosPage() {
                 para configuraciones DevOps.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Regla de oro:</strong> Elige el formato que tu audiencia/sistema CONSUME, no el
+                <span aria-hidden="true">💡</span> <strong>Regla de oro:</strong> Elige el formato que tu audiencia/sistema CONSUME, no el
                 que tú prefieres. Si entregas a marketing: Excel. Si alimentas una API: JSON. Si despliegas
                 en Kubernetes: YAML. Si importas a base de datos: CSV. El formato es un medio, no un fin.
               </p>

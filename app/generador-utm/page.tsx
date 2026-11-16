@@ -575,7 +575,7 @@ export default function GeneradorUTMPage() {
               <h3 className={styles.faqQuestion}>¿Los UTM funcionan igual en GA4 que en Universal Analytics?</h3>
               <p className={styles.faqAnswer}>Sí, GA4 reconoce los mismos 5 parámetros. La diferencia es dónde los encuentras:</p>
               <ul className={styles.faqList}>
-                <li>📍 <strong>Adquisición &gt; Tráfico &gt; Origen del tráfico</strong></li>
+                <li><span aria-hidden="true">📍</span> <strong>Adquisición &gt; Tráfico &gt; Origen del tráfico</strong></li>
                 <li><code>utm_source</code> → columna &quot;Origen&quot;</li>
                 <li><code>utm_medium</code> → columna &quot;Medio&quot;</li>
                 <li><code>utm_campaign</code> → columna &quot;Campaña&quot;</li>

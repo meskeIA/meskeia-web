@@ -1305,56 +1305,56 @@ export default function GeneradorFacturasPage() {
               <p>
                 La retención IRPF la aplicas cuando eres autónomo con actividad profesional (o artística/deportiva) y facturas a una <strong>empresa o autónomo español obligado a retener</strong>. Si tu cliente es un particular, nunca aplica retención. Si tu cliente es una empresa extranjera, tampoco. Las sociedades limitadas (SL, SA) tampoco retienen en sus facturas, solo los autónomos en actividades profesionales.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Regla práctica:</strong> Si tu cliente tiene CIF (empresa) y eres autónomo con actividad profesional = aplica retención. Si tiene DNI (particular) o es empresa extranjera = sin retención.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Regla práctica:</strong> Si tu cliente tiene CIF (empresa) y eres autónomo con actividad profesional = aplica retención. Si tiene DNI (particular) o es empresa extranjera = sin retención.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué pasa si me olvido de incluir datos obligatorios en la factura?</h4>
               <p>
                 Una factura incompleta puede ser rechazada por el cliente para deducir el IVA, y Hacienda puede imponer sanciones entre <strong>150 € y 600 €</strong> por cada factura incorrecta (art. 201 LGT). Los datos obligatorios son: número correlativo, fecha, datos del emisor y receptor (nombre + NIF/CIF + domicilio), descripción del servicio, base imponible, tipo de IVA, cuota de IVA y total. Si el receptor es persona jurídica, también su domicilio.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Tip:</strong> El generador de meskeIA incluye automáticamente todos los campos obligatorios según la normativa española (RD 1619/2012).</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Tip:</strong> El generador de meskeIA incluye automáticamente todos los campos obligatorios según la normativa española (RD 1619/2012).</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cómo corrijo un error en una factura ya emitida?</h4>
               <p>
                 <strong>Nunca modifiques una factura ya entregada.</strong> Hacerlo es falsificación de documento mercantil. La solución correcta es emitir una <strong>factura rectificativa</strong> que: haga referencia al número y fecha de la factura original, indique el motivo de la rectificación, y corrija los datos erróneos. La factura rectificativa lleva su propio número correlativo en la serie de rectificativas (ej: R-001, R-002...).
               </p>
-              <p className={styles.faqTip}>💡 <strong>Tip:</strong> Puedes emitir facturas rectificativas tanto para corregir errores como para emitir abonos (cuando devuelves dinero al cliente).</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Tip:</strong> Puedes emitir facturas rectificativas tanto para corregir errores como para emitir abonos (cuando devuelves dinero al cliente).</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué es la numeración correlativa y por qué es tan importante?</h4>
               <p>
                 La numeración correlativa significa que las facturas deben emitirse en orden secuencial sin saltos ni repeticiones (2024-001, 2024-002, 2024-003...). <strong>Hacienda considera un salto en la numeración como indicio de facturas ocultas.</strong> Puedes usar prefijos anuales (2025-001) o reiniciar la numeración cada ejercicio fiscal. Si detectas un salto, consúltalo con tu asesor antes de la próxima declaración.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Tip:</strong> Puedes tener series distintas para distintos tipos de facturas (ej: serie A para nacionales, serie E para exportación, serie R para rectificativas).</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Tip:</strong> Puedes tener series distintas para distintos tipos de facturas (ej: serie A para nacionales, serie E para exportación, serie R para rectificativas).</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuánto tiempo debo conservar las facturas?</h4>
               <p>
                 {RESPUESTA_FAQ_CONSERVAR_FACTURAS}
               </p>
-              <p className={styles.faqTip}>💡 <strong>Tip:</strong> Desde el 1 de julio de 2025, la obligación de factura electrónica (Ley Crea y Crece) se está implementando gradualmente. Prepárate para adoptar software certificado.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Tip:</strong> Desde el 1 de julio de 2025, la obligación de factura electrónica (Ley Crea y Crece) se está implementando gradualmente. Prepárate para adoptar software certificado.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Puedo incluir mi cuenta bancaria en la factura para cobrar por transferencia?</h4>
               <p>
                 Sí, es práctica habitual y recomendable incluir el IBAN en la factura para facilitar el pago. No es dato obligatorio según el reglamento de facturación, pero sí muy práctico. Asegúrate de indicar también el plazo de pago acordado. La Ley de Morosidad (Ley 3/2004) establece un plazo máximo de 30 días para empresas y 60 días para Administraciones Públicas.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Tip:</strong> Si el cliente tarda en pagar, puedes añadir intereses de demora (el tipo legal del dinero + 8 puntos para operaciones comerciales B2B).</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Tip:</strong> Si el cliente tarda en pagar, puedes añadir intereses de demora (el tipo legal del dinero + 8 puntos para operaciones comerciales B2B).</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué diferencia hay entre factura ordinaria y factura simplificada?</h4>
               <p>
                 La <strong>factura simplificada (ticket)</strong> puede emitirse cuando el destinatario es un particular o el importe es inferior a 400 € IVA incluido. No es necesario indicar los datos del receptor. Los comercios con autorización especial pueden usar tickets hasta 3.000 €. La factura <strong>ordinaria completa</strong> es obligatoria cuando el destinatario es una empresa o cuando supera los umbrales anteriores.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Regla:</strong> Si el cliente va a deducirse el IVA, necesita sí o sí una factura ordinaria completa con sus datos.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Regla:</strong> Si el cliente va a deducirse el IVA, necesita sí o sí una factura ordinaria completa con sus datos.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué es la factura electrónica y cuándo es obligatoria?</h4>
               <p>
                 La factura electrónica es una factura emitida y recibida en formato digital estructurado (XML, Facturae) con garantías de autenticidad e integridad. Ya es <strong>obligatoria para facturar a la Administración Pública</strong> desde 2015. Para el sector privado, la Ley &quot;Crea y Crece&quot; (Ley 18/2022) la hará obligatoria para empresas con facturación &gt;8M€ en 2025 y para el resto (incluidos autónomos) en 2026.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Anticípate:</strong> Adopta un software de facturación compatible con Facturae antes de que sea obligatorio para evitar prisas y costes de adaptación de última hora.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Anticípate:</strong> Adopta un software de facturación compatible con Facturae antes de que sea obligatorio para evitar prisas y costes de adaptación de última hora.</p>
             </div>
           </div>
         </section>

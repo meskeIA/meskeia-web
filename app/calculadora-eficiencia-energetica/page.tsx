@@ -589,7 +589,7 @@ export default function EficienciaEnergeticaPage() {
               <div className={styles.faqItem}>
                 <strong>¿Cuánto cuesta aislar el tejado de una casa de 100 m²?</strong>
                 <p>El aislamiento de cubierta plana o inclinada por proyección de poliuretano o celulosa oscila entre 2.000 y 4.000 € para 100 m² (20–40 €/m²). La proyección de celulosa suele ser más económica y tiene mejor comportamiento higrométrico. El ahorro anual en calefacción puede ser de 300–600 € según la zona climática.</p>
-                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Si el tejado necesita renovación de impermeabilización, combina la obra: el sobrecoste del aislamiento se reduce al compartir andamiaje y mano de obra.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Si el tejado necesita renovación de impermeabilización, combina la obra: el sobrecoste del aislamiento se reduce al compartir andamiaje y mano de obra.</p>
               </div>
               <div className={styles.faqItem}>
                 <strong>¿Es mejor bomba de calor aerotérmica o geotérmica?</strong>
@@ -598,7 +598,7 @@ export default function EficienciaEnergeticaPage() {
               <div className={styles.faqItem}>
                 <strong>¿Las mejoras energéticas aumentan el valor de mi vivienda?</strong>
                 <p>Sí. Según estudios del Banco de España y el IDAE, cada mejora de letra energética aumenta el valor de tasación entre un 3 y un 8%. Una vivienda que mejora de G a C puede incrementar su valor entre un 15 y un 25%, especialmente en el mercado de segunda mano donde los compradores ya incorporan el coste energético a su análisis.</p>
-                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Si estás pensando en vender en los próximos años, una inversión en aislamiento puede ser más rentable que una reforma estética.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Si estás pensando en vender en los próximos años, una inversión en aislamiento puede ser más rentable que una reforma estética.</p>
               </div>
               <div className={styles.faqItem}>
                 <strong>¿Qué zona climática tengo y cómo afecta al cálculo?</strong>
@@ -607,7 +607,7 @@ export default function EficienciaEnergeticaPage() {
               <div className={styles.faqItem}>
                 <strong>¿Puedo deducirme las mejoras energéticas en el IRPF?</strong>
                 <p>Sí. La deducción por obras de mejora energética en vivienda habitual es del 20% (reducción demanda calefacción/refrigeración ≥7%), 40% (reducción ≥30%) o 60% (rehabilitación energética del edificio completo). El límite máximo es 7.500 € de deducción por contribuyente. Requiere certificado energético previo y posterior.</p>
-                <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Coordina la obra con tu gestor fiscal. Las obras de diciembre pueden deducirse en la declaración del año siguiente.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Coordina la obra con tu gestor fiscal. Las obras de diciembre pueden deducirse en la declaración del año siguiente.</p>
               </div>
               <div className={styles.faqItem}>
                 <strong>¿Cuánto tarda en amortizarse el cambio de ventanas?</strong>

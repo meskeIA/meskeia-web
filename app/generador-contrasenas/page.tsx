@@ -614,56 +614,56 @@ export default function GeneradorContrasenas() {
                 <p>
                   Depende de cómo funcione. Esta herramienta usa <code>crypto.getRandomValues()</code>, la API criptográfica del navegador, que genera números verdaderamente aleatorios usando el hardware del dispositivo. La generación ocurre 100% en tu dispositivo, sin enviar ningún dato a servidores. Para verificar: abre DevTools → Network y comprueba que no hay requests al generar. Los generadores que generan en el servidor (con seed predecible o sin HTTPS) sí son peligrosos.
                 </p>
-                <p className={styles.faqTip}>💡 <strong>Cómo verificar:</strong> Busca que el generador use <code>crypto.getRandomValues()</code> (JavaScript) o equivalente. Si envía datos a un servidor para generar, no lo uses.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Cómo verificar:</strong> Busca que el generador use <code>crypto.getRandomValues()</code> (JavaScript) o equivalente. Si envía datos a un servidor para generar, no lo uses.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">❓</span> ¿Debo cambiar mis contraseñas regularmente?</h4>
                 <p>
                   La recomendación moderna (NIST 2023) es NO cambiar contraseñas regularmente si son únicas y fuertes. El cambio periódico obligatorio lleva a los usuarios a crear contraseñas débiles con pequeñas variaciones (Contraseña1 → Contraseña2). Sí debes cambiarlas cuando: hay sospecha de compromiso, el servicio anuncia una brecha, o aparece tu email en haveibeenpwned.com. Para cuentas críticas (banco, email), cambia cada 12-18 meses como buena práctica.
                 </p>
-                <p className={styles.faqTip}>💡 <strong>Comprueba hoy:</strong> Ve a haveibeenpwned.com e introduce tu email para ver si aparece en filtraciones conocidas. Es gratuito y muy revelador.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Comprueba hoy:</strong> Ve a haveibeenpwned.com e introduce tu email para ver si aparece en filtraciones conocidas. Es gratuito y muy revelador.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">❓</span> ¿Los gestores de contraseñas son seguros? ¿Qué pasa si los hackean?</h4>
                 <p>
                   Los gestores de contraseñas de referencia (Bitwarden, 1Password, KeePassXC) usan arquitectura zero-knowledge: ni la empresa puede ver tus contraseñas. Todo se cifra localmente con AES-256 antes de enviarse al servidor. Si hackean el servidor, solo obtienen datos cifrados ilegibles. El riesgo real es tu contraseña maestra: si es débil o la pierdes, pierdes el acceso. 1Password sufrió un incidente en 2022 y solo se expusieron metadatos cifrados, no contraseñas.
                 </p>
-                <p className={styles.faqTip}>💡 <strong>Recomendación:</strong> Bitwarden (open-source, auditable, gratuito) o 1Password. Usa una contraseña maestra de 5+ palabras aleatorias y guarda una copia física en lugar seguro.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Recomendación:</strong> Bitwarden (open-source, auditable, gratuito) o 1Password. Usa una contraseña maestra de 5+ palabras aleatorias y guarda una copia física en lugar seguro.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">❓</span> ¿Qué es la autenticación de dos factores (2FA) y cuál es mejor?</h4>
                 <p>
                   El 2FA añade un segundo factor de verificación: algo que sabes (contraseña) + algo que tienes (código temporal). Opciones ordenadas de menor a mayor seguridad: SMS (vulnerable a SIM swapping) &lt; Email OTP &lt; App TOTP (Google Authenticator, Authy) &lt; Passkeys &lt; Llaves físicas (YubiKey). El SMS 2FA es 99% mejor que nada, pero puede vulnerarse mediante intercambio de SIM (llamar al operador haciéndose pasar por ti). Las apps TOTP son seguras y gratuitas.
                 </p>
-                <p className={styles.faqTip}>💡 <strong>Empieza aquí:</strong> Activa 2FA con app TOTP (Authy, Google Authenticator) en email, banco y redes sociales. Es el mayor impacto en seguridad por el menor esfuerzo.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Empieza aquí:</strong> Activa 2FA con app TOTP (Authy, Google Authenticator) en email, banco y redes sociales. Es el mayor impacto en seguridad por el menor esfuerzo.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">❓</span> ¿Qué es el SIM swapping y cómo protegerse?</h4>
                 <p>
                   El SIM swapping es un ataque donde el atacante llama a tu operador móvil, se hace pasar por ti y transfiere tu número a una nueva SIM que él controla. A partir de ese momento, recibe todos tus SMS, incluyendo los códigos 2FA por SMS. Para protegerte: usa 2FA por app (no SMS) en cuentas críticas, activa un PIN de seguridad con tu operador para cambios de SIM, y usa contraseñas fuertes y únicas para la cuenta del operador.
                 </p>
-                <p className={styles.faqTip}>💡 <strong>Acción inmediata:</strong> Llama a tu operador y pide activar &quot;bloqueo de portabilidad&quot; o &quot;PIN de seguridad de SIM&quot;. Muchos operadores ofrecen esta protección adicional gratuita.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Acción inmediata:</strong> Llama a tu operador y pide activar &quot;bloqueo de portabilidad&quot; o &quot;PIN de seguridad de SIM&quot;. Muchos operadores ofrecen esta protección adicional gratuita.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">❓</span> ¿Qué son las passkeys y van a reemplazar las contraseñas?</h4>
                 <p>
                   Las passkeys son el futuro de la autenticación. Funcionan con criptografía de clave pública: tu dispositivo guarda la clave privada (protegida por biometría o PIN local) y el servidor guarda solo la clave pública. No hay contraseña que robar. No son vulnerables a phishing (la autenticación está vinculada al dominio específico). Apple, Google y Microsoft ya las soportan. Se estima que en 5-7 años substituirán las contraseñas en la mayoría de servicios.
                 </p>
-                <p className={styles.faqTip}>💡 <strong>Empieza ya:</strong> Servicios como Google, Apple, Microsoft, GitHub, PayPal y Amazon ya ofrecen passkeys. Actívalas donde estén disponibles para máxima seguridad sin fricción.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Empieza ya:</strong> Servicios como Google, Apple, Microsoft, GitHub, PayPal y Amazon ya ofrecen passkeys. Actívalas donde estén disponibles para máxima seguridad sin fricción.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">❓</span> ¿Cómo sé si mi contraseña ha sido filtrada en una brecha de datos?</h4>
                 <p>
                   haveibeenpwned.com (de Troy Hunt, experto en seguridad) es el servicio de referencia. Busca tu email y comprueba si aparece en las bases de datos de filtraciones conocidas. Para contraseñas, usa el servicio de contraseñas de HIBP: aplica k-anonymity (solo envía los primeros 5 caracteres del hash SHA-1 de tu contraseña, nunca la contraseña completa). Firefox Monitor y Google Password Checkup hacen lo mismo de forma integrada.
                 </p>
-                <p className={styles.faqTip}>💡 <strong>Acción:</strong> Comprueba tu email en haveibeenpwned.com ahora mismo. Si aparece en alguna filtración, cambia la contraseña de ese servicio y de cualquier otro donde la hayas reutilizado.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Acción:</strong> Comprueba tu email en haveibeenpwned.com ahora mismo. Si aparece en alguna filtración, cambia la contraseña de ese servicio y de cualquier otro donde la hayas reutilizado.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">❓</span> ¿Frase de paso vs. contraseña aleatoria: cuál es mejor para la contraseña maestra del gestor?</h4>
                 <p>
                   Para la contraseña maestra del gestor (la única que debes recordar): una frase de 4-5 palabras aleatorias es mejor porque tiene suficiente entropía (~70-90 bits), es memorizable y resistente a ataques de diccionario si las palabras son realmente aleatorias (usa dados o un generador). Para el resto de contraseñas (guardadas en el gestor): usa caracteres aleatorios de 16+ caracteres generados por esta herramienta, ya que no necesitas recordarlas.
                 </p>
-                <p className={styles.faqTip}>💡 <strong>Método Diceware:</strong> Tira 5 dados 5 veces y busca las palabras correspondientes en una lista Diceware. El resultado es una frase verdaderamente aleatoria con ~65 bits de entropía. Muy segura y recordable.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Método Diceware:</strong> Tira 5 dados 5 veces y busca las palabras correspondientes en una lista Diceware. El resultado es una frase verdaderamente aleatoria con ~65 bits de entropía. Muy segura y recordable.</p>
               </div>
             </div>
           </section>

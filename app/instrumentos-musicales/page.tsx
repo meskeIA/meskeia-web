@@ -454,7 +454,7 @@ export default function InstrumentosMusicalesPage() {
                 La clasificación en madera o metal no depende del material, sino del mecanismo de producción del sonido. Los instrumentos de viento-madera usan lengüeta (caña) o bisel para producir la vibración del aire. El saxofón usa lengüeta simple, igual que el clarinete, por lo que es "madera" aunque esté fabricado en latón. La trompeta y el trombón son "metal" porque usan los labios directamente como embocadura.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Regla práctica:</strong> Si tiene caña (lengüeta), es viento-madera. Si usa embocadura de copa donde los labios vibran directamente, es viento-metal.
+                <span aria-hidden="true">💡</span> <strong>Regla práctica:</strong> Si tiene caña (lengüeta), es viento-madera. Si usa embocadura de copa donde los labios vibran directamente, es viento-metal.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -463,7 +463,7 @@ export default function InstrumentosMusicalesPage() {
                 En la clasificación de Hornbostel-Sachs, el piano es un cordófono (instrumento de cuerda) porque el sonido se produce por cuerdas que vibran. El mecanismo de teclado acciona unos martillos que golpean las cuerdas. En el uso cotidiano se le clasifica como "teclado" por comodidad. El clavicémbalo (clavecín) también es de cuerda-teclado, pero en lugar de golpear, pulsa las cuerdas con plumas (plectros).
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Curiosidad:</strong> El piano tiene 230 cuerdas aproximadamente: las notas graves tienen 1 cuerda, las medias 2 y las agudas 3. El total de cuerdas produce la riqueza armónica característica.
+                <span aria-hidden="true">💡</span> <strong>Curiosidad:</strong> El piano tiene 230 cuerdas aproximadamente: las notas graves tienen 1 cuerda, las medias 2 y las agudas 3. El total de cuerdas produce la riqueza armónica característica.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -472,7 +472,7 @@ export default function InstrumentosMusicalesPage() {
                 El violín es más pequeño (cuerpo ~35 cm) y suena en registro agudo (Do3-La7). La viola es más grande (~42 cm) y suena en registro medio (Do3-Fa6), con un timbre más oscuro y cálido. En la orquesta, los violines llevan la melodía principal; las violas dan cuerpo armónico. La viola usa la clave de Do (en 3.ª línea), lo que da lugar al chiste de que los violistas "no saben leer en clave de sol".
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Para reconocerlos de oído:</strong> El violín suena brillante y penetrante. La viola tiene un timbre más "nasal" y ligeramente oscuro. En una partitura: violín = clave de sol, viola = clave de do.
+                <span aria-hidden="true">💡</span> <strong>Para reconocerlos de oído:</strong> El violín suena brillante y penetrante. La viola tiene un timbre más "nasal" y ligeramente oscuro. En una partitura: violín = clave de sol, viola = clave de do.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -481,7 +481,7 @@ export default function InstrumentosMusicalesPage() {
                 Las flautas de hueso encontradas en la cueva de Hohle Fels (Alemania) tienen 40.000-43.000 años de antigüedad, siendo los instrumentos musicales más antiguos conocidos. Están fabricadas con hueso de buitre y tienen 4-5 agujeros. Anteriores a la cerámica y la escritura, demuestran que la música es una expresión fundamental de la humanidad. Las flautas de caña y los tambores de percusión también se desarrollaron de forma independiente en distintas culturas.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Dato comparativo:</strong> La lira de Ur (Mesopotamia) tiene solo 4.500 años, y el piano moderno nació en 1709 con Bartolomeo Cristofori. El violín tal como lo conocemos se perfeccionó en el siglo XVI en Cremona (Italia).
+                <span aria-hidden="true">💡</span> <strong>Dato comparativo:</strong> La lira de Ur (Mesopotamia) tiene solo 4.500 años, y el piano moderno nació en 1709 con Bartolomeo Cristofori. El violín tal como lo conocemos se perfeccionó en el siglo XVI en Cremona (Italia).
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -490,7 +490,7 @@ export default function InstrumentosMusicalesPage() {
                 Antes de un concierto, el oboe toca la nota La (440 Hz) y toda la orquesta afina a partir de ella. La razón histórica es que el oboe es difícil de afinar rápidamente (su mecanismo de caña doble es sensible a la temperatura y humedad), por lo que era más práctico que todos los demás afinaran con él como referencia. Además, su timbre penetrante se escucha claramente sobre el resto de instrumentos afinando simultáneamente.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Curiosidad estándar:</strong> La frecuencia de afinación de La ha variado históricamente. Bach componía con La a ~415 Hz (barroco), la época romántica subió hasta 450 Hz, y en 1939 se fijó internacionalmente en 440 Hz.
+                <span aria-hidden="true">💡</span> <strong>Curiosidad estándar:</strong> La frecuencia de afinación de La ha variado históricamente. Bach componía con La a ~415 Hz (barroco), la época romántica subió hasta 450 Hz, y en 1939 se fijó internacionalmente en 440 Hz.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -499,7 +499,7 @@ export default function InstrumentosMusicalesPage() {
                 Depende del criterio. Por dificultad técnica inicial: el violín (afinación completamente manual, postura compleja). Por complejidad avanzada: el órgano (manos, pies y múltiples teclados simultáneos). Por control de embocadura: la trompa (pequeña embocadura, rango amplio de notas). El oboe y el fagot también son famosos por su dificultad. El piano y la guitarra son considerados los más accesibles para comenzar.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Perspectiva real:</strong> El instrumento "más difícil" es siempre el que no has aprendido. Con práctica constante (30-60 min/día), cualquier instrumento es accesible. El tiempo hasta el nivel intermedio varía: guitarra ~1 año, violín ~3-4 años, piano ~2-3 años.
+                <span aria-hidden="true">💡</span> <strong>Perspectiva real:</strong> El instrumento "más difícil" es siempre el que no has aprendido. Con práctica constante (30-60 min/día), cualquier instrumento es accesible. El tiempo hasta el nivel intermedio varía: guitarra ~1 año, violín ~3-4 años, piano ~2-3 años.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -508,7 +508,7 @@ export default function InstrumentosMusicalesPage() {
                 La flauta traversa (o travesera) se sujeta horizontalmente y produce el sonido soplando sobre un agujero lateral (bisel). Es el instrumento estándar de las orquestas modernas, con un rango de 3 octavas (Do4-Re7). La flauta de pico (recorder) se sujeta verticalmente y se sopla por la boquilla superior. Es más fácil de tocar pero tiene menor volumen y expresividad. Fue el instrumento de viento-madera predominante hasta el siglo XVIII.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>En la educación:</strong> La flauta de pico es el instrumento más enseñado en los colegios españoles por su bajo coste (5-20 €) y accesibilidad. La traversa cuesta desde 150 € en modelos de iniciación.
+                <span aria-hidden="true">💡</span> <strong>En la educación:</strong> La flauta de pico es el instrumento más enseñado en los colegios españoles por su bajo coste (5-20 €) y accesibilidad. La traversa cuesta desde 150 € en modelos de iniciación.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -517,7 +517,7 @@ export default function InstrumentosMusicalesPage() {
                 No. El theremin fue inventado por León Theremin en 1920 y es uno de los primeros instrumentos electrónicos. Se toca sin contacto físico, moviendo las manos cerca de dos antenas. El órgano Hammond data de 1934 y fue el pilar del jazz y el gospel. Los primeros sintetizadores (Moog) llegaron en los años 60. La guitarra eléctrica se popularizó en los 50 con Les Paul y Leo Fender, revolucionando el rock and roll.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Dato curioso:</strong> El theremin fue el primer instrumento controlado sin contacto físico y sigue usándose en bandas sonoras de cine de terror y ciencia ficción. El tema de Star Trek original usa un theremin.
+                <span aria-hidden="true">💡</span> <strong>Dato curioso:</strong> El theremin fue el primer instrumento controlado sin contacto físico y sigue usándose en bandas sonoras de cine de terror y ciencia ficción. El tema de Star Trek original usa un theremin.
               </p>
             </div>
           </div>

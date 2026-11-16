@@ -929,7 +929,7 @@ export default function GuiaTejidosFibrasPage() {
                   Para el calor, las mejores opciones son el lino, el algodón (especialmente orgánico), el bambú y el lyocell. Son transpirables, absorben la humedad y permiten que el cuerpo respire. El lino es especialmente fresco porque su estructura capilar favorece la circulación del aire. Evita las fibras sintéticas como el poliéster, que retienen el calor y el sudor.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Truco:</strong> El lino se vuelve más suave con cada lavado, así que no deseches las prendas nuevas si las notas algo rígidas al principio.
+                  <span aria-hidden="true">💡</span> <strong>Truco:</strong> El lino se vuelve más suave con cada lavado, así que no deseches las prendas nuevas si las notas algo rígidas al principio.
                 </p>
               </div>
               <div className={styles.faqItem}>
@@ -938,7 +938,7 @@ export default function GuiaTejidosFibrasPage() {
                   La lana encoge por el calor y la agitación mecánica combinados, que hacen que las escamas de la fibra se enganchen entre sí. Para evitarlo: usa agua fría o tibia (máximo 30°C), programa de lana o delicados (muy poca agitación), detergente específico para lana (pH neutro) y nunca la retuerces para escurrirla. Sécala extendida en horizontal para mantener la forma.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Regla:</strong> La lana merino es más resistente al lavado que la lana virgen convencional y suele poder lavarse en máquina con programa delicado a 30°C.
+                  <span aria-hidden="true">💡</span> <strong>Regla:</strong> La lana merino es más resistente al lavado que la lana virgen convencional y suele poder lavarse en máquina con programa delicado a 30°C.
                 </p>
               </div>
               <div className={styles.faqItem}>
@@ -947,7 +947,7 @@ export default function GuiaTejidosFibrasPage() {
                   Las tres son fibras semisintéticas de celulosa vegetal, pero con diferente proceso de fabricación y sostenibilidad. La viscosa (rayon) usa un proceso químico agresivo con sosa cáustica. El modal mejora la viscosa usando madera de haya y procesos más eficientes. El lyocell (Tencel) es el más sostenible: circuito cerrado con recuperación del 99% del solvente y madera certificada FSC.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Jerarquía ecológica:</strong> Lyocell &gt; Modal &gt; Viscosa. Si buscas la opción más responsable dentro de las semisintéticas, elige siempre Lyocell/Tencel certificado.
+                  <span aria-hidden="true">💡</span> <strong>Jerarquía ecológica:</strong> Lyocell &gt; Modal &gt; Viscosa. Si buscas la opción más responsable dentro de las semisintéticas, elige siempre Lyocell/Tencel certificado.
                 </p>
               </div>
               <div className={styles.faqItem}>
@@ -956,7 +956,7 @@ export default function GuiaTejidosFibrasPage() {
                   El rPET (poliéster reciclado de botellas) tiene un impacto menor que el poliéster virgen: usa hasta un 59% menos de energía y reduce las emisiones de CO₂. Sin embargo, sigue siendo plástico: libera microfibras de plástico en cada lavado que acaban en los océanos. Para mitigarlo existen bolsas de lavado especiales (como Guppyfriend) que atrapan las microfibras antes de que lleguen al desagüe.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Dato:</strong> Una lavadora libera hasta 700.000 microfibras plásticas por ciclo de lavado con ropa sintética. El 35% de las microplásticas en océanos procede del lavado de ropa.
+                  <span aria-hidden="true">💡</span> <strong>Dato:</strong> Una lavadora libera hasta 700.000 microfibras plásticas por ciclo de lavado con ropa sintética. El 35% de las microplásticas en océanos procede del lavado de ropa.
                 </p>
               </div>
               <div className={styles.faqItem}>
@@ -965,7 +965,7 @@ export default function GuiaTejidosFibrasPage() {
                   La lana merino es la obtenida de la oveja merina, que produce una fibra mucho más fina (15-24 micrones de diámetro) que la lana convencional (mayor de 30 micrones). Las fibras gruesas se doblan al rozar la piel y producen la sensación de picor; las finas se doblan sin molestar. Por eso la merino se puede usar directamente sobre la piel sin la incomodidad de la lana normal.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Regla práctica:</strong> Fibras de menos de 19 micrones se consideran ultrafinas y son prácticamente imperceptibles al tacto. Busca esta especificación en la etiqueta de prendas premium.
+                  <span aria-hidden="true">💡</span> <strong>Regla práctica:</strong> Fibras de menos de 19 micrones se consideran ultrafinas y son prácticamente imperceptibles al tacto. Busca esta especificación en la etiqueta de prendas premium.
                 </p>
               </div>
               <div className={styles.faqItem}>
@@ -974,7 +974,7 @@ export default function GuiaTejidosFibrasPage() {
                   La cachemira real se distingue por su peso (muy ligera), suavidad extrema sin pilling inmediato y precio (un jersey de cachemira puro de calidad cuesta mínimo 150-200 €). Desconfía de "cachemira" por 30 €: suele ser acrílico o mezcla con mínimo porcentaje real. Lee la etiqueta de composición (debe decir 100% cachemira o especificar el porcentaje exacto). El pilling rápido es señal de cachemira de baja calidad (fibras cortas) o falsificación.
                 </p>
                 <p className={styles.faqTip}>
-                  💡 <strong>Truco:</strong> La cachemira de calidad debe hacer pilling mínimo en los primeros usos (normal por las fibras cortas superficiales), pero debe desaparecer tras los primeros lavados. Si el pilling es continuo e intenso, la calidad es baja.
+                  <span aria-hidden="true">💡</span> <strong>Truco:</strong> La cachemira de calidad debe hacer pilling mínimo en los primeros usos (normal por las fibras cortas superficiales), pero debe desaparecer tras los primeros lavados. Si el pilling es continuo e intenso, la calidad es baja.
                 </p>
               </div>
             </div>

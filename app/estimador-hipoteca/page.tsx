@@ -1182,7 +1182,7 @@ export default function SimuladorHipotecaPage() {
               • <strong>TOTAL NECESARIO:</strong> ~54.000-63.000 € (27-31% del precio)
             </p>
             <p className={styles.faqTip}>
-              💡 <strong>Consejo:</strong> Reserva 5.000-10.000 € adicionales como colchón para imprevistos
+              <span aria-hidden="true">💡</span> <strong>Consejo:</strong> Reserva 5.000-10.000 € adicionales como colchón para imprevistos
               (muebles, pequeñas reformas, comunidad de propietarios del primer mes).
             </p>
           </div>
@@ -1201,7 +1201,7 @@ export default function SimuladorHipotecaPage() {
               5. <strong>Gastos:</strong> Solo notaría (~500-800 €), el resto lo paga el banco
             </p>
             <p className={styles.faqTip}>
-              💡 <strong>Cuándo merece la pena:</strong> Si reduces el TIN más de 0.5% y te quedan
+              <span aria-hidden="true">💡</span> <strong>Cuándo merece la pena:</strong> Si reduces el TIN más de 0.5% y te quedan
               más de 10 años de hipoteca. Ahorro potencial: 10.000-30.000 € en total.
             </p>
           </div>
@@ -1225,7 +1225,7 @@ export default function SimuladorHipotecaPage() {
               • Nueva cuota: ~540 €/mes (-85 €/mes = -14%)
             </p>
             <p className={styles.faqTip}>
-              ⚠️ <strong>Protección:</strong> Muchos bancos ofrecen "seguros de tipos" que limitan
+              <span aria-hidden="true">⚠️</span> <strong>Protección:</strong> Muchos bancos ofrecen "seguros de tipos" que limitan
               las subidas (caps) a cambio de renunciar a bajadas (floors). Evalúa si te compensa.
             </p>
           </div>
@@ -1248,7 +1248,7 @@ export default function SimuladorHipotecaPage() {
               • Reduces el plazo en 1 año (terminas en 24 años)
             </p>
             <p className={styles.faqTip}>
-              💡 <strong>Estrategia óptima:</strong> Si puedes, amortiza pequeñas cantidades (3.000-5.000 €)
+              <span aria-hidden="true">💡</span> <strong>Estrategia óptima:</strong> Si puedes, amortiza pequeñas cantidades (3.000-5.000 €)
               cada 2-3 años en lugar de esperar a acumular mucho. Elige reducir PLAZO en lugar de cuota
               para ahorrar más intereses.
             </p>
@@ -1272,7 +1272,7 @@ export default function SimuladorHipotecaPage() {
               • Seguros vinculados: Variable (compara con aseguradoras externas)
             </p>
             <p className={styles.faqTip}>
-              💡 <strong>Truco de negociación:</strong> Lleva ofertas de otros bancos. Si el Banco A
+              <span aria-hidden="true">💡</span> <strong>Truco de negociación:</strong> Lleva ofertas de otros bancos. Si el Banco A
               te cobra 1% de apertura (1.600 €) y el Banco B 0%, muéstraselo al A. Muchos aceptan
               igualarlo para no perder el cliente.
             </p>
@@ -1284,7 +1284,7 @@ export default function SimuladorHipotecaPage() {
               La hipoteca mixta combina un período inicial a tipo fijo (normalmente 3-10 años) con el resto a tipo variable (Euríbor + diferencial). Ventajas: tipos fijos del tramo inicial suelen ser menores que una hipoteca fija pura; si amortizas anticipadamente durante el tramo fijo, reduces mucho el coste del tramo variable posterior. Inconveniente: si los tipos suben mucho justo cuando empieza el tramo variable, te quedas sin el escudo de la fija.
             </p>
             <p className={styles.faqTip}>
-              💡 <strong>Ideal para:</strong> Quien planea amortizar fuertemente en los primeros 5-7 años (herencia esperada, bonus recurrentes) y así reducir el capital pendiente antes del tramo variable.
+              <span aria-hidden="true">💡</span> <strong>Ideal para:</strong> Quien planea amortizar fuertemente en los primeros 5-7 años (herencia esperada, bonus recurrentes) y así reducir el capital pendiente antes del tramo variable.
             </p>
           </div>
 
@@ -1294,7 +1294,7 @@ export default function SimuladorHipotecaPage() {
               Desde la Ley de Crédito Inmobiliario (2019), el banco no puede obligarte a contratar seguros con ellos. Pero sí pueden ofrecerte un diferencial de interés menor si los contratas (bonificación). El seguro de vida hipotecario garantiza el pago del préstamo si el titular fallece. El seguro de hogar (continente) sí es obligatorio por ley, pero puedes contratarlo con cualquier aseguradora.
             </p>
             <p className={styles.faqTip}>
-              💡 <strong>Cálculo clave:</strong> Compara el seguro del banco vs. aseguradoras externas (Mutua, Mapfre, AXA). La bonificación en el diferencial puede ser 0.1-0.3%. Calcula si el ahorro en intereses compensa el sobrecoste del seguro bancario. A menudo, no compensa.
+              <span aria-hidden="true">💡</span> <strong>Cálculo clave:</strong> Compara el seguro del banco vs. aseguradoras externas (Mutua, Mapfre, AXA). La bonificación en el diferencial puede ser 0.1-0.3%. Calcula si el ahorro en intereses compensa el sobrecoste del seguro bancario. A menudo, no compensa.
             </p>
           </div>
 
@@ -1304,7 +1304,7 @@ export default function SimuladorHipotecaPage() {
               El Euríbor (Euro Interbank Offered Rate) es el tipo al que los bancos europeos se prestan dinero entre sí. Las hipotecas variables en España se referencian principalmente al Euríbor a 12 meses. Cuando el BCE sube los tipos de interés para combatir la inflación, el Euríbor sube; cuando los baja (entorno de recesión o baja inflación), el Euríbor baja. La revisión de tu hipoteca variable ocurre cada 6 o 12 meses según el contrato.
             </p>
             <p className={styles.faqTip}>
-              💡 <strong>Perspectiva:</strong> El Euríbor ha oscilado entre -0.5% y +4.2% entre 2016 y 2024. Para hipotecas a 25-30 años, es estadísticamente seguro asumir que atravesará varios ciclos alcistas y bajistas. Usa el simulador con el tipo actual y luego con +2% para ver el impacto en tu cuota.
+              <span aria-hidden="true">💡</span> <strong>Perspectiva:</strong> El Euríbor ha oscilado entre -0.5% y +4.2% entre 2016 y 2024. Para hipotecas a 25-30 años, es estadísticamente seguro asumir que atravesará varios ciclos alcistas y bajistas. Usa el simulador con el tipo actual y luego con +2% para ver el impacto en tu cuota.
             </p>
           </div>
 

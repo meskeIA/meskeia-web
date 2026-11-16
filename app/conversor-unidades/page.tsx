@@ -900,7 +900,7 @@ Cinta USA marca millas
                   <strong>Ejemplo:</strong> Tienes "5 millas" (origen) y quieres saber cuántos "kilómetros" (destino) son.
                 </p>
                 <div className={styles.stepExample}>
-                  💡 <strong>Tip:</strong> Verifica que ambas unidades midan la misma magnitud. No puedes convertir metros (longitud) a kilogramos (masa).
+                  <span aria-hidden="true">💡</span> <strong>Tip:</strong> Verifica que ambas unidades midan la misma magnitud. No puedes convertir metros (longitud) a kilogramos (masa).
                 </div>
               </div>
             </div>
@@ -921,7 +921,7 @@ Cinta USA marca millas
                   <strong>Ejemplo:</strong> Convertir 5 millas a km → 5 × 1,609344 = 8,04672 km
                 </p>
                 <div className={styles.stepExample}>
-                  📐 <strong>Importante:</strong> Para magnitudes derivadas (m², m³, km/h), ajusta el exponente del factor.
+                  <span aria-hidden="true">📐</span> <strong>Importante:</strong> Para magnitudes derivadas (m², m³, km/h), ajusta el exponente del factor.
                 </div>
               </div>
             </div>

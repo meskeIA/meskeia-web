@@ -372,7 +372,7 @@ export default function MetamorfosisPage() {
         </div>
 
         <div className={styles.insight}>
-          <p>💡 <strong>Insight:</strong> Dentro de la crisálida, la oruga se disuelve casi por completo y se reconstruye a partir de células imaginales latentes desde la fase de huevo.</p>
+          <p><span aria-hidden="true">💡</span> <strong>Insight:</strong> Dentro de la crisálida, la oruga se disuelve casi por completo y se reconstruye a partir de células imaginales latentes desde la fase de huevo.</p>
         </div>
 
         {/* Otros ejemplos */}
@@ -458,7 +458,7 @@ export default function MetamorfosisPage() {
         </div>
 
         <div className={styles.insight}>
-          <p>💡 <strong>Insight:</strong> La ninfa de libélula es acuática y depredadora — muy diferente del adulto volador. Es uno de los casos más extremos de metamorfosis incompleta.</p>
+          <p><span aria-hidden="true">💡</span> <strong>Insight:</strong> La ninfa de libélula es acuática y depredadora — muy diferente del adulto volador. Es uno de los casos más extremos de metamorfosis incompleta.</p>
         </div>
 
         <div className={styles.otrosCard}>
@@ -576,7 +576,7 @@ export default function MetamorfosisPage() {
         </div>
 
         <div className={styles.insight}>
-          <p>💡 <strong>Insight:</strong> La cola del renacuajo no se cae — es reabsorbida por su propio cuerpo mediante apoptosis (muerte celular programada). Las proteínas se reciclan para construir las patas.</p>
+          <p><span aria-hidden="true">💡</span> <strong>Insight:</strong> La cola del renacuajo no se cae — es reabsorbida por su propio cuerpo mediante apoptosis (muerte celular programada). Las proteínas se reciclan para construir las patas.</p>
         </div>
       </div>
     );
@@ -608,7 +608,7 @@ export default function MetamorfosisPage() {
       </div>
 
       <div className={styles.insight}>
-        <p>💡 <strong>¿Por qué existe la metamorfosis?</strong> Reduce la competencia entre larva y adulto por los mismos recursos. La larva y el adulto ocupan nichos ecológicos diferentes: distinto alimento, distinto hábitat, distinto comportamiento. Es una ventaja evolutiva enorme.</p>
+        <p><span aria-hidden="true">💡</span> <strong>¿Por qué existe la metamorfosis?</strong> Reduce la competencia entre larva y adulto por los mismos recursos. La larva y el adulto ocupan nichos ecológicos diferentes: distinto alimento, distinto hábitat, distinto comportamiento. Es una ventaja evolutiva enorme.</p>
       </div>
     </div>
   );

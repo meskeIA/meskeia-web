@@ -669,7 +669,7 @@ export default function GeneradorCarruselesPage() {
                 Para Instagram, el rango óptimo es <strong>6-10 slides</strong>. El algoritmo detecta cuántos usuarios llegan al último slide y lo usa como señal de calidad. Con menos de 5 slides no hay suficiente recorrido; con más de 10 el abandono aumenta. Los carruseles de 7-8 slides suelen tener el mejor equilibrio entre retención y tiempo de lectura.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Pon el CTA en el último slide Y en el segundo (los usuarios que no llegan al final deben ver el CTA igualmente).
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Pon el CTA en el último slide Y en el segundo (los usuarios que no llegan al final deben ver el CTA igualmente).
               </p>
             </div>
 
@@ -679,7 +679,7 @@ export default function GeneradorCarruselesPage() {
                 Los primeros slides con mayor retención son: <strong>preguntas directas</strong> (&quot;¿Cometes este error?&quot;), <strong>afirmaciones contraintuitivas</strong> (&quot;Lo que te enseñaron sobre marketing está mal&quot;), <strong>listas numéricas</strong> (&quot;5 herramientas que uso cada día&quot;) y <strong>resultados sorprendentes</strong> (&quot;Cómo conseguí 10.000 seguidores en 30 días&quot;). Evita empezar con tu nombre o logo, es el formato menos efectivo.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Dedica el 30% de tu tiempo de creación al primer slide. Es lo único que el algoritmo muestra antes del clic.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Dedica el 30% de tu tiempo de creación al primer slide. Es lo único que el algoritmo muestra antes del clic.
               </p>
             </div>
 
@@ -689,7 +689,7 @@ export default function GeneradorCarruselesPage() {
                 Depende de la plataforma. En Instagram, el equilibrio entre diseño visual y texto breve (<strong>3-7 palabras por frase</strong>) funciona mejor. En LinkedIn, el texto más extenso (2-3 frases por slide) genera más credibilidad y comentarios. En ambas plataformas, las fuentes grandes (≥28pt) y el alto contraste son fundamentales porque muchos usuarios leen desde el feed sin ampliar.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Prueba tu carrusel en modo preview de móvil antes de publicar. Si no se lee a 30cm de distancia, el texto es demasiado pequeño.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Prueba tu carrusel en modo preview de móvil antes de publicar. Si no se lee a 30cm de distancia, el texto es demasiado pequeño.
               </p>
             </div>
 
@@ -699,7 +699,7 @@ export default function GeneradorCarruselesPage() {
                 En Instagram: <strong>martes y miércoles de 9-11h o 18-21h</strong>. En LinkedIn: <strong>martes a jueves de 8-10h o 12-14h</strong>. Estos horarios coinciden con momentos de navegación pasiva (camino al trabajo, pausa de comida). Sin embargo, la hora óptima varía según tu audiencia específica. Analiza tus propias estadísticas después de 20+ publicaciones para encontrar tu ventana horaria.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Publica con consistencia primero (mismo día/hora cada semana) y luego optimiza la hora basándote en tus datos de reach.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Publica con consistencia primero (mismo día/hora cada semana) y luego optimiza la hora basándote en tus datos de reach.
               </p>
             </div>
 
@@ -709,7 +709,7 @@ export default function GeneradorCarruselesPage() {
                 Usa la <strong>misma plantilla de forma consistente</strong> durante al menos 3-6 meses. El reconocimiento visual de marca (colores, tipografía, estilo) hace que tus seguidores identifiquen tu contenido antes de leer el texto. Las cuentas que varían constantemente de diseño generan una percepción de falta de profesionalidad y reducen la fidelización. Puedes tener 2-3 plantillas predefinidas para distintos tipos de contenido (tips, casos de éxito, anuncios).
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Elige una plantilla que represente tu marca y comprométete a usarla al menos 12 veces antes de evaluar si cambiarla.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Elige una plantilla que represente tu marca y comprométete a usarla al menos 12 veces antes de evaluar si cambiarla.
               </p>
             </div>
 
@@ -719,7 +719,7 @@ export default function GeneradorCarruselesPage() {
                 Las métricas clave para carruseles son: <strong>Tasa de alcance</strong> (impresiones/seguidores, debería superar el 20%), <strong>Slides promedio vistos</strong> (cuántos slides ven de media, objetivo: más del 60% del total), <strong>Guardados</strong> (la métrica más valiosa, indica contenido de referencia) y <strong>Comentarios</strong> (señal de engagement profundo). Evita obsesionarte con los likes, que son la métrica menos valiosa algorítmicamente.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Un carrusel con 50 guardados y 10 comentarios supera ampliamente a uno con 500 likes y 0 interacciones profundas.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Un carrusel con 50 guardados y 10 comentarios supera ampliamente a uno con 500 likes y 0 interacciones profundas.
               </p>
             </div>
 
@@ -729,7 +729,7 @@ export default function GeneradorCarruselesPage() {
                 El estándar para carruseles de Instagram y LinkedIn es <strong>1080×1080px a 72 DPI</strong> (lo que genera esta herramienta). Si publicas desde desktop, puedes usar hasta 2160×2160px. Nunca bajes de 1080px porque Instagram comprime las imágenes al subirlas y la pérdida de calidad es visible. Para formato vertical (Stories-style), usa <strong>1080×1350px</strong> (4:5 ratio).
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> El formato PNG conserva mejor la calidad del texto y los fondos planos. Usa JPEG solo para fotos con gradientes complejos.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> El formato PNG conserva mejor la calidad del texto y los fondos planos. Usa JPEG solo para fotos con gradientes complejos.
               </p>
             </div>
 
@@ -739,7 +739,7 @@ export default function GeneradorCarruselesPage() {
                 La consistencia supera la frecuencia. <strong>1-2 carruseles por semana</strong> publicados de forma consistente durante 6 meses generan más crecimiento que 5 posts por semana durante 1 mes. El algoritmo favorece a las cuentas activas y predecibles. Empieza con una frecuencia que puedas mantener: es mejor comprometerte con 1 carrusel semanal durante un año que quemarte con publicaciones diarias.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Crea 4-8 carruseles de golpe en una sesión de trabajo y programa su publicación en las próximas semanas.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Crea 4-8 carruseles de golpe en una sesión de trabajo y programa su publicación en las próximas semanas.
               </p>
             </div>
           </div>

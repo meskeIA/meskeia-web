@@ -514,13 +514,13 @@ export default function PlanificadorItinerario() {
 
         <h3>Categorías disponibles</h3>
         <ul>
-          <li>✈️ <strong>Transporte</strong>: vuelos, trenes, traslados al aeropuerto, rutas en coche.</li>
-          <li>🏨 <strong>Alojamiento</strong>: check-in, check-out, cambio de hotel.</li>
-          <li>🍽️ <strong>Gastronomía</strong>: restaurantes, mercados, bodegas, catas.</li>
-          <li>🏛️ <strong>Cultura</strong>: museos, monumentos, visitas guiadas, iglesias.</li>
-          <li>🌿 <strong>Naturaleza</strong>: senderismo, playas, parques nacionales, miradores.</li>
-          <li>🛍️ <strong>Compras</strong>: mercadillos, tiendas locales, souvenirs.</li>
-          <li>🎭 <strong>Ocio</strong>: espectáculos, nightlife, excursiones, actividades.</li>
+          <li><span aria-hidden="true">✈️</span> <strong>Transporte</strong>: vuelos, trenes, traslados al aeropuerto, rutas en coche.</li>
+          <li><span aria-hidden="true">🏨</span> <strong>Alojamiento</strong>: check-in, check-out, cambio de hotel.</li>
+          <li><span aria-hidden="true">🍽️</span> <strong>Gastronomía</strong>: restaurantes, mercados, bodegas, catas.</li>
+          <li><span aria-hidden="true">🏛️</span> <strong>Cultura</strong>: museos, monumentos, visitas guiadas, iglesias.</li>
+          <li><span aria-hidden="true">🌿</span> <strong>Naturaleza</strong>: senderismo, playas, parques nacionales, miradores.</li>
+          <li><span aria-hidden="true">🛍️</span> <strong>Compras</strong>: mercadillos, tiendas locales, souvenirs.</li>
+          <li><span aria-hidden="true">🎭</span> <strong>Ocio</strong>: espectáculos, nightlife, excursiones, actividades.</li>
         </ul>
 
         <h3>Exportar y compartir</h3>

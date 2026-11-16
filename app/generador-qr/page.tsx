@@ -1328,7 +1328,7 @@ export default function GeneradorQRPage() {
               El logo debe ocupar entre 20-40% del área total para mantener funcionalidad.
             </p>
             <p className={styles.faqTip}>
-              💡 <strong>Consejo:</strong> Usa logos con fondo transparente (PNG) y formas simples.
+              <span aria-hidden="true">💡</span> <strong>Consejo:</strong> Usa logos con fondo transparente (PNG) y formas simples.
               Los logos muy detallados pueden dificultar el escaneo si son muy grandes.
             </p>
           </div>
@@ -1368,7 +1368,7 @@ export default function GeneradorQRPage() {
               <strong>Android 9 o inferior:</strong> Puede requerir apps de terceros como &quot;WiFi QR Code Scanner&quot;.
             </p>
             <p className={styles.faqTip}>
-              💡 <strong>Recomendación:</strong> Incluye también las credenciales WiFi en texto pequeño
+              <span aria-hidden="true">💡</span> <strong>Recomendación:</strong> Incluye también las credenciales WiFi en texto pequeño
               debajo del QR para usuarios con dispositivos antiguos.
             </p>
           </div>

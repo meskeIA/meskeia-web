@@ -737,56 +737,56 @@ export default function PlanificadorCashFlowPage() {
               <p>
                 La quiebra técnica ocurre cuando una empresa no puede pagar sus obligaciones inmediatas aunque sea rentable a largo plazo. Ejemplo: una empresa factura 100.000 € en enero pero cobra en abril. Las nóminas de febrero y marzo (30.000 €) vencen antes del cobro. Si no tiene caja o crédito, no puede pagar aunque el negocio sea sólido. El 82% de las quiebras de pymes en España son por problemas de liquidez, no de rentabilidad.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Prevención:</strong> Mantén siempre un colchón de tesorería equivalente a 2-3 meses de gastos fijos en una cuenta separada. Es intocable.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Prevención:</strong> Mantén siempre un colchón de tesorería equivalente a 2-3 meses de gastos fijos en una cuenta separada. Es intocable.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué es el período medio de maduración y cómo mejorarlo?</h4>
               <p>
                 El período medio de maduración (PMM) es el tiempo que tarda el ciclo completo: compra de materias primas → producción → venta → cobro. Cuanto más largo es el PMM, más capital circulante necesitas financiar. Para reducirlo: cobrar antes (anticipo, descuento por pronto pago), pagar más tarde (negociar 60-90 días con proveedores), reducir stock (producción just-in-time, dropshipping).
               </p>
-              <p className={styles.faqTip}>💡 <strong>Fórmula:</strong> PMM = Días de stock + Días de cobro a clientes - Días de pago a proveedores. Objetivo: PMM lo más corto posible.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Fórmula:</strong> PMM = Días de stock + Días de cobro a clientes - Días de pago a proveedores. Objetivo: PMM lo más corto posible.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué herramientas de financiación de circulante existen?</h4>
               <p>
                 Las principales: (1) Factoring: vendes tus facturas al banco, cobras al 98-99% inmediatamente. (2) Confirming: el banco paga a tus proveedores antes y te financia a ti. (3) Línea de crédito: dispones hasta un límite cuando la necesitas. (4) Descuento de pagarés: anticipas el cobro de pagarés de tus clientes. (5) ICO: créditos a tipos bajos para circulante. Cada opción tiene un coste (0.5-3%) y condiciones distintas.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Regla:</strong> El factoring es ideal si tus clientes pagan tarde. La línea de crédito es mejor para necesidades puntuales. No uses deuda a largo plazo para financiar circulante.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Regla:</strong> El factoring es ideal si tus clientes pagan tarde. La línea de crédito es mejor para necesidades puntuales. No uses deuda a largo plazo para financiar circulante.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Con qué frecuencia debo hacer el plan de tesorería?</h4>
               <p>
                 Depende del tamaño y situación del negocio. Negocios pequeños estables: previsión mensual con horizonte de 3-6 meses. Negocios en crecimiento o con estacionalidad: previsión semanal con horizonte de 90 días. En situación de tensión de liquidez: previsión diaria con horizonte de 30 días. Lo más importante es la constancia: actualizar la previsión cada semana con los datos reales e incorporar los desvíos.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Señal de alarma:</strong> Si tu saldo previsto para dentro de 4 semanas está por debajo del colchón mínimo, actúa hoy. No esperes a tener la crisis encima.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Señal de alarma:</strong> Si tu saldo previsto para dentro de 4 semanas está por debajo del colchón mínimo, actúa hoy. No esperes a tener la crisis encima.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cómo negociar mejores plazos con clientes y proveedores?</h4>
               <p>
                 Con clientes: ofrece descuento por pronto pago (1-2% a 30 días vs. 0% a 90 días), exige anticipo en proyectos nuevos, usa domiciliación bancaria para cobros automáticos, y actúa rápido ante impagos (reclamación formal a los 10 días de vencimiento). Con proveedores: negocia en el momento de más poder (primera compra grande, final de año), paga siempre a tiempo para ganar reputación y luego pedir mejoras, busca proveedores alternativos para tener leverage.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Objetivo:</strong> Cobrar en 30 días o menos, pagar en 60-90 días. Esta diferencia financia parte de tu circulante sin coste.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Objetivo:</strong> Cobrar en 30 días o menos, pagar en 60-90 días. Esta diferencia financia parte de tu circulante sin coste.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué es el cash flow libre (Free Cash Flow) y para qué sirve?</h4>
               <p>
                 El Free Cash Flow (FCF) = Flujo de Caja Operativo - CAPEX (inversiones en activos fijos). Es el dinero que queda disponible después de mantener y hacer crecer el negocio. Un FCF positivo y creciente indica un negocio sano que genera valor sin necesidad de financiación externa. Las empresas cotizadas se valoran por múltiplos de FCF. Para pymes, un FCF &gt; 0 durante 12 meses consecutivos es el signo de madurez del negocio.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Distinción:</strong> Puedes tener FCF positivo aunque el beneficio neto sea negativo (amortizaciones altas). El FCF es la medida más honesta del valor generado.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Distinción:</strong> Puedes tener FCF positivo aunque el beneficio neto sea negativo (amortizaciones altas). El FCF es la medida más honesta del valor generado.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuándo es mejor reinvertir vs. distribuir dividendos?</h4>
               <p>
                 Reinvierte cuando: la rentabilidad sobre el capital invertido (ROIC) de tu negocio supera lo que podrías obtener en alternativas (&gt;8-10%), hay proyectos de crecimiento claros con VAN positivo, o el negocio todavía no ha alcanzado su escala óptima. Distribuye dividendos cuando: el negocio genera más caja de la que puede reinvertir con buena rentabilidad, o los socios tienen necesidades de liquidez personal. La decisión debe basarse en la rentabilidad marginal del capital, no en preferencias personales.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Test:</strong> Si no puedes identificar proyectos concretos donde invertir el exceso de caja con &gt;10% de rentabilidad esperada, distribúyelo.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Test:</strong> Si no puedes identificar proyectos concretos donde invertir el exceso de caja con &gt;10% de rentabilidad esperada, distribúyelo.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cómo sé si mi negocio tiene un problema de cash flow o de rentabilidad?</h4>
               <p>
                 Son problemas distintos con soluciones distintas. Problema de cash flow: el negocio es rentable pero no tiene liquidez → solución: financiación de circulante, mejora de cobros/pagos, reducción de stock. Problema de rentabilidad: el negocio genera caja pero pierde dinero → solución: revisar precios, reducir costes, cambiar mix de productos. Lo más peligroso es confundirlos: inyectar caja a un negocio no rentable es posponer el problema. Usa el plan de tesorería meskeIA junto con la cuenta de resultados para diagnosticar correctamente.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Diagnóstico rápido:</strong> Si tienes clientes, ventas y márgenes positivos pero no llegas a fin de mes → problema de cash flow. Si tienes caja pero el negocio pierde dinero mes a mes → problema de rentabilidad.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Diagnóstico rápido:</strong> Si tienes clientes, ventas y márgenes positivos pero no llegas a fin de mes → problema de cash flow. Si tienes caja pero el negocio pierde dinero mes a mes → problema de rentabilidad.</p>
             </div>
           </div>
         </section>

@@ -444,56 +444,56 @@ export default function CalculadoraCaloriasPage() {
               <p>
                 El gasto calórico depende principalmente del peso corporal (más peso = más gasto), la eficiencia metabólica (personas entrenadas son más eficientes y queman menos en la misma actividad), la composición corporal (más músculo = más gasto basal), y factores individuales como la genética y la masa muscular. Una persona de 90 kg quema aproximadamente un 50% más que una de 60 kg haciendo el mismo ejercicio.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Clave:</strong> Los valores de la calculadora son estimaciones basadas en promedios. Tu gasto real puede variar ±20% según tu fisiología individual.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Clave:</strong> Los valores de la calculadora son estimaciones basadas en promedios. Tu gasto real puede variar ±20% según tu fisiología individual.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Es mejor el cardio o la fuerza para quemar grasa?</h4>
               <p>
                 Cardio quema más calorías durante el ejercicio (500-700 kcal/hora vs 300-500 de pesas). Pero las pesas generan mayor EPOC (quema extra 24-48h después), aumentan la masa muscular (que eleva el metabolismo basal permanentemente) y son más efectivas a largo plazo. La combinación óptima para pérdida de grasa: 2-3 sesiones de fuerza + 2-3 de cardio semanal. Solo cardio sin fuerza lleva a pérdida de músculo junto con la grasa.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Evidencia:</strong> Diversos estudios sugieren que añadir entrenamiento de fuerza a un programa de cardio mejora la composición corporal y preserva masa muscular durante el déficit calórico, lo que se asocia con resultados más sostenibles a largo plazo.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Evidencia:</strong> Diversos estudios sugieren que añadir entrenamiento de fuerza a un programa de cardio mejora la composición corporal y preserva masa muscular durante el déficit calórico, lo que se asocia con resultados más sostenibles a largo plazo.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Puedo confiar en las calorías que marca mi smartwatch o pulsómetro?</h4>
               <p>
                 Los dispositivos wearables tienen un margen de error del 15-30% en el cálculo de calorías. Los pulsómetros de pecho (banda torácica) son más precisos que los de muñeca por la mejor lectura de frecuencia cardíaca. Las máquinas de cardio del gimnasio (sin datos personales) pueden tener errores del 30-40%. Los valores de la calculadora meskeIA basada en MET son tan precisos o más que la mayoría de wearables para la mayoría de actividades.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Uso correcto:</strong> Úsalos para comparar entre días (tendencias) o entre actividades, no como valor absoluto exacto. La variabilidad entre sesiones importa más que el número exacto.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Uso correcto:</strong> Úsalos para comparar entre días (tendencias) o entre actividades, no como valor absoluto exacto. La variabilidad entre sesiones importa más que el número exacto.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuánto ejercicio necesito para compensar una comida copiosa?</h4>
               <p>
                 Una hamburguesa completa con patatas y bebida (~900 kcal) requeriría ~75 minutos de running a ritmo moderado. Un trozo de pizza (~280 kcal) equivale a ~25 minutos de carrera. Pero el enfoque de "compensar" comidas con ejercicio es psicológicamente dañino y matemáticamente ineficiente. Es mucho más fácil no comer 300 kcal que quemarlas después. El ejercicio es para la salud; la dieta, para el peso.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Perspectiva sana:</strong> No uses el ejercicio como castigo ni la comida como recompensa. El ejercicio mejora la salud, el estado de ánimo y el metabolismo. La gestión del peso viene de hábitos sostenibles, no de compensaciones puntuales.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Perspectiva sana:</strong> No uses el ejercicio como castigo ni la comida como recompensa. El ejercicio mejora la salud, el estado de ánimo y el metabolismo. La gestión del peso viene de hábitos sostenibles, no de compensaciones puntuales.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué es el NEAT y por qué es tan importante?</h4>
               <p>
                 El NEAT (Non-Exercise Activity Thermogenesis) es el gasto calórico de todas las actividades físicas que no son ejercicio estructurado: caminar al trabajo, subir escaleras, gesticular, limpiar la casa, hacer recados. Puede representar entre 200 y 800 kcal/día según el estilo de vida. Personas activas en su vida diaria (NEAT alto) pueden quemar hasta 600 kcal/día más que personas sedentarias, aunque ambas hagan la misma sesión de gimnasio.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Hack fácil:</strong> Aumentar pasos diarios (NEAT) tiene beneficios medibles. La evidencia muestra mejoras de mortalidad ya a partir de 4.400 pasos, con plateau de beneficio alrededor de 7.500-8.000. El objetivo de 10.000 pasos popular proviene de una campaña publicitaria, no de un umbral fisiológico.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Hack fácil:</strong> Aumentar pasos diarios (NEAT) tiene beneficios medibles. La evidencia muestra mejoras de mortalidad ya a partir de 4.400 pasos, con plateau de beneficio alrededor de 7.500-8.000. El objetivo de 10.000 pasos popular proviene de una campaña publicitaria, no de un umbral fisiológico.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué es el efecto meseta y cómo romperlo?</h4>
               <p>
                 El efecto meseta ocurre cuando el cuerpo se adapta al ejercicio y la dieta, reduciendo el gasto calórico para compensar el déficit. El metabolismo basal puede bajar un 10-15% en dietas restrictivas prolongadas. Para romperlo: varía la intensidad y tipo de ejercicio cada 4-6 semanas, introduce días de "recarga" calórica (refeed), aumenta el NEAT diario, y asegúrate de dormir 7-9 horas (el sueño insuficiente eleva el cortisol y reduce la quema de grasa).
               </p>
-              <p className={styles.faqTip}>💡 <strong>Señal de meseta:</strong> Si llevas 3 semanas sin cambios en peso ni medidas pese a mantener déficit y ejercicio, es el momento de variar el estímulo.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Señal de meseta:</strong> Si llevas 3 semanas sin cambios en peso ni medidas pese a mantener déficit y ejercicio, es el momento de variar el estímulo.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cómo influye la temperatura y la altitud en el gasto calórico?</h4>
               <p>
                 Frío: el cuerpo gasta más energía para mantener la temperatura corporal (termogénesis), especialmente en agua fría (natación en agua fría puede incrementar el gasto un 10-20%). Calor extremo: el gasto también aumenta ligeramente pero la hidratación y el rendimiento se ven más afectados. Altitud: con menos oxígeno disponible, el cuerpo trabaja más para el mismo esfuerzo, incrementando el gasto un 5-15% en altitudes de 2.000-4.000m.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Dato práctico:</strong> Nadar en piscina exterior en invierno puede quemar un 15% más que en piscina climatizada al mismo ritmo.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Dato práctico:</strong> Nadar en piscina exterior en invierno puede quemar un 15% más que en piscina climatizada al mismo ritmo.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuál es el ejercicio más eficiente para una persona sin tiempo?</h4>
               <p>
                 Para maximizar el gasto calórico por unidad de tiempo: HIIT (10-20 min, máxima quema incluyendo EPOC), seguido de circuitos de fuerza-resistencia (20-30 min). Para maximizar beneficios de salud con mínimo tiempo: 2 sesiones semanales de fuerza de 30-40 min + 150 min semanales de actividad moderada (puede ser caminar). Para principiantes: caminar 30 min diarios es más sostenible y saludable que una sesión de HIIT que abandones en semana 3.
               </p>
-              <p className={styles.faqTip}>💡 <strong>La mejor rutina:</strong> La que harás consistentemente durante meses. La adherencia supera siempre a la "eficiencia" teórica de cualquier protocolo.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>La mejor rutina:</strong> La que harás consistentemente durante meses. La adherencia supera siempre a la "eficiencia" teórica de cualquier protocolo.</p>
             </div>
           </div>
         </section>

@@ -441,7 +441,7 @@ export default function GlosarioProgramacionPage() {
                 El frontend es todo lo que el usuario ve y con lo que interactúa directamente: HTML (estructura), CSS (estilo) y JavaScript (comportamiento) que se ejecutan en el navegador. El backend es el servidor: recibe peticiones del frontend, procesa la lógica de negocio, accede a la base de datos y devuelve respuestas. Un sistema de login: el frontend muestra el formulario, el backend verifica las credenciales contra la base de datos.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Analogía práctica:</strong> El frontend es el salón de un restaurante (lo que ve el cliente), el backend es la cocina (donde se prepara la comida), y la base de datos es la despensa (donde se guardan los ingredientes).
+                <span aria-hidden="true">💡</span> <strong>Analogía práctica:</strong> El frontend es el salón de un restaurante (lo que ve el cliente), el backend es la cocina (donde se prepara la comida), y la base de datos es la despensa (donde se guardan los ingredientes).
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -450,7 +450,7 @@ export default function GlosarioProgramacionPage() {
                 <code>undefined</code> significa que una variable existe pero no se le ha asignado ningún valor. <code>null</code> es un valor intencionalmente asignado que representa "sin valor". <code>typeof null === 'object'</code> (bug histórico de JS). <code>typeof undefined === 'undefined'</code>. En comparación laxa: <code>null == undefined</code> es <code>true</code>. En estricta: <code>null === undefined</code> es <code>false</code>.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Regla práctica:</strong> Usa <code>null</code> cuando tú quieres decir "no hay valor aquí" (p.ej: usuario no encontrado). <code>undefined</code> aparece automáticamente cuando olvidas inicializar una variable. Comprueba siempre con <code>=== null</code> o <code>=== undefined</code>, nunca con <code>== null</code>.
+                <span aria-hidden="true">💡</span> <strong>Regla práctica:</strong> Usa <code>null</code> cuando tú quieres decir "no hay valor aquí" (p.ej: usuario no encontrado). <code>undefined</code> aparece automáticamente cuando olvidas inicializar una variable. Comprueba siempre con <code>=== null</code> o <code>=== undefined</code>, nunca con <code>== null</code>.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -459,7 +459,7 @@ export default function GlosarioProgramacionPage() {
                 <strong>var</strong>: scope de función, hoisting, evitar en código moderno. <strong>let</strong>: scope de bloque, valor puede cambiar. <strong>const</strong>: scope de bloque, referencia no puede reasignarse (pero el objeto interno sí puede mutarse). Regla de oro: usa <code>const</code> por defecto. Cambia a <code>let</code> solo si necesitas reasignar. Nunca uses <code>var</code> en código nuevo (ES6+).
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Truco para entrevistar:</strong> <code>const obj = &#123;&#125;; obj.name = 'Juan';</code> es válido. <code>const</code> prohíbe reasignar la variable (<code>obj = otro</code>), no mutar el objeto. Este matiz se pregunta frecuentemente en entrevistas técnicas junior.
+                <span aria-hidden="true">💡</span> <strong>Truco para entrevistar:</strong> <code>const obj = &#123;&#125;; obj.name = 'Juan';</code> es válido. <code>const</code> prohíbe reasignar la variable (<code>obj = otro</code>), no mutar el objeto. Este matiz se pregunta frecuentemente en entrevistas técnicas junior.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -468,7 +468,7 @@ export default function GlosarioProgramacionPage() {
                 REST (Representational State Transfer) es un estilo arquitectónico para APIs web. Una API REST usa HTTP con los verbos GET (leer), POST (crear), PUT/PATCH (actualizar), DELETE (eliminar). Cada recurso tiene una URL única: <code>GET /usuarios/123</code> devuelve el usuario 123. Las respuestas son típicamente JSON. "Stateless" significa que cada petición es independiente: el servidor no guarda estado de sesión.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Alternativas modernas:</strong> GraphQL permite pedir exactamente los campos que necesitas (evita over-fetching). tRPC ofrece type-safety end-to-end entre frontend y backend TypeScript sin definir contratos manualmente.
+                <span aria-hidden="true">💡</span> <strong>Alternativas modernas:</strong> GraphQL permite pedir exactamente los campos que necesitas (evita over-fetching). tRPC ofrece type-safety end-to-end entre frontend y backend TypeScript sin definir contratos manualmente.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -477,7 +477,7 @@ export default function GlosarioProgramacionPage() {
                 Git es un sistema de control de versiones distribuido. Guarda instantáneas del código (commits) que permiten ver la historia completa, revertir cambios, trabajar en ramas paralelas (branches) sin interferir con el código principal y fusionar cambios (merge). GitHub/GitLab son plataformas que alojan repositorios Git en la nube y añaden colaboración, CI/CD y revisión de código. Sin Git, perder código por error o conflictos entre compañeros es inevitable.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Los 5 comandos que usas el 90% del tiempo:</strong> <code>git add</code>, <code>git commit</code>, <code>git push</code>, <code>git pull</code>, <code>git checkout -b nueva-rama</code>. Domínalos antes de memorizar el resto.
+                <span aria-hidden="true">💡</span> <strong>Los 5 comandos que usas el 90% del tiempo:</strong> <code>git add</code>, <code>git commit</code>, <code>git push</code>, <code>git pull</code>, <code>git checkout -b nueva-rama</code>. Domínalos antes de memorizar el resto.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -486,7 +486,7 @@ export default function GlosarioProgramacionPage() {
                 <strong>SQL</strong> (PostgreSQL, MySQL): datos estructurados con relaciones complejas, transacciones ACID, integridad de datos crítica (banking, e-commerce). <strong>NoSQL</strong> (MongoDB, Redis, Cassandra): datos semiestructurados o sin esquema fijo, escala horizontal masiva, lecturas/escrituras de alta velocidad (sesiones, caché, tiempo real). El 80% de proyectos funciona perfectamente con PostgreSQL. NoSQL no es "mejor" sino diferente: úsalo cuando tengas un problema concreto que SQL no resuelva eficientemente.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Mito derribado:</strong> "NoSQL es más rápido que SQL" es falso en términos generales. PostgreSQL con índices correctos supera a MongoDB en la mayoría de queries de lectura. La velocidad depende del diseño, no del tipo de base de datos.
+                <span aria-hidden="true">💡</span> <strong>Mito derribado:</strong> "NoSQL es más rápido que SQL" es falso en términos generales. PostgreSQL con índices correctos supera a MongoDB en la mayoría de queries de lectura. La velocidad depende del diseño, no del tipo de base de datos.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -495,7 +495,7 @@ export default function GlosarioProgramacionPage() {
                 Docker empaqueta una aplicación con todas sus dependencias en un contenedor: un entorno aislado y reproducible. Resuelve el clásico "en mi máquina funciona": si funciona en el contenedor, funciona en cualquier entorno (desarrollo, CI, producción). Un contenedor es más ligero que una máquina virtual porque comparte el kernel del sistema operativo. Lo necesitas cuando: diferentes devs tienen distintas versiones de Node/Python, el servidor de producción difiere del entorno local, o tienes múltiples microservicios.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Por dónde empezar:</strong> Aprende a escribir un Dockerfile básico para tu app y usa <code>docker-compose</code> para orquestar tu app + base de datos. Esto cubre el 90% de los casos de uso en proyectos de equipo pequeño.
+                <span aria-hidden="true">💡</span> <strong>Por dónde empezar:</strong> Aprende a escribir un Dockerfile básico para tu app y usa <code>docker-compose</code> para orquestar tu app + base de datos. Esto cubre el 90% de los casos de uso en proyectos de equipo pequeño.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -504,7 +504,7 @@ export default function GlosarioProgramacionPage() {
                 <strong>Síncrono</strong>: el código espera a que cada operación termine antes de continuar. Si leer un archivo tarda 2 segundos, el hilo se bloquea 2 segundos. <strong>Asíncrono</strong>: la operación lenta se inicia, el código sigue ejecutándose, y cuando termina se procesa el resultado (callback, Promise, async/await). JavaScript es single-threaded: la asincronía es fundamental para no bloquear la UI. Una petición a una API siempre debe ser asíncrona.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Orden de aprendizaje:</strong> Callbacks → Promises → async/await. Empieza directamente con <code>async/await</code> para el código nuevo (es la forma más legible), pero entiende Promises para manejar errores correctamente con <code>try/catch</code>.
+                <span aria-hidden="true">💡</span> <strong>Orden de aprendizaje:</strong> Callbacks → Promises → async/await. Empieza directamente con <code>async/await</code> para el código nuevo (es la forma más legible), pero entiende Promises para manejar errores correctamente con <code>try/catch</code>.
               </p>
             </div>
           </div>
