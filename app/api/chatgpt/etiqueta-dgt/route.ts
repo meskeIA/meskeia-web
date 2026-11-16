@@ -4,8 +4,8 @@
  *
  * Calcula la etiqueta medioambiental DGT (CERO, ECO, C, B o Sin etiqueta)
  * según el tipo de combustible y año de matriculación, e informa del acceso
- * a las principales ZBE de España (Madrid, Barcelona, Valencia, Sevilla,
- * Zaragoza, Valladolid y Bilbao).
+ * a las ZBE de Madrid y Barcelona; para Valencia, Sevilla, Zaragoza, Valladolid y
+ * Bilbao remite a la ordenanza de su ayuntamiento (acceso «consultar» y enlace, hallazgo 4533).
  *
  * Analytics: registra cada llamada con modo='chatgpt' en Turso.
  */
@@ -41,6 +41,7 @@ type Etiqueta = 'CERO' | 'ECO' | 'C' | 'B' | 'Sin etiqueta';
 interface ZBEInfo {
   ciudad: string;
   acceso: AccesoZBE;
+  enlace?: string;
   detalle: string;
 }
 
@@ -111,7 +112,7 @@ export async function POST(request: NextRequest) {
       autonomiaPhev: Number(autonomiaPhevKm) >= 40 ? 'cuarentaOMas' : 'menos',
     });
     const etiqueta = NOMBRE_ETIQUETA[tipo];
-    const zbeCiudades: ZBEInfo[] = CIUDADES_ZBE[tipo].map(z => ({ ciudad: z.nombre, acceso: z.acceso, detalle: z.detalle }));
+    const zbeCiudades: ZBEInfo[] = CIUDADES_ZBE[tipo].map(z => ({ ciudad: z.nombre, acceso: z.acceso, detalle: z.detalle, ...(z.enlace ? { enlace: z.enlace } : {}) }));
 
     registrarLlamada(combustible, anioMatriculacion).catch(() => {});
 
@@ -125,6 +126,7 @@ export async function POST(request: NextRequest) {
         ciudades_libres: zbeCiudades.filter(z => z.acceso === 'libre').map(z => z.ciudad),
         ciudades_restriccion: zbeCiudades.filter(z => z.acceso === 'restriccion').map(z => z.ciudad),
         ciudades_prohibido: zbeCiudades.filter(z => z.acceso === 'prohibido').map(z => z.ciudad),
+        ciudades_consultar_ordenanza: zbeCiudades.filter(z => z.acceso === 'consultar').map(z => z.ciudad),
         aviso_legal: AVISO_LEGAL,
       },
       { headers: corsHeaders() }

@@ -17,13 +17,39 @@
 
 import type { TipoEtiqueta } from './motor';
 
-export type AccesoZBE = 'libre' | 'restriccion' | 'prohibido';
+/**
+ * `consultar` (16/11/2026, hallazgo 4533): ciudad cuya regla no se puede anclar a una fuente
+ * fechada. Las restricciones las fija cada ordenanza municipal (RD 1052/2022, art. 5.2), que no
+ * está en el BOE: en vez de un veredicto («Libre acceso», «Prohibido») la tarjeta remite al
+ * portal del ayuntamiento. Decidido por el usuario en /reparar pendientes (cabo C0797, opción B).
+ */
+export type AccesoZBE = 'libre' | 'restriccion' | 'prohibido' | 'consultar';
 
 export interface CiudadZBE {
   nombre: string;
   acceso: AccesoZBE;
   detalle: string;
+  /** Portal municipal donde consultar la ordenanza (solo con `acceso: 'consultar'`). */
+  enlace?: string;
 }
+
+/** Ciudades sin fuente fechada: la tarjeta remite a su ayuntamiento, sea cual sea la etiqueta. */
+const CIUDADES_SIN_FUENTE: { nombre: string; enlace: string }[] = [
+  { nombre: 'Valencia', enlace: 'https://www.valencia.es/' },
+  { nombre: 'Sevilla', enlace: 'https://www.sevilla.org/' },
+  { nombre: 'Zaragoza', enlace: 'https://www.zaragoza.es/' },
+  { nombre: 'Valladolid', enlace: 'https://www.valladolid.es/' },
+  { nombre: 'Bilbao', enlace: 'https://www.bilbao.eus/' },
+];
+
+const consultarOrdenanza = (): CiudadZBE[] =>
+  CIUDADES_SIN_FUENTE.map(({ nombre, enlace }) => ({
+    nombre,
+    acceso: 'consultar',
+    detalle:
+      'Las restricciones las fija la ordenanza municipal y cambian por fases. No podemos fecharlas desde aquí: consulta la vigente en el portal del ayuntamiento antes de entrar.',
+    enlace,
+  }));
 
 export const CIUDADES_ZBE: Record<TipoEtiqueta, CiudadZBE[]> = {
   cero: [
@@ -37,31 +63,7 @@ export const CIUDADES_ZBE: Record<TipoEtiqueta, CiudadZBE[]> = {
       acceso: 'libre',
       detalle: 'Acceso libre a la ZBE Rondes sin restricciones en ningún momento.',
     },
-    {
-      nombre: 'Valencia',
-      acceso: 'libre',
-      detalle: 'Acceso libre sin restricciones de circulación.',
-    },
-    {
-      nombre: 'Sevilla',
-      acceso: 'libre',
-      detalle: 'Acceso libre. La ZBE está en proceso de implantación progresiva.',
-    },
-    {
-      nombre: 'Zaragoza',
-      acceso: 'libre',
-      detalle: 'Acceso libre a la ZBE del centro urbano.',
-    },
-    {
-      nombre: 'Valladolid',
-      acceso: 'libre',
-      detalle: 'Acceso libre sin restricciones.',
-    },
-    {
-      nombre: 'Bilbao',
-      acceso: 'libre',
-      detalle: 'Acceso libre a la ZBE del centro y Gran Vía.',
-    },
+    ...consultarOrdenanza(),
   ],
   eco: [
     {
@@ -74,31 +76,7 @@ export const CIUDADES_ZBE: Record<TipoEtiqueta, CiudadZBE[]> = {
       acceso: 'libre',
       detalle: 'Acceso libre a la ZBE Rondes sin restricciones.',
     },
-    {
-      nombre: 'Valencia',
-      acceso: 'libre',
-      detalle: 'Acceso libre sin restricciones.',
-    },
-    {
-      nombre: 'Sevilla',
-      acceso: 'libre',
-      detalle: 'Acceso libre. ZBE en implantación progresiva.',
-    },
-    {
-      nombre: 'Zaragoza',
-      acceso: 'libre',
-      detalle: 'Acceso libre a la ZBE del centro.',
-    },
-    {
-      nombre: 'Valladolid',
-      acceso: 'libre',
-      detalle: 'Acceso libre sin restricciones.',
-    },
-    {
-      nombre: 'Bilbao',
-      acceso: 'libre',
-      detalle: 'Acceso libre a la ZBE.',
-    },
+    ...consultarOrdenanza(),
   ],
   c: [
     {
@@ -112,31 +90,7 @@ export const CIUDADES_ZBE: Record<TipoEtiqueta, CiudadZBE[]> = {
       acceso: 'libre',
       detalle: 'Acceso libre a la ZBE Rondes sin restricciones habituales para etiqueta C.',
     },
-    {
-      nombre: 'Valencia',
-      acceso: 'libre',
-      detalle: 'Acceso libre sin restricciones para etiqueta C.',
-    },
-    {
-      nombre: 'Sevilla',
-      acceso: 'libre',
-      detalle: 'Acceso libre. ZBE en implantación; etiqueta C no está restringida.',
-    },
-    {
-      nombre: 'Zaragoza',
-      acceso: 'libre',
-      detalle: 'Acceso libre a la ZBE para etiqueta C.',
-    },
-    {
-      nombre: 'Valladolid',
-      acceso: 'libre',
-      detalle: 'Acceso libre sin restricciones.',
-    },
-    {
-      nombre: 'Bilbao',
-      acceso: 'libre',
-      detalle: 'Acceso libre para etiqueta C.',
-    },
+    ...consultarOrdenanza(),
   ],
   b: [
     {
@@ -151,32 +105,7 @@ export const CIUDADES_ZBE: Record<TipoEtiqueta, CiudadZBE[]> = {
       detalle:
         'Acceso libre: la ZBE Rondes solo restringe, en días laborables de 7:00 a 20:00, a los vehículos sin distintivo ambiental.',
     },
-    {
-      nombre: 'Valencia',
-      acceso: 'restriccion',
-      detalle: 'Restricciones de circulación en el área central. Consultar horarios y días concretos en el portal municipal.',
-    },
-    {
-      nombre: 'Sevilla',
-      acceso: 'libre',
-      detalle:
-        'Acceso libre por ahora. La ZBE está en implantación y aún no aplica restricciones para etiqueta B.',
-    },
-    {
-      nombre: 'Zaragoza',
-      acceso: 'restriccion',
-      detalle: 'Restricciones en determinados horarios y días laborables en la ZBE del centro.',
-    },
-    {
-      nombre: 'Valladolid',
-      acceso: 'libre',
-      detalle: 'Acceso libre por el momento, aunque la tendencia es endurecer la normativa.',
-    },
-    {
-      nombre: 'Bilbao',
-      acceso: 'restriccion',
-      detalle: 'Restricciones en horario de mayor tráfico en días laborables dentro de la ZBE.',
-    },
+    ...consultarOrdenanza(),
   ],
   ninguna: [
     {
@@ -191,31 +120,6 @@ export const CIUDADES_ZBE: Record<TipoEtiqueta, CiudadZBE[]> = {
       detalle:
         'Acceso prohibido a la ZBE Rondes en días laborables. Sistema de control automático con cámaras activo.',
     },
-    {
-      nombre: 'Valencia',
-      acceso: 'prohibido',
-      detalle: 'Acceso prohibido en la ZBE del centro urbano.',
-    },
-    {
-      nombre: 'Sevilla',
-      acceso: 'restriccion',
-      detalle:
-        'Restricciones progresivas en la ZBE en implantación. Se prevé prohibición total en 2025-2026.',
-    },
-    {
-      nombre: 'Zaragoza',
-      acceso: 'prohibido',
-      detalle: 'Acceso prohibido a la ZBE. Control automático mediante cámaras en los accesos.',
-    },
-    {
-      nombre: 'Valladolid',
-      acceso: 'restriccion',
-      detalle: 'Restricciones crecientes. Se prevé prohibición total a medida que la ZBE se consolide.',
-    },
-    {
-      nombre: 'Bilbao',
-      acceso: 'prohibido',
-      detalle: 'Acceso prohibido a la ZBE del centro.',
-    },
+    ...consultarOrdenanza(),
   ],
 };

@@ -198,18 +198,21 @@ function BadgeZbe({ acceso }: BadgeZbeProps) {
     libre: styles.zbeLibre,
     restriccion: styles.zbeRestriccion,
     prohibido: styles.zbeProhibido,
+    consultar: styles.zbeConsultar,
   };
 
   const iconoMap: Record<AccesoZBE, string> = {
     libre: '✓',
     restriccion: '⚠',
     prohibido: '✕',
+    consultar: 'ℹ',
   };
 
   const textoMap: Record<AccesoZBE, string> = {
     libre: 'Libre acceso',
     restriccion: 'Con restricciones',
     prohibido: 'Prohibido',
+    consultar: 'Consulta la ordenanza',
   };
 
   return (
@@ -525,11 +528,19 @@ export default function EtiquetaDgtPage() {
                     <p className={styles.zbeNombreCiudad}>{ciudad.nombre}</p>
                     <BadgeZbe acceso={ciudad.acceso} />
                     <p className={styles.zbeDetalle}>{ciudad.detalle}</p>
+                    {ciudad.enlace ? (
+                      <p key="enlace" className={styles.zbeEnlace}>
+                        <a href={ciudad.enlace} target="_blank" rel="noopener noreferrer">
+                          Portal del Ayuntamiento de {ciudad.nombre}
+                        </a>
+                      </p>
+                    ) : null}
                   </div>
                 ))}
               </div>
               <p className={styles.notaZbe}>
-                Información orientativa a 2025. Las ZBE están en evolución constante.
+                Madrid y Barcelona, según madrid.es y el AMB (consultados el 04/10/2026). En el
+                resto de ciudades, la ordenanza de cada ayuntamiento: las ZBE cambian por fases.
               </p>
             </div>
 
@@ -627,8 +638,7 @@ export default function EtiquetaDgtPage() {
               <strong>200 € de multa</strong> (100 € con pronto pago), sin pérdida de puntos.
               Madrid y Barcelona cuentan con sistemas de control perimetral mediante cámaras de
               lectura automática de matrículas (ANPR) que identifican los vehículos infractores de
-              forma continua. Zaragoza y Valladolid también han implantado sistemas de control
-              automático en los accesos a sus ZBE. En algunos municipios, la denuncia puede
+              forma continua. En algunos municipios, la denuncia puede
               interponerse igualmente por la Policía Local durante los controles manuales.
             </p>
 

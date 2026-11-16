@@ -339,6 +339,22 @@
   color: #fca5a5;
 }
 
+/* Hallazgo 4533: ciudad sin regla fechada, remite a su ordenanza. Neutro, sin veredicto. */
+.zbeConsultar {
+  background: rgba(100, 116, 139, 0.14);
+  color: #1e293b;
+}
+
+[data-theme='dark'] .zbeConsultar {
+  background: rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+}
+
+.zbeEnlace {
+  font-size: 0.875rem;
+  margin: 0.4rem 0 0;
+}
+
 .zbeDetalle {
   font-size: 0.875rem;
   color: var(--text-secondary);

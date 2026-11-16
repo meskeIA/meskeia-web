@@ -78,8 +78,8 @@
     "/api/chatgpt/etiqueta-dgt": {
       "post": {
         "operationId": "consultarEtiquetaDgt",
-        "summary": "Consulta la etiqueta DGT de un vehículo y su acceso a las ZBE de 7 ciudades españolas.",
-        "description": "Calcula la etiqueta medioambiental DGT (CERO, ECO, C, B o Sin etiqueta) según combustible y año de matriculación. Devuelve acceso detallado a ZBE de Madrid, Barcelona, Valencia, Sevilla, Zaragoza, Valladolid y Bilbao.",
+        "summary": "Consulta la etiqueta DGT de un vehículo y su acceso a las ZBE de Madrid y Barcelona.",
+        "description": "Calcula la etiqueta medioambiental DGT (CERO, ECO, C, B o Sin etiqueta) según combustible y año de matriculación. Devuelve el acceso a las ZBE de Madrid y Barcelona; para Valencia, Sevilla, Zaragoza, Valladolid y Bilbao remite a la ordenanza de su ayuntamiento (acceso «consultar» y enlace).",
         "requestBody": {
           "required": true,
           "content": {
@@ -293,19 +293,21 @@
           "recomendacion": { "type": "string", "description": "Consejo sobre implicaciones prácticas de la etiqueta." },
           "acceso_zbe": {
             "type": "array",
-            "description": "Acceso detallado a ZBE de las 7 principales ciudades.",
+            "description": "Acceso a las ZBE por ciudad: veredicto en Madrid y Barcelona, enlace a la ordenanza en el resto.",
             "items": {
               "type": "object",
               "properties": {
                 "ciudad": { "type": "string" },
-                "acceso": { "type": "string", "enum": ["libre", "restriccion", "prohibido"] },
-                "detalle": { "type": "string" }
+                "acceso": { "type": "string", "enum": ["libre", "restriccion", "prohibido", "consultar"] },
+                "detalle": { "type": "string" },
+                "enlace": { "type": "string", "description": "Portal del ayuntamiento, solo con acceso consultar." }
               }
             }
           },
           "ciudades_libres": { "type": "array", "items": { "type": "string" }, "description": "Ciudades con acceso libre." },
           "ciudades_restriccion": { "type": "array", "items": { "type": "string" }, "description": "Ciudades con acceso restringido." },
           "ciudades_prohibido": { "type": "array", "items": { "type": "string" }, "description": "Ciudades donde está prohibido circular." },
+          "ciudades_consultar_ordenanza": { "type": "array", "items": { "type": "string" }, "description": "Ciudades cuya regla no se puede fechar: consultar la ordenanza de su ayuntamiento." },
           "aviso_legal": { "type": "string" }
         }
       },

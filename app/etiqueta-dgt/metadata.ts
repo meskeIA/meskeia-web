@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Etiqueta DGT de tu Coche — ¿Puedes entrar en las ZBE? | meskeIA',
   description:
-    'Descubre la etiqueta medioambiental DGT de tu vehículo y si puedes circular por las Zonas de Bajas Emisiones de Madrid, Barcelona, Valencia y otras ciudades españolas.',
+    'Descubre la etiqueta medioambiental DGT de tu vehículo, si puedes circular por las Zonas de Bajas Emisiones de Madrid y Barcelona, y dónde consultar la ordenanza de otras ciudades españolas.',
   keywords: [
     'etiqueta DGT coche',
     'zona de bajas emisiones España',
@@ -45,11 +45,12 @@ export const metadata: Metadata = {
       generateWebAppSchema({
         name: 'Etiqueta DGT y Zonas de Bajas Emisiones',
         description:
-          'Consulta la etiqueta medioambiental DGT de tu vehículo y comprueba si puedes circular por las Zonas de Bajas Emisiones de Madrid, Barcelona, Valencia, Sevilla, Zaragoza, Valladolid y Bilbao.',
+          'Consulta la etiqueta medioambiental DGT de tu vehículo, comprueba si puedes circular por las Zonas de Bajas Emisiones de Madrid y Barcelona, y enlaza a la ordenanza de Valencia, Sevilla, Zaragoza, Valladolid y Bilbao.',
         url: 'https://meskeia.com/etiqueta-dgt/',
         features: [
           'Cálculo de etiqueta DGT (CERO, ECO, C, B o sin etiqueta)',
-          'Consulta de acceso a 7 ZBE principales de España',
+          'Acceso a las ZBE de Madrid y Barcelona según sus fuentes municipales',
+          'Enlace al ayuntamiento de Valencia, Sevilla, Zaragoza, Valladolid y Bilbao para consultar su ordenanza',
           'Información sobre restricciones por nivel de contaminación',
           'Recomendaciones según etiqueta y ciudad',
           '100% en el navegador, sin registro',
@@ -63,12 +64,13 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Etiqueta DGT y Zonas de Bajas Emisiones",
-  description: "Descubre la etiqueta medioambiental DGT de tu vehículo y si puedes circular por las Zonas de Bajas Emisiones de Madrid, Barcelona, Valencia y otras ciudades españolas.",
+  description: "Descubre la etiqueta medioambiental DGT de tu vehículo, si puedes circular por las Zonas de Bajas Emisiones de Madrid y Barcelona, y dónde consultar la ordenanza de otras ciudades españolas.",
   url: "https://meskeia.com/etiqueta-dgt/",
   category: 'UtilityApplication',
   features: [
     'Cálculo de etiqueta DGT (CERO, ECO, C, B o sin etiqueta) por combustible y fecha de matriculación',
-    'Consulta de acceso a las ZBE de Madrid, Barcelona, Valencia, Sevilla, Zaragoza, Valladolid y Bilbao',
+    'Acceso a las ZBE de Madrid y Barcelona según sus fuentes municipales',
+    'Enlace al ayuntamiento de Valencia, Sevilla, Zaragoza, Valladolid y Bilbao para consultar su ordenanza',
     'Matiz de los casos frontera (diésel de 2015, gas e híbridos anteriores a 2006)',
     'Recomendaciones según la etiqueta y la ciudad',
     'Funciona en el navegador, sin registro',
@@ -92,7 +94,7 @@ export const faqJsonLd = {
       name: '¿Qué son las Zonas de Bajas Emisiones (ZBE) en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las Zonas de Bajas Emisiones (ZBE) son áreas urbanas delimitadas donde se restringen o prohíben determinados vehículos en función de su etiqueta medioambiental DGT, con el objetivo de mejorar la calidad del aire. La Ley 7/2021, de cambio climático y transición energética (art. 14.3), obliga a los municipios de más de 50.000 habitantes y a los territorios insulares a establecerlas, y a los de más de 20.000 cuando superan los límites de contaminación. Entre las principales están Madrid (Madrid ZBE, que abarca todo el municipio, y la ZBEDEP Distrito Centro), Barcelona (ZBE Rondes) y Valencia.',
+        text: 'Las Zonas de Bajas Emisiones (ZBE) son áreas urbanas delimitadas donde se restringen o prohíben determinados vehículos en función de su etiqueta medioambiental DGT, con el objetivo de mejorar la calidad del aire. La Ley 7/2021, de cambio climático y transición energética (art. 14.3), obliga a los municipios de más de 50.000 habitantes y a los territorios insulares a establecerlas, y a los de más de 20.000 cuando superan los límites de contaminación. Entre las principales están Madrid (Madrid ZBE, que abarca todo el municipio, y la ZBEDEP Distrito Centro) y Barcelona (ZBE Rondes); en el resto, las restricciones las fija la ordenanza de cada ayuntamiento.',
       },
     },
     {

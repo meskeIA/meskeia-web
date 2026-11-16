@@ -441,10 +441,20 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
     const prohibido = resultado(page).locator('[class*="zbeProhibido"]').first();
     await expect(prohibido).toContainText('Prohibido');
     expect(await esperarEstable(() => contrasteEfectivo(prohibido)), 'prohibido en claro').toBeGreaterThanOrEqual(4.5);
+    // Hallazgo 4533 (16/11/2026): las ciudades sin fuente fechada llevan la insignia neutra
+    // «Consulta la ordenanza»; se mide igual, en claro y en oscuro.
+    const consultarInsignia = resultado(page).locator('[class*="zbeConsultar"]').first();
+    await expect(consultarInsignia).toContainText('Consulta la ordenanza');
+    expect(await esperarEstable(() => contrasteEfectivo(consultarInsignia)), 'consultar en claro').toBeGreaterThanOrEqual(4.5);
     await pasarAOscuro(page);
     expect(await esperarEstable(() => contrasteEfectivo(prohibido)), 'prohibido en oscuro').toBeGreaterThanOrEqual(4.5);
-    // «Sin etiqueta» también tiene ciudades «Con restricciones» (Sevilla, Valladolid): se mide en oscuro.
-    expect(await esperarEstable(() => contrasteEfectivo(restr)), 'restricción en oscuro').toBeGreaterThanOrEqual(4.5);
+    expect(await esperarEstable(() => contrasteEfectivo(consultarInsignia)), 'consultar en oscuro').toBeGreaterThanOrEqual(4.5);
+    // «Con restricciones» en oscuro: desde el 16/11/2026 «Sin etiqueta» ya no la tiene (era de
+    // Sevilla y Valladolid, sin fuente), así que se mide con el diésel 2010 (Madrid).
+    await consultar(page, 'diesel', { anio: 2010 });
+    const restrOscuro = resultado(page).locator('[class*="zbeRestriccion"]').first();
+    await expect(restrOscuro).toContainText('Con restricciones');
+    expect(await esperarEstable(() => contrasteEfectivo(restrOscuro)), 'restricción en oscuro').toBeGreaterThanOrEqual(4.5);
   });
 
   /**
@@ -736,15 +746,23 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
    * control automático en los accesos a sus ZBE.»).
    * Si la reparación pone la fuente fuera de la tarjeta (una nota común), este caso se adapta a ella.
    */
+  // REPARADO (4533) el 16/11/2026 con la opción B que eligió el usuario en /reparar pendientes
+  // (cabo C0797): esas ciudades (y Bilbao, igual) se quedan, pero SIN veredicto: «Consulta la
+  // ordenanza» y un enlace al portal de su ayuntamiento. Sin regla no hay nada que fechar, así que
+  // el caso comprueba lo que pedía de otra forma: ninguna afirma acceso, y la previsión vencida y
+  // lo de las cámaras de Zaragoza y Valladolid ya no están.
   test('CASO 37 · las reglas de Valencia, Sevilla, Zaragoza y Valladolid llevan fuente y fecha, o no salen', async ({ page }) => {
-    test.fail();
     const comprobar = async (): Promise<void> => {
-      for (const ciudad of CIUDADES_SIN_ANCLAR) {
+      for (const ciudad of [...CIUDADES_SIN_ANCLAR, 'Bilbao']) {
         const tarjeta = tarjetaCiudad(page, ciudad);
         if ((await tarjeta.count()) === 0) continue; // retirada: también vale
-        await expect(tarjeta, ciudad).toContainText(FECHA_ES, { timeout: 3000 });
+        if ((await tarjeta.textContent())?.match(FECHA_ES)) continue; // con fuente fechada: vale
+        await expect(tarjeta.locator('[class*="zbeStatus"]'), ciudad).toHaveText(/Consulta la ordenanza/);
+        await expect(tarjeta, ciudad).not.toContainText(/Libre acceso|Con restricciones|Prohibido|cámaras/);
+        await expect(tarjeta.getByRole('link', { name: `Portal del Ayuntamiento de ${ciudad}` })).toHaveAttribute('href', /^https:\/\/www\./);
       }
     };
+    await expect(page.locator('main')).not.toContainText('Zaragoza y Valladolid también han implantado');
     await consultar(page, 'diesel', { anio: 2000 });
     await expect(tituloResultado(page)).toHaveText('Sin etiqueta');
     await expect(resultado(page)).not.toContainText('Se prevé prohibición total en 2025-2026', { timeout: 3000 });
