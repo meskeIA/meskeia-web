@@ -141,7 +141,7 @@ export default function VisualizadorRecursosLiterariosPage() {
         <h1 className={styles.heroTitle}>Recursos Literarios</h1>
         <p className={styles.heroSubtitle}>
           {/* La cifra sale del banco: decía 27 con 26 (hallazgo 3646 del quiz, mismo banco) */}
-          {figurasRetorica.length} figuras retóricas con definición, ejemplos reales y cómo distinguirlas entre sí
+          {figurasRetorica.length} figuras retóricas con definición, ejemplos y cómo distinguirlas entre sí
         </p>
       </header>
 

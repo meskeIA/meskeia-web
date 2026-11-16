@@ -7,7 +7,7 @@ const TOTAL = figurasRetorica.length;
 
 export const metadata: Metadata = {
   title: 'Recursos Literarios — Guía Visual de Figuras Retóricas | meskeIA',
-  description: `Explora ${TOTAL} figuras retóricas con definición, ejemplos reales y cómo distinguirlas. Filtra por nivel (ESO, Bachillerato, Selectividad) y categoría. Ideal para estudiar literatura.`,
+  description: `Explora ${TOTAL} figuras retóricas con definición, ejemplos y cómo distinguirlas. Filtra por nivel (ESO, Bachillerato, Selectividad) y categoría. Ideal para estudiar literatura.`,
   keywords: 'figuras retóricas, recursos literarios, metáfora, símil, hipérbole, anáfora, ironía, metonimia, oxímoron, paradoja, figuras retóricas bachillerato, selectividad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Recursos Literarios — Guía Visual de Figuras Retóricas',
-    description: `Explora ${TOTAL} figuras retóricas con definición, ejemplos reales y cómo distinguirlas. Filtra por nivel y categoría.`,
+    description: `Explora ${TOTAL} figuras retóricas con definición, ejemplos y cómo distinguirlas. Filtra por nivel y categoría.`,
     url: 'https://meskeia.com/visualizador-recursos-literarios',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Recursos Literarios — Guía Visual de Figuras Retóricas',
-  description: `Directorio visual de ${TOTAL} figuras retóricas con definición, ejemplos reales, campo "cómo no confundirla" y filtros por nivel (ESO, Bachillerato, Selectividad) y grupo. Incluye sección de pares frecuentemente confundidos.`,
+  description: `Directorio visual de ${TOTAL} figuras retóricas con definición, ejemplos, campo "cómo no confundirla" y filtros por nivel (ESO, Bachillerato, Selectividad) y grupo. Incluye sección de pares frecuentemente confundidos.`,
   url: 'https://meskeia.com/visualizador-recursos-literarios/',
   category: 'EducationalApplication',
   features: [
@@ -51,7 +51,8 @@ export const jsonLd = generateWebAppSchema({
     'Buscador por nombre de figura',
     'Campo "cómo no confundirla" para cada figura',
     'Sección de 6 pares frecuentemente confundidos',
-    'Múltiples ejemplos reales por figura',
+    // Hallazgo 3653 del quiz, mismo banco: la mayoría de los ejemplos están escritos para la guía
+    'Varios ejemplos por figura, algunos de autores (Darío, Garcilaso, Fray Luis, Santa Teresa)',
     'Enlace directo al quiz para practicar el reconocimiento',
     'Gratuito, sin registro, en español',
   ],
@@ -82,7 +83,7 @@ export const faqJsonLd = {
       name: '¿Qué figuras retóricas son más importantes para selectividad o examen de admisión universitaria?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `En los exámenes de comentario de texto de nivel preuniversitario suelen evaluarse con mayor frecuencia: metáfora, símil, hipérbole, anáfora, antítesis, paradoja, ironía, metonimia, sinécdoque y personificación. La guía incluye las ${TOTAL} figuras más habituales ordenadas por nivel de dificultad, con ejemplos extraídos de textos literarios reales y un apartado específico para no confundir figuras parecidas.`,
+        text: `En los exámenes de comentario de texto de nivel preuniversitario suelen evaluarse con mayor frecuencia: metáfora, símil, hipérbole, anáfora, antítesis, paradoja, ironía, metonimia, sinécdoque y personificación. La guía incluye las ${TOTAL} figuras más habituales ordenadas por nivel de dificultad, con ejemplos breves (la mayoría escritos para la guía; algunos de autores como Rubén Darío o Garcilaso) y un apartado específico para no confundir figuras parecidas.`,
       },
     },
     {
