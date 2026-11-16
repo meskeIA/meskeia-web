@@ -25,7 +25,9 @@ import { esperarPaginaAsentada } from './_hidratacion';
  * · CLAVE: la respuesta correcta de cada enunciado, cotejada a mano el 28/10/2026 contra el
  *   concepto (no copiada del índice `correcta`). En la P14 la clave reproduce la que marca la app
  *   para poder conducir la partida, y el error de esa clave se mide aparte (hallazgo del banco).
- * · No hay barajado: preguntas y opciones salen siempre en el mismo orden.
+ * · Desde el hallazgo 3703 (/reparar 16/11/2026) las OPCIONES se barajan al montar y en cada
+ *   «Repetir quiz»; las preguntas mantienen el orden del banco. Por eso todo se conduce por el texto
+ *   de la opción (la CLAVE), nunca por su letra.
  */
 
 const RUTA = '/quiz-conceptos-financieros/';
@@ -509,15 +511,32 @@ test.describe('Inspector 28/10/2026 · banco y nota', () => {
    * Sin barajado: la correcta es la B en 12 de las 15 (A en la TAE y el IPC, C en la tarjeta).
    * Pulsar siempre B da 12 / 15 = 80 % → «Muy bien — Tienes buena base». Con las opciones
    * barajadas, una letra fija acierta como Binomial(15; 0,25): P(≥ 11) ≈ 1·10⁻⁴.
+   * REPARADO (3703, /reparar 16/11/2026): barajarOpciones al montar y en «Repetir quiz». Se mide
+   * además que «Repetir quiz» cambie las letras: con 15 preguntas de 4 opciones, repetir las 15
+   * permutaciones es 1 entre 24¹⁵.
    */
   test('hallazgo · contestar siempre la B no saca «Muy bien»', async ({ page }) => {
-    test.fail();
-    test.setTimeout(90_000);
+    test.setTimeout(120_000);
     await abrir(page);
     const aciertos = await jugar(page, () => 1);
     const r = await resultado(page);
     expect(r.puntuacion).toBe(`${aciertos} / 15`);
     expect(aciertos, `siempre B → ${r.puntuacion} «${r.titulo}»`).toBeLessThan(11);
+    // Dos partidas: la secuencia de opciones (las cuatro de cada pregunta, en orden) cambia
+    const secuencia = async (): Promise<string> => {
+      const filas: string[] = [];
+      for (let n = 1; n <= 15; n++) {
+        filas.push((await textosOpcion(page)).join('|'));
+        await responder(page, 'bien');
+        await avanzar(page);
+      }
+      return filas.join(' / ');
+    };
+    await page.getByRole('button', { name: 'Repetir quiz' }).click();
+    const a = await secuencia();
+    await page.getByRole('button', { name: 'Repetir quiz' }).click();
+    const b = await secuencia();
+    expect(b, '«Repetir quiz» repite las mismas letras').not.toBe(a);
   });
 
   /** Cifras del FAQPage recalculadas a mano: correctas. */
@@ -575,7 +594,9 @@ test.describe('Inspector 28/10/2026 · contenido y accesibilidad', () => {
     //   · P6: «(3-6 meses de gastos)» como cifra cerrada
     //   · FAQPage: «tipos de deuda (buena vs costosa)» y «los expertos recomiendan que el dinero a
     //     largo plazo esté invertido»
-    test.fail();
+    // REPARADO (3705, /reparar 16/11/2026): la frase se da por atribuida sin fuente, la 50/30/20 con
+    // su origen y sus límites, el fondo como referencia orientativa, y el FAQPage sin «deuda buena»,
+    // sin «los expertos recomiendan» y con la pregunta 2 respondida (por qué se le da importancia).
     test.setTimeout(90_000);
     await abrir(page);
     const textos = (await textosDelBanco(page)).map(norm);
@@ -593,6 +614,10 @@ test.describe('Inspector 28/10/2026 · contenido y accesibilidad', () => {
     if (/3-6 meses/.test(p6) && !/orientativ|depende|según|se suele|cifra/i.test(p6)) fallos.push('P6: 3-6 meses sin matiz');
     if (/deuda \(buena vs costosa\)/.test(faq)) fallos.push('FAQ: deuda buena vs costosa');
     if (/los expertos recomiendan/.test(faq)) fallos.push('FAQ: «los expertos recomiendan»');
+    if (/invertir es necesario/.test(faq)) fallos.push('FAQ: «invertir es necesario»');
+    if (/por qué se llama "la octava maravilla/.test(faq)) fallos.push('FAQ: la pregunta 2 promete un porqué que no da');
+    if (!/sin fuente documentada|no hay fuente documentada/.test(banco)) fallos.push('P2: la atribución no se matiza');
+    if (!/orientativ/.test(p6)) fallos.push('P6: el fondo no se da como referencia orientativa');
     expect(fallos).toEqual([]);
   });
 
@@ -634,7 +659,9 @@ test.describe('Inspector 28/10/2026 · contenido y accesibilidad', () => {
     // «Siguiente»: con lector de pantalla no se oye «Incorrecto» ni cuál era la buena. La opción
     // correcta solo cambia de color (clase `correcta`), sin texto ni aria-label (WCAG 1.4.1). La
     // referencia (quiz-literatura-universal) usa role="status" y un aria-label con la marca.
-    test.fail();
+    // REPARADO (3704, /reparar 16/11/2026): la tarjeta de la explicación es role="status"
+    // aria-live="polite" y, al fallar, dice «La respuesta era: …». La marca de la buena ya la había
+    // puesto el cabo C0516.
     await abrir(page);
     const iC = await indiceCorrecta(page);
     await opciones(page).nth(iC === 0 ? 1 : 0).focus();
@@ -644,6 +671,10 @@ test.describe('Inspector 28/10/2026 · contenido y accesibilidad', () => {
     const vivas = page.locator('[class*="quizSection"] :is([aria-live], [role="status"], [role="alert"])');
     if ((await vivas.count()) === 0) fallos.push('sin región viva en el quiz');
     else if (!/Incorrecto/.test(await vivas.first().innerText())) fallos.push('la región viva no lleva el veredicto');
+    else {
+      const buena = (await textosOpcion(page))[iC];
+      if (!(await vivas.first().innerText()).includes(`La respuesta era: ${buena}`)) fallos.push('la región viva no dice cuál era la buena');
+    }
     const nombreCorrecta = await opciones(page)
       .nth(iC)
       .evaluate((b) => b.getAttribute('aria-label') ?? b.textContent ?? '');
@@ -798,9 +829,10 @@ test.describe('inspector 29/10/2026', () => {
       await expect(explicacion(page)).toHaveCount(0);
       await expect(avance).toHaveCount(0);
       await page.keyboard.press('Tab');
+      // La A es cualquiera de las cuatro de la P1: las opciones se barajan (3703)
       await expect
         .poll(() => page.evaluate(() => (document.activeElement?.textContent ?? '').trim()))
-        .toBe('AQue suben los sueldos');
+        .toMatch(/^A(Que suben los sueldos|Que sube el precio general de las cosas|Que bajan los impuestos|Que sube el valor del dinero)$/);
       await expect(explicacion(page)).toHaveCount(0);
       for (let i = 0; i < 4; i++) await expect(opciones(page).nth(i)).toBeEnabled();
     });
@@ -819,7 +851,7 @@ test.describe('inspector 29/10/2026', () => {
     return (x + 0.05) / (y + 0.05);
   };
 
-  /** Contesta mal la P1 (A) y mide texto y letra de la A (fallada) y la B (correcta) sobre su fondo efectivo. */
+  /** Contesta mal la P1 y mide texto y letra de la fallada y de la correcta sobre su fondo efectivo. */
   async function medirOpciones(page: Page, tema: 'light' | 'dark'): Promise<Record<string, number>> {
     await page.addInitScript((t) => {
       try {
@@ -832,12 +864,15 @@ test.describe('inspector 29/10/2026', () => {
     await abrir(page);
     await esperarOpcionesHidratadas(page);
     await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
-    await opciones(page).nth(0).click();
+    // Con las opciones barajadas (3703) la buena no está siempre en la B: se falla con otra
+    const iC = await indiceCorrecta(page);
+    const iF = iC === 0 ? 1 : 0;
+    await opciones(page).nth(iF).click();
     await expect(explicacion(page)).toBeVisible();
     // Los colores se leen con las transiciones terminadas: a mitad, la letra blanca se medía sobre un
     // fondo aún casi blanco («1,04:1» el 29/10/2026, con la captura correcta)
     await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => undefined))));
-    const crudo = await page.evaluate(() => {
+    const crudo = await page.evaluate((indices) => {
       const num = (s: string): number[] => (s.match(/[\d.]+/g) ?? []).map(Number);
       // Fondo efectivo: compone los fondos semitransparentes desde el elemento hasta uno opaco
       const fondo = (el: Element): number[] => {
@@ -856,7 +891,7 @@ test.describe('inspector 29/10/2026', () => {
         return base;
       };
       const ops = [...document.querySelectorAll('[class*="opcionBtn"]')];
-      return [0, 1].map((i) => {
+      return indices.map((i) => {
         const b = ops[i];
         const l = b.querySelector('[class*="opcionLetra"]') as Element;
         return {
@@ -866,7 +901,7 @@ test.describe('inspector 29/10/2026', () => {
           fondoLetra: fondo(l),
         };
       });
-    });
+    }, [iF, iC]);
     const [fallada, correcta] = crudo;
     return {
       'texto de la fallada': contraste(fallada.texto, fallada.fondoTexto),

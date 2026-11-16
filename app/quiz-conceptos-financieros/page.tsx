@@ -20,13 +20,13 @@ interface Pregunta {
   categoria: string;
 }
 
-const PREGUNTAS: Pregunta[] = [
+const PREGUNTAS_BANCO: Pregunta[] = [
   { pregunta: '¿Qué es la inflación?', opciones: ['Que suben los sueldos', 'Que sube el precio general de las cosas', 'Que bajan los impuestos', 'Que sube el valor del dinero'], correcta: 1, explicacion: 'La inflación es el aumento generalizado y sostenido de los precios. Con un 3% anual, algo que hoy cuesta 100 € costará 103 € dentro de un año.', categoria: 'Economía básica' },
-  { pregunta: '¿Qué significa "interés compuesto"?', opciones: ['Pagar intereses por un préstamo', 'Intereses que se calculan sobre el capital + los intereses anteriores', 'Un tipo de cuenta bancaria', 'Interés fijo que nunca cambia'], correcta: 1, explicacion: 'El interés compuesto genera "intereses sobre intereses". Es la base del crecimiento de las inversiones a largo plazo. Einstein lo llamó "la octava maravilla del mundo".', categoria: 'Ahorro e inversión' },
+  { pregunta: '¿Qué significa "interés compuesto"?', opciones: ['Pagar intereses por un préstamo', 'Intereses que se calculan sobre el capital + los intereses anteriores', 'Un tipo de cuenta bancaria', 'Interés fijo que nunca cambia'], correcta: 1, explicacion: 'El interés compuesto genera "intereses sobre intereses". Es la base del crecimiento de las inversiones a largo plazo. Se suele atribuir a Einstein la frase «la octava maravilla del mundo», pero no hay fuente documentada que lo confirme.', categoria: 'Ahorro e inversión' },
   { pregunta: 'Tienes 1.000 € en el banco al 5% anual. ¿Cuánto tendrás en 1 año?', opciones: ['1.005 €', '1.050 €', '1.500 €', '1.100 €'], correcta: 1, explicacion: '5% de 1.000 € = 50 €. Total: 1.050 €. Así funciona el interés simple. Con interés compuesto y más años, la diferencia se multiplica.', categoria: 'Ahorro e inversión' },
   { pregunta: '¿Qué es un presupuesto?', opciones: ['Una lista de deseos', 'Un plan que organiza ingresos y gastos', 'Lo que te sobra a fin de mes', 'El saldo de tu cuenta bancaria'], correcta: 1, explicacion: 'Un presupuesto es un plan financiero que te ayuda a controlar a dónde va tu dinero: cuánto entra, cuánto sale y cuánto puedes ahorrar.', categoria: 'Presupuesto' },
-  { pregunta: '¿Cuál es la regla del 50/30/20?', opciones: ['50% ahorro, 30% gastos, 20% inversión', '50% necesidades, 30% deseos, 20% ahorro', '50% alquiler, 30% comida, 20% ocio', '50% impuestos, 30% gastos, 20% libre'], correcta: 1, explicacion: 'La regla 50/30/20 sugiere destinar el 50% de tus ingresos a necesidades (alquiler, comida), 30% a deseos (ocio, ropa) y 20% a ahorro e inversión.', categoria: 'Presupuesto' },
-  { pregunta: '¿Qué es un fondo de emergencia?', opciones: ['Dinero para vacaciones', 'Ahorro reservado para imprevistos', 'Un tipo de inversión arriesgada', 'Dinero que te presta el banco'], correcta: 1, explicacion: 'Es un colchón de seguridad (3-6 meses de gastos) para cubrir imprevistos: reparaciones, pérdida de empleo, gastos médicos. Se guarda en cuenta accesible, no invertido.', categoria: 'Ahorro' },
+  { pregunta: '¿Cuál es la regla del 50/30/20?', opciones: ['50% ahorro, 30% gastos, 20% inversión', '50% necesidades, 30% deseos, 20% ahorro', '50% alquiler, 30% comida, 20% ocio', '50% impuestos, 30% gastos, 20% libre'], correcta: 1, explicacion: 'La regla 50/30/20 la popularizaron Elizabeth Warren y Amelia Warren Tyagi en «All Your Worth» (EE. UU., 2005): 50 % de los ingresos a necesidades (alquiler, comida), 30 % a deseos (ocio, ropa) y 20 % a ahorro. Es una referencia orientativa: con ingresos ajustados, las necesidades pueden pasar del 50 % y no siempre queda un 20 % para ahorrar.', categoria: 'Presupuesto' },
+  { pregunta: '¿Qué es un fondo de emergencia?', opciones: ['Dinero para vacaciones', 'Ahorro reservado para imprevistos', 'Un tipo de inversión arriesgada', 'Dinero que te presta el banco'], correcta: 1, explicacion: 'Es un colchón de seguridad para cubrir imprevistos: reparaciones, pérdida de empleo, gastos médicos. Una referencia orientativa que se suele citar es de 3 a 6 meses de gastos, pero depende de cada situación (estabilidad del empleo, personas a cargo) y se puede ir formando poco a poco. Se guarda en cuenta accesible, no invertido.', categoria: 'Ahorro' },
   { pregunta: '¿Qué pasa si solo pagas el mínimo de tu tarjeta de crédito?', opciones: ['No pasa nada, es lo normal', 'Pagas muchos más intereses a largo plazo', 'Te devuelven dinero', 'Te bajan el límite'], correcta: 1, explicacion: 'Pagar solo el mínimo es una trampa: los intereses (20-25% TAE) se acumulan sobre el resto. Una deuda de 1.000 € puede acabar costando el doble si solo pagas el mínimo.', categoria: 'Deuda' },
   { pregunta: '¿Qué es la TAE?', opciones: ['Tasa Anual Equivalente — el coste real de un préstamo', 'Tipo de Ahorro Especial', 'Tarifa de Apertura Estándar', 'Total Acumulado en Euros'], correcta: 0, explicacion: 'La TAE (Tasa Anual Equivalente) refleja el coste total de un producto financiero incluyendo intereses, comisiones y plazos. Es la cifra que hay que comparar entre ofertas.', categoria: 'Banca' },
   { pregunta: '¿Qué es diversificar las inversiones?', opciones: ['Invertir todo en lo que más sube', 'Repartir el dinero en diferentes tipos de inversión', 'Cambiar de inversión cada mes', 'Invertir solo en tu país'], correcta: 1, explicacion: '"No pongas todos los huevos en la misma cesta". Diversificar reduce el riesgo: si una inversión baja, otras pueden compensar.', categoria: 'Inversión' },
@@ -44,9 +44,31 @@ const PREGUNTAS: Pregunta[] = [
   { pregunta: '¿Qué es el IPC?', opciones: ['Índice de Precios de Consumo — mide la inflación', 'Impuesto de Propiedad Comercial', 'Indicador de Productividad del Capital', 'Interés Personal de Crédito'], correcta: 0, explicacion: 'El IPC mide cómo varían los precios de una cesta de productos y servicios típicos. Si el IPC sube un 3%, la vida se ha encarecido un 3% de media.', categoria: 'Economía básica' },
 ];
 
+/**
+ * Hallazgo 3703: las opciones salían siempre en su letra y la correcta era la B en 12 de 15, así
+ * que «siempre la B» sacaba «Muy bien». Se barajan las opciones de cada pregunta (Fisher-Yates) y
+ * la correcta se recoloca. El orden de las preguntas se mantiene: el «Resumen por tema» sigue el
+ * del banco. Se baraja al montar (en un efecto: el HTML prerenderizado no puede llevar azar) y en
+ * cada «Repetir quiz».
+ */
+function barajarOpciones(banco: readonly Pregunta[]): Pregunta[] {
+  return banco.map((p) => {
+    const orden = p.opciones.map((_, i) => i);
+    for (let i = orden.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [orden[i], orden[j]] = [orden[j], orden[i]];
+    }
+    return { ...p, opciones: orden.map((i) => p.opciones[i]), correcta: orden.indexOf(p.correcta) };
+  });
+}
+
 // ─── Componente ───────────────────────────────────────────────────────────────
 
 export default function QuizConceptosFinancierosPage() {
+  const [PREGUNTAS, setPartida] = useState<Pregunta[]>(PREGUNTAS_BANCO);
+  useEffect(() => {
+    setPartida(barajarOpciones(PREGUNTAS_BANCO));
+  }, []);
   const [preguntaActual, setPreguntaActual] = useState(0);
   const [respuestas, setRespuestas] = useState<(number | null)[]>(new Array(PREGUNTAS.length).fill(null));
   const [mostrarExplicacion, setMostrarExplicacion] = useState(false);
@@ -81,6 +103,7 @@ export default function QuizConceptosFinancierosPage() {
 
   const reiniciar = () => {
     marcarCambioPantalla();
+    setPartida(barajarOpciones(PREGUNTAS_BANCO));
     setPreguntaActual(0);
     setRespuestas(new Array(PREGUNTAS.length).fill(null));
     setMostrarExplicacion(false);
@@ -177,7 +200,14 @@ export default function QuizConceptosFinancierosPage() {
               </div>
 
               {mostrarExplicacion && (
-                <div className={styles.explicacionCard} data-acierto={respuestas[preguntaActual] === PREGUNTAS[preguntaActual].correcta}>
+                // Hallazgo 3704: el veredicto y la explicación, en una región viva (receta de
+                // quiz-literatura-universal): el foco salta a «Siguiente» y sin ella no se oían
+                <div
+                  className={styles.explicacionCard}
+                  data-acierto={respuestas[preguntaActual] === PREGUNTAS[preguntaActual].correcta}
+                  role="status"
+                  aria-live="polite"
+                >
                   <span aria-hidden="true">
                     {respuestas[preguntaActual] === PREGUNTAS[preguntaActual].correcta ? '✅' : '❌'}
                   </span>
@@ -185,6 +215,11 @@ export default function QuizConceptosFinancierosPage() {
                     <strong>
                       {respuestas[preguntaActual] === PREGUNTAS[preguntaActual].correcta ? '¡Correcto!' : 'Incorrecto'}
                     </strong>
+                    <span>
+                      {respuestas[preguntaActual] !== PREGUNTAS[preguntaActual].correcta
+                        ? ` La respuesta era: ${PREGUNTAS[preguntaActual].opciones[PREGUNTAS[preguntaActual].correcta]}.`
+                        : ''}
+                    </span>
                     <p>{PREGUNTAS[preguntaActual].explicacion}</p>
                   </div>
                 </div>

@@ -55,15 +55,15 @@ export const faqJsonLd = {
       name: '¿Qué conceptos financieros básicos debería conocer cualquier persona?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los conceptos esenciales para gestionar bien el dinero son: interés simple e interés compuesto, inflación y poder adquisitivo, diferencia entre ahorro e inversión, tipos de deuda (buena vs costosa) y cómo elaborar un presupuesto personal. Con estos seis pilares se pueden tomar decisiones financieras más informadas sin necesidad de ser experto en economía.',
+        text: 'Los conceptos esenciales para gestionar bien el dinero son: interés simple e interés compuesto, inflación y poder adquisitivo, diferencia entre ahorro e inversión, qué cuesta cada tipo de deuda (la TAE de una tarjeta frente a la de una hipoteca) y cómo elaborar un presupuesto personal. Con estos seis pilares se pueden tomar decisiones financieras más informadas sin necesidad de ser experto en economía.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Qué es el interés compuesto y por qué se llama "la octava maravilla del mundo"?',
+      name: '¿Qué es el interés compuesto y por qué se le da tanta importancia?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El interés compuesto consiste en que los intereses generados se reinvierten y a su vez generan nuevos intereses. Con el tiempo, el crecimiento se acelera de forma exponencial. Por ejemplo, 1.000 € al 7% anual durante 30 años se convierten en más de 7.600 € sin aportaciones adicionales. La clave es el tiempo: cuanto antes se empieza, mayor es el efecto multiplicador.',
+        text: 'El interés compuesto consiste en que los intereses generados se reinvierten y a su vez generan nuevos intereses. Con el tiempo, el crecimiento se acelera de forma exponencial. Por ejemplo, 1.000 € al 7% anual durante 30 años se convierten en más de 7.600 € sin aportaciones adicionales. La clave es el tiempo: cuanto antes se empieza, mayor es el efecto multiplicador. A menudo se le llama «la octava maravilla del mundo», frase que se atribuye a Einstein sin fuente documentada.',
       },
     },
     {
@@ -71,7 +71,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre ahorro e inversión?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El ahorro consiste en guardar dinero en un lugar seguro (cuenta bancaria, depósito) con bajo riesgo y baja rentabilidad. La inversión implica poner ese dinero a trabajar en activos (acciones, fondos, inmuebles) con mayor potencial de rentabilidad pero también mayor riesgo. La inflación erosiona el ahorro a largo plazo, por lo que invertir es necesario para mantener el poder adquisitivo.',
+        text: 'El ahorro consiste en guardar dinero en un lugar seguro (cuenta bancaria, depósito) con bajo riesgo y baja rentabilidad. La inversión implica poner ese dinero a trabajar en activos (acciones, fondos, inmuebles) con mayor potencial de rentabilidad pero también mayor riesgo. La inflación erosiona el ahorro que no rinde; invertir puede compensarla, a cambio de asumir riesgo y siempre que quede margen tras cubrir los gastos y un colchón para imprevistos.',
       },
     },
     {
@@ -87,7 +87,7 @@ export const faqJsonLd = {
       name: '¿Cómo afecta la inflación al dinero que tengo ahorrado?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La inflación reduce el poder adquisitivo del dinero: si la inflación anual es del 3% y tu ahorro no genera rentabilidad, en términos reales pierdes un 3% de capacidad de compra cada año. Tras 10 años de inflación al 3%, 10.000 € valen en términos reales lo equivalente a unos 7.440 € actuales. Por eso los expertos recomiendan que el dinero a largo plazo esté invertido en activos que superen la inflación.',
+        text: 'La inflación reduce el poder adquisitivo del dinero: si la inflación anual es del 3% y tu ahorro no genera rentabilidad, en términos reales pierdes un 3% de capacidad de compra cada año. Tras 10 años de inflación al 3%, 10.000 € valen en términos reales lo equivalente a unos 7.440 € actuales. Por eso, quien tiene margen para ahorrar a largo plazo suele valorar productos cuya rentabilidad esperada supere la inflación, asumiendo su riesgo.',
       },
     },
   ],
