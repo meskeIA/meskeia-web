@@ -12,6 +12,8 @@ import {
   EXENCION_VIVIENDA_HABITUAL,
   UMBRAL_OBLIGACION_DECLARAR,
   ITSGF_UMBRAL,
+  ITSGF_PATRIMONIO_SIN_CUOTA,
+  ITSGF_MINIMO_EXENTO,
   FISCAL_PATRIMONIO_META,
   type CCAAPatrimonio,
 } from '@/data/fiscal';
@@ -158,8 +160,12 @@ export default function ImpuestoPatrimonioPage() {
                     <td className={styles.numCol}>{formatCurrency(UMBRAL_OBLIGACION_DECLARAR)}</td>
                   </tr>
                   <tr>
-                    <th scope="row" className={styles.rowHead}>Umbral del ITSGF (grandes fortunas)</th>
+                    <th scope="row" className={styles.rowHead}>ITSGF (grandes fortunas): base liquidable al 0{' '}%</th>
                     <td className={styles.numCol}>{formatCurrency(ITSGF_UMBRAL)}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" className={styles.rowHead}>ITSGF: patrimonio neto por encima del cual hay cuota (con {formatCurrency(ITSGF_MINIMO_EXENTO)} de mínimo exento)</th>
+                    <td className={styles.numCol}>{formatCurrency(ITSGF_PATRIMONIO_SIN_CUOTA)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -207,8 +213,9 @@ export default function ImpuestoPatrimonioPage() {
             <p className={styles.sectionIntro}>
               El impuesto está cedido a las comunidades, que aplican bonificaciones muy distintas
               sobre la cuota. Donde la bonificación es del 100% no se paga Patrimonio, pero los
-              patrimonios superiores a {formatCurrency(ITSGF_UMBRAL)} pueden quedar sujetos al ITSGF
-              estatal.
+              patrimonios netos superiores a {formatCurrency(ITSGF_PATRIMONIO_SIN_CUOTA)} pueden pagar el ITSGF
+              estatal, que descuenta el Patrimonio pagado y por eso también puede salir a pagar donde la
+              bonificación es menor.
             </p>
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
