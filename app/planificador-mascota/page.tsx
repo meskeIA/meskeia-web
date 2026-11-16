@@ -609,7 +609,7 @@ export default function PlanificadorMascotaPage() {
                 <div className={styles.perfilStats}>
                   {calcularEdad() && (
                     <div className={styles.statItem}>
-                      <span className={styles.statIcon}>🎂</span>
+                      <span className={styles.statIcon} aria-hidden="true">🎂</span>
                       <div>
                         <span className={styles.statLabel}>Edad</span>
                         <span className={styles.statValue}>{calcularEdad()}</span>
@@ -618,7 +618,7 @@ export default function PlanificadorMascotaPage() {
                   )}
                   {calcularDiasEnCasa() && (
                     <div className={styles.statItem}>
-                      <span className={styles.statIcon}>🏠</span>
+                      <span className={styles.statIcon} aria-hidden="true">🏠</span>
                       <div>
                         <span className={styles.statLabel}>En casa</span>
                         <span className={styles.statValue}>{calcularDiasEnCasa()}</span>
@@ -627,7 +627,7 @@ export default function PlanificadorMascotaPage() {
                   )}
                   {perfil.peso && (
                     <div className={styles.statItem}>
-                      <span className={styles.statIcon}>⚖️</span>
+                      <span className={styles.statIcon} aria-hidden="true">⚖️</span>
                       <div>
                         <span className={styles.statLabel}>Peso</span>
                         <span className={styles.statValue}>{perfil.peso} kg</span>
@@ -668,7 +668,7 @@ export default function PlanificadorMascotaPage() {
               </>
             ) : (
               <div className={styles.placeholder}>
-                <span className={styles.placeholderIcon}>🐾</span>
+                <span className={styles.placeholderIcon} aria-hidden="true">🐾</span>
                 <p>Introduce los datos de tu mascota</p>
                 <p className={styles.placeholderHint}>El checklist y las compras se filtrarán según el tipo de mascota</p>
               </div>
@@ -965,42 +965,42 @@ export default function PlanificadorMascotaPage() {
 
           <div className={styles.toxicosGrid}>
             <div className={styles.toxicoCard}>
-              <span className={styles.toxicoEmoji}>🍫</span>
+              <span className={styles.toxicoEmoji} aria-hidden="true">🍫</span>
               <strong>Chocolate</strong>
               <p>Contiene teobromina, tóxico especialmente para perros</p>
             </div>
             <div className={styles.toxicoCard}>
-              <span className={styles.toxicoEmoji}>🧅</span>
+              <span className={styles.toxicoEmoji} aria-hidden="true">🧅</span>
               <strong>Cebolla y ajo</strong>
               <p>Dañan los glóbulos rojos, causando anemia</p>
             </div>
             <div className={styles.toxicoCard}>
-              <span className={styles.toxicoEmoji}>🍇</span>
+              <span className={styles.toxicoEmoji} aria-hidden="true">🍇</span>
               <strong>Uvas y pasas</strong>
               <p>Pueden causar insuficiencia renal aguda</p>
             </div>
             <div className={styles.toxicoCard}>
-              <span className={styles.toxicoEmoji}>🥑</span>
+              <span className={styles.toxicoEmoji} aria-hidden="true">🥑</span>
               <strong>Aguacate</strong>
               <p>La persina es tóxica para perros y gatos</p>
             </div>
             <div className={styles.toxicoCard}>
-              <span className={styles.toxicoEmoji}>☕</span>
+              <span className={styles.toxicoEmoji} aria-hidden="true">☕</span>
               <strong>Cafeína</strong>
               <p>Café, té, bebidas energéticas... Muy peligrosos</p>
             </div>
             <div className={styles.toxicoCard}>
-              <span className={styles.toxicoEmoji}>🦴</span>
+              <span className={styles.toxicoEmoji} aria-hidden="true">🦴</span>
               <strong>Huesos cocidos</strong>
               <p>Se astillan y pueden perforar el intestino</p>
             </div>
             <div className={styles.toxicoCard}>
-              <span className={styles.toxicoEmoji}>🍬</span>
+              <span className={styles.toxicoEmoji} aria-hidden="true">🍬</span>
               <strong>Xilitol</strong>
               <p>Edulcorante presente en chicles, muy tóxico</p>
             </div>
             <div className={styles.toxicoCard}>
-              <span className={styles.toxicoEmoji}>🥛</span>
+              <span className={styles.toxicoEmoji} aria-hidden="true">🥛</span>
               <strong>Lácteos</strong>
               <p>Muchos son intolerantes a la lactosa</p>
             </div>

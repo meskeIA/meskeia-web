@@ -477,7 +477,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
               />
             ) : (
               <h2 onClick={() => setModoEdicionNombre(true)} className={styles.tituloMudanza}>
-                {datos.nombre} <span className={styles.editIcon}>✏️</span>
+                {datos.nombre} <span className={styles.editIcon} aria-hidden="true">✏️</span>
               </h2>
             )}
           </div>
@@ -616,7 +616,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                         </button>
                         <span className={styles.tareaTexto}>
                           {tarea.texto}
-                          {tarea.esPersonalizada && <span className={styles.badgePersonalizada}>✨</span>}
+                          {tarea.esPersonalizada && <span className={styles.badgePersonalizada} role="img" aria-label="Tarea personalizada">✨</span>}
                         </span>
                         {tarea.esPersonalizada && (
                           <button
@@ -749,7 +749,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
             <div className={styles.listaPanel}>
               {inventarioAgrupado.length === 0 ? (
                 <div className={styles.listaVacia}>
-                  <span className={styles.iconVacio}>📋</span>
+                  <span className={styles.iconVacio} aria-hidden="true">📋</span>
                   <p>No hay objetos en el inventario</p>
                   <p className={styles.hint}>Añade objetos usando el formulario de arriba</p>
                 </div>

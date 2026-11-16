@@ -372,6 +372,7 @@ export default function SimuladorHipotecaPage() {
           <div className={styles.tipoToggle}>
             <button
               type="button"
+              aria-pressed={tipoInteres === 'fijo'}
               className={`${styles.tipoBtn} ${tipoInteres === 'fijo' ? styles.activo : ''}`}
               onClick={() => setTipoInteres('fijo')}
             >
@@ -379,6 +380,7 @@ export default function SimuladorHipotecaPage() {
             </button>
             <button
               type="button"
+              aria-pressed={tipoInteres === 'variable'}
               className={`${styles.tipoBtn} ${tipoInteres === 'variable' ? styles.activo : ''}`}
               onClick={() => setTipoInteres('variable')}
             >
@@ -386,6 +388,7 @@ export default function SimuladorHipotecaPage() {
             </button>
             <button
               type="button"
+              aria-pressed={tipoInteres === 'mixta'}
               className={`${styles.tipoBtn} ${tipoInteres === 'mixta' ? styles.activo : ''}`}
               onClick={() => setTipoInteres('mixta')}
             >
@@ -566,28 +569,28 @@ export default function SimuladorHipotecaPage() {
               {/* Resumen */}
               <div className={styles.resumenGrid}>
                 <div className={styles.resumenCard}>
-                  <div className={styles.resumenIcon}>💵</div>
+                  <div className={styles.resumenIcon} aria-hidden="true">💵</div>
                   <span className={styles.resumenLabel}>Capital solicitado</span>
                   <span className={styles.resumenValor}>
                     {formatCurrency(resultado.capital)}
                   </span>
                 </div>
                 <div className={styles.resumenCard}>
-                  <div className={styles.resumenIcon}>📅</div>
+                  <div className={styles.resumenIcon} aria-hidden="true">📅</div>
                   <span className={styles.resumenLabel}>Total a pagar</span>
                   <span className={styles.resumenValor}>
                     {formatCurrency(resultado.totalPagado)}
                   </span>
                 </div>
                 <div className={`${styles.resumenCard} ${styles.intereses}`}>
-                  <div className={styles.resumenIcon}>📈</div>
+                  <div className={styles.resumenIcon} aria-hidden="true">📈</div>
                   <span className={styles.resumenLabel}>Total intereses</span>
                   <span className={styles.resumenValor}>
                     {formatCurrency(resultado.totalIntereses)}
                   </span>
                 </div>
                 <div className={styles.resumenCard}>
-                  <div className={styles.resumenIcon}>🔢</div>
+                  <div className={styles.resumenIcon} aria-hidden="true">🔢</div>
                   <span className={styles.resumenLabel}>Número de cuotas</span>
                   <span className={styles.resumenValor}>
                     {plazo * 12}
@@ -621,6 +624,7 @@ export default function SimuladorHipotecaPage() {
                   <div className={styles.tablaToggle}>
                     <button
                       type="button"
+                      aria-pressed={vistaTabla === 'anual'}
                       className={`${styles.tablaToggleBtn} ${vistaTabla === 'anual' ? styles.activo : ''}`}
                       onClick={() => setVistaTabla('anual')}
                     >
@@ -628,6 +632,7 @@ export default function SimuladorHipotecaPage() {
                     </button>
                     <button
                       type="button"
+                      aria-pressed={vistaTabla === 'mensual'}
                       className={`${styles.tablaToggleBtn} ${vistaTabla === 'mensual' ? styles.activo : ''}`}
                       onClick={() => setVistaTabla('mensual')}
                     >
@@ -664,7 +669,7 @@ export default function SimuladorHipotecaPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <div className={styles.placeholderIcon}>🏠</div>
+              <div className={styles.placeholderIcon} aria-hidden="true">🏠</div>
               <p>Introduce los datos del préstamo</p>
               <p>para ver el resultado</p>
             </div>

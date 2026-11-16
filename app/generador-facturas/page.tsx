@@ -347,10 +347,12 @@ export default function GeneradorFacturasPage() {
   // Componente para renderizar icono de validación
   const ValidationIcon = ({ status }: { status: ValidationStatus }) => {
     if (status === 'idle') return null;
-    if (status === 'validating') return <span className={`${styles.validationIcon} ${styles.loading}`}>⟳</span>;
-    if (status === 'valid') return <span className={`${styles.validationIcon} ${styles.valid}`}>✓</span>;
-    if (status === 'invalid') return <span className={`${styles.validationIcon} ${styles.invalid}`}>✗</span>;
-    if (status === 'warning') return <span className={`${styles.validationIcon} ${styles.invalid}`}>⚠</span>;
+    // Válido, inválido y aviso los dice en texto <ValidationMessage>, debajo de cada campo: ahí el
+    // icono es redundante. «Validando» no tiene mensaje, así que el icono lleva su nombre.
+    if (status === 'validating') return <span className={`${styles.validationIcon} ${styles.loading}`} role="img" aria-label="Validando">⟳</span>;
+    if (status === 'valid') return <span className={`${styles.validationIcon} ${styles.valid}`} aria-hidden="true">✓</span>;
+    if (status === 'invalid') return <span className={`${styles.validationIcon} ${styles.invalid}`} aria-hidden="true">✗</span>;
+    if (status === 'warning') return <span className={`${styles.validationIcon} ${styles.invalid}`} aria-hidden="true">⚠</span>;
     return null;
   };
 

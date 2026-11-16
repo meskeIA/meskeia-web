@@ -47,7 +47,7 @@ export default function InstrumentosMusicalesPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🎵</span>
+        <span className={styles.heroIcon} aria-hidden="true">🎵</span>
         <h1 className={styles.title}>Instrumentos Musicales</h1>
         <p className={styles.subtitle}>
           Explora 45 instrumentos de todo el mundo: cuerda, viento, percusión,
@@ -60,7 +60,7 @@ export default function InstrumentosMusicalesPage() {
       {/* Buscador y Filtros */}
       <div className={styles.searchSection}>
         <div className={styles.searchBox}>
-          <span className={styles.searchIcon}>🔍</span>
+          <span className={styles.searchIcon} aria-hidden="true">🔍</span>
           <input
             type="text"
             placeholder="Buscar por nombre, tipo o material..."
@@ -189,7 +189,7 @@ export default function InstrumentosMusicalesPage() {
       {/* Sin resultados */}
       {filteredInstruments.length === 0 && (
         <div className={styles.noResults}>
-          <span className={styles.noResultsIcon}>🎼</span>
+          <span className={styles.noResultsIcon} aria-hidden="true">🎼</span>
           <p>No se encontraron instrumentos con esos criterios.</p>
           <button
             type="button"

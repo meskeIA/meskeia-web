@@ -193,7 +193,7 @@ export default function GeneradorUTMPage() {
 
       {error && (
         <div className={styles.errorBanner}>
-          <span>⚠️</span> {error}
+          <span aria-hidden="true">⚠️</span> {error}
         </div>
       )}
 
@@ -564,10 +564,10 @@ export default function GeneradorUTMPage() {
               <h3 className={styles.faqQuestion}>¿Mayúsculas o minúsculas en los valores?</h3>
               <p className={styles.faqAnswer}>Siempre <strong>minúsculas</strong> y sin espacios (usa guiones bajos). Los UTM son case-sensitive: &quot;Google&quot; y &quot;google&quot; son dos fuentes distintas en GA4.</p>
               <ul className={styles.faqList}>
-                <li>✅ <code>utm_source=google</code></li>
-                <li>✅ <code>utm_campaign=black_friday_2025</code></li>
-                <li>❌ <code>utm_source=Google</code> (crea duplicado)</li>
-                <li>❌ <code>utm_campaign=Black Friday</code> (espacio = error)</li>
+                <li><span role="img" aria-label="Correcto">✅</span> <code>utm_source=google</code></li>
+                <li><span role="img" aria-label="Correcto">✅</span> <code>utm_campaign=black_friday_2025</code></li>
+                <li><span role="img" aria-label="Incorrecto">❌</span> <code>utm_source=Google</code> (crea duplicado)</li>
+                <li><span role="img" aria-label="Incorrecto">❌</span> <code>utm_campaign=Black Friday</code> (espacio = error)</li>
               </ul>
             </div>
 

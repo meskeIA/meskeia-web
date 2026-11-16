@@ -448,6 +448,7 @@ export default function GeneradorContrasenas() {
                       onClick={() => copyToClipboard(item.password)}
                       className={styles.btnHistoryCopy}
                       title="Copiar"
+                      aria-label="Copiar contraseña"
                     >
                       📋
                     </button>

@@ -1022,7 +1022,7 @@ export default function GeneradorQRPage() {
 
             {!qrGenerado && !cargando && (
               <div className={styles.placeholder} style={{ width: Math.min(tamano, 300), height: Math.min(tamano, 300) }}>
-                <span className={styles.placeholderIcon}>📱</span>
+                <span className={styles.placeholderIcon} aria-hidden="true">📱</span>
                 <p>Introduce contenido para generar el código QR</p>
               </div>
             )}
@@ -1106,7 +1106,7 @@ export default function GeneradorQRPage() {
 
         <div className={styles.useCasesTable}>
           <div className={styles.useCaseRow}>
-            <div className={styles.useCaseIcon}>🔗</div>
+            <div className={styles.useCaseIcon} aria-hidden="true">🔗</div>
             <div className={styles.useCaseContent}>
               <h3>QR para URLs</h3>
               <p><strong>Ideal para:</strong> Landing pages, menús digitales, promociones, enlaces a redes sociales</p>
@@ -1116,7 +1116,7 @@ export default function GeneradorQRPage() {
           </div>
 
           <div className={styles.useCaseRow}>
-            <div className={styles.useCaseIcon}>📶</div>
+            <div className={styles.useCaseIcon} aria-hidden="true">📶</div>
             <div className={styles.useCaseContent}>
               <h3>QR para WiFi</h3>
               <p><strong>Ideal para:</strong> Cafeterías, hoteles, oficinas, eventos, espacios coworking</p>
@@ -1126,7 +1126,7 @@ export default function GeneradorQRPage() {
           </div>
 
           <div className={styles.useCaseRow}>
-            <div className={styles.useCaseIcon}>👤</div>
+            <div className={styles.useCaseIcon} aria-hidden="true">👤</div>
             <div className={styles.useCaseContent}>
               <h3>QR para Contactos (vCard)</h3>
               <p><strong>Ideal para:</strong> Tarjetas de visita, networking, ferias, presentaciones</p>
@@ -1136,7 +1136,7 @@ export default function GeneradorQRPage() {
           </div>
 
           <div className={styles.useCaseRow}>
-            <div className={styles.useCaseIcon}>📧</div>
+            <div className={styles.useCaseIcon} aria-hidden="true">📧</div>
             <div className={styles.useCaseContent}>
               <h3>QR para Email</h3>
               <p><strong>Ideal para:</strong> Formularios de contacto, soporte técnico, feedback, eventos</p>
@@ -1146,7 +1146,7 @@ export default function GeneradorQRPage() {
           </div>
 
           <div className={styles.useCaseRow}>
-            <div className={styles.useCaseIcon}>📞</div>
+            <div className={styles.useCaseIcon} aria-hidden="true">📞</div>
             <div className={styles.useCaseContent}>
               <h3>QR para Teléfono</h3>
               <p><strong>Ideal para:</strong> Atención al cliente, servicios urgentes, taxis, delivery</p>
@@ -1156,7 +1156,7 @@ export default function GeneradorQRPage() {
           </div>
 
           <div className={styles.useCaseRow}>
-            <div className={styles.useCaseIcon}>📝</div>
+            <div className={styles.useCaseIcon} aria-hidden="true">📝</div>
             <div className={styles.useCaseContent}>
               <h3>QR para Texto</h3>
               <p><strong>Ideal para:</strong> Códigos promocionales, instrucciones, mensajes secretos, juegos</p>

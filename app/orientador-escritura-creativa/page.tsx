@@ -408,14 +408,14 @@ export default function OrientadorEscrituraCreativaPage() {
                 <h3 className={styles.generoNombre}>{genero.nombre}</h3>
                 <p className={styles.generoDesc}>{genero.descripcion}</p>
                 <div className={styles.generoMeta}>
-                  <span className={styles.generoExtension}>📏 {genero.extension}</span>
+                  <span className={styles.generoExtension}><span aria-hidden="true">📏</span> {genero.extension}</span>
                   <span className={[
                     styles.generoDificultad,
                     genero.dificultad === 'Ideal para empezar' ? styles.dificultadFacil :
                     genero.dificultad === 'Avanzada' ? styles.dificultadAvanzada : '',
                   ].join(' ')}>{genero.dificultad}</span>
                 </div>
-                <p className={styles.generoEjemplos}>✨ {genero.ejemplo}</p>
+                <p className={styles.generoEjemplos}><span aria-hidden="true">✨</span> {genero.ejemplo}</p>
               </button>
             ))}
           </div>
@@ -462,7 +462,7 @@ export default function OrientadorEscrituraCreativaPage() {
                   ))}
                 </div>
                 <p className={styles.perspectivIdeal}><span aria-hidden="true">🎯</span> Ideal para: {p.ideal}</p>
-                <p className={styles.perspectivEjemplo}>📚 {p.ejemploFamoso}</p>
+                <p className={styles.perspectivEjemplo}><span aria-hidden="true">📚</span> {p.ejemploFamoso}</p>
               </button>
             ))}
           </div>

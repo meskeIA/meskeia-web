@@ -219,8 +219,8 @@ function TarjetaActividad({ actividad, onEditar, onEliminar, onMoverArriba, onMo
         <span className={styles.actividadCategoria} title={cat.label}>{cat.icono}</span>
         <div className={styles.actividadInfo}>
           <span className={styles.actividadTitulo}>{actividad.titulo || 'Sin título'}</span>
-          {actividad.hora && <span className={styles.actividadHora}>⏰ {actividad.hora}</span>}
-          {actividad.duracion && <span className={styles.actividadDuracion}>⌛ {actividad.duracion}</span>}
+          {actividad.hora && <span className={styles.actividadHora}><span role="img" aria-label="Hora">⏰</span> {actividad.hora}</span>}
+          {actividad.duracion && <span className={styles.actividadDuracion}><span role="img" aria-label="Duración">⌛</span> {actividad.duracion}</span>}
         </div>
         <div className={styles.actividadAcciones}>
           <button
@@ -243,8 +243,8 @@ function TarjetaActividad({ actividad, onEditar, onEliminar, onMoverArriba, onMo
           <button type="button" className={`${styles.btnIcono} ${styles.btnEliminar}`} onClick={onEliminar} aria-label="Eliminar actividad" title="Eliminar">✕</button>
         </div>
       </div>
-      {actividad.lugar && <div className={styles.actividadLugar}>📍 {actividad.lugar}</div>}
-      {actividad.notas && <div className={styles.actividadNotas}>📝 {actividad.notas}</div>}
+      {actividad.lugar && <div className={styles.actividadLugar}><span role="img" aria-label="Lugar">📍</span> {actividad.lugar}</div>}
+      {actividad.notas && <div className={styles.actividadNotas}><span role="img" aria-label="Notas">📝</span> {actividad.notas}</div>}
     </div>
   );
 }

@@ -461,7 +461,7 @@ export default function PlanificadorCashFlowPage() {
                     </div>
                     <span className={styles.saldoMes}>{mes}</span>
                     {calculos.saldoAcumulado[i] < 0 && (
-                      <span className={styles.alertaIcono}>⚠️</span>
+                      <span className={styles.alertaIcono} role="img" aria-label="Saldo negativo">⚠️</span>
                     )}
                   </div>
                 ))}

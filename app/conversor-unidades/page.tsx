@@ -411,6 +411,7 @@ export default function ConversorUnidadesPage() {
               <button
                 type="button"
                 key={cat}
+                aria-pressed={categoria === cat}
                 className={`${styles.categoriaBtn} ${categoria === cat ? styles.categoriaActiva : ''}`}
                 onClick={() => handleCategoriaChange(cat)}
               >

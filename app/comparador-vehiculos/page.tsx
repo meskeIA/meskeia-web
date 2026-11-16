@@ -583,7 +583,7 @@ export default function ComparadorVehiculosPage() {
               {/* Recomendación */}
               {mejorOpcion && (
                 <div className={styles.recomendacion}>
-                  <div className={styles.recomendacionIcono}>🏆</div>
+                  <div className={styles.recomendacionIcono} aria-hidden="true">🏆</div>
                   <div className={styles.recomendacionTexto}>
                     <h3>Opción más económica: {mejorOpcion.nombre}</h3>
                     <p>Coste total: {formatCurrency(mejorOpcion.costeTotal)} ({formatCurrency(mejorOpcion.costeMensualEquiv)}/mes)</p>
@@ -686,7 +686,7 @@ export default function ComparadorVehiculosPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🚗</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🚗</span>
               <p>Introduce el precio del vehículo y los datos de las opciones que quieras comparar</p>
               <p className={styles.placeholderTip}>
                 <span aria-hidden="true">💡</span> Puedes pedir al concesionario los datos exactos de cada opción
