@@ -1,9 +1,17 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type Locator } from '@playwright/test';
 import { esperarHidratacion } from './_hidratacion';
 
 /**
  * Test de Fragilidad (Escala FRAIL) — test de regresión (Inspector, 18/09/2026)
  * Los 7 hallazgos de esa inspección se repararon el mismo día; sus casos están al final.
+ *
+ * Re-inspección en modo CAMBIO (16/11/2026) sobre `git diff 885242c3 HEAD`: la reparación de
+ * esos 7 hallazgos (radios Sí/No, aviso de cuestionario incompleto, lista cerrada de
+ * enfermedades, DataReference, salvedad en el veredicto, JSON-LD) y las tandas de contraste
+ * C0070, C0226 y C0296. Sus casos son los CASOS 10 a 14 y los HALLAZGO (16/11/2026, ABIERTO)
+ * del final, que llevan test.fail(): describen lo que DEBERÍA pasar y hoy no pasa. Al reparar
+ * cada uno se quita su test.fail() —comprobando antes que lo que afirma sigue siendo lo
+ * correcto— y el título pasa a REPARADO.
  *
  * La app es riesgo 1 CRÍTICO: emite un juicio sobre el estado de salud de una persona
  * mayor. Lo que aquí se fija es la ARITMÉTICA del instrumento y los tres cortes, que es
@@ -401,4 +409,310 @@ test('899 · el bloque educativo no se contradice consigo mismo', async ({ page 
   // Y donde aparecen los 4,5 kg, se dice de qué escala vienen.
   const fried = page.getByText(/4,5 kg/).first();
   await expect(fried).toContainText('Fried');
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN DEL 16/11/2026 (modo cambio)
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// ESCALA CONTRA LA QUE SE RESOLVIERON LOS CASOS, A MANO Y ANTES DE ABRIR EL NAVEGADOR
+//   La que la propia app declara en cuatro sitios que coinciden entre sí —bloque educativo
+//   («Con 0 puntos: robusto; 1-2: pre-frágil; 3-5: frágil»), tabla comparativa, FAQPage y
+//   `features` del JSON-LD—: 1 punto por ítem en «Sí», 0 robusto, 1-2 pre-frágil, 3-5 frágil.
+//   El artículo de Morley et al. (2012) que cita no está en la lista de fuentes que puede
+//   leer el Inspector; la app ya declara ese límite en su DataReference.
+
+/** Abre la app con el tema pedido (next-themes lo lee de `meskeia-theme` antes de pintar). */
+async function abrirConTema(page: Page, tema: 'light' | 'dark') {
+  await page.addInitScript((t) => localStorage.setItem('meskeia-theme', t), tema);
+  await abrir(page);
+  // Sembrar el tema puede no prender: sin esta comprobación el caso mediría el otro tema.
+  await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
+}
+
+/**
+ * Contraste WCAG del texto de un elemento contra el fondo de su caja, CON la opacidad del
+ * propio elemento y de sus ancestros hasta esa caja. `contrasteSobreFondoReal` (_contraste.ts)
+ * no mira `opacity`, y aquí es justo lo que cuenta: `.nivelSalvedad` lleva `opacity: 0.85`, que
+ * compone el color del texto al 85 % sobre el tinte de la caja del veredicto.
+ */
+async function contrasteConOpacidad(elemento: Locator): Promise<number> {
+  return elemento.evaluate((el) => {
+    const rgba = (s: string): number[] => {
+      const n = (s.match(/[\d.]+/g) ?? []).map(Number);
+      return [n[0], n[1], n[2], n.length > 3 ? n[3] : 1];
+    };
+    const lum = ([r, g, b]: number[]): number => {
+      const f = (c: number) => {
+        const x = c / 255;
+        return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+    };
+    const capas: number[][] = [];
+    let opacidad = 1;
+    let caja: Element | null = null;
+    for (let n: Element | null = el; n; n = n.parentElement) {
+      const c = rgba(getComputedStyle(n).backgroundColor);
+      if (c[3] > 0) {
+        capas.push(c);
+        if (c[3] >= 1) {
+          caja = n;
+          break;
+        }
+      }
+    }
+    // La opacidad que separa el texto de su fondo: la de los nodos ENTRE el texto y la caja.
+    for (let n: Element | null = el; n && n !== caja; n = n.parentElement) {
+      opacidad *= Number(getComputedStyle(n).opacity);
+    }
+    let fondo = [255, 255, 255];
+    for (let i = capas.length - 1; i >= 0; i--) {
+      const [r, g, b, a] = capas[i];
+      fondo = [r * a + fondo[0] * (1 - a), g * a + fondo[1] * (1 - a), b * a + fondo[2] * (1 - a)];
+    }
+    const t = rgba(getComputedStyle(el).color);
+    const alfa = t[3] * opacidad;
+    const texto = [0, 1, 2].map((i) => t[i] * alfa + fondo[i] * (1 - alfa));
+    const a = lum(texto);
+    const b = lum(fondo);
+    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  });
+}
+
+/** La salvedad «No es un diagnóstico» de la caja del veredicto (el único <p> de esa caja). */
+const salvedad = (page: Page) => veredicto(page).locator('p');
+
+/** Las respuestas que dan cada nivel: 0, 1 y 3 «Sí». */
+const RESPUESTAS_POR_NIVEL = {
+  robusto: { conSi: [] as ItemId[], titulo: 'Robusto — Sin fragilidad detectada' },
+  prefragil: { conSi: ['fatiga'] as ItemId[], titulo: 'Pre-frágil — Riesgo moderado' },
+  fragil: { conSi: ['fatiga', 'resistencia', 'ambulacion'] as ItemId[], titulo: 'Frágil — Riesgo alto' },
+} as const;
+
+test('CASO 10 — la frontera baja: un solo «Sí» ya es 1 / 5 y «Pre-frágil»', async ({ page }) => {
+  // Resuelto a mano: solo Pérdida de peso en «Sí» = 1 punto → 1-2 → pre-frágil. Los CASOS 1 a
+  // 4 fijan 0, 2, 3 y 5; faltaba el lado alto de la frontera 0/1.
+  await abrir(page);
+  await responderTodo(page, ['peso']);
+  await botonEvaluar(page).click();
+
+  await expect(veredicto(page)).toContainText('Pre-frágil — Riesgo moderado');
+  await expect(page.getByText('1 / 5', { exact: true })).toBeVisible();
+});
+
+test('CASO 11 — pasar un «Sí» a «No» resta: 5 → 4 → 0', async ({ page }) => {
+  // Con la casilla única, desmarcar era quitar del conjunto; con dos radios, cambiar de «Sí» a
+  // «No» tiene que SUSTITUIR la respuesta, no sumar otra. Resuelto a mano:
+  //   los cinco a Sí            = 5 → frágil
+  //   Resistencia pasa a No     = 4 → frágil   (y el veredicto de 5 se retira al cambiar)
+  //   los cinco a No            = 0 → robusto
+  await abrir(page);
+  await responderTodo(page, IDS);
+  await botonEvaluar(page).click();
+  await expect(page.getByText('5 / 5', { exact: true })).toBeVisible();
+
+  await opcion(page, 'resistencia', 'no').click();
+  await expect(veredicto(page)).toHaveCount(0);
+  await expect(contador(page)).toHaveText('Las 5 preguntas respondidas · 4 con «Sí»');
+  await botonEvaluar(page).click();
+  await expect(veredicto(page)).toContainText('Frágil — Riesgo alto');
+  await expect(page.getByText('4 / 5', { exact: true })).toBeVisible();
+  const resumen = page
+    .getByText('Puntuación FRAIL', { exact: true })
+    .locator('xpath=../following-sibling::div[1]');
+  await expect(resumen).toHaveText(
+    /F\s*Fatiga\s*Sí\s*R\s*Resistencia\s*No\s*A\s*Ambulación\s*Sí\s*I\s*Enfermedades\s*Sí\s*L\s*Pérdida de peso\s*Sí/,
+  );
+
+  await responderTodo(page, []);
+  await botonEvaluar(page).click();
+  await expect(veredicto(page)).toContainText('Robusto — Sin fragilidad detectada');
+  await expect(page.getByText('0 / 5', { exact: true })).toBeVisible();
+});
+
+test('CASO 12 — con 4 de 5 respondidas no hay veredicto y el aviso nombra la que falta', async ({
+  page,
+}) => {
+  // Las cuatro primeras a «No» y Pérdida de peso sin tocar: sin el quinto ítem la puntuación
+  // podría ser 0 (robusto) o 1 (pre-frágil), así que la app no puede elegir por el usuario.
+  await abrir(page);
+  for (const id of IDS.slice(0, 4)) await opcion(page, id, 'no').click();
+  await expect(contador(page)).toHaveText('4 de 5 preguntas respondidas');
+  await botonEvaluar(page).click();
+
+  await expect(veredicto(page)).toHaveCount(0);
+  const aviso = page.locator('[class*="avisoIncompleto"]');
+  await expect(aviso).toHaveAttribute('role', 'alert');
+  await expect(aviso).toContainText('Pérdida de peso');
+  await expect(aviso).not.toContainText('Fatiga');
+
+  // Responder la que falta retira el aviso.
+  await opcion(page, 'peso', 'no').click();
+  await expect(aviso).toHaveCount(0);
+});
+
+test('CASO 13 — los radios se manejan con el teclado', async ({ page }) => {
+  // El cambio sustituyó la casilla por dos radios nativos con el mismo `name`: Espacio marca,
+  // las flechas mueven dentro del grupo y Tab salta al grupo siguiente.
+  await abrir(page);
+  await opcion(page, 'fatiga', 'si').focus();
+  await page.keyboard.press('Space');
+  await expect(opcion(page, 'fatiga', 'si')).toBeChecked();
+  await page.keyboard.press('ArrowRight');
+  await expect(opcion(page, 'fatiga', 'no')).toBeChecked();
+  await expect(contador(page)).toHaveText('1 de 5 preguntas respondidas');
+  await page.keyboard.press('Tab');
+  await expect(opcion(page, 'resistencia', 'si')).toBeFocused();
+});
+
+// Medido el 16/11/2026, con la opacidad 0,85 de `.nivelSalvedad` (texto de 13,12 px, así que el
+// mínimo es 4,5:1): oscuro 6,98 · 6,35 · 6,36; claro en Frágil, 4,74. Robusto y Pre-frágil en
+// claro NO llegan: son el HALLAZGO de contraste de abajo.
+test('CASO 14 — la salvedad del veredicto se lee en oscuro, en los tres niveles', async ({ page }) => {
+  await abrirConTema(page, 'dark');
+  for (const nivel of Object.values(RESPUESTAS_POR_NIVEL)) {
+    await responderTodo(page, nivel.conSi);
+    await botonEvaluar(page).click();
+    await expect(veredicto(page)).toContainText(nivel.titulo);
+    expect(await contrasteConOpacidad(salvedad(page)), `oscuro · ${nivel.titulo}`).toBeGreaterThanOrEqual(4.5);
+  }
+});
+
+test('CASO 14 bis — la salvedad del veredicto se lee en claro en «Frágil»', async ({ page }) => {
+  await abrirConTema(page, 'light');
+  await responderTodo(page, RESPUESTAS_POR_NIVEL.fragil.conSi);
+  await botonEvaluar(page).click();
+  await expect(veredicto(page)).toContainText(RESPUESTAS_POR_NIVEL.fragil.titulo);
+  expect(await contrasteConOpacidad(salvedad(page))).toBeGreaterThanOrEqual(4.5);
+});
+
+test.describe('CASO 15 — en móvil', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('el aviso médico se ve sin plegar, nada desborda y el cuestionario se contesta a toques', async ({
+    page,
+  }) => {
+    // Riesgo 1: el aviso crítico no puede quedar plegado tampoco en un móvil de 360 px, y los
+    // radios Sí/No (39 × 62 px medidos) tienen que poder pulsarse con el dedo.
+    await abrir(page);
+    const aviso = page.getByRole('note', { name: 'Aviso importante' });
+    await expect(aviso).toBeVisible();
+    await expect(aviso.locator('button[aria-expanded]')).toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+
+    for (const id of IDS) await opcion(page, id, id === 'fatiga' || id === 'peso' ? 'si' : 'no').tap();
+    await expect(contador(page)).toHaveText('Las 5 preguntas respondidas · 2 con «Sí»');
+    await botonEvaluar(page).tap();
+    await expect(veredicto(page)).toContainText('Pre-frágil — Riesgo moderado');
+    await expect(veredicto(page)).toContainText('No es un diagnóstico');
+  });
+});
+
+// ── Hallazgos de la re-inspección del 16/11/2026 ──
+
+test('HALLAZGO (16/11/2026, ABIERTO) · cada grupo Sí/No se anuncia sin su pregunta', async ({
+  page,
+}) => {
+  // Antes del cambio la casilla llevaba `aria-label={item.pregunta}`; ahora el <fieldset> tiene
+  // por <legend> solo el título («Resistencia») y los radios se llaman «Sí» y «No», sin
+  // aria-describedby. Quien rellena el test con lector de pantalla y tabulador oye
+  // «Resistencia, agrupación, Sí, botón de opción», sin «10 escalones», «100 metros», «5 de
+  // estas enfermedades» ni «más del 5 % en el último año», que son los umbrales del ítem.
+  // Esperado: la pregunta llega en el nombre o la descripción accesible del grupo o de sus
+  // radios. Hoy: grupo «Resistencia» sin descripción, radios «Sí»/«No» sin descripción.
+  test.fail();
+  await abrir(page);
+  const cdp = await page.context().newCDPSession(page);
+  const { nodes } = (await cdp.send('Accessibility.getFullAXTree')) as {
+    nodes: { role?: { value?: string }; name?: { value?: string }; description?: { value?: string } }[];
+  };
+  const anunciado = nodes
+    .filter((n) => n.role?.value === 'group' || n.role?.value === 'radio')
+    .map((n) => `${n.name?.value ?? ''} ${n.description?.value ?? ''}`)
+    .join(' | ');
+  for (const pregunta of Object.values(PREGUNTAS)) {
+    expect(anunciado, `«${pregunta}» no llega al lector de pantalla`).toContain(pregunta);
+  }
+});
+
+test('HALLAZGO (16/11/2026, ABIERTO) · la salvedad del veredicto no llega a 4,5:1 en claro en Robusto y Pre-frágil', async ({
+  page,
+}) => {
+  // `.nivelSalvedad` hereda el color de la caja (--verde-texto #136E35 / --naranja-texto
+  // #B93E0B, que dan 5,93 y 5,30 sobre sus tintes) pero lleva `opacity: 0.85`, que compone el
+  // texto al 85 % sobre el tinte. Medido el 16/11/2026: Robusto 4,35:1 (4,41 por píxel) y
+  // Pre-frágil 4,12:1 (4,16 por píxel), con texto de 13,12 px que pide 4,5:1. Es el aviso
+  // «No es un diagnóstico» que la reparación del hallazgo 897 puso ahí para que viajara con el
+  // veredicto. check:semanticos-claro mide el color de la regla y no ve la opacidad.
+  test.fail();
+  await abrirConTema(page, 'light');
+  for (const nivel of [RESPUESTAS_POR_NIVEL.robusto, RESPUESTAS_POR_NIVEL.prefragil]) {
+    await responderTodo(page, nivel.conSi);
+    await botonEvaluar(page).click();
+    await expect(veredicto(page)).toContainText(nivel.titulo);
+    expect(await contrasteConOpacidad(salvedad(page)), `claro · ${nivel.titulo}`).toBeGreaterThanOrEqual(4.5);
+  }
+});
+
+test('HALLAZGO (16/11/2026, ABIERTO) · el FAQPage sigue contando cualquier enfermedad crónica', async ({
+  page,
+}) => {
+  // La reparación del hallazgo 893 cerró el ítem de enfermedades a la lista del instrumento en
+  // la página («El recuento es solo sobre esta lista: hipertensión, diabetes, […] Ninguna otra
+  // enfermedad cuenta para este ítem»), pero la respuesta del FAQPage —lo que leen buscadores
+  // y asistentes— sigue diciendo «Illnesses (presencia de 5 o más enfermedades crónicas)».
+  // Con cinco crónicas ajenas a la lista más Fatiga y Resistencia, el FAQPage da 3 → frágil y
+  // la página 2 → pre-frágil.
+  test.fail();
+  await page.goto(RUTA);
+  const faq = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((ss) =>
+      ss
+        .map((s) => JSON.parse(s.textContent ?? '{}') as Record<string, unknown>)
+        .find((x) => x['@type'] === 'FAQPage'),
+    );
+  const preguntas = (faq?.mainEntity ?? []) as { name: string; acceptedAnswer: { text: string } }[];
+  const frail = preguntas.find((p) => p.name.includes('escala FRAIL'));
+  expect(frail, 'el FAQPage tiene la pregunta sobre la escala FRAIL').toBeTruthy();
+  // La lista cerrada tiene que estar dicha: al menos un miembro que no sea genérico y la idea
+  // de que el recuento es sobre esa lista.
+  expect(frail?.acceptedAnswer.text ?? '').toMatch(/hipertensión/);
+  expect(frail?.acceptedAnswer.text ?? '').toMatch(/lista|\b11\b/);
+});
+
+test('HALLAZGO (16/11/2026, ABIERTO) · «Faltan 1 de 5 preguntas»: la concordancia falla con una sola', async ({
+  page,
+}) => {
+  // El aviso se construye siempre en plural: con una sola sin responder dice «Faltan 1 de 5
+  // preguntas por responder: Pérdida de peso.». Esperado en singular: «Falta 1 …» (o «Falta
+  // una …»).
+  test.fail();
+  await abrir(page);
+  for (const id of IDS.slice(0, 4)) await opcion(page, id, 'no').click();
+  await botonEvaluar(page).click();
+  const aviso = page.locator('[class*="avisoIncompleto"]');
+  await expect(aviso).toContainText('Pérdida de peso');
+  await expect(aviso).toHaveText(/^Falta (1|una)\b/);
+});
+
+test('HALLAZGO (16/11/2026, ABIERTO) · «unos 3,5 kg en una persona de 70» no dice 70 qué', async ({
+  page,
+}) => {
+  // En un test para mayores, «una persona de 70» se lee como edad, y el 5 % depende del PESO:
+  // es justo la confusión que el párrafo quiere deshacer frente a los 4,5 kg fijos de Fried.
+  // La ayuda del propio ítem lo dice bien: «más de 3,5 kg si se pesa 70 kg» (5 % de 70 kg).
+  test.fail();
+  await abrir(page);
+  await page.getByRole('button', { name: /Ver guía|guía educativa/i }).first().click();
+  const parrafo = page.getByText(/unos 3,5 kg/).first();
+  await expect(parrafo).toContainText(/70 kg/);
 });
