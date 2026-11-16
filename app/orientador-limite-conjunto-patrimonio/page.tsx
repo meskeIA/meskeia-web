@@ -12,13 +12,18 @@ import {
   RegionBadge,
   DataReference,
 } from '@/components';
-import { formatCurrency, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
   BONIFICACIONES_CCAA_PATRIMONIO,
   FISCAL_PATRIMONIO_META,
   ITSGF_UMBRAL,
   LIMITE_CONJUNTO_PORCENTAJE,
   TOPE_REDUCCION_PORCENTAJE,
+  UMBRAL_OBLIGACION_DECLARAR,
+  MINIMO_EXENTO_ESTATAL,
+  EXENCION_VIVIENDA_HABITUAL,
+  REDUCCION_TRIBUTACION_CONJUNTA_2025,
+  getMinimoExentoPatrimonio,
   orientarLimiteConjunto,
   type ResultadoOrientacion,
 } from '@/data/fiscal';
@@ -54,6 +59,31 @@ function leerCampo(s: string): number {
   if (!s.trim()) return 0;
   return parseSpanishNumber(s);
 }
+
+// ─── Cifras y listas del texto, derivadas de data/fiscal ─────────────────────────
+// Hallazgos 4881 y 4886: la lista de CCAA con bonificación total estaba escrita a mano (daba
+// Galicia, que es parcial, y olvidaba La Rioja) y las cifras normativas, como literales.
+
+function euros(n: number): string {
+  return `${formatNumber(n, 0)} €`;
+}
+
+function pct(fraccion: number): string {
+  return `${Math.round(fraccion * 100)} %`;
+}
+
+function enumerar(nombres: string[]): string {
+  if (nombres.length <= 1) return nombres.join('');
+  return `${nombres.slice(0, -1).join(', ')} y ${nombres[nombres.length - 1]}`;
+}
+
+const CCAA_BONIFICACION_TOTAL = enumerar(
+  BONIFICACIONES_CCAA_PATRIMONIO.filter(c => c.bonificacion === 'total').map(c => c.nombre),
+);
+const PCT_LIMITE = pct(LIMITE_CONJUNTO_PORCENTAJE);
+const PCT_TOPE = pct(TOPE_REDUCCION_PORCENTAJE);
+const PCT_MINIMO = pct(1 - TOPE_REDUCCION_PORCENTAJE);
+const ITSGF = euros(ITSGF_UMBRAL);
 
 // ─── Componente ───────────────────────────────────────────────────────────────
 
@@ -172,8 +202,8 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
           <h2 className={styles.panelTitle}><span aria-hidden="true">📖</span> ¿Qué es el límite conjunto IRPF-Patrimonio?</h2>
           <p className={styles.panelDesc}>
             El Art. 31 de la Ley 19/1991 establece que la suma de tu cuota íntegra del IRPF más la cuota íntegra
-            del Impuesto sobre el Patrimonio no puede superar el 60% de tu base imponible del IRPF. Si la supera,
-            se reduce la cuota de Patrimonio (con un tope: siempre se paga al menos el 20%). Es una posibilidad
+            del Impuesto sobre el Patrimonio no puede superar el {PCT_LIMITE} de tu base imponible del IRPF. Si la supera,
+            se reduce la cuota de Patrimonio (con un tope: siempre se paga al menos el {PCT_MINIMO}). Es una posibilidad
             poco conocida que puede ahorrar miles de euros en patrimonios medios-altos con poca renta declarada.
           </p>
           <p className={styles.panelDesc}>{EXCLUSION_GANANCIAS_ART31}</p>
@@ -183,24 +213,24 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               <span className={styles.comoFuncionaIcon} aria-hidden="true">🏛️</span>
               <p className={styles.comoFuncionaTitle}>1. Tu CCAA</p>
               <p className={styles.comoFuncionaText}>
-                Si tu CCAA bonifica el Patrimonio al 100%, no pagas cuota → el límite no aplica. Patrimonios
+                Si tu CCAA bonifica el Patrimonio al 100{' '}%, no pagas cuota → el límite no aplica. Patrimonios
                 superiores a {formatCurrency(ITSGF_UMBRAL)} pueden tributar por el ITSGF estatal.
               </p>
             </div>
             <div className={styles.comoFuncionaCard}>
               <span className={styles.comoFuncionaIcon} aria-hidden="true">📊</span>
-              <p className={styles.comoFuncionaTitle}>2. La regla del 60%</p>
+              <p className={styles.comoFuncionaTitle}>2. La regla del {PCT_LIMITE}</p>
               <p className={styles.comoFuncionaText}>
-                Sumamos cuota IRPF + cuota Patrimonio. Si supera el {Math.round(LIMITE_CONJUNTO_PORCENTAJE * 100)}%
-                de tu base imponible IRPF, podrías beneficiarte de la reducción.
+                Sumamos cuota IRPF + cuota Patrimonio. Si supera el {PCT_LIMITE} de tu base imponible IRPF,
+                podrías beneficiarte de la reducción.
               </p>
             </div>
             <div className={styles.comoFuncionaCard}>
               <span className={styles.comoFuncionaIcon} aria-hidden="true">📉</span>
-              <p className={styles.comoFuncionaTitle}>3. El tope del 80%</p>
+              <p className={styles.comoFuncionaTitle}>3. El tope del {PCT_TOPE}</p>
               <p className={styles.comoFuncionaText}>
-                La reducción nunca puede superar el {Math.round(TOPE_REDUCCION_PORCENTAJE * 100)}% de tu cuota de
-                Patrimonio. Es decir, siempre pagarás al menos el 20%.
+                La reducción nunca puede superar el {PCT_TOPE} de tu cuota de Patrimonio. Es decir, siempre
+                pagarás al menos el {PCT_MINIMO}.
               </p>
             </div>
           </div>
@@ -264,7 +294,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 ))}
               </select>
               <span className={styles.formHint}>
-                Algunas CCAA bonifican el Patrimonio al 100%. En esos casos, el límite conjunto no aplica.
+                Algunas CCAA bonifican el Patrimonio al 100{' '}%. En esos casos, el límite conjunto no aplica.
               </span>
             </div>
 
@@ -486,20 +516,20 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               <tbody>
                 <tr>
                   <td><strong>Descartado por CCAA</strong></td>
-                  <td>Resides en una CCAA con bonificación total (Madrid, Andalucía, Galicia, Cantabria, Extremadura, Castilla y León, Murcia)</td>
+                  <td>Resides en una CCAA con bonificación total ({CCAA_BONIFICACION_TOTAL})</td>
                   <td>No pagas Patrimonio → no hay nada que reducir</td>
-                  <td>Si tu patrimonio supera 3M€, evaluar ITSGF con asesor</td>
+                  <td>Si tu patrimonio supera {ITSGF}, evaluar ITSGF con asesor</td>
                 </tr>
                 <tr>
                   <td><strong>Descartado por límite</strong></td>
-                  <td>Cuota IRPF + cuota Patrimonio NO supera el 60% de tu BI IRPF</td>
+                  <td>Cuota IRPF + cuota Patrimonio NO supera el {PCT_LIMITE} de tu BI IRPF</td>
                   <td>El Art. 31 no se activa</td>
                   <td>Revisar en años con menor renta o más patrimonio</td>
                 </tr>
                 <tr>
                   <td><strong>Posible reducción</strong></td>
-                  <td>Cuota IRPF + cuota Patrimonio supera el 60% de tu BI IRPF</td>
-                  <td>Reducción orientativa hasta el 80% de la cuota Patrimonio</td>
+                  <td>Cuota IRPF + cuota Patrimonio supera el {PCT_LIMITE} de tu BI IRPF</td>
+                  <td>Reducción orientativa hasta el {PCT_TOPE} de la cuota Patrimonio</td>
                   <td>Asesor fiscal para cálculo exacto y aplicación</td>
                 </tr>
                 <tr>
@@ -576,11 +606,11 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               </div>
               <div className={styles.escenarioExample}>
                 <p><strong>Situación:</strong> 60 años, BI IRPF 60.000 €, patrimonio neto 4.000.000 €</p>
-                <p><strong>CCAA:</strong> Madrid (bonificación 100%)</p>
-                <p><strong>Resultado:</strong> descarte del límite, pero posible ITSGF estatal por superar 3M€</p>
+                <p><strong>CCAA:</strong> Madrid (bonificación 100{' '}%)</p>
+                <p><strong>Resultado:</strong> descarte del límite, pero posible ITSGF estatal por superar {ITSGF}</p>
               </div>
               <div className={styles.escenarioTip}>
-                El ITSGF se diseñó para CCAA con bonificación 100%. Tu asesor coordinará IP y ITSGF.
+                El ITSGF se diseñó para CCAA con bonificación 100{' '}%. Tu asesor coordinará IP y ITSGF.
               </div>
             </div>
 
@@ -596,15 +626,15 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               <h4>¿Qué es exactamente el límite conjunto IRPF-Patrimonio?</h4>
               <p>{RESPUESTA_FAQ_QUE_ES}</p>
               <div className={styles.faqTip}>
-                Ejemplo: BI IRPF 100.000 €, cuota IRPF 35.000 €, cuota Patrimonio 40.000 €. Suma 75.000 € &gt; 60% × 100.000 € = 60.000 €. Exceso 15.000 € → reducción aplicable hasta el tope (80% de 40.000 = 32.000). Reducción real: 15.000 €.
+                Ejemplo: BI IRPF 100.000 €, cuota IRPF 35.000 €, cuota Patrimonio 40.000 €. Suma 75.000 € &gt; {PCT_LIMITE} × 100.000 € = {euros(LIMITE_CONJUNTO_PORCENTAJE * 100000)}. Exceso {euros(75000 - LIMITE_CONJUNTO_PORCENTAJE * 100000)} → reducción aplicable hasta el tope ({PCT_TOPE} de 40.000 = {euros(TOPE_REDUCCION_PORCENTAJE * 40000)}). Reducción real: {euros(Math.min(75000 - LIMITE_CONJUNTO_PORCENTAJE * 100000, TOPE_REDUCCION_PORCENTAJE * 40000))}.
               </div>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Es la "reducción por declaración conjunta" del IRPF?</h4>
               <p>
-                <strong>No, son cosas distintas.</strong> La reducción por tributación conjunta (3.400 € en
-                matrimonios) opera sobre la base imponible del IRPF. El límite conjunto del Art. 31 opera sobre la
+                <strong>No, son cosas distintas.</strong> La reducción por tributación conjunta
+                ({euros(REDUCCION_TRIBUTACION_CONJUNTA_2025.biparental)} en matrimonios) opera sobre la base imponible del IRPF. El límite conjunto del Art. 31 opera sobre la
                 cuota del Impuesto sobre el Patrimonio. La confusión es habitual porque ambas se llaman "conjuntas".
                 El límite conjunto se llama así porque suma cuotas de dos impuestos (IRPF + Patrimonio), no porque
                 requiera declaración conjunta.
@@ -641,20 +671,20 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
             <div className={styles.faqItem}>
               <h4>¿Puedo aplicar el límite si tengo bonificación 100% en mi CCAA?</h4>
               <p>
-                No tiene sentido: si tu CCAA bonifica al 100%, la cuota de Patrimonio queda en 0 € → no hay nada
-                que reducir. Sin embargo, los patrimonios netos superiores a 3.000.000 € pueden quedar sujetos al
+                No tiene sentido: si tu CCAA bonifica al 100{' '}%, la cuota de Patrimonio queda en 0 € → no hay nada
+                que reducir. Sin embargo, los patrimonios netos superiores a {ITSGF} pueden quedar sujetos al
                 <strong> ITSGF (Impuesto Temporal de Solidaridad de las Grandes Fortunas)</strong>, que es estatal.
-                El ITSGF se diseñó precisamente para "rescatar" tributación en CCAA con bonificación 100%.
+                El ITSGF se diseñó precisamente para "rescatar" tributación en CCAA con bonificación 100{' '}%.
               </p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Es obligatorio declarar Patrimonio?</h4>
               <p>
-                No siempre. La obligación general aparece cuando el patrimonio bruto supera 2.000.000 € o cuando
+                No siempre. La obligación general aparece cuando el patrimonio bruto supera {euros(UMBRAL_OBLIGACION_DECLARAR)} o cuando
                 la cuota del Impuesto sobre el Patrimonio sale a pagar (tras aplicar mínimo exento). El mínimo
-                exento estatal es 700.000 €, pero las CCAA pueden modificarlo (Cataluña: 500.000 €). La vivienda
-                habitual está exenta hasta 300.000 € adicionales.
+                exento estatal es {euros(MINIMO_EXENTO_ESTATAL)}, pero las CCAA pueden modificarlo (Cataluña: {euros(getMinimoExentoPatrimonio('cataluna'))}). La vivienda
+                habitual está exenta hasta {euros(EXENCION_VIVIENDA_HABITUAL)} adicionales.
               </p>
             </div>
 
@@ -708,9 +738,8 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               <div className={styles.stepContent}>
                 <h4>Indica tu modo de IRPF y tu CCAA</h4>
                 <p>
-                  Si presentas conjunta, suma los datos de ambos cónyuges. La CCAA es clave: en Madrid, Andalucía,
-                  Galicia, Cantabria, Extremadura, Castilla y León y Murcia el Patrimonio está bonificado al 100%
-                  y el orientador te lo dirá inmediatamente.
+                  Si presentas conjunta, suma los datos de ambos cónyuges. La CCAA es clave: en {CCAA_BONIFICACION_TOTAL} el
+                  Patrimonio está bonificado al 100{' '}% y el orientador te lo dirá inmediatamente.
                 </p>
               </div>
             </div>
@@ -721,7 +750,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 <h4>Introduce las cifras y comprueba</h4>
                 <p>
                   Pulsa "Comprobar mi situación". El orientador te dará uno de tres resultados: descarte por CCAA,
-                  descarte por no superar el 60%, o posible beneficio. En este último caso, también verás una
+                  descarte por no superar el {PCT_LIMITE}, o posible beneficio. En este último caso, también verás una
                   estimación orientativa del ahorro.
                 </p>
               </div>
@@ -798,8 +827,8 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               <div>
                 <h4>Conoce las bonificaciones de tu CCAA</h4>
                 <p>
-                  Madrid, Andalucía, Galicia, Cantabria, Extremadura, Castilla y León y Murcia bonifican al 100%.
-                  Pueden cambiar cada año. Verifica con tu Hacienda autonómica.
+                  {CCAA_BONIFICACION_TOTAL} bonifican al 100{' '}%. Pueden cambiar cada año. Verifica con
+                  tu Hacienda autonómica.
                 </p>
               </div>
             </div>
@@ -807,9 +836,9 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">⚠️</span>
               <div>
-                <h4>Vigila el ITSGF si tu patrimonio supera 3M€</h4>
+                <h4>Vigila el ITSGF si tu patrimonio supera {ITSGF}</h4>
                 <p>
-                  Aunque tu CCAA bonifique el Patrimonio al 100%, los patrimonios netos sobre 3M€ pueden tributar
+                  Aunque tu CCAA bonifique el Patrimonio al 100{' '}%, los patrimonios netos sobre {ITSGF} pueden tributar
                   por el ITSGF estatal. No te confíes de la bonificación autonómica si tu patrimonio es alto.
                 </p>
               </div>
@@ -855,8 +884,8 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               </li>
               <li>
                 <strong>Asumir que la reducción es automática sin verificar tu CCAA.</strong> Si vives en una CCAA
-                con bonificación 100%, no pagas Patrimonio: la reducción es irrelevante, pero podrías estar sujeto
-                al ITSGF si tu patrimonio supera 3M€.
+                con bonificación 100{' '}%, no pagas Patrimonio: la reducción es irrelevante, pero podrías estar sujeto
+                al ITSGF si tu patrimonio supera {ITSGF}.
               </li>
               <li>
                 <strong>Calcular un límite por cónyuge cuando hay IRPF conjunto.</strong> La ley acumula las cuotas
@@ -870,7 +899,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               </li>
               <li>
                 <strong>Pensar que la reducción puede dejar la cuota de Patrimonio en 0 €.</strong> Imposible: el
-                tope del 80% garantiza que siempre pagas al menos el 20% de la cuota íntegra de Patrimonio.
+                tope del {PCT_TOPE} garantiza que siempre pagas al menos el {PCT_MINIMO} de la cuota íntegra de Patrimonio.
               </li>
               <li>
                 <strong>No revisar ejercicios pasados.</strong> Si descubres que en un año anterior se debió

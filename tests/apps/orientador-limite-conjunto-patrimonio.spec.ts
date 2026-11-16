@@ -212,15 +212,43 @@ test.describe('Hallazgos de la inspección del 16/11/2026', () => {
     await expect(resultado(page)).toContainText('ITSGF');
   });
 
-  test('HALLAZGO (16/11/2026, ABIERTO) · el texto da a Galicia por bonificada al 100 % y olvida La Rioja; el selector (data/fiscal) dice otra cosa', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4881) · el texto daba a Galicia por bonificada al 100 % y olvidaba La Rioja; ahora sale de data/fiscal', async ({ page }) => {
     const totales = (await page.locator('#ccaa option').allInnerTexts())
-      .filter((t) => t.includes('(bonificación 100%)'))
+      .filter((t) => /\(bonificación 100\s?%\)/.test(t))
       .map((t) => t.replace(/\s*\(.*$/, ''));
     expect(totales.length).toBeGreaterThan(0);
+    expect(totales).toContain('La Rioja');
     const paso2 = page.getByText(/La CCAA es clave/);
     for (const nombre of totales) await expect(paso2).toContainText(nombre);
     await expect(paso2).not.toContainText('Galicia');
+    // La tabla y el consejo «Conoce las bonificaciones de tu CCAA», igual
+    const guia = page.locator('[data-guia-educativa]');
+    // La guía nace plegada (oculta por CSS): se localiza por etiqueta, no por rol.
+    const fila = guia.locator('tr', { hasText: 'Descartado por CCAA' });
+    await expect(fila).toContainText('La Rioja');
+    await expect(fila).not.toContainText('Galicia');
+    const consejo = guia.locator('h4', { hasText: 'Conoce las bonificaciones de tu CCAA' }).locator('xpath=following-sibling::p[1]');
+    await expect(consejo).toContainText('La Rioja');
+    await expect(consejo).not.toContainText('Galicia');
+  });
+
+  test('REPARADO (hallazgo 4886) · las cifras normativas del texto salen de data/fiscal (con su formato: espacio duro antes de € y %)', async ({ page }) => {
+    // Los literales («2.000.000 €» con espacio normal, «3M€», «60%») pasan a interpolarse de
+    // UMBRAL_OBLIGACION_DECLARAR, MINIMO_EXENTO_ESTATAL, getMinimoExentoPatrimonio('cataluna'),
+    // EXENCION_VIVIENDA_HABITUAL, ITSGF_UMBRAL, LIMITE_CONJUNTO_PORCENTAJE y TOPE_REDUCCION_PORCENTAJE.
+    const guia = (await page.locator('[data-guia-educativa]').textContent()) ?? '';
+    expect(guia).toContain('supera 2.000.000 €');
+    expect(guia).toContain('es 700.000 €');
+    expect(guia).toContain('Cataluña: 500.000 €');
+    expect(guia).toContain('hasta 300.000 €');
+    expect(guia).toContain('(3400 € en matrimonios)');
+    expect(guia).not.toContain('3M€');
+    expect(guia).toContain('3.000.000 €');
+    const panel = (await page.getByRole('heading', { name: /¿Qué es el límite conjunto IRPF-Patrimonio\?/ }).locator('..').textContent()) ?? '';
+    expect(panel).toContain('el 60 % de tu base imponible');
+    expect(panel).toContain('La regla del 60 %');
+    expect(panel).toContain('El tope del 80 %');
+    expect(panel).toContain('al menos el 20 %');
   });
 
   test('REPARADO (hallazgo 4882) · «35000.5» se leía 350.005: la reducción salía 32.000 € en vez de 15.000,50 €', async ({ page }) => {
