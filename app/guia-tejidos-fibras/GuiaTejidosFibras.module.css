@@ -191,6 +191,17 @@
 .sosMediaBtn { border-color: rgba(255,152,0,0.3);  color: var(--naranja-texto, #e65100); }
 .sosBajaBtn  { border-color: rgba(244,67,54,0.3);  color: var(--rojo-texto, #c62828); }
 
+/* El filtro activo es blanco sobre el azul también en Alta, Media y Baja, y con el ratón
+   encima (C0773): las tres de arriba y el :hover iban detrás con la misma especificidad y
+   pintaban verde, naranja, rojo o el azul de texto sobre --primary-boton, ~1,2:1. */
+.sosFiltroActivo:hover,
+.sosFiltroActivo.sosAltaBtn,
+.sosFiltroActivo.sosMediaBtn,
+.sosFiltroActivo.sosBajaBtn {
+  color: #fff;
+  border-color: var(--primary-boton);
+}
+
 /* ── Resultados ── */
 .resultadosHeader { margin-bottom: 1rem; }
 
