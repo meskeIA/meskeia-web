@@ -84,6 +84,12 @@ const MANO: Record<string, number> = {
   'Un viejo estanque,': 5,
   'salta una rana —el sonido': 8,
   'del agua oscura.': 5,
+  // Reparación del 17/11/2026 (hallazgos 4980 y 4984): sal-ta_u-na-ra-na-rui-do = 7 ·
+  // un-vie-jo_es-tan-que = 5 · mo-za-tan-fer-mo-sa = 6 · ju-ven-tud-di-vi-no-te-so-ro = 9
+  'salta una rana —ruido': 7,
+  'Un viejo estanque': 5,
+  'Moza tan fermosa': 6,
+  'Juventud, divino tesoro': 9,
   '¡A las armas!': 4,
   'La hora': 2,
 };
@@ -341,10 +347,12 @@ test.describe('guia-metrica-estrofas', () => {
   // ─────────────────────────────── HALLAZGOS DE LAS FICHAS ───────────────────────────────
 
   test('HALLAZGO [contenido/alto] · tres fichas de «Tipos de verso» ilustran su medida con un verso de otra medida', async ({ page }) => {
-    // ABIERTO. ESPERADO cada ejemplo mide lo que dice su ficha (a mano, y el contador de la app lo confirma)
+    // REPARADO (hallazgo 4980). ESPERADO cada ejemplo mide lo que dice su ficha (a mano, y el contador
+    // de la app lo confirma)
     // OBTENIDO «Noche oscura» = 4 en la ficha Pentasílabo · «Olas gigantes» = 5 en Hexasílabo ·
     //          «Del salón en el ángulo oscuro» = 10 en Eneasílabo
-    test.fail();
+    // AHORA «Un viejo estanque» (5, el haiku de la propia app) · «Moza tan fermosa» (6) · «Juventud,
+    //       divino tesoro» (9, el Darío de la propia app). Se exige además que cada verso esté en MANO.
     await page.getByRole('tab', { name: 'Tipos de verso' }).click();
     const tarjetas = page.locator('[class*="_tipoCard"]');
     await expect(tarjetas).toHaveCount(8);
@@ -359,40 +367,46 @@ test.describe('guia-metrica-estrofas', () => {
     for (const f of fichas) {
       const c = await contar(page, f.verso);
       const aMano = MANO[f.verso];
-      if (aMano !== undefined && aMano !== f.medida) descuadres.push(`«${f.verso}»: ficha ${f.medida}, a mano ${aMano}, contador ${c.silabas}`);
+      if (aMano === undefined) descuadres.push(`«${f.verso}»: sin cómputo a mano en MANO`);
+      else if (aMano !== undefined && aMano !== f.medida) descuadres.push(`«${f.verso}»: ficha ${f.medida}, a mano ${aMano}, contador ${c.silabas}`);
       else if (c.silabas !== f.medida) descuadres.push(`«${f.verso}»: ficha ${f.medida}, contador ${c.silabas}`);
     }
     expect(descuadres).toEqual([]);
   });
 
   test('HALLAZGO [contenido/medio] · la ficha Serventesio dice «Cuatro endecasílabos» y su ejemplo de Darío son eneasílabos', async ({ page }) => {
-    // ABIERTO. ESPERADO los versos del ejemplo miden lo que declara la ficha (11)
-    // OBTENIDO «Canción de otoño en primavera» va en eneasílabos: 9 · 9 · 9 · 9 (tabla MANO)
-    test.fail();
+    // REPARADO (hallazgo 4983), por la segunda vía que daba el acta: una definición que cubre el ABAB
+    // de arte mayor. ESPERADO los versos del ejemplo miden lo que declara la ficha.
+    // OBTENIDO «Canción de otoño en primavera» va en eneasílabos: 9 · 9 · 9 · 9 (tabla MANO), y la
+    //          ficha decía «Cuatro endecasílabos». Ahora declara «Arte mayor» (9 o más sílabas, según la
+    //          FAQ visible de la app) y dice que el ejemplo de Darío va en eneasílabos.
     const ficha = await abrirEstrofa(page, /Serventesio/);
     const cabecera = (await ficha.getByRole('button').textContent()) ?? '';
     const nombreMedida = cabecera.toLowerCase().match(/[a-záéíóú]+sílabos|alejandrinos/)?.[0] ?? '';
-    const declarada = MEDIDAS[nombreMedida];
-    expect(declarada, `medida declarada en «${cabecera}»`).toBeTruthy();
     const versos = (await ficha.locator('[class$="_estrofaVerso"]').allTextContents()).map((v) => v.trim());
     expect(versos).toHaveLength(4);
-    for (const v of versos) {
-      const medida = MANO[v] ?? (await contar(page, v)).silabas;
-      expect.soft(medida, v).toBe(declarada);
+    const medidas = versos.map((v) => MANO[v]);
+    if (nombreMedida) {
+      for (const [i, v] of versos.entries()) expect.soft(medidas[i], v).toBe(MEDIDAS[nombreMedida]);
+    } else {
+      expect(cabecera, 'la cabecera declara arte mayor').toMatch(/arte mayor/i);
+      for (const [i, v] of versos.entries()) expect.soft(medidas[i], `${v}: arte mayor`).toBeGreaterThanOrEqual(9);
+      await expect(ficha).not.toContainText('Cuatro endecasílabos');
+      await expect(ficha).toContainText('eneasílabos');
     }
   });
 
   test('HALLAZGO [contenido/medio] · el haiku de ejemplo es 5-8-5 y la ficha declara 5-7-5', async ({ page }) => {
-    // ABIERTO. ESPERADO 5 · 7 · 5 (estructura de la ficha)
-    // OBTENIDO 5 · 8 · 5: sal-ta_u-na-ra-na_el-so-ni-do = 8 (el contador de la app también da 8)
-    test.fail();
+    // REPARADO (hallazgo 4984). ESPERADO 5 · 7 · 5 (estructura de la ficha)
+    // OBTENIDO 5 · 8 · 5: sal-ta_u-na-ra-na_el-so-ni-do = 8 (el contador de la app también da 8).
+    // Ahora el segundo verso es «salta una rana —ruido» = sal-ta_u-na-ra-na-rui-do = 7.
     const haiku = await forma(page, 'Haiku');
     await expect(haiku.locator('[class$="_formaEstructura"]')).toHaveText('5 sílabas · 7 sílabas · 5 sílabas');
     const versos = (await haiku.locator('[class$="_formaVerso"]').allTextContents()).map((v) => v.trim());
     const medidas: number[] = [];
     for (const v of versos) medidas.push((await contar(page, v)).silabas);
     expect(medidas).toEqual([5, 7, 5]);
-    for (const v of versos) if (MANO[v] !== undefined) expect(MANO[v], v).toBe(medidas[versos.indexOf(v)]);
+    for (const v of versos) expect(MANO[v], v).toBe(medidas[versos.indexOf(v)]);
   });
 
   test('HALLAZGO [contenido/medio] · la octava real de ejemplo no rima ABABABCC y es un texto «adaptado» atribuido a Ercilla', async ({ page }) => {
@@ -412,11 +426,10 @@ test.describe('guia-metrica-estrofas', () => {
   });
 
   test('HALLAZGO [contenido/medio] · el ejemplo de rima asonante empareja dos versos que no riman (é-e / á-a)', async ({ page }) => {
-    // ABIERTO. ESPERADO dos versos con las mismas vocales desde la última tónica (p. ej. «ramas» /
-    //          «montaña», á-a, del mismo romance)
+    // REPARADO (hallazgo 4986). ESPERADO dos versos con las mismas vocales desde la última tónica (p. ej.
+    //          «ramas» / «montaña», á-a, del mismo romance)
     // OBTENIDO «Verde que te quiero verde» / «Verde viento. Verdes ramas» y el rótulo
     //          «-e / -a (e-e / a-a → solo vocales tónicas)», que además contradice la definición
-    test.fail();
     await page.getByRole('tab', { name: 'Rima' }).click();
     const tarjeta = page.locator('[class$="_rimaTipoCard"]').filter({ has: page.getByRole('heading', { name: 'Rima asonante' }) });
     const versos = (await tarjeta.locator('[class$="_rimaVerso"]').allTextContents()).map(sinComillas);
@@ -426,25 +439,28 @@ test.describe('guia-metrica-estrofas', () => {
   });
 
   test('HALLAZGO [contenido/medio] · el FAQPage da «aurora/hora» como rima asonante y es consonante (-ora)', async ({ page }) => {
-    // ABIERTO. ESPERADO un par asonante de verdad: au-RO-ra / HO-ra coinciden en vocales Y consonantes
-    //          desde la tónica («-ora»), que es la definición de consonante que da la misma respuesta
-    // OBTENIDO «Por ejemplo, "aurora/hora" es asonante (ambas terminan en o-a)»
-    test.fail();
+    // REPARADO (hallazgo 4987). ESPERADO un par asonante de verdad: au-RO-ra / HO-ra coinciden en vocales
+    //          Y consonantes desde la tónica («-ora»), que es la definición de consonante que da la
+    //          misma respuesta
+    // OBTENIDO «Por ejemplo, "aurora/hora" es asonante (ambas terminan en o-a)». Ahora «ramas/montaña».
     const faq = (await jsonLd(page)).find((n) => n['@type'] === 'FAQPage');
     const r = faq?.mainEntity?.find((q) => /rima consonante y rima asonante/.test(q.name))?.acceptedAnswer.text ?? '';
     expect(r.length).toBeGreaterThan(0);
     const par = r.match(/"([a-záéíóúñ]+)\/([a-záéíóúñ]+)" es asonante/);
-    if (par) expect(colaConsonante(par[2]), par[0]).not.toBe(colaConsonante(par[1]));
+    expect(par, 'la respuesta da un par asonante').not.toBeNull();
+    if (par) {
+      expect(colaConsonante(par[2]), par[0]).not.toBe(colaConsonante(par[1]));
+      expect(colaAsonante(par[2]), par[0]).toBe(colaAsonante(par[1]));
+    }
   });
 
   test('HALLAZGO [contenido/medio] · los ejemplos de las reglas cuentan mal: «¡A las armas!» 5, «la hora» 3 y «poema» con sinalefa', async ({ page }) => {
-    // ABIERTO. ESPERADO «¡A las armas!» = a-las-ar-mas = 4 · «La hora» = la_ho-ra = 2 · «poema» empieza
+    // REPARADO (hallazgo 4988). ESPERADO «¡A las armas!» = a-las-ar-mas = 4 · «La hora» = la_ho-ra = 2 · «poema» empieza
     //          por consonante: no puede hacer sinalefa con la palabra anterior (lo que lo deja en 2 es la
     //          sinéresis, poe-ma) · «dos vocales contiguas» forman diptongo solo si una es cerrada átona
     // OBTENIDO «5 sílabas» · «la-ho-ra = 3 sílabas, no 4» · «puede tener 2 sílabas métricas si forma
     //          sinalefa con la palabra anterior» · «Normalmente dos vocales contiguas … forman diptongo»
     //          y el título «Los diptongos son la excepción, no la regla»
-    test.fail();
     const acento = reglaCard(page, 'Corrección por acento final');
     const dichoArmas = Number(((await acento.textContent()) ?? '').match(/(\d+) sílabas/)?.[1]);
     // El contador acierta (4); lo que falla es el texto de la regla
@@ -452,7 +468,7 @@ test.describe('guia-metrica-estrofas', () => {
     expect.soft(dichoArmas, '¡A las armas! según la regla').toBe(MANO['¡A las armas!']);
 
     const guia = await textoGuia(page);
-    const dichoHora = Number(guia.match(/la-ho-ra = (\d+) sílabas/)?.[1] ?? MANO['La hora']);
+    const dichoHora = Number(guia.match(/la[-_]ho-ra = (\d+) sílabas/)?.[1]);
     expect((await contar(page, 'La hora')).silabas).toBe(MANO['La hora']);
     expect.soft(dichoHora, '«La hora» según el consejo').toBe(MANO['La hora']);
 
@@ -469,22 +485,22 @@ test.describe('guia-metrica-estrofas', () => {
   });
 
   test('HALLAZGO [contenido/medio] · la guía enseña que la corrección por acento va solo en el último verso', async ({ page }) => {
-    // ABIERTO. ESPERADO la corrección se aplica a CADA verso por su última palabra (es lo que hace el
-    //          contador: ver el testigo de la redondilla, cuatro agudas y cuatro +1)
+    // REPARADO (hallazgo 4989). ESPERADO la corrección se aplica a CADA verso por su última palabra (es
+    //          lo que hace el contador: ver el testigo de la redondilla, cuatro agudas y cuatro +1)
     // OBTENIDO «la corrección se aplica al último verso de cada unidad, no solo al primero» y «Si el
     //          último verso termina en palabra aguda, suma 1»
-    test.fail();
     const guia = await textoGuia(page);
     expect.soft(guia, 'recuadro de confusiones').not.toContain('la corrección se aplica al último verso de cada unidad');
     expect.soft(guia, 'consejo del acento final').not.toContain('Si el último verso termina en palabra aguda');
+    expect(guia).toContain('se aplica a cada verso según su última palabra');
+    expect(guia).toContain('Cada verso se corrige por su última palabra');
   });
 
   test('HALLAZGO [contenido/bajo] · descripciones que contradicen a la propia app (heptasílabo «el más largo» de arte menor; pentasílabo en la lira)', async ({ page }) => {
-    // ABIERTO. ESPERADO arte menor = 2 a 8 sílabas (FAQ visible) → el más largo es el octosílabo; la
-    //          lira es 7a 11B 7a 7b 11B (ficha Lira): no lleva pentasílabos
+    // REPARADO (hallazgo 4993). ESPERADO arte menor = 2 a 8 sílabas (FAQ visible) → el más largo es el
+    //          octosílabo; la lira es 7a 11B 7a 7b 11B (ficha Lira): no lleva pentasílabos
     // OBTENIDO Heptasílabo: «El verso de arte menor más largo» · Pentasílabo: «especialmente en la
     //          lírica popular y en la lira»
-    test.fail();
     await page.getByRole('tab', { name: 'Tipos de verso' }).click();
     const panel = page.getByRole('tabpanel');
     await expect(panel).toContainText('Octosílabo');
@@ -507,22 +523,22 @@ test.describe('guia-metrica-estrofas', () => {
   });
 
   test('HALLAZGO [contenido/bajo] · el ejemplo de sinalefa subraya vocales que no se funden', async ({ page }) => {
-    // ABIERTO. ESPERADO subrayadas las cuatro que se funden: la «a» de «la», la «a» inicial y la final
-    //          de «alegría» y la «e» inicial de «eterna»
+    // REPARADO (hallazgo 4994). ESPERADO subrayadas las cuatro que se funden: la «a» de «la», la «a»
+    //          inicial y la final de «alegría» y la «e» inicial de «eterna»
     // OBTENIDO la <u>a</u>l<u>e</u>gría <u>e</u>t<u>e</u>rna: subraya la «e» de «-le-» y la de «-ter-»
     //          y deja sin subrayar la «a» de «la» y la final de «alegría»
-    test.fail();
     await expect(reglaCard(page, 'Sinalefa')).toContainText('la alegría eterna');
     const html = await reglaCard(page, 'Sinalefa').innerHTML();
     expect.soft(html, '«e» de «-le-»').not.toContain('l<u>e</u>gría');
     expect.soft(html, '«e» de «-ter-»').not.toContain('t<u>e</u>rna');
+    expect(html).toContain('l<u>a</u> <u>a</u>legrí<u>a</u> <u>e</u>terna');
   });
 
   test('HALLAZGO [contenido/medio] · el JSON-LD promete ejemplos de Machado y versos desde el tetrasílabo, que no están', async ({ page }) => {
-    // ABIERTO. ESPERADO cada característica, visible en la app
+    // REPARADO (hallazgo 4991). ESPERADO cada característica, visible en la app
     // OBTENIDO «Ejemplos de Garcilaso, Machado, Lorca, Bécquer, Quevedo y más» (ningún verso de Machado)
     //          y «Tipos de verso: del tetrasílabo al alejandrino» (la pestaña empieza en el pentasílabo)
-    test.fail();
+    // AHORA cada autor de la lista de ejemplos se busca en la página, y el verso con el que empieza.
     const app = (await jsonLd(page)).find((n) => n['@type'] === 'WebApplication');
     const features = ((app?.featureList ?? app?.features ?? []) as unknown[]).map(String);
     expect(features.length).toBeGreaterThanOrEqual(4);
@@ -548,13 +564,20 @@ test.describe('guia-metrica-estrofas', () => {
     }
     if (features.some((f) => f.includes('Machado'))) expect.soft(todo, 'Machado en la página').toContain('Machado');
     if (features.some((f) => /tetrasílabo/i.test(f))) expect.soft(todo, 'ficha del tetrasílabo').toMatch(/Tetrasílabo/);
+    const autores = features.find((f) => f.startsWith('Ejemplos de')) ?? '';
+    const nombres = autores.replace('Ejemplos de', '').split(/,| y /).map((s) => s.trim()).filter(Boolean);
+    expect(nombres.length).toBeGreaterThanOrEqual(4);
+    for (const n of nombres) expect.soft(todo, `ejemplo de ${n} en la página`).toContain(n);
+    const desde = features.find((f) => f.startsWith('Tipos de verso'))?.match(/del ([a-záéíóúñ]+)/i)?.[1] ?? '';
+    await page.getByRole('tab', { name: 'Tipos de verso' }).click();
+    const primera = (await page.locator('[class$="_tipoNombre"]').first().textContent()) ?? '';
+    expect(primera.toLowerCase(), 'la pestaña empieza donde dice el JSON-LD').toBe(desde.toLowerCase());
   });
 
   test('HALLAZGO [contenido/bajo] · el FAQPage pregunta por «el bachillerato» (Latam-friendly)', async ({ page }) => {
-    // ABIERTO. ESPERADO «educación secundaria / preparatoria» (CLAUDE.md §1.bis; la respuesta ya dice
-    //          «educación secundaria y preuniversitaria»)
+    // REPARADO (hallazgo 4995). ESPERADO «educación secundaria / preparatoria» (CLAUDE.md §1.bis; la
+    //          respuesta ya dice «educación secundaria y preuniversitaria»)
     // OBTENIDO «¿Qué estrofas españolas son más habituales en el bachillerato y los comentarios de texto?»
-    test.fail();
     const faq = (await jsonLd(page)).find((n) => n['@type'] === 'FAQPage');
     const preguntas = (faq?.mainEntity ?? []).map((q) => q.name);
     expect(preguntas.length).toBeGreaterThanOrEqual(5);

@@ -35,12 +35,12 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [
     'Contador interactivo de sílabas con detección de sinalefa',
-    'Tipos de verso: del tetrasílabo al alejandrino con ejemplos',
+    'Tipos de verso: del pentasílabo al alejandrino con ejemplos',
     'Rima consonante y asonante, esquemas visuales',
     'Estrofas: pareado, redondilla, cuarteto, décima, romance…',
     'Formas poéticas completas: soneto, romance, lira, haiku',
     'Reglas de métrica: sinalefa, hiato, acento y corrección silábica',
-    'Ejemplos de Garcilaso, Machado, Lorca, Bécquer, Quevedo y más',
+    'Ejemplos de Garcilaso, Lorca, Quevedo, Darío, Sor Juana y Calderón',
   ],
 });
 
@@ -77,12 +77,12 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre rima consonante y rima asonante?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En la rima consonante coinciden todos los sonidos a partir de la última vocal tónica: tanto las vocales como las consonantes. En la rima asonante solo coinciden las vocales a partir de la última tónica, ignorando las consonantes. Por ejemplo, "aurora/hora" es asonante (ambas terminan en o-a), mientras que "cielo/vuelo" es consonante (coinciden -elo). La rima asonante es característica del romance castellano y se considera de menor exigencia formal que la consonante.',
+        text: 'En la rima consonante coinciden todos los sonidos a partir de la última vocal tónica: tanto las vocales como las consonantes. En la rima asonante solo coinciden las vocales a partir de la última tónica, ignorando las consonantes. Por ejemplo, "ramas/montaña" es asonante (coinciden las vocales á-a, pero no las consonantes), mientras que "cielo/vuelo" es consonante (coinciden -elo). La rima asonante es característica del romance castellano y se considera de menor exigencia formal que la consonante.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Qué estrofas españolas son más habituales en el bachillerato y los comentarios de texto?',
+      name: '¿Qué estrofas españolas son más habituales en la educación secundaria y los comentarios de texto?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Las estrofas más estudiadas en educación secundaria y preuniversitaria son: el soneto (14 endecasílabos, esquema ABBA ABBA CDC DCD), el romance (serie indefinida de octosílabos con rima asonante en pares), la décima (10 octosílabos, esquema abbaaccddc) y la redondilla (4 octosílabos, rima abba). También aparecen la lira (combinación de heptasílabos y endecasílabos) y la silva. Identificar la estrofa es el primer paso de cualquier comentario de texto poético.',

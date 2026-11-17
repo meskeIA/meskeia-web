@@ -144,11 +144,11 @@ interface TipoVerso {
 }
 
 const TIPOS_VERSO: TipoVerso[] = [
-  { silabas: 5, nombre: 'Pentasílabo', arte: 'menor', descripcion: 'Poco frecuente solo; aparece en combinación con otros versos, especialmente en la lírica popular y en la lira.', ejemplo: { verso: 'Noche oscura', autor: 'San Juan de la Cruz', obra: 'Noche oscura del alma' } },
-  { silabas: 6, nombre: 'Hexasílabo', arte: 'menor', descripcion: 'Verso de cadencia ágil, muy usado en la lírica popular y en combinación con heptasílabos. Frecuente en Bécquer.', ejemplo: { verso: 'Olas gigantes', autor: 'Gustavo A. Bécquer', obra: 'Rima LII' } },
-  { silabas: 7, nombre: 'Heptasílabo', arte: 'menor', descripcion: 'El verso de arte menor más largo. Pieza clave de la lira (combinado con endecasílabos) y de la silva. Muy musical.', ejemplo: { verso: 'Si de mi baja lira', autor: 'Garcilaso de la Vega', obra: 'Canción V' } },
+  { silabas: 5, nombre: 'Pentasílabo', arte: 'menor', descripcion: 'Poco frecuente solo; aparece en combinación con otros versos, sobre todo en la lírica popular, y en los versos primero y tercero del haiku adaptado al español.', ejemplo: { verso: 'Un viejo estanque', autor: 'Matsuo Bashō', obra: 'El estanque (traducción)' } },
+  { silabas: 6, nombre: 'Hexasílabo', arte: 'menor', descripcion: 'Verso de cadencia ágil, muy usado en la lírica popular, en las serranillas medievales y en combinación con heptasílabos.', ejemplo: { verso: 'Moza tan fermosa', autor: 'Marqués de Santillana', obra: 'Serranilla de la Finojosa' } },
+  { silabas: 7, nombre: 'Heptasílabo', arte: 'menor', descripcion: 'Uno de los versos de arte menor más usados en la poesía culta. Pieza clave de la lira (combinado con endecasílabos) y de la silva. Muy musical.', ejemplo: { verso: 'Si de mi baja lira', autor: 'Garcilaso de la Vega', obra: 'Canción V' } },
   { silabas: 8, nombre: 'Octosílabo', arte: 'menor', descripcion: 'El verso rey de la poesía popular española. Base del romance, la redondilla y la décima. Ritmo natural del castellano.', ejemplo: { verso: 'Por las ramas del laurel', autor: 'Federico García Lorca', obra: 'Romance sonámbulo' } },
-  { silabas: 9, nombre: 'Eneasílabo', arte: 'mayor', descripcion: 'Verso relativamente infrecuente en la tradición clásica, más habitual en el Romanticismo y el Modernismo.', ejemplo: { verso: 'Del salón en el ángulo oscuro', autor: 'Gustavo A. Bécquer', obra: 'Rima VII' } },
+  { silabas: 9, nombre: 'Eneasílabo', arte: 'mayor', descripcion: 'Verso relativamente infrecuente en la tradición clásica, más habitual en el Romanticismo y el Modernismo.', ejemplo: { verso: 'Juventud, divino tesoro', autor: 'Rubén Darío', obra: 'Canción de otoño en primavera' } },
   { silabas: 10, nombre: 'Decasílabo', arte: 'mayor', descripcion: 'Aparece en la épica medieval y renace en el Modernismo. Se divide en dos hemistiquios de 4+6 o variantes.', ejemplo: { verso: 'Hemos perdido aun este crepúsculo', autor: 'Pablo Neruda', obra: 'Poema XX' } },
   { silabas: 11, nombre: 'Endecasílabo', arte: 'mayor', descripcion: 'El verso culto por excelencia del castellano. Base del soneto, la lira, la octava real y la silva. Introducido por Garcilaso en el siglo XVI desde Italia.', ejemplo: { verso: 'Yo no nací sino para quereros', autor: 'Garcilaso de la Vega', obra: 'Soneto V' } },
   { silabas: 14, nombre: 'Alejandrino', arte: 'mayor', descripcion: 'Verso de 14 sílabas dividido en dos hemistiquios de 7 (7+7). Protagonista del Modernismo hispanoamericano. Rubén Darío lo popularizó en castellano.', ejemplo: { verso: 'La princesa está triste… ¿qué tendrá la princesa?', autor: 'Rubén Darío', obra: 'Sonatina' } },
@@ -200,8 +200,8 @@ const ESTROFAS: Estrofa[] = [
     nombre: 'Serventesio',
     versos: 4,
     esquema: 'ABAB',
-    medida: 'Endecasílabos',
-    descripcion: 'Cuatro endecasílabos con rima alterna (encadenada). Más dinámico que el cuarteto; frecuente en el Romanticismo y el Modernismo.',
+    medida: 'Arte mayor',
+    descripcion: 'Cuatro versos de arte mayor con rima alterna (encadenada). El más habitual es el endecasílabo, pero también se escribe con otros versos de arte mayor, como los eneasílabos del ejemplo de Darío. Más dinámico que el cuarteto; frecuente en el Romanticismo y el Modernismo.',
     ejemplo: { lineas: ['Juventud, divino tesoro,', '¡ya te vas para no volver!', 'Cuando quiero llorar, no lloro...', 'y a veces lloro sin querer.'], autor: 'Rubén Darío', obra: 'Canción de otoño en primavera' },
   },
   {
@@ -254,7 +254,7 @@ const FORMAS: FormaPoética[] = [
     descripcion: 'Poema de tres versos con 5, 7 y 5 sílabas. Originario de Japón. En su adaptación al español se mantiene el recuento silábico fonético. Capta un instante concreto, generalmente de la naturaleza.',
     estructura: '5 sílabas · 7 sílabas · 5 sílabas',
     historia: 'Forma desarrollada por Matsuo Bashō en el siglo XVII. Introducida en la poesía en español por los modernistas a través de las traducciones. Hoy es una de las formas más practicadas en los talleres de escritura en lengua española.',
-    ejemplo: { lineas: ['Un viejo estanque,', 'salta una rana —el sonido', 'del agua oscura.'], titulo: 'El estanque (traducción)', autor: 'Matsuo Bashō' },
+    ejemplo: { lineas: ['Un viejo estanque,', 'salta una rana —ruido', 'del agua oscura.'], titulo: 'El estanque (traducción)', autor: 'Matsuo Bashō' },
   },
   {
     nombre: 'Octava Real',
@@ -383,7 +383,7 @@ export default function GuiaMetricaEstrofasPage() {
                   Cuando una palabra termina en vocal y la siguiente empieza por vocal (o <em>h</em> muda seguida de vocal), ambas vocales forman una sola sílaba en la pronunciación del verso.
                 </p>
                 <div className={styles.reglaEjemplo}>
-                  <span className={styles.reglaVerso}>&ldquo;la <u>a</u>l<u>e</u>gría <u>e</u>t<u>e</u>rna&rdquo;</span>
+                  <span className={styles.reglaVerso}>&ldquo;l<u>a</u> <u>a</u>legrí<u>a</u> <u>e</u>terna&rdquo;</span>
                   <span className={styles.reglaFlecha}>→ &ldquo;la_a-le-grí-a_e-ter-na&rdquo; — la unión se marca con _</span>
                 </div>
               </div>
@@ -407,14 +407,14 @@ export default function GuiaMetricaEstrofasPage() {
                 </ul>
                 <div className={styles.reglaEjemplo}>
                   <span className={styles.reglaVerso}>&ldquo;¡A las armas!&rdquo;</span>
-                  <span className={styles.reglaFlecha}>→ «armas» es llana: cómputo directo. 5 sílabas.</span>
+                  <span className={styles.reglaFlecha}>→ a-las-ar-mas: «armas» es llana, cómputo directo. 4 sílabas.</span>
                 </div>
               </div>
 
               <div className={styles.reglaCard}>
                 <h3 className={styles.reglaTitulo}>Diptongo y diéresis</h3>
                 <p className={styles.reglaDesc}>
-                  Normalmente dos vocales contiguas dentro de una misma palabra forman diptongo (una sola sílaba). Si el poeta necesita contarlas como dos sílabas separadas, usa la <strong>diéresis</strong> (ü en palabras como &ldquo;süave&rdquo;). Lo contrario es la <strong>sinéresis</strong>: contar como diptongo lo que no lo es normalmente.
+                  Dos vocales contiguas dentro de una misma palabra forman diptongo (una sola sílaba) cuando una de ellas es cerrada (<em>i</em>, <em>u</em>) y átona: &ldquo;cie-lo&rdquo;, &ldquo;cuer-po&rdquo;. Dos vocales abiertas (<em>a</em>, <em>e</em>, <em>o</em>) forman hiato: &ldquo;po-e-ma&rdquo;. Si el poeta necesita separar un diptongo en dos sílabas, usa la <strong>diéresis</strong> (ü en palabras como &ldquo;süave&rdquo;). Lo contrario es la <strong>sinéresis</strong>: contar como diptongo lo que no lo es normalmente.
                 </p>
               </div>
             </div>
@@ -462,9 +462,9 @@ export default function GuiaMetricaEstrofasPage() {
                 <h3 className={styles.rimaTipoTitulo}>Rima asonante</h3>
                 <p>Solo coinciden las vocales desde la última vocal tónica; las consonantes pueden ser distintas. Típica del romance.</p>
                 <div className={styles.rimaPar}>
-                  <span className={styles.rimaVerso}>&ldquo;Verde que te quiero verde&rdquo;</span>
                   <span className={styles.rimaVerso}>&ldquo;Verde viento. Verdes ramas&rdquo;</span>
-                  <span className={styles.rimaIndicador}>-e / -a (e-e / a-a → solo vocales tónicas)</span>
+                  <span className={styles.rimaVerso}>&ldquo;y el caballo en la montaña&rdquo;</span>
+                  <span className={styles.rimaIndicador}>rá-mas / ta-ña: á-a / á-a ✓ (asonante: mismas vocales desde la tónica)</span>
                 </div>
               </div>
             </div>
@@ -667,22 +667,22 @@ export default function GuiaMetricaEstrofasPage() {
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">👂</span>
             <strong>No confundir sílabas ortográficas con métricas</strong>
-            <p>«Poema» tiene 3 sílabas ortográficas (po-e-ma) pero puede tener 2 sílabas métricas si forma sinalefa con la palabra anterior.</p>
+            <p>«Poema» tiene 3 sílabas (po-e-ma), pero el poeta puede contarla como 2 (poe-ma) uniendo las dos vocales abiertas: es la sinéresis. La sinalefa, en cambio, solo une vocales de palabras distintas.</p>
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🔤</span>
             <strong>La h no cuenta</strong>
-            <p>La h muda no impide la sinalefa. «La hora» forma sinalefa: la-ho-ra = 3 sílabas, no 4. La h es muda para la métrica.</p>
+            <p>La h muda no impide la sinalefa. «La hora» forma sinalefa: la_ho-ra = 2 sílabas, no 3. La h es muda para la métrica.</p>
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">📍</span>
             <strong>El acento final siempre se aplica</strong>
-            <p>Si el último verso termina en palabra aguda, suma 1 aunque cuentes bien hasta ahí. Muchos errores en el recuento vienen de olvidar esta corrección.</p>
+            <p>Cada verso se corrige por su última palabra: si es aguda, suma 1; si es esdrújula, resta 1. Va verso a verso, no solo en el último del poema. Muchos errores en el recuento vienen de olvidar esta corrección.</p>
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🎶</span>
-            <strong>Los diptongos son la excepción, no la regla</strong>
-            <p>Dos vocales juntas dentro de una palabra suelen formar diptongo (una sílaba), pero un acento en la vocal débil lo rompe: «día» = dí-a (2 sílabas), no «dia» (1).</p>
+            <strong>Una tilde en la vocal cerrada rompe el diptongo</strong>
+            <p>Una vocal cerrada (i, u) junto a una abierta forma diptongo (una sílaba), pero si la cerrada lleva tilde lo rompe: «día» = dí-a (2 sílabas), no «dia» (1).</p>
           </div>
         </div>
 
@@ -694,7 +694,7 @@ export default function GuiaMetricaEstrofasPage() {
           <ul className={styles.warningList}>
             <li><span aria-hidden="true">❌</span> Confundir verso blanco con verso libre: el verso blanco tiene metro regular pero sin rima; el verso libre no tiene ni metro ni rima fijos.</li>
             <li><span aria-hidden="true">❌</span> Creer que la rima asonante es "rima mal hecha": es una rima deliberada con sus propias reglas, característica del romance y de mucha poesía popular latinoamericana.</li>
-            <li><span aria-hidden="true">❌</span> Aplicar la corrección de acento al primer verso y no al resto: la corrección se aplica al último verso de cada unidad, no solo al primero.</li>
+            <li><span aria-hidden="true">❌</span> Aplicar la corrección de acento solo a algunos versos: se aplica a cada verso según su última palabra (aguda +1, esdrújula −1), como los cuatro versos agudos de la redondilla de Sor Juana.</li>
             <li><span aria-hidden="true">❌</span> Confundir décima con cualquier poema de 10 versos: la décima o espinela tiene un esquema fijo (abbaaccddc) y una pausa obligatoria. No todo poema de 10 versos es una décima.</li>
             <li><span aria-hidden="true">❌</span> Olvidar que el haiku en español es una adaptación: el número de sílabas (5-7-5) es una convención del español, no una regla del haiku japonés original.</li>
           </ul>
