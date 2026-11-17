@@ -10,7 +10,8 @@ import { esperarPaginaAsentada } from './_hidratacion';
  * ──────────────────
  * · <h1> «Quiz de Métrica 🎵» · «Tipos de verso, estrofas, rima y sinalefa · ESO, Bachillerato y
  *   Selectividad». Tres niveles (Básico «10 preguntas esenciales», Intermedio «10 preguntas
- *   habituales», Avanzado «8 preguntas complejas») y un selector de 8 / 10 / 15 preguntas; el botón
+ *   habituales», Avanzado «8 preguntas complejas») y un selector de 5 / 8 / 10 preguntas (8 / 10 / 15 hasta el
+ *   hallazgo 3664; en Avanzado solo 5 / 8, lo que cabe en su banco); el botón
  *   dice «Empezar Quiz — N preguntas · nivel».
  * · Pantalla final: «N pts», título por tramo, «X de Y respuestas correctas», «X/Y», «Acierto» y
  *   tiempo; salidas «Jugar de nuevo» (misma configuración) y «Cambiar nivel».
@@ -91,7 +92,7 @@ const botonEmpezar = (page: Page): Locator => page.getByRole('button', { name: /
 const opciones = (page: Page): Locator => page.locator('button:has([class*="opcionLetra"])');
 const hud = async (page: Page): Promise<string[]> => (await page.locator('[class*="hudValor"]').allInnerTexts()).map(norm);
 
-async function configurar(page: Page, nivel: 'Básico' | 'Intermedio' | 'Avanzado', num: 8 | 10 | 15): Promise<void> {
+async function configurar(page: Page, nivel: 'Básico' | 'Intermedio' | 'Avanzado', num: 5 | 8 | 10): Promise<void> {
   const bNivel = page.getByRole('button', { name: new RegExp(nivel) }).first();
   await bNivel.click();
   await expect(bNivel).toHaveAttribute('aria-pressed', 'true');
@@ -404,7 +405,7 @@ test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
   test('hallazgo · el «Acierto» en vivo no pasa del 100 % (2 de 2 dan 100 %, no 200 %)', async ({ page }) => {
     // page.tsx:452 — `correctas / preguntaActual`: el numerador ya cuenta la pregunta contestada y el
     // denominador no. A mano: 1 de 1 → 100 %; 2 de 2 → 100 %. Medido: 0 % y 200 % (luego 150, 133…).
-    test.fail();
+    // REPARADO (hallazgo 3663): divide entre las contestadas.
     await abrir(page);
     await configurar(page, 'Básico', 10);
     await empezar(page);
@@ -417,29 +418,40 @@ test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
     expect([tras1, tras2], 'Acierto tras 1 de 1 y tras 2 de 2').toEqual([expect.stringMatching(pct), expect.stringMatching(pct)]);
   });
 
-  test('hallazgo · «15 preguntas» da 15 preguntas (y Avanzado con 10 da 10)', async ({ page }) => {
-    // page.tsx:252 y :266 — el selector ofrece 15 y el botón promete «Empezar Quiz — 15 preguntas»,
-    // pero `slice(0, min(num, pool))` con pools de 10/10/8 da 10 en Básico e Intermedio y 8 en
+  test('hallazgo · el número de preguntas que promete el botón es el que se juega (sin «15» que da 10 ni «10» que da 8)', async ({ page }) => {
+    // page.tsx:252 y :266 — el selector ofrecía 15 y el botón prometía «Empezar Quiz — 15 preguntas»,
+    // pero `slice(0, min(num, pool))` con pools de 10/10/8 daba 10 en Básico e Intermedio y 8 en
     // Avanzado (también con 10: la tarjeta de Avanzado dice «8 preguntas»). Medido: 1/10 y 1/8.
-    test.fail();
+    // REPARADO (hallazgo 3664) con OTRO esperado que el del acta («15 da 1/15»): con bancos de 10,
+    // 10 y 8 preguntas no caben 15 sin inventar preguntas. Lo que la app no puede hacer es prometer
+    // una cifra y jugar otra: ahora solo ofrece las que caben en el banco del nivel (5, 8 y 10; en
+    // Avanzado, 5 y 8) y el botón dice lo que se juega.
     await abrir(page);
-    await configurar(page, 'Básico', 15);
-    await expect(botonEmpezar(page)).toHaveText(/15 preguntas/);
-    await empezar(page);
-    const basico15 = (await hud(page))[0];
-    await page.goto(RUTA);
-    await esperarPaginaAsentada(page);
-    await configurar(page, 'Avanzado', 10);
+    const ofrecidas = async (): Promise<string[]> =>
+      (await page.getByRole('group', { name: 'Número de preguntas' }).getByRole('button').allInnerTexts()).map(norm);
+    expect(await ofrecidas()).toEqual(['5 preguntas', '8 preguntas', '10 preguntas']);
+    await configurar(page, 'Básico', 10);
     await expect(botonEmpezar(page)).toHaveText(/10 preguntas/);
     await empezar(page);
-    const avanzado10 = (await hud(page))[0];
-    expect([basico15, avanzado10]).toEqual(['1/15', '1/10']);
+    const basico10 = (await hud(page))[0];
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+    // Avanzado con el 10 que viene marcado por defecto: no se ofrece, se marca el 8 y se juegan 8.
+    const bAvanzado = page.getByRole('button', { name: /Avanzado/ }).first();
+    await bAvanzado.click();
+    await expect(bAvanzado).toHaveAttribute('aria-pressed', 'true');
+    expect(await ofrecidas()).toEqual(['5 preguntas', '8 preguntas']);
+    await expect(page.getByRole('button', { name: '8 preguntas', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(botonEmpezar(page)).toHaveText(/8 preguntas/);
+    await empezar(page);
+    const avanzado = (await hud(page))[0];
+    expect([basico10, avanzado]).toEqual(['1/10', '1/8']);
   });
 
   test('hallazgo · el porcentaje va separado con espacio duro («75 %»)', async ({ page }) => {
     // page.tsx:452 y :553 pegan el «%» (regla de formato del 25/09/2026, Ortografía RAE 2010).
     // A mano: Básico con 8, 6 bien → 6/8 = 0,75 → 60 + 0,05/0,2·40 = 70 pts, Acierto 75 %.
-    test.fail();
+    // REPARADO (hallazgo 3676), con el 3663, que reescribió la cifra en vivo.
     await abrir(page);
     await configurar(page, 'Básico', 8);
     await empezar(page);
@@ -574,28 +586,34 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
 
   test('hallazgo · rima asonante: «verde» y «ramas» no riman (é-e frente a á-a)', () => {
     // vér-de → e-e · rá-mas → a-a. En el Romance sonámbulo riman «ramas» / «montaña» (á-a).
-    test.fail();
-    expect(ficha(/coincide solo en las vocales/).explicacion).not.toMatch(/«verde» \/ «ramas» riman/);
+    // REPARADO (hallazgo 3667).
+    const e = ficha(/coincide solo en las vocales/).explicacion;
+    expect(e).not.toMatch(/«verde» \/ «ramas» riman/);
+    expect(e).toMatch(/«ramas» \/ «montaña» riman en asonante \(á-a\)/);
   });
 
   test('hallazgo · el heptasílabo no es «el verso de arte menor más largo»: lo es el octosílabo', () => {
     // La propia app (pregunta del arte del octosílabo): «El octosílabo es precisamente el límite
-    // superior del arte menor».
-    test.fail();
-    expect(ficha(/verso de 7 sílabas/).explicacion).not.toMatch(/arte menor más largo/);
+    // superior del arte menor». REPARADO (hallazgo 3668).
+    const e = ficha(/verso de 7 sílabas/).explicacion;
+    expect(e).not.toMatch(/arte menor más largo/);
+    expect(e).toMatch(/octosílabo, que marca el límite del arte menor/);
   });
 
   test('hallazgo · «Del salón en el ángulo oscuro» es decasílabo, no ejemplo de eneasílabo', () => {
     // Del / sa / lón / en / el / án / gu / lo os / cu / ro = 10 (llana). Bécquer, Rima VII.
-    test.fail();
-    expect(ficha(/sílabas tiene el eneasílabo/).explicacion).not.toMatch(/Del salón en el ángulo oscuro/);
+    // REPARADO (hallazgo 3665): «Juventud, divino tesoro» = Ju / ven / tud / di / vi / no / te / so / ro = 9.
+    const e = ficha(/sílabas tiene el eneasílabo/).explicacion;
+    expect(e).not.toMatch(/Del salón en el ángulo oscuro/);
+    expect(e).toMatch(/«Juventud, divino tesoro» \(Rubén Darío\)/);
   });
 
   test('hallazgo · serventesio «de 4 endecasílabos» ilustrado con «Canción de otoño en primavera», en eneasílabos', () => {
     // Ju / ven / tud / di / vi / no / te / so / ro = 9 · ya / te / vas / pa / ra / no / vol / ver = 8 + 1 = 9.
-    test.fail();
+    // REPARADO (hallazgo 3671): «4 versos de arte mayor, normalmente endecasílabos», y Darío en eneasílabos.
     const e = ficha(/esquema de rima tiene el serventesio/).explicacion;
     expect(/4 endecasílabos/.test(e) && /Canción de otoño en primavera/.test(e)).toBe(false);
+    expect(e).toMatch(/4 versos de arte mayor, normalmente endecasílabos/);
   });
 
   test('hallazgo · la ley del acento final vale para TODO verso, no para «el último verso»', () => {
@@ -619,11 +637,19 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
     //   «Del salón en el ángulo oscuro»  = 10 (fila Eneasílabo, 9)
     //   Sanos: «Si de mi baja lira» 7 · «Verde que te quiero verde» 8 · «Yo no nací sino para
     //   quereros» 11 · «La princesa está triste…» 7 + 7 = 14.
-    test.fail();
+    // REPARADO (hallazgo 3666, y la fila del eneasílabo con el 3665). Los ejemplos nuevos, a mano:
+    //   «Céfiro blando»           cé / fi / ro / blan / do = 5 (el adónico que cierra la estrofa
+    //                             sáfica de Villegas, «Al céfiro»)
+    //   «Hermana Marica»          Her / ma / na / Ma / ri / ca = 6 (Góngora, letrilla en hexasílabos)
+    //   «Juventud, divino tesoro» Ju / ven / tud / di / vi / no / te / so / ro = 9 (Darío)
+    // La tabla tiene que citar exactamente estos tres y que cada uno cuadre con su fila.
     const CUENTA: Record<string, number> = {
       'Noche oscura': 4,
       'Olas gigantes': 5,
       'Del salón en el ángulo oscuro': 10,
+      'Céfiro blando': 5,
+      'Hermana Marica': 6,
+      'Juventud, divino tesoro': 9,
       'Si de mi baja lira': 7,
       'Verde que te quiero verde': 8,
       'Yo no nací sino para quereros': 11,
@@ -641,14 +667,17 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
       if (verso === 'Pentasílabo' && /Lira/.test(uso)) fallos.push('Pentasílabo: uso «Lira»');
     }
     expect(fallos).toEqual([]);
+    const citas = filas.map((f) => (f[4].match(/«([^»]+)»/) ?? [])[1] ?? '');
+    expect(citas).toEqual(expect.arrayContaining(['Céfiro blando', 'Hermana Marica', 'Juventud, divino tesoro']));
   });
 
   test('hallazgo · «La hora» con sinalefa son 2 sílabas métricas, no 3', async ({ page }) => {
-    // la / ho / ra = 3 fonológicas; la sinalefa la + (h)o deja «lao / ra» = 2. La app: «(3 sílabas, 1 sinalefa), no 4».
-    test.fail();
+    // la / ho / ra = 3 fonológicas; la sinalefa la + (h)o deja «lao / ra» = 2. La app decía
+    // «(3 sílabas, 1 sinalefa), no 4». REPARADO (hallazgo 3669).
     await abrir(page);
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     await expect(page.locator('[class*="warningBox"]')).not.toContainText('3 sílabas, 1 sinalefa');
+    await expect(page.locator('[class*="warningBox"]')).toContainText('2 sílabas métricas gracias a la sinalefa');
   });
 
   test('hallazgo · FAQPage: la h y las mayúsculas de arte menor contradicen a la página', async ({ page }) => {
@@ -673,7 +702,9 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
     // features: «tipos de verso (pentasílabo al alejandrino)» — no hay pregunta sobre pentasílabo,
     // hexasílabo ni decasílabo (solo salen como distractores); «sinalefa, hiato y corrección por
     // acento» — el hiato solo es distractor.
-    test.fail();
+    // REPARADO (hallazgo 3670): el FAQPage y las features dicen lo que pregunta cada nivel. El hiato
+    // se mira solo en la PROMESA («Preguntas sobre …»): el FAQPage de la sinalefa lo nombra, con
+    // razón, al explicar cuándo no se produce, y eso no promete ninguna pregunta.
     await abrir(page);
     const ld = await page.evaluate(() =>
       [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '').join(' '),
@@ -683,8 +714,9 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
     const avanzadoMideUnVerso = BANCO.some((p) => p.nivel === 'avanzado' && /este verso|mide|cuenta las sílabas/i.test(p.enunciado));
     if (/cómputo silábico/.test(ld) && !avanzadoMideUnVerso) fallos.push('cómputo silábico en avanzado');
     if (/pentasílabo al alejandrino/.test(ld) && !preguntaSobre(/[Pp]entasílabo/)) fallos.push('pentasílabo');
-    if (/hiato/.test(ld) && !preguntaSobre(/[Hh]iato/)) fallos.push('hiato');
+    if (/Preguntas sobre[^"]*hiato/.test(ld) && !preguntaSobre(/[Hh]iato/)) fallos.push('hiato');
     expect(fallos).toEqual([]);
+    expect(ld).toContain('Preguntas sobre sinalefa, sinéresis, diéresis y corrección por acento final');
   });
 });
 
@@ -1181,7 +1213,8 @@ test.describe('Inspector 29/10/2026 (tarde) · FAQPage', () => {
    * avanzado y el «cómputo silábico») es el 3670, abierto.
    */
   test('hallazgo · el FAQPage no dice que el intermedio «introduce» las estrofas y los esquemas de rima que Básico ya pregunta', async ({ page }) => {
-    test.fail();
+    // REPARADO (hallazgo 3812, junto con el 3670): la respuesta reparte los temas como los reparte
+    // el banco (Básico: soneto, redondilla, romance y rima asonante).
     await page.goto(RUTA);
     const bloques = await page.evaluate(() =>
       [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? ''),
@@ -1199,5 +1232,6 @@ test.describe('Inspector 29/10/2026 (tarde) · FAQPage', () => {
       choques.push('«introduce … esquemas de rima», y Básico ya pregunta el esquema abba de la redondilla');
     }
     expect(choques).toEqual([]); // medido: los dos
+    expect(respuesta).toMatch(/El nivel básico pregunta por[^;]*soneto, redondilla, romance/);
   });
 });

@@ -34,10 +34,10 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/quiz-metrica-estrofas/',
   category: 'EducationalApplication',
   features: [
-    'Tres niveles: básico, intermedio y avanzado',
-    'Preguntas sobre tipos de verso (pentasílabo al alejandrino)',
-    'Identificación de estrofas clásicas: soneto, décima, romance, redondilla',
-    'Preguntas sobre sinalefa, hiato y corrección por acento',
+    'Tres niveles: básico, intermedio y avanzado, cada uno con su banco de preguntas',
+    'Preguntas sobre tipos de verso, del heptasílabo al alejandrino, y su arte mayor o menor',
+    'Identificación de estrofas clásicas: soneto, décima, romance, redondilla, lira, octava real y silva',
+    'Preguntas sobre sinalefa, sinéresis, diéresis y corrección por acento final',
     'Esquemas de rima consonante y asonante',
     'Feedback educativo detallado en cada respuesta',
     'Puntuación, tiempo y estadísticas de acierto',
@@ -85,7 +85,7 @@ export const faqJsonLd = {
       name: '¿Para qué nivel educativo está pensado este quiz de métrica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El quiz cubre los contenidos de métrica española de 3.º y 4.º de la ESO, Bachillerato y pruebas de acceso universitario. El nivel básico trabaja los versos más comunes (octosílabo, endecasílabo) y la sinalefa; el intermedio introduce estrofas clásicas y esquemas de rima; el avanzado profundiza en formas métricas menos habituales y casos especiales de cómputo silábico. También sirve para repasar antes de exámenes de lengua y literatura.',
+        text: 'El quiz cubre los contenidos de métrica española de 3.º y 4.º de la ESO, Bachillerato y pruebas de acceso universitario. El nivel básico pregunta por los versos más comunes (octosílabo, endecasílabo, alejandrino), la sinalefa, la rima asonante y las estrofas más conocidas (soneto, redondilla, romance); el intermedio añade la corrección por acento final, la sinéresis y estrofas como el cuarteto, el serventesio y la décima; el avanzado pregunta por formas menos habituales (lira, octava real, silva, haiku), esquemas exactos y distinciones finas como la diéresis o el verso blanco frente al verso libre. También sirve para repasar antes de exámenes de lengua y literatura.',
       },
     },
   ],

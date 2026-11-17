@@ -71,7 +71,7 @@ const PREGUNTAS: PreguntaMetrica[] = [
     enunciado: '¿Qué tipo de rima coincide solo en las vocales desde la última vocal tónica?',
     opciones: ['Asonante', 'Consonante', 'Blanca', 'Libre'],
     correcta: 'Asonante',
-    explicacion: 'La rima asonante coincide únicamente en las vocales desde la última vocal tónica; las consonantes pueden ser distintas. Es la rima del romance: «verde» / «ramas» riman en asonante (e-a / a-a).',
+    explicacion: 'La rima asonante coincide únicamente en las vocales desde la última vocal tónica; las consonantes pueden ser distintas. Es la rima del romance: en el Romance sonámbulo de Lorca, «ramas» / «montaña» riman en asonante (á-a).',
   },
   {
     nivel: 'basico', categoria: 'estrofa',
@@ -136,14 +136,14 @@ const PREGUNTAS: PreguntaMetrica[] = [
     enunciado: '¿Qué esquema de rima tiene el serventesio?',
     opciones: ['ABAB', 'ABBA', 'AABB', 'ABCD'],
     correcta: 'ABAB',
-    explicacion: 'El serventesio son 4 endecasílabos con rima alterna ABAB. Más dinámico que el cuarteto, es frecuente en el Romanticismo y el Modernismo. Rubén Darío lo usa en «Canción de otoño en primavera».',
+    explicacion: 'El serventesio son 4 versos de arte mayor, normalmente endecasílabos, con rima alterna ABAB. Más dinámico que el cuarteto, es frecuente en el Romanticismo y el Modernismo. Rubén Darío lo escribe en eneasílabos en «Canción de otoño en primavera».',
   },
   {
     nivel: 'intermedio', categoria: 'verso',
     enunciado: '¿Cómo se llama el verso de 7 sílabas?',
     opciones: ['Heptasílabo', 'Hexasílabo', 'Octosílabo', 'Eneasílabo'],
     correcta: 'Heptasílabo',
-    explicacion: 'El heptasílabo (7 sílabas) es el verso de arte menor más largo. Es pieza clave de la lira (combinado con endecasílabos) y de la silva. Muy musical: «Si de mi baja lira» (Garcilaso).',
+    explicacion: 'El heptasílabo (7 sílabas) es un verso de arte menor, solo una sílaba por debajo del octosílabo, que marca el límite del arte menor. Es pieza clave de la lira (combinado con endecasílabos) y de la silva. Muy musical: «Si de mi baja lira» (Garcilaso).',
   },
   {
     nivel: 'intermedio', categoria: 'estrofa',
@@ -164,7 +164,7 @@ const PREGUNTAS: PreguntaMetrica[] = [
     enunciado: '¿Cuántas sílabas tiene el eneasílabo?',
     opciones: ['9', '8', '10', '11'],
     correcta: '9',
-    explicacion: 'El eneasílabo (9 sílabas) es un verso de arte mayor relativamente infrecuente en la tradición clásica, pero más habitual en el Romanticismo y el Modernismo. «Del salón en el ángulo oscuro» (Bécquer).',
+    explicacion: 'El eneasílabo (9 sílabas) es un verso de arte mayor relativamente infrecuente en la tradición clásica, pero más habitual en el Romanticismo y el Modernismo. «Juventud, divino tesoro» (Rubén Darío).',
   },
 
   // ── AVANZADO ──
@@ -253,7 +253,21 @@ const CATEGORIA_LABEL: Record<PreguntaMetrica['categoria'], string> = {
   regla:   '✍️ Regla métrica',
 };
 
-const OPCIONES_PREGUNTAS = [8, 10, 15];
+// Hallazgo 3664: se ofrecían 8, 10 y 15 con bancos de 10, 10 y 8 preguntas, así que «15» daba 10
+// y en Avanzado «10» daba 8, con el botón prometiendo otra cifra. Ahora solo se ofrecen las que
+// caben en el banco del nivel, y lo que se pinta es lo que se juega.
+const OPCIONES_PREGUNTAS = [5, 8, 10];
+const TAMANO_BANCO: Record<Nivel, number> = {
+  basico: PREGUNTAS.filter(p => p.nivel === 'basico').length,
+  intermedio: PREGUNTAS.filter(p => p.nivel === 'intermedio').length,
+  avanzado: PREGUNTAS.filter(p => p.nivel === 'avanzado').length,
+};
+const opcionesDeNivel = (n: Nivel): number[] => OPCIONES_PREGUNTAS.filter(x => x <= TAMANO_BANCO[n]);
+/** El número que se juega: el elegido, o el mayor que quepa en el banco del nivel. */
+const numeroEfectivo = (n: Nivel, elegido: number): number => {
+  const caben = opcionesDeNivel(n);
+  return caben.includes(elegido) ? elegido : caben[caben.length - 1];
+};
 const LETRAS = ['A', 'B', 'C', 'D'];
 
 function mezclar<T>(arr: T[]): T[] {
@@ -299,8 +313,12 @@ export default function QuizMetricaEstrofasPage() {
   const [tiempoInicio, setTiempoInicio] = useState(0);
   const [tiempoTotal, setTiempoTotal] = useState(0);
 
+  const numJugar = numeroEfectivo(nivel, numPreguntas);
   const pregunta = preguntas[preguntaActual];
   const totalPreguntas = preguntas.length;
+  // Hallazgo 3663: el acierto en vivo se divide entre las CONTESTADAS. `correctas` ya cuenta la
+  // pregunta recién respondida, así que el denominador también tiene que contarla.
+  const contestadas = preguntaActual + (seleccionada !== null ? 1 : 0);
   const esUltima = preguntaActual === totalPreguntas - 1;
 
   // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
@@ -310,13 +328,13 @@ export default function QuizMetricaEstrofasPage() {
 
   const iniciarQuiz = useCallback(() => {
     marcarCambioPantalla();
-    setPreguntas(generarPreguntas(nivel, numPreguntas));
+    setPreguntas(generarPreguntas(nivel, numJugar));
     setPreguntaActual(0);
     setSeleccionada(null);
     setCorrectas(0);
     setTiempoInicio(Date.now());
     setPantalla('quiz');
-  }, [nivel, numPreguntas, marcarCambioPantalla]);
+  }, [nivel, numJugar, marcarCambioPantalla]);
 
   const responder = useCallback((opcion: string) => {
     if (seleccionada !== null) return;
@@ -413,13 +431,13 @@ export default function QuizMetricaEstrofasPage() {
 
           <h3 className={styles.configSubtitle}>Número de preguntas</h3>
           <div className={styles.preguntasRow} role="group" aria-label="Número de preguntas">
-            {OPCIONES_PREGUNTAS.map(n => (
+            {opcionesDeNivel(nivel).map(n => (
               <button
                 type="button"
                 key={n}
-                className={`${styles.pregBtn} ${numPreguntas === n ? styles.active : ''}`}
+                className={`${styles.pregBtn} ${numJugar === n ? styles.active : ''}`}
                 onClick={() => setNumPreguntas(n)}
-                aria-pressed={numPreguntas === n}
+                aria-pressed={numJugar === n}
               >
                 {n} preguntas
               </button>
@@ -427,7 +445,7 @@ export default function QuizMetricaEstrofasPage() {
           </div>
 
           <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
-            Empezar Quiz — {numPreguntas} preguntas · {NIVEL_CONFIG[nivel].label}
+            Empezar Quiz — {numJugar} preguntas · {NIVEL_CONFIG[nivel].label}
           </button>
 
           <div className={styles.temasCubiertos}>
@@ -456,7 +474,7 @@ export default function QuizMetricaEstrofasPage() {
             </div>
             <div className={styles.hudItem}>
               <span className={styles.hudValor}>
-                {preguntaActual > 0 ? Math.round((correctas / preguntaActual) * 100) : 0}%
+                {contestadas > 0 ? Math.round((correctas / contestadas) * 100) : 0}{' '}%
               </span>
               <span className={styles.hudLabel}>Acierto</span>
             </div>
@@ -566,7 +584,7 @@ export default function QuizMetricaEstrofasPage() {
               <p className={styles.statRLabel}>Correctas</p>
             </div>
             <div className={styles.statR}>
-              <span className={styles.statRValor}>{Math.round((correctas / totalPreguntas) * 100)}%</span>
+              <span className={styles.statRValor}>{Math.round((correctas / totalPreguntas) * 100)}{' '}%</span>
               <p className={styles.statRLabel}>Acierto</p>
             </div>
             <div className={styles.statR}>
@@ -602,11 +620,11 @@ export default function QuizMetricaEstrofasPage() {
               </tr>
             </thead>
             <tbody>
-              <tr><td><strong>Pentasílabo</strong></td><td>5</td><td>Menor</td><td>Lira (combinado)</td><td><em>«Noche oscura»</em> — San Juan</td></tr>
-              <tr><td><strong>Hexasílabo</strong></td><td>6</td><td>Menor</td><td>Lírica popular</td><td><em>«Olas gigantes»</em> — Bécquer</td></tr>
+              <tr><td><strong>Pentasílabo</strong></td><td>5</td><td>Menor</td><td>Adónico de la estrofa sáfica</td><td><em>«Céfiro blando»</em> — Villegas</td></tr>
+              <tr><td><strong>Hexasílabo</strong></td><td>6</td><td>Menor</td><td>Lírica popular</td><td><em>«Hermana Marica»</em> — Góngora</td></tr>
               <tr><td><strong>Heptasílabo</strong></td><td>7</td><td>Menor</td><td>Lira, silva</td><td><em>«Si de mi baja lira»</em> — Garcilaso</td></tr>
               <tr><td><strong>Octosílabo</strong></td><td>8</td><td>Menor</td><td>Romance, redondilla</td><td><em>«Verde que te quiero verde»</em> — Lorca</td></tr>
-              <tr><td><strong>Eneasílabo</strong></td><td>9</td><td>Mayor</td><td>Romanticismo</td><td><em>«Del salón en el ángulo oscuro»</em> — Bécquer</td></tr>
+              <tr><td><strong>Eneasílabo</strong></td><td>9</td><td>Mayor</td><td>Romanticismo</td><td><em>«Juventud, divino tesoro»</em> — Darío</td></tr>
               <tr><td><strong>Decasílabo</strong></td><td>10</td><td>Mayor</td><td>Épica, Modernismo</td><td><em>«Hemos perdido aun este crepúsculo»</em> — Neruda</td></tr>
               <tr><td><strong>Endecasílabo</strong></td><td>11</td><td>Mayor</td><td>Soneto, lira, octava real</td><td><em>«Yo no nací sino para quereros»</em> — Garcilaso</td></tr>
               <tr><td><strong>Alejandrino</strong></td><td>14</td><td>Mayor</td><td>Modernismo</td><td><em>«La princesa está triste…»</em> — Darío</td></tr>
@@ -726,7 +744,7 @@ export default function QuizMetricaEstrofasPage() {
           <ul className={styles.warningList}>
             <li><span aria-hidden="true">❌</span> Confundir verso blanco con verso libre: el verso blanco tiene metro regular; el verso libre no tiene ni metro ni rima fijos.</li>
             <li><span aria-hidden="true">❌</span> Olvidar la corrección por acento final: identificar si la última palabra es aguda, llana o esdrújula es el paso previo al recuento, no el posterior.</li>
-            <li><span aria-hidden="true">❌</span> No aplicar la sinalefa cuando hay «h»: la h muda no impide la sinalefa. «La hora» = la-ho-ra (3 sílabas, 1 sinalefa), no 4.</li>
+            <li><span aria-hidden="true">❌</span> No aplicar la sinalefa cuando hay «h»: la h muda no impide la sinalefa. «La hora» se cuenta «lao-ra»: 2 sílabas métricas gracias a la sinalefa, no las 3 de la-ho-ra.</li>
             <li><span aria-hidden="true">❌</span> Llamar décima a cualquier poema de 10 versos: la espinela tiene un esquema fijo (abbaaccddc) y una pausa obligatoria tras el cuarto verso.</li>
             <li><span aria-hidden="true">❌</span> Confundir sinéresis con sinalefa: la sinalefa une vocales entre palabras distintas; la sinéresis une vocales dentro de una misma palabra.</li>
           </ul>
