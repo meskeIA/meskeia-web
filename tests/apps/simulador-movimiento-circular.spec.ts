@@ -2602,7 +2602,11 @@ test.describe('Inspector 17/11/2026 — modo cambio: leerRespuestaAula, redondea
     await irAlCaso(page, 5); // 1,5707963
     expect(await responderAula(page, '1.580')).toContain('No es correcto. Te has desviado 0,01 de la respuesta.');
     await irAlCaso(page, 7); // 9,4247780
-    expect(await responderAula(page, '-9.425')).toContain('Te has desviado 9434,42 de la respuesta.'); // 9425 + 3π
+    // Desde el hallazgo 4933 (17/11/2026) la lectura decimal se mide en valor absoluto: «-9.425» es
+    // la respuesta con el signo cambiado y se lee −9,425, como «-9,425»: se desvía 9,425 + 3π = 18,85.
+    // Antes se leía −9425 y enseñaba «9434,42», la desviación de un número que nadie escribió.
+    expect(await responderAula(page, '-9.425')).toContain('Te has desviado 18,85 de la respuesta.');
+    expect(await responderAula(page, '-9,425')).toContain('Te has desviado 18,85 de la respuesta.');
     await irAlCaso(page, 6); // f = 6/60 = 0,1 Hz, exacto
     expect(await responderAula(page, '1.000')).toContain('Te has desviado 999,9 de la respuesta.'); // 1000 − 0,1
   });
@@ -2656,19 +2660,20 @@ test.describe('Inspector 17/11/2026 — modo cambio: leerRespuestaAula, redondea
     }
   });
 
-  /* ── Hallazgo del 17/11/2026 (accesibilidad, bajo), ABIERTO ──────────────────────────────── */
+  /* ── Hallazgo 4932 del 17/11/2026 (accesibilidad, bajo), REPARADO el mismo día: los rótulos se
+     pintan al final del fotograma y a 24 px como mínimo del centro de la partícula; «a_t», hacia
+     fuera de la circunferencia. ─────────────────────────────────────────────────────────────── */
 
   test(
-    'ABIERTO (accesibilidad, bajo) — en MCNU con r = 2 m la partícula tapa el rótulo «a_t» en parte de la vuelta',
+    'REPARADO (hallazgo 4932, accesibilidad, bajo) — en MCNU con r = 2 m la partícula tapaba el rótulo «a_t» en parte de la vuelta',
     async ({ page }) => {
-      // ABIERTO (17/11/2026). «a_t» se pinta en (punta + 4, punta + 14) y la partícula (radio 8 px
+      // Antes (17/11/2026): «a_t» se pintaba en (punta + 4, punta + 14) y la partícula (radio 8 px
       // y 2 de trazo) se pinta DESPUÉS. Con r = 2 m la flecha a_t mide α·r·18 = 0,5·2·18 = 18 px,
       // así que cuando la partícula está en el cuadrante de arriba a la derecha (la tangente
       // apunta arriba a la izquierda) la caja del rótulo cae encima del disco. Medido a 1280 px:
       // en 71 de 379 fotogramas (19 %) más de la mitad de la tinta de «a_t» queda tapada, con un
       // máximo del 97 % (rótulo invisible). r = 2 m es el radio de inicio. El testigo de
       // contraste no lo ve porque mide el fondo en el instante de pintar el texto.
-      test.fail();
       test.setTimeout(30_000);
       await page.addInitScript(espiarRotulos);
       await page.goto(RUTA);
@@ -2687,16 +2692,15 @@ test.describe('Inspector 17/11/2026 — modo cambio: leerRespuestaAula, redondea
   );
 
   test(
-    'ABIERTO (accesibilidad, bajo) — en MCNU desde el reposo con r = 5 m la flecha a_t tapa el rótulo «v»',
+    'REPARADO (hallazgo 4932, accesibilidad, bajo) — en MCNU desde el reposo con r = 5 m la flecha a_t tapaba el rótulo «v»',
     async ({ page }) => {
-      // ABIERTO (17/11/2026), mismo hallazgo: desde a35c7dd2 «v» va 12 px más allá de la punta de
+      // Antes (17/11/2026), mismo hallazgo: desde a35c7dd2 «v» va 12 px más allá de la punta de
       // su flecha, SOBRE la tangente, que es justo por donde va la flecha a_t, pintada después.
       // Mientras v·18 + 12 < α·r·18 (con r = 5: ω < 0,37 rad/s, los primeros 0,73 s de cada ciclo
       // MCNU que arranca en ω₀ = 0) la flecha roja cruza el rótulo en TODOS los ángulos; antes,
       // con el rótulo a (+4, −4) de la punta, solo en los que la tangente apuntaba arriba a la
       // derecha. Medido a 1280 px: 20 de 88 fotogramas del primer 1,5 s con más de la mitad de
       // «v» tapada, máximo 97 %.
-      test.fail();
       test.setTimeout(30_000);
       await page.addInitScript(espiarRotulos);
       await page.goto(RUTA);

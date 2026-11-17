@@ -217,6 +217,13 @@ export default function SimuladorMovimientoCircularPage() {
       ctx.textAlign = 'center';
       ctx.fillText('r', midRx + 8, midRy - 6);
 
+      // Hallazgo 4932 (17/11/2026): los rótulos se pintaban antes que la partícula y que la flecha
+      // a_t, que los tapaban (hasta el 97 % de «a_t» con r = 2 m, y «v» bajo la flecha roja al
+      // arrancar el MCNU). Ahora se guardan y se pintan al final, y a una distancia mínima del
+      // centro de la partícula para que debajo quede el fondo del lienzo y no el disco.
+      const rotulos: Array<() => void> = [];
+      const DISTANCIA_MIN_ROTULO = 24; // px desde el centro de la partícula (disco de 8 + 2 de trazo)
+
       // Vector velocidad tangencial (perpendicular al radio, sentido antihorario = convención positiva)
       if (omegaActual > 0.01) {
         const velScale = 18; // px por unidad de v
@@ -231,12 +238,15 @@ export default function SimuladorMovimientoCircularPage() {
 
         // Más allá de la punta, en la dirección de la flecha: a 4 px arriba a la derecha, la
         // punta caía encima del rótulo en la mitad de los ángulos
-        ctx.fillStyle = velTexto;
-        ctx.font = `bold ${Math.round(w * 0.028)}px system-ui`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('v', vx2 + tx * 12, vy2 - ty * 12);
-        ctx.textBaseline = 'alphabetic';
+        const dV = Math.max(vLen + 12, DISTANCIA_MIN_ROTULO);
+        rotulos.push(() => {
+          ctx.fillStyle = velTexto;
+          ctx.font = `bold ${Math.round(w * 0.028)}px system-ui`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('v', px + tx * dV, py - ty * dV);
+          ctx.textBaseline = 'alphabetic';
+        });
       }
 
       // Vector aceleración centrípeta (apuntando hacia el centro)
@@ -252,12 +262,15 @@ export default function SimuladorMovimientoCircularPage() {
         const acy2 = py + (dy / dNorm) * acLen;
         drawArrow(ctx, px, py, acx2, acy2, acColor, 2);
 
-        ctx.fillStyle = acTexto;
-        ctx.font = `bold ${Math.round(w * 0.028)}px system-ui`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('a_c', acx2 + (dx / dNorm) * 16, acy2 + (dy / dNorm) * 16);
-        ctx.textBaseline = 'alphabetic';
+        const dAc = Math.max(acLen + 16, DISTANCIA_MIN_ROTULO);
+        rotulos.push(() => {
+          ctx.fillStyle = acTexto;
+          ctx.font = `bold ${Math.round(w * 0.028)}px system-ui`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('a_c', px + (dx / dNorm) * dAc, py + (dy / dNorm) * dAc);
+          ctx.textBaseline = 'alphabetic';
+        });
       }
 
       // Vector aceleración tangencial (misma dirección que v, magnitud α·r constante).
@@ -273,10 +286,18 @@ export default function SimuladorMovimientoCircularPage() {
         const aty2 = py + atLen * (-ty);
         drawArrow(ctx, px, py, atx2, aty2, atColor, 2);
 
-        ctx.fillStyle = atTexto;
-        ctx.font = `bold ${Math.round(w * 0.028)}px system-ui`;
-        ctx.textAlign = 'left';
-        ctx.fillText('a_t', atx2 + 4, aty2 + 14);
+        // Junto a su punta pero hacia FUERA de la circunferencia: sobre la tangente iría encima de la
+        // flecha v, que lleva la misma dirección, y su rótulo.
+        const fueraX = Math.cos(theta);
+        const fueraY = -Math.sin(theta);
+        rotulos.push(() => {
+          ctx.fillStyle = atTexto;
+          ctx.font = `bold ${Math.round(w * 0.028)}px system-ui`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('a_t', atx2 + fueraX * DISTANCIA_MIN_ROTULO, aty2 + fueraY * DISTANCIA_MIN_ROTULO);
+          ctx.textBaseline = 'alphabetic';
+        });
       }
 
       // Punto/partícula
@@ -293,6 +314,9 @@ export default function SimuladorMovimientoCircularPage() {
       ctx.beginPath();
       ctx.arc(cx, cy, 3, 0, 2 * Math.PI);
       ctx.fill();
+
+      // Los rótulos de las flechas, encima de todo (hallazgo 4932)
+      for (const pintar of rotulos) pintar();
     },
     [radio, modo],
   );
