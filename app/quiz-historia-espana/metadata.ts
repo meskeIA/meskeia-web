@@ -74,7 +74,7 @@ export const faqJsonLd = {
       name: '¿Para qué exámenes o asignaturas sirve este quiz?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es especialmente útil para preparar la asignatura de Historia de España de 2.º de Bachillerato y el examen de Selectividad (EBAU/EvAU), que incluye obligatoriamente Historia de España. También sirve para estudiantes hispanoamericanos de preparatoria, secundaria o que preparan un examen de admisión universitaria con contenidos de historia de España, para oposiciones que incluyen cultura general española, y para cualquier persona interesada en conocer la historia del país.',
+        text: 'Es especialmente útil para preparar la asignatura de Historia de España de 2.º de Bachillerato y la prueba de acceso a la universidad (PAU), donde desde 2025 Historia de España es uno de los dos ejercicios a elegir, junto con Historia de la Filosofía (Real Decreto 534/2024). También sirve para estudiantes hispanoamericanos de preparatoria, secundaria o que preparan un examen de admisión universitaria con contenidos de historia de España, para oposiciones que incluyen cultura general española, y para cualquier persona interesada en conocer la historia del país.',
       },
     },
     {

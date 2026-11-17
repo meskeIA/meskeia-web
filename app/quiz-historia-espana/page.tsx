@@ -492,7 +492,7 @@ export default function QuizHistoriaEspanaPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">🎓</span>
               <h3>Selectividad y exámenes de admisión</h3>
-              <p>Historia de España es materia troncal en 2º de Bachillerato y en la EvAU/ABAU. También es útil para estudiantes de preparatoria o secundaria en Hispanoamérica que repasan historia de España de cara a un examen de admisión universitaria. Los temas de este quiz son los más habituales en los exámenes.</p>
+              <p>Historia de España es materia común en 2.º de Bachillerato y, desde las pruebas de 2025, en la prueba de acceso a la universidad es uno de los dos ejercicios a elegir, junto con Historia de la Filosofía (Real Decreto 534/2024). También es útil para estudiantes de preparatoria o secundaria en Hispanoamérica que repasan historia de España de cara a un examen de admisión universitaria. Los temas de este quiz son los más habituales en los exámenes.</p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">🌍</span>

@@ -904,8 +904,8 @@ test.describe('Inspector 28/10/2026 · contenido (hallazgos abiertos)', () => {
   });
 
   test('hallazgo · Selectividad: Historia de España ya no es obligatoria en la PAU', async ({ page }) => {
-    test.fail(); // falla por la aserción del defecto mientras siga abierto
-    // ABIERTO.Real Decreto 534/2024 (BOE-A-2024-11858), art. 12.1.b): «Historia de España o
+    // REPARADO (hallazgo 3745): las dos la dan como uno de los dos ejercicios a elegir.
+    // Real Decreto 534/2024 (BOE-A-2024-11858), art. 12.1.b): «Historia de España o
     // Historia de la Filosofía, a elección del alumnado», aplicable a las pruebas desde el curso
     // 2024-2025 (disposición final cuarta). La FAQPage dice «que incluye obligatoriamente Historia de
     // España» y la guía visible, «materia troncal en 2º de Bachillerato y en la EvAU/ABAU».
@@ -917,6 +917,8 @@ test.describe('Inspector 28/10/2026 · contenido (hallazgos abiertos)', () => {
     if (/incluye obligatoriamente Historia de España/.test(ld)) fallos.push('FAQPage: «incluye obligatoriamente Historia de España»');
     if (/troncal en 2º de Bachillerato y en la EvAU/.test(texto)) fallos.push('guía: «troncal … en la EvAU/ABAU»');
     expect(fallos).toEqual([]);
+    expect(ld).toContain('uno de los dos ejercicios a elegir, junto con Historia de la Filosofía');
+    expect(texto).toContain('uno de los dos ejercicios a elegir, junto con Historia de la Filosofía');
   });
 
   test('hallazgo · el JSON-LD declara qué hace la app (features con 4 o más)', async ({ page }) => {
