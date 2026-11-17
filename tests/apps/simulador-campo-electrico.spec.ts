@@ -7,6 +7,9 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValorAcotado } from './
  * Primera inspección 24/08/2026 · SEGUNDA inspección 24/08/2026 (tras la reparación) ·
  * TERCERA 28/09/2026 (re-inspección tras el motor aparte, las equipotenciales que usan su
  * potencial y la regla móvil del hero): bloque «Inspector 28/09/2026», al final del fichero.
+ * Después, 16/10, 18/10 y SEXTA 17/11/2026 (modo cambio: la lectura de la respuesta de aula con
+ * leerRespuestaAula, el redondeo de la clave con redondearA y el color del ✗): bloque
+ * «Inspector 17/11/2026», el último.
  *
  * El <h1> promete «Simulador de Campo Eléctrico» y el subtítulo «Coloca cargas, observa
  * líneas de campo y mide fuerza sobre una carga de prueba». La metadata añade «Calcula E, V,
@@ -814,7 +817,8 @@ import {
   generarEjercicioAleatorio,
 } from '../../app/simulador-campo-electrico/casos';
 import { calcularCampoEnPunto, modulo } from '../../app/simulador-campo-electrico/motor';
-import { redondearA } from '../../lib/calculadoras/correctorCasosAula';
+import { leerRespuestaAula, redondearA } from '../../lib/calculadoras/correctorCasosAula';
+import { formatNumber } from '../../lib/formatters';
 import {
   alCentimetro,
   leerCoordenada,
@@ -2327,4 +2331,233 @@ test.describe('Inspector 18/10/2026 — cuadrupolo, extremos de los controles, c
       });
     });
   }
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR 17/11/2026 — SEXTA PASADA (modo cambio, desde 770d521e, la validación del 18/10)
+ *
+ * Qué cambió:
+ *   · 03ec4600 (casos.ts) — `redondear` es ahora `redondearA` del motor compartido: los empates
+ *     van LEJOS de cero y se limpia el ruido binario antes de redondear (cabo C0126). Con
+ *     Math.round a secas un −58,435 exacto quedaba en −58,43 mientras el panel escribía −58,44.
+ *   · cd6270a9 + 447183de + a6f65b11 (CasosAula.tsx) — la casilla se lee con `leerRespuestaAula`:
+ *     «X.YYY» (de una a tres cifras, punto y tres cifras) se lee con punto DECIMAL si esa lectura
+ *     queda cerca de la respuesta —a no más de máx(0,5; 10 %)— y más cerca que la española; si no,
+ *     en español, como parseSpanishNumber (C0558, C0724).
+ *   · d114e3d8 (módulo CSS) — el ✗ de «Errores frecuentes» pasa de #f59e0b a
+ *     var(--ambar-texto, #f59e0b) (C0296).
+ *   · 3b92acef (textoDesviacion) no llega a esta app: su desviación la escribe cifra(diferencia, 2).
+ * Los 72 tests de las cinco pasadas anteriores siguen en verde.
+ *
+ * CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (k = 8,99·10⁹, el que declara cada
+ * enunciado; tolerancia = máx(0,01; 1 %); banda de la lectura decimal = máx(0,5; 10 %))
+ *
+ *   LECTURA (normal y límite):
+ *     caso 7 (|F| = 431,52 nN): «431.520» → decimal 431,52, a 0 (la española sería 431520) → Correcto.
+ *       Con parseSpanishNumber, que es lo que había, se leía 431520.
+ *     caso 11 (Fₓ = −107,88 nN): «-107.880» y «−107.880» → −107,88 → Correcto.
+ *     caso 2 (|E| = 11,24; exacto 11,2375): «11.238» → 11,238, a 0,002 → Correcto.
+ *     caso 1 (|E| = 44,95; banda 4,495): «49.000» → 49 queda a 4,05 ≤ 4,495 → se lee 49:
+ *       «No es correcto. Te has desviado 4,05 de la respuesta.» · «50.000» → 50 queda a 5,05 > 4,495
+ *       → se lee 50000: «Te has desviado 49.955,05 de la respuesta.» (lo que la banda decide a
+ *       propósito: lejos de las dos, manda la convención española).
+ *
+ *   REDONDEO DE LA CLAVE (redondearA), en la práctica (semilla = Date.now(), fijada con el reloj):
+ *     semilla 23 → V en el origen con −6 nC en (−1,5; 0) y −5 nC en (2; 0):
+ *       8,99·(−6)/1,5 + 8,99·(−5)/2 = −35,96 − 22,475 = −58,435 → empate → −58,44 (lejos de cero).
+ *       El panel escribe formatNumber(V, 2) = «-58,44 V»: clave y panel, iguales.
+ *       Eₓ = −8,99·6/2,25 + 8,99·5/4 = −23,9733 + 11,2375 = −12,7358 → «-12,74 N/C».
+ *     semilla 49 → |E| de +2 nC a 2 m = 4,495 → 4,50 · semilla 22 → Eₓ = 4,495 − 179,8 = −175,305 → −175,31.
+ *     Barrido de 300.000 semillas (7.504 configuraciones, 834 con empate exacto): en |E|, Eₓ y V la
+ *     cifra de la solución es SIEMPRE la del panel. Aquí se barren las 3.000 primeras.
+ *
+ *   SIGNO CAMBIADO CON PUNTO DECIMAL (lo que debe diagnosticarse como error de signo):
+ *     caso 3 (Eₓ = −8,99; tolerancia 0,0899): «8,990» → 8,99 → «el SIGNO no» ✔ · «8.990» → la
+ *       lectura decimal 8,99 está a 17,98 de −8,99, fuera de la banda (0,899) → se lee 8990 y sale
+ *       «Te has desviado 8998,99». Igual en el caso 4 («17.980» → «17.997,98»).
+ *     práctica 1480853 (U = −4,495 nJ → −4,50, «Redondea a dos decimales»): «4,495» → SIGNO;
+ *       «4.495» → «Te has desviado 4499,5». Práctica 23: «58,435» → SIGNO; «58.435» → 58.493,44. → H1
+ *
+ *   CONTRASTE del ✗ (::before, 0,85rem en negrita): claro #8A5A00 sobre #fef3c7 = 5,32:1 (antes
+ *     #f59e0b, 1,93:1); oscuro #FCD34D sobre #2d1b00 = 11,48:1. Medido en el navegador: lo mismo.
+ *
+ * HALLAZGO de esta pasada:
+ *   H1 bajo · cálculo · ABIERTO · el diagnóstico de signo, que casos.ts llama «el error típico del
+ *     tema», se pierde cuando la respuesta con el signo cambiado se escribe con punto decimal y tres
+ *     decimales: leerRespuestaAula solo mira la cercanía a la respuesta, no a su opuesta, así que lee
+ *     8990 donde con coma lee 8,99, y enseña una desviación de un número que el alumno no escribió.
+ *     En la práctica uno de cada nueve ejercicios tiene la cifra exacta con tres decimales (los
+ *     empates de arriba), que es justo lo que se escribe antes de redondear.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('Inspector 17/11/2026 — lectura de la respuesta, redondeo de la clave y el ✗ de errores frecuentes', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+  const casoAula = (id: number) => {
+    const c = CASOS_AULA.find((x) => x.id === id);
+    if (!c) throw new Error(`no hay caso ${id}`);
+    return c;
+  };
+
+  /** Lo mismo que hace CasosAula.comprobar: el menos tipográfico a guion, leerRespuestaAula y comprobarRespuesta. */
+  const corregirComoLaApp = (texto: string, id: number) => {
+    const c = casoAula(id);
+    const leido = leerRespuestaAula(texto.replace(/[−–]/g, '-'), c.respuesta);
+    return { leido, ...comprobarRespuesta(leido, c.respuesta, c.datos.magnitud) };
+  };
+
+  /** Corrige en la página y devuelve SU aviso (no el anunciador de rutas de Next). */
+  async function corregir(page: Page, respuesta: string) {
+    await seccion(page).locator('#casos-respuesta').fill(respuesta);
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    return seccion(page).locator('[role="alert"]');
+  }
+
+  test('LECTURA · «X.YYY» con punto decimal aprueba cuando es la respuesta; lejos de ella manda la española', async () => {
+    expect(corregirComoLaApp('431.520', 7)).toMatchObject({ leido: 431.52, correcto: true });
+    expect(corregirComoLaApp('-107.880', 11)).toMatchObject({ leido: -107.88, correcto: true });
+    expect(corregirComoLaApp('−107.880', 11)).toMatchObject({ leido: -107.88, correcto: true });
+    expect(corregirComoLaApp('11.238', 2)).toMatchObject({ leido: 11.238, correcto: true });
+
+    // Caso 1, banda 4,495: 49 está dentro (a 4,05) y 50 fuera (a 5,05)
+    const dentro = corregirComoLaApp('49.000', 1);
+    expect(dentro.leido).toBe(49);
+    expect(dentro.motivo).toBe('No es correcto. Te has desviado 4,05 de la respuesta.');
+    const fuera = corregirComoLaApp('50.000', 1);
+    expect(fuera.leido).toBe(50000);
+    expect(fuera.motivo).toBe('No es correcto. Te has desviado 49.955,05 de la respuesta.');
+
+    // Un módulo negativo sigue siendo imposible, se lea como se lea (hallazgo 3350)
+    expect(corregirComoLaApp('-431.520', 7).motivo).toContain('es un módulo y nunca es negativo');
+  });
+
+  test('REDONDEO · los empates de la práctica van lejos de cero y la solución escribe la cifra del panel', async () => {
+    const p23 = generarEjercicioAleatorio(23);
+    expect(p23.datos.magnitud).toBe('V');
+    expect(resolverCaso(p23.datos).valor).toBeCloseTo(-58.435, 9);
+    expect(p23.respuesta).toBe(-58.44); // Math.round a secas daba −58,43
+    expect(p23.pasos[p23.pasos.length - 1]).toBe('Redondeando a 2 decimales: V = -58,44 V.');
+    expect(generarEjercicioAleatorio(49).respuesta).toBe(4.5); // |E| = 4,495
+    expect(generarEjercicioAleatorio(22).respuesta).toBe(-175.31); // Eₓ = −175,305
+
+    // El panel mide con calcularCampoEnPunto (q₀ = +1 nC) y escribe formatNumber(…, 2): en |E|, Eₓ
+    // y V la cifra de «Ver solución» tiene que ser la que el alumno lee en el panel al cargarlo.
+    let comparados = 0;
+    for (let s = 1; s <= 3000; s++) {
+      const e = generarEjercicioAleatorio(s);
+      const m = e.datos.magnitud;
+      if ((m !== 'V' && m !== 'Ex' && m !== 'modulo-E') || !e.datos.punto) continue;
+      const c = calcularCampoEnPunto(e.datos.punto.x, e.datos.punto.y, e.datos.cargas);
+      const delPanel = m === 'V' ? c.V : m === 'Ex' ? c.Ex : modulo(c.Ex, c.Ey);
+      expect(formatNumber(e.respuesta, 2), `semilla ${s} (${m})`).toBe(formatNumber(delPanel, 2));
+      comparados += 1;
+    }
+    expect(comparados).toBeGreaterThan(1000);
+  });
+
+  test('LECTURA en la página · «431.520» aprueba el caso 7, «49.000» se corrige como 49 y «50.000» como 50000', async ({ page }) => {
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    await seccion(page).getByRole('button', { name: /^Caso 7:/ }).click();
+    await expect(await corregir(page, '431.520')).toContainText('¡Correcto!');
+    await seccion(page).getByRole('button', { name: /^Caso 11:/ }).click();
+    await expect(await corregir(page, '−107.880')).toContainText('¡Correcto!');
+    await seccion(page).getByRole('button', { name: /^Caso 1:/ }).click();
+    await expect(await corregir(page, '49.000')).toContainText('Te has desviado 4,05 de la respuesta');
+    await expect(await corregir(page, '50.000')).toContainText('Te has desviado 49.955,05 de la respuesta');
+    await seccion(page).getByRole('button', { name: /^Caso 3:/ }).click();
+    await expect(await corregir(page, '-8.990')).toContainText('¡Correcto!');
+    // Control de H1: con coma decimal el signo cambiado SÍ se nombra
+    await expect(await corregir(page, '8,990')).toContainText('el SIGNO no');
+  });
+
+  test('REDONDEO en la página · práctica con semilla 23: la solución y el panel dicen «-58,44 V»', async ({ page }) => {
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    await page.clock.setFixedTime(23); // generarEjercicioAleatorio() toma Date.now() como semilla
+    await seccion(page).getByRole('button', { name: 'Practicar' }).click();
+    const enunciado = seccion(page).locator('p[aria-live="polite"]');
+    await expect(enunciado).toContainText('Una carga de −6 nC está en (−1,5; 0) y otra de −5 nC en (2; 0)');
+    await expect(enunciado).toContainText('Redondea a dos decimales.');
+    await seccion(page).getByRole('button', { name: 'Ver solución' }).click();
+    await expect(seccion(page).getByText(/^Respuesta:/)).toHaveText('Respuesta: -58,44 V');
+
+    await seccion(page).getByRole('button', { name: 'Cargar en el simulador' }).click();
+    await expect(valor(page, 'Posición x')).toHaveText('0,00 m');
+    await expect(valor(page, 'Posición y')).toHaveText('0,00 m');
+    await expect(valor(page, 'V (potencial)')).toHaveText('-58,44 V'); // −58,435 → −58,44
+    await expect(valor(page, 'Eₓ')).toHaveText('-12,74 N/C'); // −23,9733 + 11,2375
+
+    await expect(await corregir(page, '-58.435')).toContainText('¡Correcto!'); // decimal, a 0,005
+    await expect(await corregir(page, '58,435')).toContainText('el SIGNO no'); // control de H1
+  });
+
+  // HALLAZGO H1 (bajo, cálculo) · ABIERTO (17/11/2026).
+  // comprobarRespuesta (casos.ts) nombra el signo cambiado, «el error típico del tema». Desde
+  // 447183de la casilla se lee con leerRespuestaAula, que elige la lectura decimal de «X.YYY» solo
+  // si queda cerca de la RESPUESTA: con el signo cambiado la lectura decimal queda a dos veces la
+  // respuesta, fuera de la banda, y se lee en español, mil veces más grande. Con coma, el mismo
+  // alumno recibe «el SIGNO no» (controles en los dos tests de arriba).
+  // Caso: caso 3 (Eₓ = −8,99 N/C), respuesta «8.990» → esperado «El valor es correcto, pero el
+  //       SIGNO no…» (lo que da «8,990») · obtenido «No es correcto. Te has desviado 8998,99 de la
+  //       respuesta.». Práctica 1480853 (U = −4,50 nJ, exacto −4,495), «4.495» → esperado SIGNO ·
+  //       obtenido «Te has desviado 4499,5».
+  test.fail('HALLAZGO H1 · el signo cambiado con punto decimal se nombra igual que con coma', async () => {
+    expect(corregirComoLaApp('8.990', 3).motivo).toContain('el SIGNO no');
+    const p = generarEjercicioAleatorio(1480853);
+    const leido = leerRespuestaAula('4.495', p.respuesta);
+    expect(comprobarRespuesta(leido, p.respuesta, p.datos.magnitud).motivo).toContain('el SIGNO no');
+  });
+
+  test.fail('HALLAZGO H1 · en la página, «8.990» en el caso 3 dice «el SIGNO no», como «8,990»', async ({ page }) => {
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    await seccion(page).getByRole('button', { name: /^Caso 3:/ }).click();
+    await expect(await corregir(page, '8.990')).toContainText('el SIGNO no', { timeout: 3000 });
+  });
+
+  // d114e3d8 (C0296): el ✗ estaba en #f59e0b fijo, 1,93:1 sobre el #fef3c7 de la caja en claro.
+  test('CONTRASTE · el ✗ de «Errores frecuentes» se lee en los dos temas (5,32:1 y 11,48:1)', async ({ page }) => {
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const contraste = () =>
+      page.evaluate(() => {
+        const lin = (c: number) => {
+          const s = c / 255;
+          return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+        };
+        const lum = (c: number[]) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+        const rgba = (s: string) => {
+          const m = s.match(/rgba?\(([^)]+)\)/);
+          if (!m) throw new Error(`color que no es rgb(): ${s}`);
+          return m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+        };
+        const li = [...document.querySelectorAll('li')].find((l) => l.textContent?.includes('Confundir E (vector'));
+        if (!li) throw new Error('no está la lista de errores frecuentes');
+        const aspa = getComputedStyle(li, '::before');
+        if (!aspa.content.includes('✗')) throw new Error(`el ::before ya no es el ✗: ${aspa.content}`);
+        // El fondo es el del primer antepasado opaco: la caja de aviso
+        let el: Element | null = li;
+        let fondo: number[] | null = null;
+        while (el && !fondo) {
+          const c = rgba(getComputedStyle(el).backgroundColor);
+          if (c.length < 4 || c[3] > 0) fondo = c;
+          el = el.parentElement;
+        }
+        if (!fondo) throw new Error('sin fondo opaco');
+        const [a, b] = [lum(rgba(aspa.color)), lum(fondo)].sort((x, y) => y - x);
+        return Math.round(((a + 0.05) / (b + 0.05)) * 100) / 100;
+      });
+    const estable = async (): Promise<number> => {
+      let anterior = await contraste();
+      for (let i = 0; i < 30; i++) {
+        await page.waitForTimeout(100);
+        const actual = await contraste();
+        if (actual === anterior) return actual;
+        anterior = actual;
+      }
+      return anterior;
+    };
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    expect(await estable(), '✗ en claro (antes 1,93:1)').toBeGreaterThanOrEqual(4.5);
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    expect(await estable(), '✗ en oscuro').toBeGreaterThanOrEqual(4.5);
+  });
 });

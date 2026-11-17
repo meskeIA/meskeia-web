@@ -238,6 +238,24 @@ test.describe('Calculadora de almíbar — lo que promete el <h1>', () => {
     for (const p of preguntas) expect(textoPagina, p).toContain(p);
   });
 
+  test('HALLAZGO (cabo C0790) · el aviso del almíbar caliente no afirma sin fuente que «reseca» el bizcocho', async ({ page }) => {
+    // ABIERTO: la caja «A tener en cuenta» de la guía dice «Deja enfriar antes de calar. El almíbar
+    // caliente reseca el bizcocho en vez de dar jugosidad.» No hay fuente accesible de la red de
+    // fuentes oficiales que trate la temperatura del almíbar al calar (AESAN da 403; BOE, EFSA y
+    // el resto no tratan técnica de repostería), y la afirmación es incoherente por sí misma: un
+    // almíbar es sobre todo agua, y empapar la miga con él le AÑADE humedad, no se la quita. Lo que
+    // suele enseñarse es otra cosa (temperaturas opuestas para que se absorba sin deshacer la
+    // miga), tampoco anclado aquí. Esperado: el aviso matizado sin «reseca» o retirado (C0203).
+    test.fail();
+    const guia = page.getByRole('button', { name: /guía educativa/ });
+    await guia.click();
+    await expect(guia).toHaveAttribute('aria-expanded', 'true');
+    const avisos = page.locator('main li').filter({ hasText: /almíbar caliente/i });
+    for (const texto of await avisos.allInnerTexts()) {
+      expect(texto, 'aviso del almíbar caliente').not.toMatch(/resec/i);
+    }
+  });
+
   test('HALLAZGO · el porcentaje del FAQPage va separado de la cifra («50 %»)', async ({ page }) => {
     // ABIERTO: «Un almíbar al 50% de azúcar tiene 50 °Brix» pega el % a la cifra (CLAUDE.md §2:
     // separado con espacio duro U+00A0).

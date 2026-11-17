@@ -307,3 +307,78 @@ test.describe('Hallazgos de la inspección del 16/11/2026', () => {
     await boton(page).click();
     expect(await resultado(page).textContent()).toContain('bonificado al 100 %');  });
 });
+
+/**
+ * Cabo C0789 — comprobación puntual del 17/11/2026 (dos sospechas sin caso de la primera inspección).
+ *
+ * Norma (BOE, leída el 17/11/2026):
+ *   · Ley Foral 13/1992 de Navarra, del Impuesto sobre el Patrimonio (BOE-A-1993-2877, consolidada a
+ *     31/12/2025), art. 31 en la redacción del art. 2.1 de la Ley Foral 22/2023 (en vigor el 30/12/2023):
+ *       1. la suma de cuotas «no podrá exceder, para los sujetos pasivos sometidos al impuesto por
+ *          obligación personal, del 65 por 100 de la suma de la base imponible de este último»;
+ *       2. «se reducirá la cuota íntegra de este impuesto hasta alcanzar dicho límite, sin que tal
+ *          reducción pueda exceder del 55 por 100»;
+ *       3. en unidades familiares «los límites referidos en los números anteriores se calcularán
+ *          individualmente, con independencia de la tributación, individual o conjunta».
+ *     El art. 31 estatal (Ley 19/1991, BOE-A-1991-14392) dice «60 por 100» y «80 por 100», y acumula en
+ *     la conjunta (31.Dos). La app calcula Navarra con el estatal: LIMITE_CONJUNTO_PORCENTAJE y
+ *     TOPE_REDUCCION_PORCENTAJE no distinguen CCAA, y el resultado no lleva ningún aviso foral.
+ *   · Ley 12/2002, Concierto Económico con el País Vasco (BOE-A-2002-9969), art. 24: «El Impuesto sobre
+ *     el Patrimonio es un tributo concertado de normativa autónoma.» Las Normas Forales de Álava,
+ *     Bizkaia y Gipuzkoa no se pudieron leer en la red de fuentes: el caso pide el aviso, no una cifra.
+ *
+ * Los esperados se resolvieron a mano ANTES de abrir el navegador.
+ */
+test.describe('Cabo C0789 (17/11/2026): territorios forales y la STS de marzo de 2024', () => {
+  // ABIERTO: la app aplica el 60 % estatal a Navarra; con el 65 % foral la suma no supera el límite.
+  test.fail('ABIERTO (cabo C0789) · Navarra, BI 100.000, IRPF 30.000, IP 32.000: con el 65 % foral no hay reducción, y la app ofrece 2000 €', async ({ page }) => {
+    // LF 13/1992, art. 31.1: límite 0,65 × 100.000 = 65.000; 30.000 + 32.000 = 62.000 ≤ 65.000 → sin
+    // reducción (31.2 solo reduce si «la suma de ambas cuotas supere el límite»); cuota IP 32.000 €.
+    // Con el estatal (lo que hace la app): 62.000 − 60.000 = 2.000 € de reducción, cuota 30.000 €.
+    await comprobar(page, { ccaa: 'navarra', bi: '100.000', irpf: '30.000', ip: '32.000' });
+    await expect(resultado(page)).not.toContainText('Podrías beneficiarte');
+    await expect(resultado(page)).not.toContainText(eur('2000,00'));
+  });
+
+  // ABIERTO: la app aplica el tope estatal del 80 % a Navarra, donde la reducción no pasa del 55 %.
+  test.fail('ABIERTO (cabo C0789) · Navarra, BI 5.000, IRPF 0, IP 20.000: el tope foral es el 55 % (11.000 €) y la app reduce 16.000 €', async ({ page }) => {
+    // LF 13/1992: límite 0,65 × 5.000 = 3.250; exceso 20.000 − 3.250 = 16.750; tope 0,55 × 20.000 =
+    // 11.000 → reducción 11.000 €, cuota 9000 € (se paga el 45 %). La app: tope 0,80 × 20.000 = 16.000 €,
+    // cuota 4000 €. Lo que no puede salir es la cifra estatal; si la app calcula la foral, 11.000 / 9000.
+    await comprobar(page, { ccaa: 'navarra', bi: '5.000', irpf: '0', ip: '20.000' });
+    await expect(resultado(page)).not.toContainText(eur('16.000,00'));
+    await expect(resultado(page)).not.toContainText(eur('4000,00'));
+  });
+
+  // ABIERTO: la pista de la conjunta afirma que «la ley» acumula, y la Ley Foral 13/1992 manda calcularlo
+  // individualmente (art. 31.3).
+  test.fail('ABIERTO (cabo C0789) · Navarra en IRPF conjunta: la pista dice que la ley acumula las cuotas, y la foral calcula cada límite por separado', async ({ page }) => {
+    await page.getByRole('button', { name: 'Conjunta (matrimonio)' }).click();
+    await page.locator('#ccaa').selectOption('navarra');
+    const pista = page.getByText(/En IRPF conjunta: indica los datos sumados/);
+    await expect(pista).toBeVisible();
+    await expect(pista).not.toContainText('Así es como lo calcula la ley');
+  });
+
+  // ABIERTO: País Vasco se calcula con el art. 31 estatal sin avisar de que el IP es allí de normativa
+  // autónoma (Concierto, art. 24). No se exige una cifra: o avisa del régimen foral o no da la estatal.
+  test.fail('ABIERTO (cabo C0789) · País Vasco, BI 100.000, IRPF 30.000, IP 32.000: da la reducción estatal (2000 €) sin aviso de normativa foral', async ({ page }) => {
+    await comprobar(page, { ccaa: 'pais-vasco', bi: '100.000', irpf: '30.000', ip: '32.000' });
+    const texto = (await resultado(page).textContent()) ?? '';
+    const avisaForal = /foral|normativa propia|Diputaci[oó]n|Concierto/i.test(texto);
+    const daCifraEstatal = texto.includes('Podrías beneficiarte') && texto.includes(eur('2000,00'));
+    expect(avisaForal || !daCifraEstatal, 'aviso de régimen foral o sin la cifra estatal').toBe(true);
+  });
+
+  // ABIERTO: la «STS de marzo 2024» no se ha podido anclar en ninguna fuente de la red (CENDOJ fuera,
+  // la sede de la AEAT da 403), y tal como está escrita es una obviedad: el art. 31.Uno.b solo excluye
+  // los elementos que «no sean susceptibles de producir los rendimientos gravados», y una acción que
+  // reparte dividendos los produce. Criterio C0203: retirarla o matizarla con fuente accesible.
+  test.fail('ABIERTO (cabo C0789) · «la STS de marzo 2024 … las acciones que reparten dividendos NO son improductivas» sin fuente que la ancle', async ({ page }) => {
+    const sinAnclar = /acciones (que reparten dividendos|con dividendos) NO son improductivas/i;
+    const guia = (await page.locator('[data-guia-educativa]').textContent()) ?? '';
+    expect(guia).not.toMatch(sinAnclar);
+    await comprobar(page, { ccaa: 'cataluna', bi: '100.000', irpf: '35.000', ip: '40.000' });
+    expect((await resultado(page).textContent()) ?? '').not.toMatch(sinAnclar);
+  });
+});

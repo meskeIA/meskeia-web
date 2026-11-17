@@ -5,8 +5,9 @@ import { prepararParaMedir } from '../_contraste';
 /**
  * Inspector — simulador-movimiento-circular (segmento interactiva/física, riesgo 3, 816 usos)
  *
- * Primera inspección 21/08/2026 · RE-INSPECCIONES 30/08/2026, 22/09/2026, 28/09/2026 y
- * 16/10/2026 (cada una en su bloque, por orden, al final del fichero).
+ * Primera inspección 21/08/2026 · RE-INSPECCIONES 30/08/2026, 22/09/2026, 28/09/2026,
+ * 16/10/2026, 18/10/2026 y 17/11/2026 —esta, en modo cambio— (cada una en su bloque, por orden,
+ * al final del fichero).
  *
  * ⚠️ Desde el 15/09/2026 las cinco fórmulas del panel ya NO viven en page.tsx: están en
  * app/simulador-movimiento-circular/casos.ts, que page.tsx importa (ver «CASOS PARA CLASE»).
@@ -2365,6 +2366,349 @@ test.describe('Inspector 18/10/2026 — re-inspección tras la política de redo
       expect(texto).not.toMatch(/centr[ií]fug[ao] (lanza|empuja|expulsa)/i);
       expect(texto).toContain('hacia el centro');
       expect(texto).toContain('por la tangente');
+    },
+  );
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * Inspector 17/11/2026 — re-inspección en modo CAMBIO (base a7f3c27f, validada el 18/10/2026)
+ *
+ * QUÉ CAMBIÓ (git log a7f3c27f..HEAD -- app/simulador-movimiento-circular/ y el corrector):
+ *   · CasosAula.tsx  lee la respuesta con `leerRespuestaAula(texto, esperado)` en vez de
+ *                    `parseSpanishNumber` (C0558): «X.YYY» (1-3 cifras, punto, 3 cifras) se lee
+ *                    como decimal si esa lectura queda a ≤ máx(0,5; 10 % de la respuesta) y más
+ *                    cerca que la española; si no, como millares (C0724, BANDA_LECTURA_DECIMAL).
+ *   · casos.ts       `redondear` es ya `redondearA` del motor compartido (C0126): empates lejos
+ *                    de cero y limpieza del ruido binario antes de redondear.
+ *   · corrector      `textoDesviacion` formatea la diferencia YA redondeada (hallazgo 3445).
+ *   · page.tsx       rótulos «v», «a_c» y «a_t» del lienzo en un tono de texto por tema, y «v» y
+ *                    «a_c» llevados más allá de la punta de su flecha (cabo C0297).
+ *
+ * CASOS RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ *
+ *   CORRECTOR (respuestas de los casos ya verificadas en la tabla A_MANO: 1,2 · 3,14 · 1,57 ·
+ *   0,1 · 9,42 · 12 · 8 · 5,03; la práctica de la semilla 1800000000211 es F_c = 4,8 N)
+ *     normal  · caso 7  «9.425»: millares 9425 (a 9415,6) frente a decimal 9,425 (a 0,005 ≤ 0,942)
+ *               → 9,425; |9,425 − 3π| = 0,0002 ≤ 0,005 → «¡Correcto!» (antes: «desviado 9415,58»)
+ *             · caso 5  «1.571» → 1,571; |1,571 − π/2| = 0,0002 → «¡Correcto!»
+ *             · caso 12 «5.027» → 5,027; |5,027 − 1,6π| = 0,0005 → «¡Correcto!»
+ *             · caso 3  «1.200» → 1,2 = 0,2·2²·1,5, exacto → «¡Correcto!»
+ *             · práctica «4.800» → 4,8 → «¡Correcto!»
+ *     límite  · caso 8 (a_c = 12, exacto): banda = máx(0,5; 1,2) = 1,2
+ *               «10.800» → |10,8 − 12| = 1,2 ≤ 1,2 → decimal → «Te has desviado 1,2»
+ *               «10.799» → 1,201 > 1,2 → millares 10799 → 10799 − 12 = «Te has desviado 10.787»
+ *               «13.200» → 1,2 → decimal → «desviado 1,2» · «13.201» → 13201 − 12 = «desviado 13.189»
+ *             · caso 9 (a_c = 8, exacto) «8,005» → |8,005 − 8| = 0,005, redondeada a dos
+ *               decimales (empate lejos de cero) 0,01 → «Te has desviado 0,01» (3445: nunca «0»)
+ *     rechazo · caso 4 (T = π) «2.493»: decimal 2,493 queda a 0,647 > máx(0,5; 0,314) = 0,5 →
+ *               millares 2493 → 2493 − π = 2489,858 → «Te has desviado 2489,86»
+ *             · caso 4 «2,5» (coma: sin ambigüedad) → |2,5 − π| = 0,6416 → «desviado 0,64»
+ *             · caso 5 «1.580» → decimal 1,58 (cerca) → |1,58 − 1,5708| = 0,0092 > 0,005 →
+ *               «No es correcto. Te has desviado 0,01»
+ *             · caso 7 «-9.425» → la decimal −9,425 queda a 18,85 > 0,942 → −9425 →
+ *               9425 + 9,4248 = 9434,4248 → «Te has desviado 9434,42»
+ *             · caso 6 (f = 0,1 exacto) «1.000» → la decimal 1 queda a 0,9 > 0,5 → 1000 →
+ *               «Te has desviado 999,9»
+ *
+ *   REDONDEO DE casos.ts — v = 0,15 · 0,5 = 0,075 m/s, un empate exacto a dos decimales:
+ *     redondeo escolar 0,08. Con el `Math.round(valor·100)/100` de antes salía 0,07, porque
+ *     0,075·100 vale 7,499999999999999 en coma flotante. Los doce casos no tienen empates (sus
+ *     respuestas siguen siendo las de A_MANO, que ya vigila el test 3 de «casos para clase»).
+ *
+ *   RÓTULOS DEL LIENZO — contraste WCAG contra el fondo del lienzo (#F8FAFC claro, #1A1A1A oscuro),
+ *   luminancias calculadas a mano con la fórmula sRGB:
+ *     claro  · «v» #327874 → 1,00355/0,20371 = 4,93 · «a_c» #B4530A → 4,80 · «a_t» #B91C1C → 6,18
+ *     oscuro · «v» #5ABDB9 → 0,47070/0,06033 = 7,80 · «a_c» #E07A1F → 5,78 · «a_t» #F87171 → 6,29
+ *     Todos ≥ 4,5:1 (texto en negrita de 13 px, que no es «grande»).
+ *   Y la geometría: «v» y «a_c» no pueden quedar tapados por lo que se pinta DESPUÉS (el testigo
+ *   tests/contraste-lienzo.spec.ts mide el fondo en el instante de pintar el rótulo y no lo ve).
+ *
+ * RESULTADO: el corrector coincide con todo lo calculado; el redondeo y los colores, también.
+ * Un hallazgo nuevo (accesibilidad, bajo), con test.fail() al final del bloque: en MCNU los
+ * rótulos se pintan ANTES que la partícula y que la flecha a_t, que los tapan.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+interface LecturaRotulo {
+  t: string;
+  /** Fracción de la tinta del rótulo que algo pintado después en el mismo fotograma ha tapado */
+  tapada: number;
+  color: string;
+  /** El color dominante bajo el rótulo cuando se pintó */
+  fondo: number[];
+  oscuro: boolean;
+}
+type VentanaRotulos = Window & { __rotulos?: LecturaRotulo[] };
+
+/**
+ * Espía de los rótulos del lienzo: guarda los píxeles de la caja de «v», «a_c» y «a_t» antes y
+ * después de pintarlos y, al terminar el fotograma (el callback de requestAnimationFrame), cuenta
+ * cuánta de su tinta ha cambiado: eso es lo que la flecha, la partícula u otro rótulo le han
+ * pintado encima.
+ */
+function espiarRotulos(): void {
+  const w = window as VentanaRotulos;
+  w.__rotulos = [];
+  interface Pendiente {
+    t: string;
+    ctx: CanvasRenderingContext2D;
+    x0: number;
+    y0: number;
+    x1: number;
+    y1: number;
+    antes: Uint8ClampedArray;
+    despues: Uint8ClampedArray;
+    color: string;
+  }
+  let pendientes: Pendiente[] = [];
+  const P = CanvasRenderingContext2D.prototype;
+  const original = P.fillText;
+  P.fillText = function (this: CanvasRenderingContext2D, t: string, x: number, y: number, max?: number) {
+    const texto = String(t).trim();
+    let caja: Omit<Pendiente, 'despues'> | null = null;
+    if (texto === 'v' || texto === 'a_c' || texto === 'a_t') {
+      const met = this.measureText(String(t));
+      const m = this.getTransform();
+      const lienzo = this.canvas;
+      const x0 = Math.max(0, Math.floor(m.a * (x - met.actualBoundingBoxLeft) + m.e));
+      const x1 = Math.min(lienzo.width, Math.ceil(m.a * (x + met.actualBoundingBoxRight) + m.e));
+      const y0 = Math.max(0, Math.floor(m.d * (y - met.actualBoundingBoxAscent) + m.f));
+      const y1 = Math.min(lienzo.height, Math.ceil(m.d * (y + met.actualBoundingBoxDescent) + m.f));
+      if (x1 > x0 && y1 > y0) {
+        caja = {
+          t: texto,
+          ctx: this,
+          x0,
+          y0,
+          x1,
+          y1,
+          antes: this.getImageData(x0, y0, x1 - x0, y1 - y0).data.slice(),
+          color: String(this.fillStyle),
+        };
+      }
+    }
+    const r = max === undefined ? original.call(this, t, x, y) : original.call(this, t, x, y, max);
+    if (caja) {
+      pendientes.push({ ...caja, despues: this.getImageData(caja.x0, caja.y0, caja.x1 - caja.x0, caja.y1 - caja.y0).data.slice() });
+    }
+    return r;
+  };
+  const raf = window.requestAnimationFrame.bind(window);
+  window.requestAnimationFrame = (cb: FrameRequestCallback) =>
+    raf((ts) => {
+      pendientes = [];
+      cb(ts);
+      for (const p of pendientes) {
+        const fin = p.ctx.getImageData(p.x0, p.y0, p.x1 - p.x0, p.y1 - p.y0).data;
+        const cuenta = new Map<string, number>();
+        let tinta = 0;
+        let tapada = 0;
+        for (let i = 0; i < fin.length; i += 4) {
+          const k = `${p.antes[i]},${p.antes[i + 1]},${p.antes[i + 2]}`;
+          cuenta.set(k, (cuenta.get(k) ?? 0) + 1);
+          const pinto = Math.abs(p.despues[i] - p.antes[i]) + Math.abs(p.despues[i + 1] - p.antes[i + 1]) + Math.abs(p.despues[i + 2] - p.antes[i + 2]);
+          if (pinto > 60) {
+            tinta++;
+            const encima = Math.abs(fin[i] - p.despues[i]) + Math.abs(fin[i + 1] - p.despues[i + 1]) + Math.abs(fin[i + 2] - p.despues[i + 2]);
+            if (encima > 60) tapada++;
+          }
+        }
+        const moda = [...cuenta.entries()].sort((a, b) => b[1] - a[1])[0][0].split(',').map(Number);
+        w.__rotulos!.push({
+          t: p.t,
+          tapada: tinta ? tapada / tinta : 0,
+          color: p.color,
+          fondo: moda,
+          oscuro: document.documentElement.getAttribute('data-theme') === 'dark',
+        });
+      }
+    });
+}
+
+/** Contraste WCAG entre un color «#rrggbb» y un fondo [r, g, b]. */
+function contrasteWcag(hex: string, fondo: number[]): number {
+  const lin = (c: number) => {
+    const s = c / 255;
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  };
+  const lum = (c: number[]) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+  const tinta = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  const [a, b] = [lum(tinta), lum(fondo)].sort((x, y) => y - x);
+  return (a + 0.05) / (b + 0.05);
+}
+
+const lecturasRotulos = (page: Page) => page.evaluate(() => (window as VentanaRotulos).__rotulos ?? []);
+const vaciarRotulos = (page: Page) =>
+  page.evaluate(() => {
+    (window as VentanaRotulos).__rotulos = [];
+  });
+
+test.describe('Inspector 17/11/2026 — modo cambio: leerRespuestaAula, redondearA y rótulos del lienzo', () => {
+  const CAMPO_AULA = '#casos-respuesta';
+  const irAlCaso = (page: Page, n: number) => page.getByRole('button', { name: new RegExp(`^Caso ${n}:`) }).click();
+
+  /**
+   * Escribe, comprueba y devuelve el veredicto. Se acota el `role="alert"` por su texto: el
+   * anunciador de rutas de Next también es un `alert`.
+   */
+  async function responderAula(page: Page, texto: string): Promise<string> {
+    await page.fill(CAMPO_AULA, texto);
+    await esperarValorEnReact(page, CAMPO_AULA, texto);
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    const aviso = page.getByRole('alert').filter({ hasText: /orrecto|Escribe un número/ });
+    await expect(aviso).toBeVisible();
+    return ((await aviso.textContent()) ?? '').replace(/\s+/g, ' ').trim();
+  }
+
+  test('CASO 1 (normal) — la respuesta con punto decimal aprueba cuando la lectura decimal es la buena', async ({
+    page,
+  }) => {
+    await esperarHidratacion(page, [CAMPO_AULA]);
+    await irAlCaso(page, 7); // v = 2π·0,5·3 = 3π = 9,4247780 → 9,42
+    expect(await responderAula(page, '9.425')).toContain('¡Correcto!'); // antes: 9425, «desviado 9415,58»
+    await irAlCaso(page, 5); // ω = 2π/4 = 1,5707963 → 1,57
+    expect(await responderAula(page, '1.571')).toContain('¡Correcto!');
+    await irAlCaso(page, 12); // v = 2π/0,5 · 0,4 = 1,6π = 5,0265482 → 5,03
+    expect(await responderAula(page, '5.027')).toContain('¡Correcto!');
+    await irAlCaso(page, 3); // F_c = 0,2 · 2² · 1,5 = 1,2, exacto
+    expect(await responderAula(page, '1.200')).toContain('¡Correcto!');
+
+    // Práctica, semilla fija 1800000000211 → F_c = 0,2 · 4² · 1,5 = 4,8 N (bloque del 18/10/2026)
+    await page.clock.setFixedTime(new Date(1800000000211));
+    await page.getByRole('button', { name: /Practicar/ }).click();
+    await expect(page.getByText('Un objeto de 0,2 kg gira a 4 rad/s en una circunferencia de 1,5 m de radio.', { exact: false })).toBeVisible();
+    expect(await responderAula(page, '4.800')).toContain('¡Correcto!');
+  });
+
+  test('CASO 2 (límite) — el borde de la banda del 10 % y la desviación de media centésima', async ({ page }) => {
+    await esperarHidratacion(page, [CAMPO_AULA]);
+    // Caso 8: v = 6, r = 3 → ω = 2 → a_c = 2² · 3 = 12, exacto. Banda = máx(0,5; 12 · 0,1) = 1,2.
+    await irAlCaso(page, 8);
+    expect(await responderAula(page, '10.800')).toContain('No es correcto. Te has desviado 1,2 de la respuesta.');
+    expect(await responderAula(page, '10.799')).toContain('Te has desviado 10.787 de la respuesta.'); // 10799 − 12
+    expect(await responderAula(page, '13.200')).toContain('Te has desviado 1,2 de la respuesta.');
+    expect(await responderAula(page, '13.201')).toContain('Te has desviado 13.189 de la respuesta.'); // 13201 − 12
+    // Caso 9: a_c = 2² · 2 = 8, exacto. 0,005 redondeada a dos decimales es 0,01, nunca «0» (3445).
+    await irAlCaso(page, 9);
+    expect(await responderAula(page, '8,005')).toContain('No es correcto. Te has desviado 0,01 de la respuesta.');
+  });
+
+  test('CASO 3 (rechazo) — «2.493» lejos de la respuesta se lee en español y lo erróneo suspende', async ({
+    page,
+  }) => {
+    await esperarHidratacion(page, [CAMPO_AULA]);
+    await irAlCaso(page, 4); // T = 2π/2 = π = 3,1415927 → 3,14
+    expect(await responderAula(page, '2.493')).toContain('Te has desviado 2489,86 de la respuesta.'); // 2493 − π
+    expect(await responderAula(page, '2,5')).toContain('Te has desviado 0,64 de la respuesta.'); // π − 2,5
+    await irAlCaso(page, 5); // 1,5707963
+    expect(await responderAula(page, '1.580')).toContain('No es correcto. Te has desviado 0,01 de la respuesta.');
+    await irAlCaso(page, 7); // 9,4247780
+    expect(await responderAula(page, '-9.425')).toContain('Te has desviado 9434,42 de la respuesta.'); // 9425 + 3π
+    await irAlCaso(page, 6); // f = 6/60 = 0,1 Hz, exacto
+    expect(await responderAula(page, '1.000')).toContain('Te has desviado 999,9 de la respuesta.'); // 1000 − 0,1
+  });
+
+  test('redondeo de casos.ts — el empate 0,075 sube a 0,08 (redondeo escolar), no baja a 0,07', async () => {
+    const r = resolverCaso({ radio: 0.5, entrada: { via: 'omega', omega: 0.15 }, magnitud: 'velocidad' });
+    expect(r.ok).toBe(true);
+    expect(r.pasos).toContain('v = ω·r = 0,15·0,5 = 0,075 m/s.');
+    expect(r.pasos[r.pasos.length - 1]).toBe('Redondeando a 2 decimales: 0,08.');
+    // Y los doce casos conservan las respuestas resueltas a mano (A_MANO, al principio del fichero).
+    for (const caso of CASOS) expect(caso.respuesta, `caso ${caso.id}`).toBe(A_MANO[caso.id]);
+  });
+
+  test('rótulos del lienzo — «v», «a_c» y «a_t» a ≥ 4,5:1 en los dos temas, y en MCU nada tapa «v» ni «a_c»', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await page.addInitScript(espiarRotulos);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="range"]']);
+
+    // MCU con r = 2 m y ω = 2 rad/s (los valores de inicio): T = π s, así que 3,4 s es más de una vuelta
+    await vaciarRotulos(page);
+    await page.waitForTimeout(3400);
+    const claroMcu = (await lecturasRotulos(page)).filter((l) => !l.oscuro);
+    for (const t of ['v', 'a_c']) {
+      const suyas = claroMcu.filter((l) => l.t === t);
+      expect(suyas.length, `«${t}» pintado en claro`).toBeGreaterThan(60);
+      // La reparación de C0297: antes la punta de la flecha caía encima del rótulo en la mitad de los ángulos
+      expect(Math.max(...suyas.map((l) => l.tapada)), `«${t}» no queda tapado en ningún ángulo`).toBeLessThan(0.15);
+    }
+
+    // Los tres colores, en claro (a_t solo existe en MCNU) y luego en oscuro
+    await page.getByRole('button', { name: /^MCNU/ }).click();
+    await page.waitForTimeout(600);
+    const esperadoClaro: Record<string, number> = { v: 4.93, a_c: 4.8, a_t: 6.18 };
+    const esperadoOscuro: Record<string, number> = { v: 7.8, a_c: 5.78, a_t: 6.29 };
+    for (const l of (await lecturasRotulos(page)).filter((x) => !x.oscuro)) {
+      expect(l.fondo, 'el fondo del lienzo en claro es #F8FAFC').toEqual([248, 250, 252]);
+      expect(contrasteWcag(l.color, l.fondo), `«${l.t}» ${l.color} en claro`).toBeCloseTo(esperadoClaro[l.t], 1);
+    }
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await vaciarRotulos(page);
+    await page.waitForTimeout(600);
+    const oscuras = (await lecturasRotulos(page)).filter((l) => l.oscuro);
+    expect(new Set(oscuras.map((l) => l.t))).toEqual(new Set(['v', 'a_c', 'a_t']));
+    for (const l of oscuras) {
+      expect(l.fondo, 'el fondo del lienzo en oscuro es #1A1A1A').toEqual([26, 26, 26]);
+      expect(contrasteWcag(l.color, l.fondo), `«${l.t}» ${l.color} en oscuro`).toBeCloseTo(esperadoOscuro[l.t], 1);
+    }
+  });
+
+  /* ── Hallazgo del 17/11/2026 (accesibilidad, bajo), ABIERTO ──────────────────────────────── */
+
+  test(
+    'ABIERTO (accesibilidad, bajo) — en MCNU con r = 2 m la partícula tapa el rótulo «a_t» en parte de la vuelta',
+    async ({ page }) => {
+      // ABIERTO (17/11/2026). «a_t» se pinta en (punta + 4, punta + 14) y la partícula (radio 8 px
+      // y 2 de trazo) se pinta DESPUÉS. Con r = 2 m la flecha a_t mide α·r·18 = 0,5·2·18 = 18 px,
+      // así que cuando la partícula está en el cuadrante de arriba a la derecha (la tangente
+      // apunta arriba a la izquierda) la caja del rótulo cae encima del disco. Medido a 1280 px:
+      // en 71 de 379 fotogramas (19 %) más de la mitad de la tinta de «a_t» queda tapada, con un
+      // máximo del 97 % (rótulo invisible). r = 2 m es el radio de inicio. El testigo de
+      // contraste no lo ve porque mide el fondo en el instante de pintar el texto.
+      test.fail();
+      test.setTimeout(30_000);
+      await page.addInitScript(espiarRotulos);
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['input[type="range"]']);
+      await moverDeVerdad(page, OMEGA, 1); // ω₀ = 1 rad/s, r = 2 m (inicio)
+      await page.getByRole('button', { name: /^MCNU/ }).click();
+      await vaciarRotulos(page);
+      await page.waitForTimeout(4000); // θ = t + ¼·t² = 8 rad en 4 s: más de una vuelta
+      const at = (await lecturasRotulos(page)).filter((l) => l.t === 'a_t');
+      expect(at.length, '«a_t» pintado').toBeGreaterThan(100);
+      expect(
+        at.filter((l) => l.tapada > 0.5).length,
+        'ningún fotograma con más de la mitad de «a_t» bajo la partícula',
+      ).toBe(0);
+    },
+  );
+
+  test(
+    'ABIERTO (accesibilidad, bajo) — en MCNU desde el reposo con r = 5 m la flecha a_t tapa el rótulo «v»',
+    async ({ page }) => {
+      // ABIERTO (17/11/2026), mismo hallazgo: desde a35c7dd2 «v» va 12 px más allá de la punta de
+      // su flecha, SOBRE la tangente, que es justo por donde va la flecha a_t, pintada después.
+      // Mientras v·18 + 12 < α·r·18 (con r = 5: ω < 0,37 rad/s, los primeros 0,73 s de cada ciclo
+      // MCNU que arranca en ω₀ = 0) la flecha roja cruza el rótulo en TODOS los ángulos; antes,
+      // con el rótulo a (+4, −4) de la punta, solo en los que la tangente apuntaba arriba a la
+      // derecha. Medido a 1280 px: 20 de 88 fotogramas del primer 1,5 s con más de la mitad de
+      // «v» tapada, máximo 97 %.
+      test.fail();
+      test.setTimeout(30_000);
+      await page.addInitScript(espiarRotulos);
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['input[type="range"]']);
+      await moverDeVerdad(page, RADIO, 5);
+      await moverDeVerdad(page, OMEGA, 0);
+      await vaciarRotulos(page);
+      await page.getByRole('button', { name: /^MCNU/ }).click();
+      await page.waitForTimeout(1500);
+      const v = (await lecturasRotulos(page)).filter((l) => l.t === 'v');
+      expect(v.length, '«v» pintado').toBeGreaterThan(40);
+      expect(v.filter((l) => l.tapada > 0.5).length, 'ningún fotograma con más de la mitad de «v» bajo la flecha a_t').toBe(0);
     },
   );
 });

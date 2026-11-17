@@ -13,6 +13,9 @@ import { esperarHidratacion } from './_hidratacion';
  * cada uno se quita su test.fail() —comprobando antes que lo que afirma sigue siendo lo
  * correcto— y el título pasa a REPARADO.
  *
+ * Comprobación PUNTUAL del cabo C0787 (17/11/2026): la frase de «Errores frecuentes» sobre el
+ * umbral de pérdida de peso de Fried. Su caso es el último del fichero.
+ *
  * La app es riesgo 1 CRÍTICO: emite un juicio sobre el estado de salud de una persona
  * mayor. Lo que aquí se fija es la ARITMÉTICA del instrumento y los tres cortes, que es
  * lo único que un test puede demostrar; el juicio clínico no.
@@ -712,4 +715,43 @@ test('REPARADO (hallazgo 4867) · «unos 3,5 kg en una persona de 70» no decía
   await page.getByRole('button', { name: /Ver guía|guía educativa/i }).first().click();
   const parrafo = page.getByText(/unos 3,5 kg/).first();
   await expect(parrafo).toContainText(/70 kg/);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CABO C0787 (modo cabo, 17/11/2026) — el umbral de Fried «con independencia del peso»
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// LO QUE SE COMPROBÓ
+//   · Dónde sale: SOLO en la caja «Errores frecuentes ante la fragilidad» del bloque educativo
+//     (page.tsx, 4.º <li> de la lista de avisos). No está en la FAQ visible ni en el FAQPage, y
+//     el JSON-LD WebApplication solo nombra «criterios de Fried» en `featureList`.
+//   · Qué decide: nada del resultado. El motor (`calcularFragilidad`) no aplica Fried: suma los
+//     «Sí» de los cinco ítems FRAIL, y el de peso pregunta por «más del 5%» del peso en el último
+//     año (CASO 6). La frase es informativa y coherente con ese 5 %.
+//   · La fuente: Fried et al. (2001), J Gerontol A Biol Sci Med Sci 56(3):M146-56, sigue sin poder
+//     leerse. Ni la revista, ni PubMed, ni el Documento de consenso del Ministerio de Sanidad
+//     (2014) están en la red de fuentes del Inspector; el buscador del BOE rechaza la consulta
+//     por URL («Los valores de búsqueda enviados son incorrectos») y el de la OMS se pinta en el
+//     cliente y no devuelve resultados. Así que no se pudo comprobar si el criterio original lleva
+//     también un umbral relativo al peso (un porcentaje), que es justo lo que la frase niega.
+test.fail('HALLAZGO (17/11/2026, ABIERTO) · cabo C0787 · «con independencia del peso de partida» no se puede anclar a una fuente accesible', async ({
+  page,
+}) => {
+  // ABIERTO: la frase afirma en absoluto que Fried fija 4,5 kg «con independencia del peso de
+  // partida», y no hay fuente accesible que lo sostenga (criterio C0203: lo que no se puede
+  // anclar se matiza o se retira). Esperado: la frase sin esa afirmación absoluta, que se quede
+  // en que Fried es otra escala y de ahí viene la cifra de 4,5 kg. Si la reparación prefiere
+  // ANCLARLA a una fuente que pueda leerse y citarse en la página, esta aserción se cambia por
+  // la cita, no se borra.
+  await abrir(page);
+  await page.getByRole('button', { name: /Ver guía|guía educativa/i }).first().click();
+
+  // La caja existe y está a la vista: sin esto, el toHaveCount(0) de abajo pasaría en verde con
+  // la página sin cargar.
+  await expect(page.getByText('Errores frecuentes ante la fragilidad', { exact: true })).toBeVisible();
+  const aviso = page.getByRole('listitem').filter({ hasText: 'No informar al médico de la pérdida de peso' });
+  await expect(aviso).toBeVisible();
+  await expect(aviso).toContainText('el umbral que usa este test');
+
+  await expect(page.getByText(/con independencia del peso de partida/)).toHaveCount(0);
 });
