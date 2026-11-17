@@ -351,23 +351,30 @@ test('HALLAZGO 4947 (17/11/2026, REPARADO) · un laberinto con más filas que co
   }
 });
 
-test('HALLAZGO (17/11/2026, ABIERTO) · «Otro distinto» da otro laberinto aunque haya un n.º escrito', async ({ page }) => {
-  // generar() toma la semilla del campo si tiene cifras, y «Otro distinto» llama a la misma
-  // función: con 12345 escrito vuelve a salir el laberinto 12345, idéntico.
-  test.fail();
+test('HALLAZGO 4948 (17/11/2026, REPARADO) · «Otro distinto» da otro laberinto aunque haya un n.º escrito', async ({ page }) => {
+  // generar() tomaba la semilla del campo si tenía cifras, y «Otro distinto» llamaba a la misma
+  // función: con 12345 escrito volvía a salir el laberinto 12345, idéntico. Ahora sortea otro n.º
+  // y vacía el campo, así que el siguiente «Generar» tampoco vuelve al 12345 sin que se escriba.
   await generar(page, { columnas: 15, filas: 15, trazado: 'Pasillos largos', semilla: '12345' });
   await expect(metrica(page, 'nº de laberinto')).toHaveText('12345');
   const antes = huella(await leerLaberinto(page));
   await page.getByRole('button', { name: /Otro distinto/ }).click();
   await expect(metrica(page, 'nº de laberinto')).not.toHaveText('12345');
+  await expect(metrica(page, 'nº de laberinto')).toHaveText(/^[1-9]\d{5}$/);
   expect(huella(await leerLaberinto(page))).not.toBe(antes);
+  await expect(page.getByPlaceholder('Al azar')).toHaveValue('');
+  // El n.º nuevo reconstruye el laberinto que se ve (es el que va a la hoja)
+  const n = (await metrica(page, 'nº de laberinto').innerText()).trim();
+  const otro = huella(await leerLaberinto(page));
+  await generar(page, { semilla: '1' });
+  await generar(page, { semilla: n });
+  expect(huella(await leerLaberinto(page)), `n.º ${n}`).toBe(otro);
 });
 
-test('HALLAZGO (17/11/2026, ABIERTO) · tras cambiar de trazado sin regenerar, la hoja sigue diciendo con qué trazado se generó', async ({ page }) => {
-  // El pie lee el trazado SELECCIONADO (estado `trazado`), no el del laberinto. Generado con
-  // «Pasillos largos» y pulsado «Muy ramificado» sin regenerar, el pie dice «Muy ramificado», y
+test('HALLAZGO 4949 (17/11/2026, REPARADO) · tras cambiar de trazado sin regenerar, la hoja sigue diciendo con qué trazado se generó', async ({ page }) => {
+  // El pie leía el trazado SELECCIONADO (estado `trazado`), no el del laberinto. Generado con
+  // «Pasillos largos» y pulsado «Muy ramificado» sin regenerar, el pie decía «Muy ramificado», y
   // con esos datos (n.º 12345, 15×15, Muy ramificado) sale otro laberinto distinto del impreso.
-  test.fail();
   await generar(page, { columnas: 15, filas: 15, trazado: 'Pasillos largos', semilla: '12345' });
   await expect(pieDeHoja(page)).toHaveText('Laberinto n.º 12345 · 15×15 · Pasillos largos · meskeia.com');
   await page.getByRole('button', { name: /^Muy ramificado/ }).click();

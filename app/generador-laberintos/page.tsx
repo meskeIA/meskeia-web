@@ -33,6 +33,8 @@ interface Laberinto {
   camino: { fila: number; col: number }[];
   callejones: number;
   semilla: number;
+  /** Trazado con el que se generó: el seleccionado puede cambiar sin regenerar (hallazgo 4949) */
+  trazado: Trazado;
 }
 
 const ETIQUETAS_TRAZADO: Record<Trazado, { nombre: string; detalle: string }> = {
@@ -211,6 +213,7 @@ function generarLaberinto(filas: number, columnas: number, trazado: Trazado, sem
     camino: buscarCamino(celdas),
     callejones: contarCallejones(celdas),
     semilla,
+    trazado,
   };
 }
 
@@ -229,12 +232,24 @@ export default function GeneradorLaberintosPage() {
   const [laberinto, setLaberinto] = useState<Laberinto | null>(null);
   const [mostrarSolucion, setMostrarSolucion] = useState(false);
 
-  const generar = useCallback(() => {
-    const base = Number(semillaManual.replace(/\D/g, ''));
-    const semilla = base > 0 ? base : Math.floor(Math.random() * 900000) + 100000;
-    setLaberinto(generarLaberinto(filas, columnas, trazado, semilla));
-    setMostrarSolucion(false);
-  }, [filas, columnas, trazado, semillaManual]);
+  /**
+   * `otroDistinto`: «Otro distinto» sortea siempre un n.º nuevo, distinto del del laberinto
+   * actual, y vacía el campo. Antes tomaba la semilla del campo como «Generar» y, con un n.º
+   * escrito, repetía el mismo laberinto (hallazgo 4948, el mismo que el 4273 de las fichas).
+   */
+  const generar = useCallback(
+    (otroDistinto: boolean) => {
+      const base = otroDistinto ? 0 : Number(semillaManual.replace(/\D/g, ''));
+      let semilla = base;
+      while (semilla <= 0 || (otroDistinto && semilla === laberinto?.semilla)) {
+        semilla = Math.floor(Math.random() * 900000) + 100000;
+      }
+      if (otroDistinto) setSemillaManual('');
+      setLaberinto(generarLaberinto(filas, columnas, trazado, semilla));
+      setMostrarSolucion(false);
+    },
+    [filas, columnas, trazado, semillaManual, laberinto],
+  );
 
   /** Segmentos de pared en coordenadas SVG */
   const paredes: { x1: number; y1: number; x2: number; y2: number }[] = [];
@@ -352,7 +367,7 @@ export default function GeneradorLaberintosPage() {
               />
             </label>
 
-            <button type="button" className={styles.btnPrimary} onClick={generar}>
+            <button type="button" className={styles.btnPrimary} onClick={() => generar(false)}>
               <span aria-hidden="true">✨</span> Generar laberinto
             </button>
           </div>
@@ -404,7 +419,7 @@ export default function GeneradorLaberintosPage() {
                     <span aria-hidden="true">🖨️</span> Imprimir esta vista
                   </button>
 
-                  <button type="button" className={styles.btnSecundario} onClick={generar}>
+                  <button type="button" className={styles.btnSecundario} onClick={() => generar(true)}>
                     <span aria-hidden="true">🔄</span> Otro distinto
                   </button>
                 </div>
@@ -465,7 +480,7 @@ export default function GeneradorLaberintosPage() {
 
           <p className={styles.pieHoja}>
             Laberinto n.º {laberinto.semilla} · {laberinto.columnas}×{laberinto.filas} ·{' '}
-            {ETIQUETAS_TRAZADO[trazado].nombre} · meskeia.com
+            {ETIQUETAS_TRAZADO[laberinto.trazado].nombre} · meskeia.com
           </p>
         </div>
       )}
