@@ -359,6 +359,13 @@
   width: fit-content;
 }
 
+.fuenteNota {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+
 /* Cerebro */
 .cerebroGrid {
   display: grid;

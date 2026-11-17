@@ -183,22 +183,27 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     expect(r).toContain('no evita que el alcohol llegue al cerebro');
   });
 
-  test('HALLAZGO ABIERTO [contenido/medio] CASO 3 (rechazo): las frecuencias de ALDH2 no suman 100 % y dan un 15 % de europeos portadores', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 17/11/2026) [contenido/medio]
-    // ENTRADA  pestaña «Variante ALDH2», las tres tarjetas de genotipo
-    // ESPERADO en Asia oriental normal + heterocigoto + homocigoto = 100 % (NCBI Gene: ~50 % sin la
-    //          isoenzima mitocondrial activa, es decir, ~50 % de portadores en total); europeos: «Most
-    //          Caucasians have two major isozymes» (la propia página: «variante genética común en Asia oriental»)
-    // OBTENIDO «~85%» normal (sin decir de qué población), «~15% europeos / ~50% asiáticos orientales»
-    //          heterocigotos y «~5-8% asiáticos orientales» homocigotos: 85 + 50 + 5 = 140 % en Asia oriental
+  test('REPARADO (hallazgo 4917) [contenido/medio] CASO 3 (rechazo): las frecuencias de ALDH2 no sumaban 100 % y daban un 15 % de europeos portadores', async ({ page }) => {
+    // REPARADO 17/11/2026. ENTRADA pestaña «Variante ALDH2», las tres tarjetas de genotipo.
+    // ESPERADO en Asia oriental normal + portadores = 100 % (NCBI Gene: ~50 % sin la isoenzima
+    //          mitocondrial activa, es decir, ~50 % de portadores en total); europeos: «Most Caucasians
+    //          have two major isozymes». La fuente no reparte entre heterocigotos y homocigotos, así que
+    //          la app tampoco: la tarjeta del heterocigoto da el ~50 % de los dos juntos y la del
+    //          homocigoto dice que es la parte menor (con ~50 % de portadores, Hardy-Weinberg da un
+    //          alelo de 1 − √0,5 ≈ 0,29 y un 9 % de homocigotos frente a un 41 % de heterocigotos).
+    // OBTENIDO (antes) «~85%» normal, «~15% europeos / ~50% asiáticos orientales» y «~5-8% asiáticos
+    //          orientales»: 85 + 50 + 5 = 140 % en Asia oriental.
+    const q = 1 - Math.sqrt(0.5);
+    expect(q * q).toBeLessThan(2 * q * (1 - q));
     await irA(page, /Variante ALDH2/);
     const t = await tarjetasAldh2(page).allInnerTexts();
     expect(t).toHaveLength(3);
-    const normal = Number(t[0].match(/(\d+)\s*%/)?.[1]);
-    const het = Number(t[1].match(/(\d+)\s*%\s*asiáticos/)?.[1]);
-    const hom = Number(t[2].match(/(\d+)(?:\s*[-–]\s*\d+)?\s*%\s*asiáticos/)?.[1]);
-    expect(normal + het + hom, `${normal} + ${het} + ${hom}`).toBeLessThanOrEqual(105);
-    expect(t[1]).not.toMatch(/15\s*%\s*europeos/);
+    const normal = Number(t[0].match(/(\d+)\s*%\s*en Asia oriental/)?.[1]);
+    const portadores = Number(t[1].match(/homocigoto, ~(\d+)\s*%\s*en Asia oriental/)?.[1]);
+    expect(normal + portadores, `${normal} + ${portadores}`).toBe(100);
+    expect(t[2]).toMatch(/parte menor de ese ~50\s*%/);
+    expect(t.join(' ')).not.toMatch(/europeos/);
+    expect(t[0]).toMatch(/mayoría de las personas de origen europeo/);
   });
 
   test('HALLAZGO ABIERTO [contenido/bajo]: «carcinógeno Tipo 1» en vez de «Grupo 1» del IARC', async ({ page }) => {
@@ -264,17 +269,22 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     await expect(seccion(page, H2_ORGANOS)).not.toContainText(/\d%|\d+g\b/, { timeout: 2000 });
   });
 
-  test('HALLAZGO ABIERTO [contenido/bajo]: las cifras de las pestañas no citan fuente', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 17/11/2026) [contenido/bajo]
-    // ENTRADA  pestañas «Órganos afectados» y «Variante ALDH2»
-    // ESPERADO cada cifra con su fuente y año (CLAUDE.md §1.quinquies, regla 1), o retirada
-    // OBTENIDO sin fuente: «el 90-95% del alcohol ingerido», «10-100 veces mayor que en sangre»,
-    //          «al 25-30% de su capacidad», los porcentajes de genotipo (uno de ellos, falso: CASO 3) y
-    //          «hasta 6-10 veces mayor»; solo se nombran el IARC (aviso) y OMS 2023 / The Lancet 2018 (FAQPage)
+  test('REPARADO (hallazgo 4924) [contenido/bajo]: las cifras de las pestañas no citaban fuente', async ({ page }) => {
+    // REPARADO 17/11/2026. ESPERADO cada cifra con su fuente y año (CLAUDE.md §1.quinquies, regla 1),
+    // o retirada. Con fuente leída en la sesión: el 90-98 % que se oxida a acetato (HSDB en PubChem,
+    // CID 702, citando a Goodman & Gilman, 12.ª ed., 2011, p. 630) y el ~50 % de portadores de Asia
+    // oriental (NCBI Gene, ALDH2). Sin fuente accesible, retiradas: «10-100 veces mayor que en sangre»,
+    // «al 25-30% de su capacidad» y «hasta 6-10 veces mayor».
     await irA(page, /Variante ALDH2/);
     const aldh2 = seccion(page, 'La variante ALDH2: el «efecto flus»');
-    await expect(aldh2).toContainText('6-10 veces');
-    await expect(aldh2).toContainText(/fuente|según|\(\d{4}\)/i, { timeout: 2000 });
+    await expect(aldh2).toContainText('Fuente de las frecuencias: resumen de NCBI Gene');
+    await expect(aldh2).not.toContainText(/6-10 veces|25-30/, { timeout: 2000 });
+    await irA(page, /Órganos afectados/);
+    await expect(seccion(page, H2_ORGANOS)).toContainText('Goodman & Gilman, 12.ª ed., 2011');
+    await expect(seccion(page, H2_ORGANOS)).not.toContainText(/90-95/, { timeout: 2000 });
+    await organo(page, 'Boca y esófago').click();
+    await expect(seccion(page, H2_ORGANOS)).toContainText('acetaldehído que se forma en la saliva');
+    await expect(seccion(page, H2_ORGANOS)).not.toContainText('10-100 veces', { timeout: 2000 });
   });
 
   test('HALLAZGO ABIERTO [contenido/bajo]: erratas «Via MEOS», «(posibles adicción)» y la sigla inglesa «BBB»', async ({ page }) => {

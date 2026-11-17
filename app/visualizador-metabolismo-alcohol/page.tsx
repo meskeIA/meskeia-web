@@ -92,7 +92,7 @@ const ORGANOS: OrganoInfo[] = [
     nombre: 'Hígado',
     icono: '🫀',
     color: '#C0392B',
-    mecanismo: 'El hígado metaboliza el 90-95% del alcohol ingerido. La acumulación de NADH altera la beta-oxidación de ácidos grasos, provocando su acumulación (esteatosis). El acetaldehído forma adductos covalentes con proteínas y ADN del hepatocito, iniciando fibrosis.',
+    mecanismo: 'Entre el 90 y el 98 % del alcohol ingerido se oxida a acetato, sobre todo en el hígado (Goodman & Gilman, 12.ª ed., 2011, citado por HSDB). La acumulación de NADH altera la beta-oxidación de ácidos grasos, provocando su acumulación (esteatosis). El acetaldehído forma adductos covalentes con proteínas y ADN del hepatocito, iniciando fibrosis.',
     acetaldehido: 'Concentración local máxima: es el órgano más expuesto. Los adductos proteína-acetaldehído activan células estrelladas → fibrosis → cirrosis.',
     consecuencias: [
       'Esteatosis hepática alcohólica (hígado graso): reversible si se deja de beber',
@@ -108,7 +108,7 @@ const ORGANOS: OrganoInfo[] = [
     icono: '🦷',
     color: '#E67E22',
     mecanismo: 'Las bacterias de la microbiota oral (Streptococcus, Fusobacterium, Candida) poseen su propia ADH bacteriana: convierten el alcohol de la saliva en acetaldehído local. Este acetaldehído no pasa por el hígado: actúa directamente sobre la mucosa.',
-    acetaldehido: 'Concentración en saliva tras beber: 10-100 veces mayor que en sangre. El acetaldehído salival es el principal responsable del riesgo de cáncer oral y esofágico.',
+    acetaldehido: 'El acetaldehído que se forma en la saliva actúa sobre la mucosa sin pasar antes por el hígado, y se considera uno de los factores del riesgo de cáncer oral y esofágico asociado al alcohol.',
     consecuencias: [
       'Riesgo de cáncer de cavidad oral (clasificado como carcinógeno Tipo 1 por IARC)',
       'Riesgo de cáncer de esófago (especialmente en portadores de mutación ALDH2)',
@@ -149,23 +149,30 @@ const ORGANOS: OrganoInfo[] = [
   },
 ];
 
+// Frecuencias (hallazgos 4917 y 4924, 17/11/2026): daban un ~15 % de europeos portadores y en Asia
+// oriental sumaban 85 + 50 + 5-8 = 140 %. La fuente que se ha podido leer, el resumen de NCBI Gene
+// para ALDH2 (PubChem, gen 217), dice «Most Caucasians have two major isozymes, while approximately
+// 50% of East Asians have the cytosolic isozyme but not the mitochondrial isozyme»: ~50 % de
+// portadores en total y europeos casi sin la variante. No reparte entre heterocigotos y homocigotos,
+// así que la app no da ese reparto; con ~50 % de portadores, el homocigoto es la parte menor
+// (Hardy-Weinberg: alelo ≈ 0,29, homocigotos ≈ 9 %). La actividad «al 25-30 %» no tenía fuente.
 const EFECTOS_ALDH2: EfectoALDH2[] = [
   {
-    porcentaje: '~85%',
+    porcentaje: '~50 % en Asia oriental',
     poblacion: 'ALDH2 normal (dos copias funcionales)',
-    descripcion: 'Metabolizan el acetaldehído con eficiencia normal. El riesgo de cáncer existe pero es menor que en portadores de la mutación.',
+    descripcion: 'Metabolizan el acetaldehído con eficiencia normal. Es el genotipo de la mayoría de las personas de origen europeo. El riesgo de cáncer existe pero es menor que en portadores de la variante.',
     riesgo: 'Riesgo basal',
     color: '#27AE60',
   },
   {
-    porcentaje: '~15% europeos / ~50% asiáticos orientales',
+    porcentaje: 'Con el homocigoto, ~50 % en Asia oriental',
     poblacion: 'ALDH2*2 heterocigoto (una copia deficiente)',
-    descripcion: 'La enzima ALDH2 funciona al 25-30% de su capacidad. El acetaldehído se acumula más rápido. Síntomas: enrojecimiento facial (flush), taquicardia, náuseas, cefalea. El riesgo de cáncer esofágico al beber es significativamente mayor.',
+    descripcion: 'La actividad de la enzima ALDH2 queda muy reducida. El acetaldehído se acumula más rápido. Síntomas: enrojecimiento facial (flush), taquicardia, náuseas, cefalea. El riesgo de cáncer esofágico al beber es significativamente mayor.',
     riesgo: 'Riesgo elevado de cáncer',
     color: '#E67E22',
   },
   {
-    porcentaje: '~5-8% asiáticos orientales',
+    porcentaje: 'La parte menor de ese ~50 %',
     poblacion: 'ALDH2*2 homocigoto (dos copias deficientes)',
     descripcion: 'ALDH2 prácticamente inactiva. El acetaldehído se acumula masivamente. Los síntomas son tan intensos que la mayoría no puede consumir alcohol con regularidad. Paradójicamente, esto reduce la exposición acumulada.',
     riesgo: 'Máximo riesgo si beben',
@@ -377,11 +384,18 @@ export default function MetabolismoAlcoholPage() {
             ))}
           </div>
 
+          <p className={styles.fuenteNota}>
+            Fuente de las frecuencias: resumen de NCBI Gene para ALDH2 (consultado en PubChem, 2026): «Most
+            Caucasians have two major isozymes, while approximately 50% of East Asians have the cytosolic
+            isozyme but not the mitochondrial isozyme». No da el reparto entre una y dos copias.
+          </p>
+
           <div className={styles.warningBox}>
-            <strong><span aria-hidden="true">⚠️</span> El &ldquo;efecto flus&rdquo; no es solo una molestia:</strong> Los estudios muestran que
-            las personas con ALDH2*2 heterocigoto que beben regularmente tienen un riesgo de cáncer esofágico
-            hasta 6-10 veces mayor que la población general. El enrojecimiento es una señal de alerta biológica,
-            no simplemente una predisposición a la intolerancia.
+            <strong><span aria-hidden="true">⚠️</span> El &ldquo;efecto flus&rdquo; no es solo una molestia:</strong> Según
+            el mismo resumen de NCBI Gene, la forma inactiva de la enzima, al aumentar la exposición al
+            acetaldehído, puede dar mayor susceptibilidad a muchos tipos de cáncer en quienes beben. El
+            enrojecimiento es una señal de
+            alerta biológica, no simplemente una predisposición a la intolerancia.
           </div>
         </section>
       )}
