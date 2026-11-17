@@ -581,13 +581,17 @@ test.describe('guia-metrica-estrofas en móvil', () => {
   });
 
   test('HALLAZGO [accesibilidad/medio] · en ≤ 768 px las pestañas se quedan sin nombre accesible ni texto visible', async ({ page }) => {
-    // ABIERTO. ESPERADO cada pestaña con nombre («Reglas y contador», «Tipos de verso»…)
+    // REPARADO (hallazgo 4992). ESPERADO cada pestaña con nombre («Reglas y contador», «Tipos de verso»…)
     // OBTENIDO .tabNombre { display: none } en ≤ 768 px y el emoji va con aria-hidden: cinco role="tab"
-    //          sin nombre, y en pantalla solo ✍️ 📏 🎵 🏛️ 📜
-    test.fail();
+    //          sin nombre, y en pantalla solo ✍️ 📏 🎵 🏛️ 📜. Ahora el nombre queda oculto solo a la
+    //          vista, y el panel se nombra por su pestaña (aria-labelledby) y ellas lo controlan.
     await abrir(page);
     const pestanas = page.getByRole('tab');
     await expect(pestanas).toHaveCount(5);
-    for (let i = 0; i < 5; i++) await expect(pestanas.nth(i)).toHaveAccessibleName(/\S/, { timeout: 2000 });
+    const nombres = ['Reglas y contador', 'Tipos de verso', 'Rima', 'Estrofas', 'Formas poéticas'];
+    for (let i = 0; i < 5; i++) await expect(pestanas.nth(i)).toHaveAccessibleName(nombres[i], { timeout: 2000 });
+    await page.getByRole('tab', { name: 'Rima' }).click();
+    await expect(page.getByRole('tabpanel', { name: 'Rima' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Rima' })).toHaveAttribute('aria-controls', 'panel-metrica');
   });
 });

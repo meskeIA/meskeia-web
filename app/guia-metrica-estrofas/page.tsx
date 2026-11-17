@@ -320,6 +320,8 @@ export default function GuiaMetricaEstrofasPage() {
             className={`${styles.tabBtn} ${tab === t.id ? styles.tabBtnActive : ''}`}
             onClick={() => setTab(t.id)}
             role="tab"
+            id={`pestana-${t.id}`}
+            aria-controls="panel-metrica"
             aria-selected={tab === t.id}
           >
             <span aria-hidden="true">{t.icono}</span>
@@ -328,7 +330,7 @@ export default function GuiaMetricaEstrofasPage() {
         ))}
       </nav>
 
-      <div className={styles.tabContent} role="tabpanel">
+      <div className={styles.tabContent} role="tabpanel" id="panel-metrica" aria-labelledby={`pestana-${tab}`}>
 
         {/* ── TAB 1: Reglas y contador ── */}
         {tab === 'reglas' && (

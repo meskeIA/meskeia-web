@@ -956,8 +956,18 @@
 ══════════════════════════════════════ */
 
 @media (max-width: 768px) {
+  /* En móvil solo se ve el icono, pero el nombre sigue en el árbol de accesibilidad: con
+     display: none las cinco pestañas se quedaban sin nombre (hallazgo 4992) */
   .tabNombre {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .tabBtn {
