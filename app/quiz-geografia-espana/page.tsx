@@ -577,10 +577,10 @@ export default function QuizGeografiaEspanaPage() {
             {[
               { icon: '🏔️', titulo: 'El punto más meridional de Europa', desc: 'Punta de Tarifa (Cádiz) es el punto más al sur de Europa continental, a solo 14 km de África. En días claros se ve la costa marroquí.' },
               { icon: '🌊', titulo: 'El río más caudaloso', desc: 'El Ebro es el río más caudaloso de España con 426 m³/s de media, aunque el Tajo es más largo. El Ebro es el único gran río que desemboca en el Mediterráneo.' },
-              { icon: '🏝️', titulo: 'Canarias, a la misma latitud que el Sáhara', desc: 'El archipiélago canario está a 100 km de la costa africana y en la misma latitud que el norte de Marruecos. Tiene clima subtropical, no mediterráneo.' },
+              { icon: '🏝️', titulo: 'Canarias, a la misma latitud que el Sáhara', desc: 'El archipiélago canario está a 100 km de la costa africana, a la altura del sur de Marruecos y del Sáhara Occidental: unos 700 km más al sur que el estrecho de Gibraltar. Tiene clima subtropical, no mediterráneo.' },
               { icon: '📐', titulo: 'España, el segundo país más montañoso de Europa', desc: 'Con una altitud media de 660 m, España es el segundo país más montañoso de Europa tras Suiza. Solo un 11% de su territorio está por debajo de los 200 m.' },
               { icon: '🌐', titulo: 'Dos husos horarios', desc: 'España tiene técnicamente dos husos horarios: la Península y Baleares (UTC+1) y Canarias (UTC). Ceuta y Melilla siguen el horario peninsular aunque estén en África.' },
-              { icon: '💧', titulo: 'La laguna más grande de España', desc: 'La Albufera de Valencia es la laguna más grande de España con 2.800 ha de agua dulce. El Mar Menor (Murcia) es la laguna salada más grande de Europa occidental.' },
+              { icon: '💧', titulo: 'La mayor laguna costera del Mediterráneo español', desc: 'El Mar Menor (Murcia), con 135 km² de agua salada, es la mayor laguna costera del Mediterráneo español. La Albufera de Valencia, con unas 2.800 ha de agua dulce, es la otra gran laguna litoral mediterránea.' },
             ].map(t => (
               <div key={t.icon} className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">{t.icon}</span>

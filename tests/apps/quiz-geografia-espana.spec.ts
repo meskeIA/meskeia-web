@@ -1167,61 +1167,72 @@ async function tarjetaGuia(page: Page, clase: string, texto: string): Promise<st
 
 test.describe('Inspector 28/10/2026 · contenido (cabo C0203 y JSON-LD)', () => {
   test('hallazgo · Ordesa no fue el primer parque nacional: Covadonga se declaró antes', async () => {
-    // ABIERTO (inspector 28/10/2026). id 62: «Fue el primer parque nacional español, creado en 1918.»
+    // REPARADO (hallazgo 3692): ahora nombra a Covadonga como el primero. Antes, id 62: «Fue el
+    // primer parque nacional español, creado en 1918.»
     // BOE: la Ley de 22 de julio de 1918 (Gaceta de Madrid núm. 205, 24/07/1918, BOE-A-1918-3943),
     // art. 2, declara parque nacional el macizo de Peña Santa «con el nombre de Parque Nacional de
     // la Montaña de Covadonga»; el «Real decreto de 16 de agosto de 1918 creando el Parque Nacional
     // del Valle de Ordesa o del río Ara […] fijando sus límites y extensión y los del Parque Nacional
     // de Covadonga» (Gaceta núm. 230, 18/08/1918, BOE-A-1918-4414) es 25 días posterior.
-    test.fail();
-    expect(fichaDe(/Parque Nacional de Ordesa y Monte Perdido/).explicacion).not.toMatch(/primer parque nacional/i);
+    const explicacion = fichaDe(/Parque Nacional de Ordesa y Monte Perdido/).explicacion;
+    expect(explicacion).not.toMatch(/primer parque nacional/i);
+    expect(explicacion).toMatch(/Covadonga/);
   });
 
   test('hallazgo · el Aneto no está en un «Parque Nacional Posets-Maladeta»', async () => {
-    // ABIERTO (inspector 28/10/2026). id 29: «dentro del Parque Nacional Posets-Maladeta».
+    // REPARADO (hallazgo 3693): «Parque Natural Posets-Maladeta». Antes, id 29: «dentro del Parque
+    // Nacional Posets-Maladeta».
     // BOE: Ley 3/1994, de 23 de junio, de las Cortes de Aragón, «de creación del Parque
     // Posets-Maladeta», art. 1: «Se crea el Parque de Posets-Maladeta, en el Pirineo aragonés»
     // (figura de Parque de la Ley 4/1989). Un parque nacional se declara «por ley de las Cortes
     // Generales» (Ley 30/2014, art. 8.1) y Posets-Maladeta no está entre los de la disposición
     // adicional primera de esa ley.
-    test.fail();
-    expect(fichaDe(/pico más alto del Pirineo/).explicacion).not.toMatch(/Parque Nacional Posets/i);
+    const explicacion = fichaDe(/pico más alto del Pirineo/).explicacion;
+    expect(explicacion).not.toMatch(/Parque Nacional Posets/i);
+    expect(explicacion).toMatch(/Parque Natural Posets-Maladeta/);
   });
 
   test('hallazgo · Zaragoza es hoy la cuarta ciudad más poblada y Sevilla la quinta', async () => {
-    // ABIERTO (inspector 28/10/2026). id 11: «Sevilla … la cuarta ciudad más poblada de España»;
+    // REPARADO (hallazgo 3694): las dos dicen «una de las cinco ciudades más pobladas», cierto con
+    // cualquiera de los dos órdenes, que se cruzan entre padrones por unos miles de habitantes.
+    // Antes, id 11: «Sevilla … la cuarta ciudad más poblada de España»;
     // id 17: «Zaragoza … la quinta ciudad más poblada de España». INE, cifras oficiales del Padrón a
     // 1 de enero de 2025 (tablas «Zaragoza: Población por municipios y sexo» y «Sevilla: …»):
     // València 840.792 · Zaragoza 693.091 · Sevilla 689.423. Esperado: Zaragoza 4.ª, Sevilla 5.ª.
-    test.fail();
     const fallos: string[] = [];
     if (/cuarta ciudad más poblada/.test(fichaDe(/capital de Andalucía/).explicacion)) fallos.push('Sevilla «cuarta» (INE 2025: 689.423, quinta)');
     if (/quinta ciudad más poblada/.test(fichaDe(/capital de Aragón/).explicacion)) fallos.push('Zaragoza «quinta» (INE 2025: 693.091, cuarta)');
     expect(fallos).toEqual([]);
+    expect(fichaDe(/capital de Andalucía/).explicacion).toMatch(/una de las cinco ciudades más pobladas/);
+    expect(fichaDe(/capital de Aragón/).explicacion).toMatch(/una de las cinco ciudades más pobladas/);
   });
 
   test('hallazgo · la Albufera no es «la laguna más grande de España»: el Mar Menor tiene 135 km²', async ({ page }) => {
-    // ABIERTO (inspector 28/10/2026). Curiosidad de la guía: «La Albufera de Valencia es la laguna
+    // REPARADO (hallazgo 3695): la tarjeta da el puesto al Mar Menor con la cifra y la expresión del
+    // BOE. Antes, curiosidad de la guía: «La Albufera de Valencia es la laguna
     // más grande de España con 2.800 ha de agua dulce. El Mar Menor (Murcia) es la laguna salada…».
     // BOE: Ley 19/2022, de 30 de septiembre, «para el reconocimiento de personalidad jurídica a la
     // laguna del Mar Menor», preámbulo: «con una superficie de 135 km2, la mayor laguna costera del
     // Mediterráneo español». 135 km² = 13.500 ha > 2.800 ha.
-    test.fail();
     await abrir(page);
     const t = await tarjetaGuia(page, 'tipCard', 'Albufera');
     const ha = Number(((t.match(/([\d.]+) ha/) ?? [])[1] ?? 'NaN').replace(/\./g, ''));
     expect(ha, 'superficie que da la tarjeta').toBe(2800);
     expect(/laguna más grande de España/.test(t) && ha < 13_500, `«${t}»`).toBe(false);
+    expect(t).toContain('El Mar Menor (Murcia), con 135 km² de agua salada, es la mayor laguna costera del Mediterráneo español');
   });
 
   test('hallazgo · Canarias no está «en la misma latitud que el norte de Marruecos»', async ({ page }) => {
-    // ABIERTO (inspector 28/10/2026). BOE: Real Decreto 2510/1977, de 5 de agosto, sobre trazado de
+    // REPARADO (hallazgo 3696): «a la altura del sur de Marruecos y del Sáhara Occidental: unos 700 km
+    // más al sur que el estrecho» (36º 00' − 29º 25', la punta norte de Alegranza, ≈ 6,6º ≈ 730 km).
+    // BOE: Real Decreto 2510/1977, de 5 de agosto, sobre trazado de
     // líneas de base rectas: el punto más septentrional de Canarias, Pta. Grieta (Alegranza), está
     // a 29º 42' N y Pta. de la Restinga (El Hierro) a 27º 38' N; Tarifa (isla), a 36º 00' N, frente
     // a la costa norte de Marruecos a 14 km (la propia guía). Canarias queda 6º-8º más al sur.
-    test.fail();
     await abrir(page);
-    expect(await tarjetaGuia(page, 'tipCard', 'archipiélago canario')).not.toMatch(/norte de Marruecos/);
+    const t = await tarjetaGuia(page, 'tipCard', 'archipiélago canario');
+    expect(t).not.toMatch(/norte de Marruecos/);
+    expect(t).toMatch(/sur de Marruecos y del Sáhara Occidental/);
   });
 
   test('REPARADO (C0203, decisión del usuario 30/10/2026) · sin las cuatro afirmaciones que ninguna fuente oficial ancla', async ({ page }) => {
