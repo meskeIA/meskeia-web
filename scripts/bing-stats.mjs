@@ -180,10 +180,15 @@ async function analizarSitio(siteUrl) {
             (variacion != null ? ` (${signo}${nf1.format(Math.abs(variacion))} % vs ${VENTANA} d previos)` : '') +
             ` · ${nf.format(r5)} 5xx${alerta ? '   ⚠️' : ''}`,
         );
+        // 17/11/2026: el aviso mandaba directamente a pedir el export de GSC, y dos ciclos seguidos
+        // saltó con cifras pequeñas (31 frente a 6) sin una sola URL nuestra rota. Ahora manda
+        // primero al rastreo propio; el export, solo si eso encuentra algo o hay 5xx.
         if (alerta) {
+          const esMeskeia = siteUrl.includes('meskeia.com');
           console.log(
-            '     → señal activa: pedir el export de URLs en GSC → Indexación → Páginas' +
-              (r5 > 0 ? ' (los 5xx son errores de servidor: mirar primero)' : ''),
+            r5 > 0
+              ? '     → señal activa con 5xx (errores de servidor): pedir el export de URLs en GSC → Indexación → Páginas'
+              : `     → señal activa: rastreo propio primero (${esMeskeia ? 'la Ronda de hoy, _private/rondas/' : 'node scripts/rastreo-portales.mjs'}); el export de GSC, solo si encuentra una URL nuestra sin 200`,
           );
         }
       }
