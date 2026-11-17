@@ -410,10 +410,12 @@ test.describe('guia-metrica-estrofas', () => {
   });
 
   test('HALLAZGO [contenido/medio] · la octava real de ejemplo no rima ABABABCC y es un texto «adaptado» atribuido a Ercilla', async ({ page }) => {
-    // ABIERTO. ESPERADO A = v1, v3, v5 · B = v2, v4, v6 · C = v7, v8, en consonante
+    // REPARADO (hallazgo 4985, /reparar pendientes del 17/11/2026). ESPERADO A = v1, v3, v5 · B = v2, v4,
+    //          v6 · C = v7, v8, en consonante
     // OBTENIDO v6 «congoja» no rima con «duda / sañuda»; el pareado «solo / vitola» no rima;
     //          atribución «La Araucana (adaptado) · Alonso de Ercilla»
-    test.fail();
+    // Ahora la primera octava del canto I, cotejada en Wikisource («La araucana primera parte/I»):
+    // gentilezas / ternezas / proezas · enamorados / cuidados / esforzados · domada / espada.
     const octava = await forma(page, 'Octava Real');
     await expect(octava).toContainText('ABABABCC');
     const versos = (await octava.locator('[class$="_formaVerso"]').allTextContents()).map((v) => v.trim());
@@ -423,6 +425,8 @@ test.describe('guia-metrica-estrofas', () => {
     expect.soft([c[3], c[5]], 'rima B').toEqual([c[1], c[1]]);
     expect.soft(c[7], 'pareado C').toBe(c[6]);
     await expect.soft(octava.locator('[class$="_formaAtrib"]')).not.toContainText('adaptado', { timeout: 2000 });
+    // La ottava rima italiana también es ABABABCC: el pareado no puede ser lo que las distingue
+    await expect.soft(octava, 'frase de la ottava').not.toContainText('la distingue de la ottava', { timeout: 2000 });
   });
 
   test('HALLAZGO [contenido/medio] · el ejemplo de rima asonante empareja dos versos que no riman (é-e / á-a)', async ({ page }) => {
@@ -510,16 +514,27 @@ test.describe('guia-metrica-estrofas', () => {
   });
 
   test('HALLAZGO [contenido/medio] · atribuciones que no casan: un «terceto» de las Soledades, que la propia app da como silva', async ({ page }) => {
-    // ABIERTO. La ficha Silva dice que «Góngora la usó en las Soledades» (y cita su comienzo real, «Era
-    // del año la estación florida»); la ficha Terceto atribuye a «Soledades» unos versos que abren la
-    // dedicatoria del Polifemo, en octavas reales (sin fuente en la red para anclarlo: criterio C0203).
+    // REPARADO (hallazgo 4990, /reparar pendientes del 17/11/2026). La ficha Silva dice que «Góngora la
+    // usó en las Soledades» (y cita su comienzo real, «Era del año la estación florida»); la ficha Terceto
+    // atribuía a «Soledades» unos versos que abren la dedicatoria del Polifemo, en octavas reales.
     // Sin anclar, en el acta: «Poema XX» para «Hemos perdido aun este crepúsculo», «Romance sonámbulo»
-    // para «Por las ramas del laurel», «Noche oscura del alma» como título.
-    test.fail();
+    // para «Por las ramas del laurel», «Noche oscura del alma» como título (ya fuera con 4980).
+    // Ahora, cotejado en Wikisource: el terceto es el de la Epístola moral a Fabio («al más astuto», como
+    // la cita Bello, Gramática, cap. XXVIII; no «activo», como la daba la propuesta de memoria), y
+    // «Por las ramas del laurel» abre la «Casida de las palomas oscuras». Neruda, sin edición: solo el autor.
     const silva = await forma(page, 'Silva');
     await expect(silva).toContainText('Soledades');
     const terceto = await abrirEstrofa(page, /Terceto/);
-    await expect(terceto.locator('[class$="_estrofaAtrib"]')).not.toContainText('Soledades', { timeout: 2000 });
+    const atrib = terceto.locator('[class$="_estrofaAtrib"]');
+    await expect(atrib).not.toContainText('Soledades', { timeout: 2000 });
+    await expect(atrib).toContainText('Epístola moral a Fabio');
+    await expect(terceto).toContainText('y donde al más astuto nacen canas.');
+
+    await page.getByRole('tab', { name: 'Tipos de verso' }).click();
+    // Por el verso, no por el nombre: «Decasílabo» también casaría con «Endecasílabo» (hasText ignora mayúsculas)
+    const tipo = (verso: string) => page.locator('[class*="_tipoCard"]').filter({ hasText: verso });
+    await expect(tipo('Por las ramas del laurel').locator('[class$="_tipoAtrib"]')).toHaveText('Federico García Lorca · Casida de las palomas oscuras');
+    await expect(tipo('Hemos perdido aun este crepúsculo').locator('[class$="_tipoAtrib"]')).toHaveText('Pablo Neruda');
   });
 
   test('HALLAZGO [contenido/bajo] · el ejemplo de sinalefa subraya vocales que no se funden', async ({ page }) => {

@@ -140,16 +140,17 @@ interface TipoVerso {
   nombre: string;
   arte: 'menor' | 'mayor';
   descripcion: string;
-  ejemplo: { verso: string; autor: string; obra: string };
+  // `obra` es opcional desde el hallazgo 4990: sin una edición que ancle el título, solo el autor.
+  ejemplo: { verso: string; autor: string; obra?: string };
 }
 
 const TIPOS_VERSO: TipoVerso[] = [
   { silabas: 5, nombre: 'Pentasílabo', arte: 'menor', descripcion: 'Poco frecuente solo; aparece en combinación con otros versos, sobre todo en la lírica popular, y en los versos primero y tercero del haiku adaptado al español.', ejemplo: { verso: 'Un viejo estanque', autor: 'Matsuo Bashō', obra: 'El estanque (traducción)' } },
   { silabas: 6, nombre: 'Hexasílabo', arte: 'menor', descripcion: 'Verso de cadencia ágil, muy usado en la lírica popular, en las serranillas medievales y en combinación con heptasílabos.', ejemplo: { verso: 'Moza tan fermosa', autor: 'Marqués de Santillana', obra: 'Serranilla de la Finojosa' } },
   { silabas: 7, nombre: 'Heptasílabo', arte: 'menor', descripcion: 'Uno de los versos de arte menor más usados en la poesía culta. Pieza clave de la lira (combinado con endecasílabos) y de la silva. Muy musical.', ejemplo: { verso: 'Si de mi baja lira', autor: 'Garcilaso de la Vega', obra: 'Canción V' } },
-  { silabas: 8, nombre: 'Octosílabo', arte: 'menor', descripcion: 'El verso rey de la poesía popular española. Base del romance, la redondilla y la décima. Ritmo natural del castellano.', ejemplo: { verso: 'Por las ramas del laurel', autor: 'Federico García Lorca', obra: 'Romance sonámbulo' } },
+  { silabas: 8, nombre: 'Octosílabo', arte: 'menor', descripcion: 'El verso rey de la poesía popular española. Base del romance, la redondilla y la décima. Ritmo natural del castellano.', ejemplo: { verso: 'Por las ramas del laurel', autor: 'Federico García Lorca', obra: 'Casida de las palomas oscuras' } },
   { silabas: 9, nombre: 'Eneasílabo', arte: 'mayor', descripcion: 'Verso relativamente infrecuente en la tradición clásica, más habitual en el Romanticismo y el Modernismo.', ejemplo: { verso: 'Juventud, divino tesoro', autor: 'Rubén Darío', obra: 'Canción de otoño en primavera' } },
-  { silabas: 10, nombre: 'Decasílabo', arte: 'mayor', descripcion: 'Aparece en la épica medieval y renace en el Modernismo. Se divide en dos hemistiquios de 4+6 o variantes.', ejemplo: { verso: 'Hemos perdido aun este crepúsculo', autor: 'Pablo Neruda', obra: 'Poema XX' } },
+  { silabas: 10, nombre: 'Decasílabo', arte: 'mayor', descripcion: 'Aparece en la épica medieval y renace en el Modernismo. Se divide en dos hemistiquios de 4+6 o variantes.', ejemplo: { verso: 'Hemos perdido aun este crepúsculo', autor: 'Pablo Neruda' } },
   { silabas: 11, nombre: 'Endecasílabo', arte: 'mayor', descripcion: 'El verso culto por excelencia del castellano. Base del soneto, la lira, la octava real y la silva. Introducido por Garcilaso en el siglo XVI desde Italia.', ejemplo: { verso: 'Yo no nací sino para quereros', autor: 'Garcilaso de la Vega', obra: 'Soneto V' } },
   { silabas: 14, nombre: 'Alejandrino', arte: 'mayor', descripcion: 'Verso de 14 sílabas dividido en dos hemistiquios de 7 (7+7). Protagonista del Modernismo hispanoamericano. Rubén Darío lo popularizó en castellano.', ejemplo: { verso: 'La princesa está triste… ¿qué tendrá la princesa?', autor: 'Rubén Darío', obra: 'Sonatina' } },
 ];
@@ -178,7 +179,7 @@ const ESTROFAS: Estrofa[] = [
     esquema: 'ABA / BCB / CDC…',
     medida: 'Endecasílabos',
     descripcion: 'Tres endecasílabos encadenados. La terza rima de Dante. En castellano, los tercetos encadenados se usan en elegías y poemas filosóficos.',
-    ejemplo: { lineas: ['Estas que me dictó rimas sonoras,', 'culta sí, aunque bucólica, Talía', '—¡oh excelso Conde!—, en las purpúreas horas'], autor: 'Luis de Góngora', obra: 'Soledades' },
+    ejemplo: { lineas: ['Fabio, las esperanzas cortesanas', 'prisiones son do el ambicioso muere', 'y donde al más astuto nacen canas.'], autor: 'Andrés Fernández de Andrada', obra: 'Epístola moral a Fabio' },
   },
   {
     nombre: 'Redondilla',
@@ -261,8 +262,8 @@ const FORMAS: FormaPoética[] = [
     icono: '👑',
     descripcion: 'Ocho endecasílabos con esquema ABABABCC. Los dos últimos forman un pareado de cierre. Fue la estrofa de la épica culta renacentista y barroca.',
     estructura: 'ABABAB + CC (ocho endecasílabos)',
-    historia: 'Importada del italiano por Garcilaso y Boscán. Usada por Ercilla en La Araucana, por Ariosto en Orlando Furioso y por Torquato Tasso. El pareado final la distingue de la ottava y le da un remate sentencioso.',
-    ejemplo: { lineas: ['Las armas y el furor del pecho airado', 'que al cielo con su fuerza puso en duda', 'y a la terrible diosa que ha negado', 'su vengativa cólera sañuda,', 'el nuevo ardor del mozo arrebatado', 'que al reino puso en áspera congoja,', 'canto, Señor, en tu servicio solo,', 'bajo el amparo tuyo y tu vitola.'], titulo: 'La Araucana (adaptado)', autor: 'Alonso de Ercilla' },
+    historia: 'Es la adaptación castellana de la ottava rima italiana de Ariosto (Orlando furioso) y Tasso, con el mismo esquema; la importaron Boscán y Garcilaso, y Ercilla la usó en La Araucana. El pareado final le da un remate sentencioso.',
+    ejemplo: { lineas: ['No las damas, amor, no gentilezas', 'de caballeros canto enamorados,', 'ni las muestras, regalos y ternezas', 'de amorosos afectos y cuidados;', 'mas el valor, los hechos, las proezas', 'de aquellos españoles esforzados,', 'que a la cerviz de Arauco no domada', 'pusieron duro yugo por la espada.'], titulo: 'La Araucana, canto I', autor: 'Alonso de Ercilla' },
   },
   {
     nombre: 'Silva',
@@ -438,7 +439,10 @@ export default function GuiaMetricaEstrofasPage() {
                 <p className={styles.tipoDesc}>{tv.descripcion}</p>
                 <div className={styles.tipoEjemplo}>
                   <em className={styles.tipoVerso}>&ldquo;{tv.ejemplo.verso}&rdquo;</em>
-                  <span className={styles.tipoAtrib}>{tv.ejemplo.autor} · <cite>{tv.ejemplo.obra}</cite></span>
+                  <span className={styles.tipoAtrib}>
+                    <span>{tv.ejemplo.autor}</span>
+                    {tv.ejemplo.obra ? <span> · <cite>{tv.ejemplo.obra}</cite></span> : null}
+                  </span>
                 </div>
               </div>
             ))}
