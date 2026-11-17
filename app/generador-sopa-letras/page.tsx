@@ -34,6 +34,9 @@ interface Sopa {
   colocadas: PalabraColocada[];
   descartadas: string[];
   semilla: number;
+  /** Lado y nivel con los que se generó: los seleccionados pueden cambiar sin regenerar */
+  lado: number;
+  nivel: Nivel;
 }
 
 /** Direcciones como [deltaFila, deltaColumna] */
@@ -232,7 +235,7 @@ function generarSopa(palabras: string[], lado: number, nivel: Nivel, semilla: nu
     }
   }
 
-  return { cuadricula, colocadas, descartadas, semilla };
+  return { cuadricula, colocadas, descartadas, semilla, lado, nivel };
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -255,7 +258,12 @@ export default function GeneradorSopaLetrasPage() {
     return Array.from(new Set(limpias));
   }, [entrada]);
 
-  const generar = useCallback(() => {
+  /**
+   * `otraDistinta`: «Otra distinta» sortea siempre un n.º nuevo, distinto del de la sopa actual,
+   * y vacía el campo. Antes tomaba el n.º escrito como «Generar» y repetía la misma sopa (el
+   * mismo defecto que el hallazgo 4273 de las fichas y el 4948 del laberinto).
+   */
+  const generar = useCallback((otraDistinta: boolean) => {
     const palabras = palabrasNormalizadas();
 
     if (palabras.length === 0) {
@@ -264,8 +272,12 @@ export default function GeneradorSopaLetrasPage() {
       return;
     }
 
-    const semillaBase = Number(semillaManual.replace(/\D/g, ''));
-    const semilla = semillaBase > 0 ? semillaBase : Math.floor(Math.random() * 900000) + 100000;
+    const semillaBase = otraDistinta ? 0 : Number(semillaManual.replace(/\D/g, ''));
+    let semilla = semillaBase;
+    while (semilla <= 0 || (otraDistinta && semilla === sopa?.semilla)) {
+      semilla = Math.floor(Math.random() * 900000) + 100000;
+    }
+    if (otraDistinta) setSemillaManual('');
 
     const resultado = generarSopa(palabras, lado, nivel, semilla);
     setSopa(resultado);
@@ -278,7 +290,7 @@ export default function GeneradorSopaLetrasPage() {
     } else {
       setAviso('');
     }
-  }, [palabrasNormalizadas, lado, nivel, semillaManual]);
+  }, [palabrasNormalizadas, lado, nivel, semillaManual, sopa]);
 
   const cargarLista = (id: string) => {
     const lista = LISTAS_TEMATICAS.find((l) => l.id === id);
@@ -409,7 +421,7 @@ export default function GeneradorSopaLetrasPage() {
               </div>
             </div>
 
-            <button type="button" className={styles.btnPrimary} onClick={generar}>
+            <button type="button" className={styles.btnPrimary} onClick={() => generar(false)}>
               <span aria-hidden="true">✨</span> Generar sopa de letras
             </button>
 
@@ -436,7 +448,7 @@ export default function GeneradorSopaLetrasPage() {
                 <p className={styles.resumen}>
                   <strong>{sopa.colocadas.length}</strong> palabras colocadas en una cuadrícula de{' '}
                   <strong>
-                    {lado} × {lado}
+                    {sopa.lado} × {sopa.lado}
                   </strong>
                   . Número de sopa: <strong>{sopa.semilla}</strong>.
                 </p>
@@ -460,7 +472,7 @@ export default function GeneradorSopaLetrasPage() {
                     <span aria-hidden="true">🖨️</span> Imprimir esta vista
                   </button>
 
-                  <button type="button" className={styles.btnSecundario} onClick={generar}>
+                  <button type="button" className={styles.btnSecundario} onClick={() => generar(true)}>
                     <span aria-hidden="true">🔄</span> Otra distinta
                   </button>
                 </div>
@@ -483,7 +495,7 @@ export default function GeneradorSopaLetrasPage() {
 
           <table className={`${styles.cuadricula} ${impresion.rejilla}`}>
             <caption className={styles.srOnly}>
-              Cuadrícula de {lado} por {lado} letras con {sopa.colocadas.length} palabras escondidas
+              Cuadrícula de {sopa.lado} por {sopa.lado} letras con {sopa.colocadas.length} palabras escondidas
             </caption>
             <tbody>
               {sopa.cuadricula.map((fila, f) => (
@@ -511,7 +523,7 @@ export default function GeneradorSopaLetrasPage() {
           </div>
 
           <p className={styles.pieHoja}>
-            Sopa n.º {sopa.semilla} · {ETIQUETAS_NIVEL[nivel]} · meskeia.com
+            Sopa n.º {sopa.semilla} · {ETIQUETAS_NIVEL[sopa.nivel]} · meskeia.com
           </p>
         </div>
       )}
