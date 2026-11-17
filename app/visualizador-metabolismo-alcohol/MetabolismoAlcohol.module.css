@@ -1,4 +1,8 @@
+/* Morado de texto del estómago (hallazgo 4918): globals.css no lo trae. 7,07:1 sobre blanco y
+   7,8:1 sobre la tarjeta oscura #2D2D2D. */
 .container {
+  --morado-texto: #7E3A9C;
+
   min-height: 100vh;
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -447,6 +451,10 @@
 
 [data-theme='dark'] .infoBox {
   background: #1e3a5f;
+}
+
+[data-theme='dark'] .container {
+  --morado-texto: #D8B4FE;
 }
 
 /* Dark mode base */

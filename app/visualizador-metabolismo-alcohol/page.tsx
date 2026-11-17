@@ -31,7 +31,8 @@ interface OrganoInfo {
   id: OrganoId;
   nombre: string;
   icono: string;
-  color: string;
+  color: string;       // borde y tinte del botón (decorativo)
+  colorTexto: string;  // el h3: tono de texto por tema (hallazgo 4918)
   mecanismo: string;
   acetaldehido: string;
   consecuencias: string[];
@@ -43,8 +44,13 @@ interface EfectoALDH2 {
   poblacion: string;
   descripcion: string;
   riesgo: string;
-  color: string;
+  color: string;       // borde superior y tinte de la etiqueta (decorativo)
+  colorTexto: string;  // cifra y etiqueta: tono de texto por tema (hallazgo 4918)
 }
+
+// Hallazgo 4918 (17/11/2026): el color puro de cada órgano y genotipo pintaba texto por style
+// (2,35-3,98:1 en algún tema). Los tonos de texto de globals.css cambian con el tema; el morado
+// no existe allí y lo declara el módulo (--morado-texto, con su variante oscura).
 
 // ─── Datos ───────────────────────────────────────────
 const PASOS_METABOLICOS: PasoMetabolico[] = [
@@ -93,6 +99,7 @@ const ORGANOS: OrganoInfo[] = [
     // Hallazgo 4920: era 🫀 (corazón anatómico); no hay emoji de hígado, así que uno de laboratorio.
     icono: '🧪',
     color: '#C0392B',
+    colorTexto: 'var(--rojo-texto, #B91C1C)',
     mecanismo: 'Entre el 90 y el 98 % del alcohol ingerido se oxida a acetato, sobre todo en el hígado (Goodman & Gilman, 12.ª ed., 2011, citado por HSDB). La acumulación de NADH altera la beta-oxidación de ácidos grasos, provocando su acumulación (esteatosis). El acetaldehído forma adductos covalentes con proteínas y ADN del hepatocito, iniciando fibrosis.',
     acetaldehido: 'Concentración local máxima: es el órgano más expuesto. Los adductos proteína-acetaldehído activan células estrelladas → fibrosis → cirrosis.',
     consecuencias: [
@@ -108,6 +115,7 @@ const ORGANOS: OrganoInfo[] = [
     nombre: 'Boca y esófago',
     icono: '🦷',
     color: '#E67E22',
+    colorTexto: 'var(--naranja-texto, #B93E0B)',
     mecanismo: 'Las bacterias de la microbiota oral (Streptococcus, Fusobacterium, Candida) poseen su propia ADH bacteriana: convierten el alcohol de la saliva en acetaldehído local. Este acetaldehído no pasa por el hígado: actúa directamente sobre la mucosa.',
     acetaldehido: 'El acetaldehído que se forma en la saliva actúa sobre la mucosa sin pasar antes por el hígado, y se considera uno de los factores del riesgo de cáncer oral y esofágico asociado al alcohol.',
     consecuencias: [
@@ -124,6 +132,7 @@ const ORGANOS: OrganoInfo[] = [
     // Hallazgo 4920: era 🫁 (pulmones).
     icono: '🍽️',
     color: '#8E44AD',
+    colorTexto: 'var(--morado-texto, #7E3A9C)',
     mecanismo: 'La mucosa gástrica tiene su propia ADH, pero en menor cantidad que el hígado. El alcohol inhibe parcialmente esta ADH gástrica, permitiendo que más etanol pase al torrente sanguíneo sin ser metabolizado. Esto explica por qué el alcohol en ayunas llega más rápido y con mayor concentración al cerebro.',
     acetaldehido: 'La producción local de acetaldehído en el estómago causa irritación directa de la mucosa gástrica. Las bebidas fermentadas (vino, cerveza) contienen también acetaldehído preformado.',
     consecuencias: [
@@ -139,6 +148,7 @@ const ORGANOS: OrganoInfo[] = [
     nombre: 'Cerebro',
     icono: '🧠',
     color: '#2E86AB',
+    colorTexto: 'var(--primary-texto, #26718F)',
     mecanismo: 'El etanol cruza la barrera hematoencefálica con facilidad. Potencia los receptores GABA-A (inhibe la actividad neuronal) y bloquea los receptores NMDA (glutamato, principal excitador). El acetaldehído también puede cruzar parcialmente la barrera hematoencefálica y condensarse con la dopamina → tetrahidroisoquinolinas (posible papel en la adicción).',
     acetaldehido: 'Las concentraciones cerebrales de acetaldehído son bajas pero suficientes para interferir con neurotransmisores. La interacción acetaldehído-dopamina es una de las hipótesis sobre el desarrollo de la dependencia alcohólica.',
     consecuencias: [
@@ -165,6 +175,7 @@ const EFECTOS_ALDH2: EfectoALDH2[] = [
     descripcion: 'Metabolizan el acetaldehído con eficiencia normal. Es el genotipo de la mayoría de las personas de origen europeo. El riesgo de cáncer existe pero es menor que en portadores de la variante.',
     riesgo: 'Riesgo basal',
     color: '#27AE60',
+    colorTexto: 'var(--verde-texto, #136E35)',
   },
   {
     porcentaje: 'Con el homocigoto, ~50 % en Asia oriental',
@@ -172,6 +183,7 @@ const EFECTOS_ALDH2: EfectoALDH2[] = [
     descripcion: 'La actividad de la enzima ALDH2 queda muy reducida. El acetaldehído se acumula más rápido. Síntomas: enrojecimiento facial (flush), taquicardia, náuseas, cefalea. El riesgo de cáncer esofágico al beber es significativamente mayor.',
     riesgo: 'Riesgo elevado de cáncer',
     color: '#E67E22',
+    colorTexto: 'var(--naranja-texto, #B93E0B)',
   },
   {
     porcentaje: 'La parte menor de ese ~50 %',
@@ -179,6 +191,7 @@ const EFECTOS_ALDH2: EfectoALDH2[] = [
     descripcion: 'ALDH2 prácticamente inactiva. El acetaldehído se acumula masivamente. Los síntomas son tan intensos que la mayoría no puede consumir alcohol con regularidad. Paradójicamente, esto reduce la exposición acumulada.',
     riesgo: 'Máximo riesgo si beben',
     color: '#DC2626',
+    colorTexto: 'var(--rojo-texto, #B91C1C)',
   },
 ];
 
@@ -318,7 +331,7 @@ export default function MetabolismoAlcoholPage() {
           <div className={styles.organoDetalle} style={{ borderLeftColor: organoActual.color }}>
             <div className={styles.organoHeader}>
               <span className={styles.organoIconoGrande} aria-hidden="true">{organoActual.icono}</span>
-              <h3 className={styles.organoNombre} style={{ color: organoActual.color }}>
+              <h3 className={styles.organoNombre} style={{ color: organoActual.colorTexto }}>
                 {organoActual.nombre}
               </h3>
             </div>
@@ -374,12 +387,12 @@ export default function MetabolismoAlcoholPage() {
           <div className={styles.aldh2Grid}>
             {EFECTOS_ALDH2.map(efecto => (
               <div key={efecto.porcentaje} className={styles.aldh2Card} style={{ borderTopColor: efecto.color }}>
-                <div className={styles.aldh2Porcentaje} style={{ color: efecto.color }}>
+                <div className={styles.aldh2Porcentaje} style={{ color: efecto.colorTexto }}>
                   {efecto.porcentaje}
                 </div>
                 <h3 className={styles.aldh2Poblacion}>{efecto.poblacion}</h3>
                 <p className={styles.aldh2Desc}>{efecto.descripcion}</p>
-                <span className={styles.aldh2Riesgo} style={{ backgroundColor: efecto.color + '20', color: efecto.color }}>
+                <span className={styles.aldh2Riesgo} style={{ backgroundColor: efecto.color + '20', color: efecto.colorTexto }}>
                   {efecto.riesgo}
                 </span>
               </div>

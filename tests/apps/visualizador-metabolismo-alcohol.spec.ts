@@ -317,9 +317,9 @@ test.describe('Hallazgos de accesibilidad: colores de órgano y genotipo por sty
   // Umbrales WCAG 1.4.3: 3:1 para texto grande (≥ 18,66 px en negrita: los h3 de órgano, 22,4 px
   // 700, y las cifras de genotipo, 25,6 px 900) y 4,5:1 para las etiquetas de riesgo (12,48 px 700).
 
-  test('HALLAZGO ABIERTO [accesibilidad/medio]: en claro, «Boca y esófago», dos cifras de genotipo y las tres etiquetas de riesgo', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 17/11/2026) [accesibilidad/medio]
-    // OBTENIDO (17/11/2026) h3 «Boca y esófago» #E67E22 sobre blanco 2,85:1 · «~85%» #27AE60 2,87:1 ·
+  test('REPARADO (hallazgo 4918) [accesibilidad/medio]: en claro, «Boca y esófago», dos cifras de genotipo y las tres etiquetas de riesgo', async ({ page }) => {
+    // REPARADO 17/11/2026: el texto toma el tono -texto de su color, que cambia con el tema.
+    // OBTENIDO (antes, 17/11/2026) h3 «Boca y esófago» #E67E22 sobre blanco 2,85:1 · «~85%» #27AE60 2,87:1 ·
     //          «~15% europeos…» #E67E22 2,85:1 · «Riesgo basal» 2,54:1 · «Riesgo elevado de cáncer»
     //          2,52:1 · «Máximo riesgo si beben» 3,98:1
     await abrir(page);
@@ -337,9 +337,9 @@ test.describe('Hallazgos de accesibilidad: colores de órgano y genotipo por sty
     }
   });
 
-  test('HALLAZGO ABIERTO [accesibilidad/medio]: en oscuro, «Hígado», «Estómago», «~5-8%» y las tres etiquetas de riesgo', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 17/11/2026) [accesibilidad/medio]
-    // OBTENIDO (17/11/2026) sobre la tarjeta #2D2D2D: h3 «Hígado» #C0392B 2,53:1 · «Estómago» #8E44AD
+  test('REPARADO (hallazgo 4918) [accesibilidad/medio]: en oscuro, «Hígado», «Estómago», «~5-8%» y las tres etiquetas de riesgo', async ({ page }) => {
+    // REPARADO 17/11/2026: el texto toma el tono -texto de su color, que cambia con el tema.
+    // OBTENIDO (antes, 17/11/2026) sobre la tarjeta #2D2D2D: h3 «Hígado» #C0392B 2,53:1 · «Estómago» #8E44AD
     //          2,35:1 · «~5-8% asiáticos orientales» #DC2626 2,85:1 · «Riesgo basal» 4,00:1 ·
     //          «Riesgo elevado de cáncer» 4,03:1 · «Máximo riesgo si beben» 2,66:1
     await abrir(page, 'dark');
