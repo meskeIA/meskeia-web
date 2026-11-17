@@ -163,8 +163,9 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     await expect(page.getByRole('heading', { level: 3, name: 'Abstinencia: el peligro del rebote' })).toBeVisible();
   });
 
-  test('HALLAZGO ABIERTO [contenido/alto] CASO 2 (límite): el FAQPage dice que el alcohol solo circula por la sangre si se supera 1 unidad por hora', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO 4916 (inspector 17/11/2026) [contenido/alto: salud con consecuencia de seguridad]
+  test('REPARADO (hallazgo 4916) [contenido/alto] CASO 2 (límite): el FAQPage decía que el alcohol solo circula por la sangre si se supera 1 unidad por hora', async ({ page }) => {
+    // REPARADO 17/11/2026 (hallazgo 4916): la respuesta dice que pasa a la sangre al absorberse y
+    // llega al cerebro desde la primera copa, también bebiendo al ritmo de eliminación.
     // ENTRADA  FAQPage, «¿Cómo metaboliza el cuerpo el alcohol?»: beber justo 1 UBE (10 g) por hora
     // ESPERADO el etanol pasa a la sangre al absorberse y se reparte por el agua corporal (HSDB/
     //          Goodman & Gilman: 0,5-0,7 L/kg): 0,20-0,29 g/L en 70 kg, aunque no se supere la tasa.
@@ -178,6 +179,8 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     const r = faq?.mainEntity?.find((q) => q.name === '¿Cómo metaboliza el cuerpo el alcohol?')?.acceptedAnswer.text ?? '';
     expect(r.length).toBeGreaterThan(0);
     expect(r).not.toMatch(/cuando se supera esa tasa,? el alcohol excedente circula por la sangre/);
+    expect(r).toContain('pasa a la sangre a medida que se absorbe');
+    expect(r).toContain('no evita que el alcohol llegue al cerebro');
   });
 
   test('HALLAZGO ABIERTO [contenido/medio] CASO 3 (rechazo): las frecuencias de ALDH2 no suman 100 % y dan un 15 % de europeos portadores', async ({ page }) => {

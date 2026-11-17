@@ -40,7 +40,7 @@ export const faqJsonLd = {
       name: '¿Cómo metaboliza el cuerpo el alcohol?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El alcohol (etanol) se absorbe rápidamente en el estómago e intestino delgado y llega al hígado, donde la enzima alcohol deshidrogenasa (ADH) lo convierte en acetaldehído. A continuación, la enzima aldehído deshidrogenasa (ALDH2) transforma el acetaldehído en acetato, una molécula relativamente inofensiva que el organismo puede oxidar para obtener energía. El hígado procesa aproximadamente una unidad de alcohol por hora; cuando se supera esa tasa, el alcohol excedente circula por la sangre y llega al cerebro y otros órganos.',
+        text: 'El alcohol (etanol) se absorbe rápidamente en el estómago e intestino delgado y llega al hígado, donde la enzima alcohol deshidrogenasa (ADH) lo convierte en acetaldehído. A continuación, la enzima aldehído deshidrogenasa (ALDH2) transforma el acetaldehído en acetato, una molécula relativamente inofensiva que el organismo puede oxidar para obtener energía. El alcohol pasa a la sangre a medida que se absorbe y se reparte por el agua de todo el cuerpo, cerebro incluido, desde la primera copa. El hígado lo elimina a un ritmo aproximadamente constante, del orden de una unidad por hora: beber más rápido que ese ritmo hace que la concentración en sangre siga subiendo, pero beber a ese ritmo no evita que el alcohol llegue al cerebro.',
       },
     },
     {
