@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useLayoutEffect } from 'react';
 import styles from './CalculadoraZScoreAltman.module.css';
 import {
   MeskeiaLogo,
@@ -169,6 +169,17 @@ export default function CalculadoraZScoreAltman() {
   const [datos, setDatos] = useState<InputData>(DATOS_EJEMPLO);
   const [modelo, setModelo] = useState<ModeloKey>(MODELO_EJEMPLO);
   const [rawValues, setRawValues] = useState<Partial<InputData>>({});
+  const campoPorSeleccionar = useRef<HTMLInputElement | null>(null);
+
+  // Al enfocar, el texto pasa de «450.000» a «450000» y el navegador pierde la selección que hace
+  // Tab: lo tecleado se añadía al valor (cabo C0793, receta del hallazgo 4871). Síncrono tras el
+  // commit del foco, para que la selección llegue antes que la primera tecla.
+  useLayoutEffect(() => {
+    const campo = campoPorSeleccionar.current;
+    if (!campo) return;
+    campoPorSeleccionar.current = null;
+    if (document.activeElement === campo) campo.select();
+  }, [rawValues]);
 
   const m = MODELOS[modelo];
   const resultado = calcularZScore(datos, modelo);
@@ -281,7 +292,10 @@ export default function CalculadoraZScoreAltman() {
                   inputMode="decimal"
                   className={styles.campoInputField}
                   value={getDisplayValue(c.campo)}
-                  onFocus={() => handleFocus(c.campo)}
+                  onFocus={e => {
+                    campoPorSeleccionar.current = e.currentTarget;
+                    handleFocus(c.campo);
+                  }}
                   onChange={e => handleChange(c.campo, e.target.value)}
                   onBlur={() => handleBlur(c.campo)}
                   placeholder={c.placeholder}

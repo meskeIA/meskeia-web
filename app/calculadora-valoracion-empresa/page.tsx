@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt — resultado orientativo, DisclaimerCard variant="financial" severity="medium"
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useLayoutEffect } from 'react';
 import styles from './CalculadoraValoracionEmpresa.module.css';
 import {
   MeskeiaLogo,
@@ -180,6 +180,17 @@ export default function CalculadoraValoracionEmpresa() {
   const [datos, setDatos] = useState<InputData>(DATOS_EJEMPLO);
   const [sector, setSector] = useState<SectorKey>(SECTOR_EJEMPLO);
   const [rawValues, setRawValues] = useState<Partial<InputData>>({});
+  const campoPorSeleccionar = useRef<HTMLInputElement | null>(null);
+
+  // Al enfocar, el texto pasa de «290.000» a «290000» y el navegador pierde la selección que hace
+  // Tab: lo tecleado se añadía al valor (cabo C0793, receta del hallazgo 4871). Síncrono tras el
+  // commit del foco, para que la selección llegue antes que la primera tecla.
+  useLayoutEffect(() => {
+    const campo = campoPorSeleccionar.current;
+    if (!campo) return;
+    campoPorSeleccionar.current = null;
+    if (document.activeElement === campo) campo.select();
+  }, [rawValues]);
 
   const resultados = calcularValoraciones(datos, sector);
 
@@ -194,7 +205,8 @@ export default function CalculadoraValoracionEmpresa() {
     ? [0, 0.25, 0.5, 0.75, 1].map(f => fmtEur(Math.round(globalMax * f)))
     : ['0 €', '', '', '', ''];
 
-  const handleFocus = useCallback((campo: keyof InputData) => {
+  const handleFocus = useCallback((campo: keyof InputData, entrada: HTMLInputElement) => {
+    campoPorSeleccionar.current = entrada;
     setRawValues(prev => ({ ...prev, [campo]: datos[campo] }));
   }, [datos]);
 
@@ -282,7 +294,7 @@ export default function CalculadoraValoracionEmpresa() {
                 inputMode="decimal"
                 className={styles.campoInputField}
                 value={getDisplayValue('ebitda')}
-                onFocus={() => handleFocus('ebitda')}
+                onFocus={e => handleFocus('ebitda', e.currentTarget)}
                 onChange={e => handleChange('ebitda', e.target.value)}
                 onBlur={() => handleBlur('ebitda')}
                 placeholder="290.000"
@@ -300,7 +312,7 @@ export default function CalculadoraValoracionEmpresa() {
                 inputMode="decimal"
                 className={styles.campoInputField}
                 value={getDisplayValue('ventas')}
-                onFocus={() => handleFocus('ventas')}
+                onFocus={e => handleFocus('ventas', e.currentTarget)}
                 onChange={e => handleChange('ventas', e.target.value)}
                 onBlur={() => handleBlur('ventas')}
                 placeholder="3.200.000"
@@ -318,7 +330,7 @@ export default function CalculadoraValoracionEmpresa() {
                 inputMode="decimal"
                 className={styles.campoInputField}
                 value={getDisplayValue('resultadoNeto')}
-                onFocus={() => handleFocus('resultadoNeto')}
+                onFocus={e => handleFocus('resultadoNeto', e.currentTarget)}
                 onChange={e => handleChange('resultadoNeto', e.target.value)}
                 onBlur={() => handleBlur('resultadoNeto')}
                 placeholder="180.000"
@@ -336,7 +348,7 @@ export default function CalculadoraValoracionEmpresa() {
                 inputMode="decimal"
                 className={styles.campoInputField}
                 value={getDisplayValue('patrimonioNeto')}
-                onFocus={() => handleFocus('patrimonioNeto')}
+                onFocus={e => handleFocus('patrimonioNeto', e.currentTarget)}
                 onChange={e => handleChange('patrimonioNeto', e.target.value)}
                 onBlur={() => handleBlur('patrimonioNeto')}
                 placeholder="1.250.000"
@@ -354,7 +366,7 @@ export default function CalculadoraValoracionEmpresa() {
                 inputMode="decimal"
                 className={styles.campoInputField}
                 value={getDisplayValue('tasaCapitalizacion')}
-                onFocus={() => handleFocus('tasaCapitalizacion')}
+                onFocus={e => handleFocus('tasaCapitalizacion', e.currentTarget)}
                 onChange={e => handleChange('tasaCapitalizacion', e.target.value)}
                 onBlur={() => handleBlur('tasaCapitalizacion')}
                 placeholder="15"
