@@ -4,6 +4,16 @@
  * FAQPage dejaba fuera a los hongos simbiontes que el propio banco enseña (trufa, liquen). Se
  * escribe UNA vez y la importan las dos bocas.
  */
+/**
+ * Hallazgo 3711: «¿Cuántos reinos…?» tenía dos respuestas que se contradecían (la visible, seis
+ * reinos; la del FAQPage, cinco y «seis dominios», cuando los dominios son tres). Una sola, aquí.
+ */
+export const FAQ_REINOS = {
+  pregunta: '¿Cuántos reinos hay actualmente en biología?',
+  respuesta:
+    'Depende del sistema de clasificación. Este quiz usa el de 6 reinos (Animalia, Plantae, Fungi, Protista, Eubacteria y Archaea), muy extendido en la enseñanza secundaria. El de 5 reinos de Whittaker (1969) juntaba bacterias y arqueas en un solo reino, Monera. En investigación se usa el sistema de 3 dominios de Woese (1990): Bacteria, Archaea y Eukarya, que agrupa los cuatro reinos de organismos con núcleo.',
+};
+
 export const FAQ_HONGOS = {
   pregunta: '¿Por qué los hongos no son plantas?',
   respuesta:

@@ -344,8 +344,8 @@ test.describe('Foco (invariante de la familia)', () => {
 
 test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
   test('hallazgo · «Precisión» no pasa del 100 %: tras acertar la 1.ª es 100 %, y dos de dos, 100 %', async ({ page }) => {
-    test.fail(); // ABIERTO — page.tsx:236 divide `correctas` (ya con la respuesta actual) entre
-    // `preguntaActual` (las ANTERIORES). Medido 28/10/2026 acertando seguidas: «0%» tras la 1.ª,
+    // REPARADO (hallazgo 3709): divide entre las contestadas. Antes, page.tsx:236 dividía `correctas`
+    // (ya con la respuesta actual) entre `preguntaActual` (las ANTERIORES). Medido 28/10/2026 acertando seguidas: «0%» tras la 1.ª,
     // «200%» tras la 2.ª, «150%» tras la 3.ª (escritorio y 412 px).
     await abrir(page);
     await arrancar(page, 'Básico', 10);
@@ -360,24 +360,44 @@ test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
   });
 
   test('hallazgo · el número de preguntas que anuncia «Empezar Quiz» es el que se juega', async ({ page }) => {
-    test.fail(); // ABIERTO — generarPreguntas (page.tsx:46) corta a Math.min(num, organismos del nivel)
-    // sin decirlo: «20 preguntas · 🟡 Intermedio» y «15» juegan 13; «15/20 preguntas · 🔴 Avanzado», 10.
+    // REPARADO (hallazgo 3710). Antes, generarPreguntas (page.tsx:46) cortaba a Math.min(num,
+    // organismos del nivel) sin decirlo: «20 preguntas · 🟡 Intermedio» y «15» jugaban 13;
+    // «15/20 preguntas · 🔴 Avanzado», 10. Ahora cada nivel ofrece lo que cabe en su banco
+    // (Básico 20 y Todos 43: 10, 15 y 20; Intermedio 13: 10 y 13; Avanzado 10: solo 10), con el
+    // 20 elegido se marca el mayor que cabe, y cada oferta se juega entera.
     await abrir(page);
+    const grupo = page.getByRole('group', { name: 'Número de preguntas' });
+    const empezarBtn = page.getByRole('button', { name: /^Empezar Quiz/ });
+    const ESPERADAS: Record<Nivel, number[]> = {
+      Básico: [10, 15, 20],
+      Intermedio: [10, 13],
+      Avanzado: [10],
+      Todos: [10, 15, 20],
+    };
+    // Con 20 elegido en Básico, Intermedio pasa a marcar 13 y Avanzado 10: lo que se promete se juega.
+    await elegir(page, 'Básico', 20);
     const fallos: string[] = [];
-    for (const [nivel, num] of [['Intermedio', 15], ['Intermedio', 20], ['Avanzado', 15], ['Avanzado', 20]] as const) {
-      await elegir(page, nivel, num);
-      const promete = Number((norm(await page.locator('[class*="btnIniciar"]').innerText()).match(/(\d+) preguntas/) ?? [])[1]);
-      await page.locator('[class*="btnIniciar"]').click();
+    for (const nivel of ['Básico', 'Intermedio', 'Avanzado', 'Todos'] as const) {
+      const bn = page.getByRole('button', { name: new RegExp(nivel) }).first();
+      await bn.click();
+      await expect(bn).toHaveAttribute('aria-pressed', 'true');
+      const ofrecidas = (await grupo.getByRole('button').allInnerTexts()).map((t) => Number(norm(t).match(/\d+/)?.[0]));
+      if (ofrecidas.join() !== ESPERADAS[nivel].join()) fallos.push(`${nivel}: ofrece ${ofrecidas.join(', ')}`);
+      const promete = Number((norm(await empezarBtn.innerText()).match(/(\d+) preguntas/) ?? [])[1]);
+      if (promete !== Math.max(...ESPERADAS[nivel])) fallos.push(`${nivel}: con 20 elegido promete ${promete}`);
+      await empezarBtn.click();
       const juega = Number((norm(await contador(page).innerText()).match(/de (\d+)$/) ?? [])[1]);
       if (promete !== juega) fallos.push(`${nivel}: promete ${promete}, juega ${juega}`);
       await page.goto(RUTA);
       await esperarPaginaAsentada(page);
+      await elegir(page, 'Básico', 20);
     }
     expect(fallos).toEqual([]);
   });
 
   test('hallazgo · el porcentaje va separado con espacio duro («70 %»)', async ({ page }) => {
-    test.fail(); // ABIERTO — page.tsx:236 (HUD «Precisión») y :345 (resultado «Acierto») pegan el «%».
+    // REPARADO (hallazgo 3720, con el 3709, que reescribió la cifra del HUD). Antes, page.tsx:236
+    // (HUD «Precisión») y :345 (resultado «Acierto») pegaban el «%».
     test.setTimeout(90_000);
     await abrir(page);
     await arrancar(page, 'Básico', 10);
@@ -444,16 +464,17 @@ test.describe('Inspector 28/10/2026 · promesas (metadata y FAQ)', () => {
   });
 
   test('hallazgo · «¿Cuántos reinos…?» tiene UNA respuesta en la FAQ visible y en el FAQPage', async ({ page }) => {
-    test.fail(); // ABIERTO — visible (page.tsx:479): el sistema de 6 reinos «es el más usado en la
-    // educación secundaria española»; FAQPage (metadata.ts:54): «El más extendido en la enseñanza
-    // secundaria distingue cinco… llegando a seis dominios» (los dominios son tres). Reparación: UNA
-    // constante en metadata.ts para las dos bocas.
+    // REPARADO (hallazgo 3711): FAQ_REINOS de faq.ts, que importan las dos bocas. Antes, visible
+    // (page.tsx:479): el sistema de 6 reinos «es el más usado en la educación secundaria española»;
+    // FAQPage (metadata.ts:54): «El más extendido en la enseñanza secundaria distingue cinco…
+    // llegando a seis dominios» (los dominios son tres).
     await abrir(page);
     const visible = norm(await page.locator('[class*="faqItem"]', { hasText: '¿Cuántos reinos hay' }).locator('dd').textContent());
     const ld = faqJsonLd.mainEntity.find((q) => /Cuántos reinos/.test(q.name));
     expect(ld).toBeTruthy();
     expect(ld?.acceptedAnswer.text).not.toMatch(/seis dominios/);
     expect(visible).toBe(norm(ld?.acceptedAnswer.text));
+    expect(visible).toContain('sistema de 3 dominios de Woese (1990)');
   });
 });
 
@@ -465,8 +486,11 @@ test.describe('Inspector 28/10/2026 · promesas (metadata y FAQ)', () => {
  */
 test.describe('Inspector 28/10/2026 · contenido del banco', () => {
   test('hallazgo · Prión: «Agente Acelular (no ser vivo)» también es correcta y se da por mala', async ({ page }) => {
-    test.fail(); // ABIERTO — el prión es un agente infeccioso acelular (formas acelulares: virus,
-    // viroides y priones) y no es un ser vivo: la distractora describe al prión tan bien como la clave.
+    // El prión es un agente infeccioso acelular (formas acelulares: virus, viroides y priones) y no es
+    // un ser vivo: la distractora describía al prión tan bien como la clave.
+    // REPARADO (hallazgo 3712) con la otra salida que daba el acta: la distractora ya no se ofrece;
+    // en su lugar va «Virus», que sí es otra cosa (tiene genoma). Se mide en la partida: cuando sale
+    // el Prión, sus opciones son la clave, «Virus», «Bacteria» y «Hongo», y la clave da «¡Correcto!».
     // Avanzado con 10 preguntas juega los 10 organismos del nivel, así que el Prión sale siempre.
     test.setTimeout(90_000);
     await abrir(page);
@@ -476,7 +500,9 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
       const o = await organismoVisible(page);
       const ops = await textosOpcion(page);
       if (o.id === 'prion') {
-        await opciones(page).nth(ops.indexOf('Agente Acelular (no ser vivo)')).click();
+        expect(ops).not.toContain('Agente Acelular (no ser vivo)');
+        expect([...ops].sort()).toEqual(['Bacteria', 'Hongo', 'Proteína mal plegada (no ser vivo)', 'Virus']);
+        await opciones(page).nth(ops.indexOf('Proteína mal plegada (no ser vivo)')).click();
         await expect(page.locator('[class*="feedbackResultado"]')).toHaveText('¡Correcto!', { timeout: 2000 });
         return;
       }
@@ -487,28 +513,35 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
   });
 
   test('hallazgo · Fitoplancton: «Bacteria» no puede ser incorrecta', () => {
-    test.fail(); // ABIERTO — el fitoplancton es una categoría ecológica que incluye cianobacterias
-    // (Prochlorococcus, Synechococcus); el propio banco da la Cianobacteria como bacteria fotosintética.
+    // El fitoplancton es una categoría ecológica que incluye cianobacterias (Prochlorococcus,
+    // Synechococcus); el propio banco da la Cianobacteria como bacteria fotosintética.
+    // REPARADO (hallazgo 3713): «Bacteria» deja de ser distractora y la explicación lo dice.
     expect(organismo('fitoplancton').confundibleCon).not.toContain('Bacteria');
+    expect(organismo('fitoplancton').porQueConfunde).toMatch(/No es un grupo taxonómico[^.]*cianobacterias/);
   });
 
   test('hallazgo · Liquen: el fotobionte no es siempre un alga y la unión no es «inseparable»', () => {
-    test.fail(); // ABIERTO — en una parte de los líquenes el fotobionte es una cianobacteria, y los
-    // simbiontes se aíslan y cultivan por separado; además el liquen se nombra y clasifica por su hongo.
+    // En una parte de los líquenes el fotobionte es una cianobacteria, y los simbiontes se aíslan y
+    // cultivan por separado; además el liquen se nombra y clasifica por su hongo.
+    // REPARADO (hallazgo 3714): sin «inseparable», con la cianobacteria, y «Hongo» ya no es una
+    // distractora que se dé por falsa (era la segunda respuesta defendible).
     const l = organismo('liquen');
     expect(`${l.grupo} ${l.porQueConfunde}`).not.toMatch(/inseparable/);
     expect(`${l.grupo} ${l.porQueConfunde} ${l.curiosidad}`).toMatch(/cianobacteria/i);
+    expect(l.confundibleCon).not.toContain('Hongo');
   });
 
   test('hallazgo · Alga roja: el tejido vascular no «define» a las plantas (el musgo no lo tiene)', () => {
-    test.fail(); // ABIERTO — alga-roja.porQueConfunde frente a musgo.porQueConfunde («ni tejido
-    // vascular… Pero sí es planta») del mismo banco.
+    // alga-roja.porQueConfunde frente a musgo.porQueConfunde («ni tejido vascular… Pero sí es
+    // planta») del mismo banco. REPARADO (hallazgo 3715): el criterio es el talo sin tejidos y el
+    // sistema de 6 reinos del quiz.
     expect(organismo('musgo').porQueConfunde).toMatch(/tejido vascular/);
     expect(organismo('alga-roja').porQueConfunde).not.toMatch(/tejidos vasculares que definen a las plantas/);
+    expect(organismo('alga-roja').porQueConfunde).toMatch(/talo sin tejidos ni órganos diferenciados/);
   });
 
   test('hallazgo · curiosidades: caballito de mar, levadura y bacterias del cuerpo', () => {
-    test.fail(); // ABIERTO — (1) la gestación masculina es de toda la familia Syngnathidae (también
+    // REPARADO (hallazgo 3717). (1) la gestación masculina es de toda la familia Syngnathidae (también
     // peces pipa y dragones de mar); (2) la levadura fue el primer EUCARIOTA secuenciado (1996): antes,
     // Haemophilus influenzae (1995); (3) la razón 10:1 de bacterias está revisada: ~1,3:1 (Sender,
     // Fuchs y Milo, PLoS Biology 2016), no el 90 %.
@@ -517,10 +550,14 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
     if (/primer organismo secuenciado/.test(organismo('levadura').curiosidad)) fallos.push('levadura');
     if (/90% de las células de tu cuerpo/.test(organismo('bacteria').curiosidad)) fallos.push('bacteria');
     expect(fallos).toEqual([]);
+    expect(organismo('caballito-mar').curiosidad).toMatch(/peces pipa y los dragones de mar/);
+    expect(organismo('levadura').curiosidad).toMatch(/primer eucariota/);
+    expect(organismo('bacteria').curiosidad).toMatch(/unas 1,3 por cada célula humana/);
   });
 
   test('hallazgo · algas: «Confundir algas con plantas» no se da como error sin decir el sistema', async ({ page }) => {
-    test.fail(); // ABIERTO — en el sistema de Whittaker (1969) que cita la propia FAQ las algas
+    // REPARADO (hallazgo 3716): la guía dice en qué sistema y nombra a las carofitas.
+    // En el sistema de Whittaker (1969) que cita la propia FAQ las algas
     // pluricelulares (verdes, rojas, pardas) eran Plantae, y en el de Ruggiero et al. (2015) las verdes y
     // rojas lo son; la FAQ visible además llama a Chlorophyta «el grupo más relacionado» con las plantas
     // terrestres, cuando lo son las carofitas (Streptophyta).
@@ -531,6 +568,7 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
     if (/Solo las plantas terrestres \(briófitos/.test(guia) && !/Whittaker.{0,200}algas/.test(guia)) fallos.push('error común sin sistema');
     if (/Chlorophyta\) son el grupo más relacionado/.test(guia)) fallos.push('Chlorophyta');
     expect(fallos).toEqual([]);
+    expect(guia).toMatch(/emparentadas con las plantas terrestres son las carofitas/);
   });
 
   test('hallazgo · la guía de 7 pasos no clasifica las esporas como rasgo de Fungi', async ({ page }) => {

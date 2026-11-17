@@ -9,7 +9,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { organismosNaturaleza, OrganismoNaturaleza } from '@/data/organismos-naturaleza';
-import { FAQ_HONGOS } from './faq';
+import { FAQ_HONGOS, FAQ_REINOS } from './faq';
 
 type Nivel = 'basico' | 'intermedio' | 'avanzado' | 'todos';
 type Pantalla = 'config' | 'quiz' | 'resultado';
@@ -30,6 +30,29 @@ const NIVEL_CONFIG: Record<Nivel, { label: string; desc: string }> = {
 const OPCIONES_PREGUNTAS = [10, 15, 20];
 const LETRAS = ['A', 'B', 'C', 'D'];
 
+const poolDeNivel = (nivel: Nivel): OrganismoNaturaleza[] =>
+  nivel === 'todos' ? organismosNaturaleza : organismosNaturaleza.filter(o => o.nivel === nivel);
+
+/**
+ * Hallazgo 3710: se ofrecían 10, 15 y 20 en cualquier nivel, y el botón repetía la cifra, pero
+ * Intermedio tiene 13 organismos y Avanzado 10: «20 preguntas» daba 13 o 10 sin avisar. Ahora se
+ * ofrecen las que caben en el nivel y, si el nivel tiene menos de 20, también «todos los del
+ * nivel» (13 en Intermedio). El botón dice lo que se juega.
+ */
+function opcionesDeNivel(nivel: Nivel): number[] {
+  const tamano = poolDeNivel(nivel).length;
+  const caben = OPCIONES_PREGUNTAS.filter(n => n <= tamano);
+  const maximo = OPCIONES_PREGUNTAS[OPCIONES_PREGUNTAS.length - 1];
+  if (tamano < maximo && !caben.includes(tamano)) caben.push(tamano);
+  return caben;
+}
+
+/** El número que se juega: el elegido si cabe en el nivel; si no, el mayor que cabe. */
+function numeroEfectivo(nivel: Nivel, elegido: number): number {
+  const caben = opcionesDeNivel(nivel);
+  return caben.includes(elegido) ? elegido : caben[caben.length - 1];
+}
+
 function mezclar<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -40,9 +63,7 @@ function mezclar<T>(arr: T[]): T[] {
 }
 
 function generarPreguntas(nivel: Nivel, numPreguntas: number): PreguntaQuiz[] {
-  const pool = nivel === 'todos'
-    ? organismosNaturaleza
-    : organismosNaturaleza.filter(o => o.nivel === nivel);
+  const pool = poolDeNivel(nivel);
 
   const seleccionados = mezclar(pool).slice(0, Math.min(numPreguntas, pool.length));
 
@@ -85,9 +106,13 @@ export default function QuizReinosNaturalezaPage() {
   const [tiempoInicio, setTiempoInicio] = useState<number>(0);
   const [tiempoTotal, setTiempoTotal] = useState<number>(0);
 
+  const numJugar = numeroEfectivo(nivel, numPreguntas);
   const pregunta = preguntas[preguntaActual];
   const totalPreguntas = preguntas.length;
   const esUltima = preguntaActual === totalPreguntas - 1;
+  // Hallazgo 3709: la precisión se divide entre las CONTESTADAS. `correctas` ya cuenta la pregunta
+  // recién respondida, así que el denominador también tiene que contarla (marcaba 0 % y 200 %).
+  const contestadas = preguntaActual + (seleccionada !== null ? 1 : 0);
 
   // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
   // (cabo C0082, lib/useGuardaRafaga.ts). Y en la opción: el foco a «Siguiente» sube la página y
@@ -96,14 +121,14 @@ export default function QuizReinosNaturalezaPage() {
 
   const iniciarQuiz = useCallback(() => {
     marcarCambioPantalla();
-    const nuevasPreguntas = generarPreguntas(nivel, numPreguntas);
+    const nuevasPreguntas = generarPreguntas(nivel, numJugar);
     setPreguntas(nuevasPreguntas);
     setPreguntaActual(0);
     setSeleccionada(null);
     setCorrectas(0);
     setTiempoInicio(Date.now());
     setPantalla('quiz');
-  }, [nivel, numPreguntas, marcarCambioPantalla]);
+  }, [nivel, numJugar, marcarCambioPantalla]);
 
   const responder = useCallback((opcion: string) => {
     if (seleccionada !== null) return;
@@ -203,13 +228,13 @@ export default function QuizReinosNaturalezaPage() {
 
           <h3 className={styles.configSubtitle}>Número de preguntas</h3>
           <div className={styles.preguntasRow} role="group" aria-label="Número de preguntas">
-            {OPCIONES_PREGUNTAS.map(n => (
+            {opcionesDeNivel(nivel).map(n => (
               <button
                 key={n}
                 type="button"
-                className={`${styles.pregBtn} ${numPreguntas === n ? styles.active : ''}`}
+                className={`${styles.pregBtn} ${numJugar === n ? styles.active : ''}`}
                 onClick={() => setNumPreguntas(n)}
-                aria-pressed={numPreguntas === n}
+                aria-pressed={numJugar === n}
               >
                 {n} preguntas
               </button>
@@ -217,7 +242,7 @@ export default function QuizReinosNaturalezaPage() {
           </div>
 
           <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
-            Empezar Quiz — {numPreguntas} preguntas · {NIVEL_CONFIG[nivel].label}
+            Empezar Quiz — {numJugar} preguntas · {NIVEL_CONFIG[nivel].label}
           </button>
         </div>
       )}
@@ -237,7 +262,7 @@ export default function QuizReinosNaturalezaPage() {
             </div>
             <div className={styles.hudItem}>
               <span className={styles.hudValor}>
-                {preguntaActual > 0 ? Math.round((correctas / preguntaActual) * 100) : 0}%
+                {contestadas > 0 ? Math.round((correctas / contestadas) * 100) : 0}{' '}%
               </span>
               <span className={styles.hudLabel}>Precisión</span>
             </div>
@@ -355,7 +380,7 @@ export default function QuizReinosNaturalezaPage() {
             </div>
             <div className={styles.statR}>
               <span className={styles.statRValor}>
-                {Math.round((correctas / totalPreguntas) * 100)}%
+                {Math.round((correctas / totalPreguntas) * 100)}{' '}%
               </span>
               <p className={styles.statRLabel}>Acierto</p>
             </div>
@@ -490,8 +515,9 @@ export default function QuizReinosNaturalezaPage() {
           <h4 id="edu-faq"><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre los Reinos</h4>
           <dl className={styles.faqList}>
             <div className={styles.faqItem}>
-              <dt>¿Cuántos reinos hay actualmente en biología?</dt>
-              <dd>Depende del sistema de clasificación. El sistema de <strong>6 reinos</strong> (Animalia, Plantae, Fungi, Protista, Eubacteria, Archaea) es el más usado en la educación secundaria española. En investigación moderna se usa el sistema de 3 dominios (Bacteria, Archaea, Eukarya), que agrupa los primeros cuatro reinos bajo Eukarya.</dd>
+              {/* La misma pregunta y respuesta que el FAQPage (hallazgo 3711) */}
+              <dt>{FAQ_REINOS.pregunta}</dt>
+              <dd>{FAQ_REINOS.respuesta}</dd>
             </div>
             <div className={styles.faqItem}>
               {/* La misma pregunta y respuesta que el FAQPage (hallazgo 3782) */}
@@ -516,7 +542,9 @@ export default function QuizReinosNaturalezaPage() {
             </div>
             <div className={styles.faqItem}>
               <dt>¿A qué reino pertenecen las algas?</dt>
-              <dd>La mayoría de las algas (macroalgas y microalgas como la <em>Chlorella</em>) pertenecen al reino <strong>Protista</strong>, no a Plantae. Solo los briófitos y plantas vasculares forman el reino Plantae. Las algas verdes (<em>Chlorophyta</em>) son el grupo más relacionado filogenéticamente con las plantas terrestres, pero taxonómicamente siguen siendo Protistas.</dd>
+              {/* Hallazgo 3716: lo daba como hecho absoluto, y depende del sistema; y el grupo hermano de
+                  las plantas terrestres son las carofitas, no Chlorophyta */}
+              <dd>Depende del sistema de clasificación. En el de <strong>6 reinos</strong> que usa este quiz, las algas (macroalgas y microalgas como la <em>Chlorella</em>) son <strong>Protista</strong> y solo los briófitos y las plantas vasculares forman el reino Plantae. No es la única forma de verlo: en el sistema de 5 reinos de Whittaker (1969), las algas pluricelulares (verdes, rojas y pardas) eran Plantae, y en la clasificación de Ruggiero y colaboradores (2015) lo son las verdes y las rojas. Las algas más emparentadas con las plantas terrestres son las <strong>carofitas</strong>, un grupo de algas verdes.</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Cómo ha evolucionado la clasificación de los reinos a lo largo de la historia?</dt>
@@ -623,7 +651,7 @@ export default function QuizReinosNaturalezaPage() {
             <ul className={styles.warningList}>
               <li><strong>Clasificar los hongos como plantas:</strong> los hongos NO realizan fotosíntesis y su pared celular es de quitina, no de celulosa. Son más parecidos a los animales que a las plantas en términos evolutivos.</li>
               <li><strong>Pensar que los virus son un reino:</strong> los virus no están clasificados en ningún reino porque no son seres vivos según los criterios biológicos estándar (no tienen metabolismo ni estructura celular propia).</li>
-              <li><strong>Confundir algas con plantas:</strong> la mayoría de las algas (kelp, alga verde unicelular, diatomeas) pertenecen al reino Protista, no a Plantae. Solo las plantas terrestres (briófitos, helechos, gimnospermas, angiospermas) son Plantae.</li>
+              <li><strong>Confundir algas con plantas:</strong> en el sistema de 6 reinos que se suele pedir en secundaria (y el de este quiz), las algas (kelp, alga verde unicelular, diatomeas) son Protista y solo las plantas terrestres (briófitos, helechos, gimnospermas, angiospermas) son Plantae. Si tu temario sigue a Whittaker (1969), las algas pluricelulares eran Plantae: comprueba qué sistema pide.</li>
               <li><strong>Creer que bacteria y archaea son lo mismo:</strong> ambas son procariotas, pero son grupos completamente distintos con bioquímica diferente. Las Archaea están más relacionadas con los eucariotas que con las bacterias.</li>
               <li><strong>Ignorar que Protista es un reino &quot;cajón de sastre&quot;:</strong> Protista agrupa organismos eucariotas que no encajan en Animalia, Plantae ni Fungi. Es un grupo artificial muy diverso que en la taxonomía moderna se divide en múltiples linajes.</li>
               <li><strong>Asumir que todos los unicelulares son bacterias:</strong> existen eucariotas unicelulares (Protistas como la ameba, el paramecio o la euglena) y procariotas unicelulares (bacterias y arqueas). El tamaño de la célula y la presencia de núcleo son claves para distinguirlos.</li>

@@ -120,7 +120,7 @@ export const organismosNaturaleza: OrganismoNaturaleza[] = [
     grupo: 'Pez',
     confundibleCon: ['Molusco', 'Crustáceo', 'Anfibio'],
     porQueConfunde: 'Su aspecto no recuerda en nada a un pez: tiene cabeza de caballo, cuerpo vertical y nada en posición erguida. Pero tiene branquias y aletas.',
-    curiosidad: 'Es el único pez en el que el macho queda embarazado y da a luz. Las crías nacen en grupos de hasta 2.000.',
+    curiosidad: 'Es el macho quien queda embarazado y da a luz, algo que comparte con el resto de su familia (los peces pipa y los dragones de mar). Las crías nacen en grupos de hasta 2.000.',
     nivel: 'basico',
   },
 
@@ -232,16 +232,19 @@ export const organismosNaturaleza: OrganismoNaturaleza[] = [
     grupo: 'Hongo',
     confundibleCon: ['Bacteria', 'Protista', 'Planta'],
     porQueConfunde: 'Es microscópica y unicelular como las bacterias, pero tiene núcleo celular verdadero y pertenece al reino Fungi.',
-    curiosidad: 'Llevamos 10.000 años usando levadura para hacer pan, cerveza y vino sin saber lo que era. Es el primer organismo secuenciado genéticamente.',
+    curiosidad: 'Llevamos 10.000 años usando levadura para hacer pan, cerveza y vino sin saber lo que era. En 1996 fue el primer eucariota con el genoma secuenciado entero (antes, en 1995, se había secuenciado el de la bacteria Haemophilus influenzae).',
     nivel: 'intermedio',
   },
 
   {
     id: 'liquen',
     nombre: 'Liquen',
+    // Hallazgo 3714: decía «unión permanente e inseparable» de hongo y alga (los simbiontes se aíslan
+    // y cultivan por separado), callaba que el fotobionte puede ser una cianobacteria y daba «Hongo»
+    // por falso, cuando el liquen se nombra y clasifica por su hongo: dos respuestas defendibles.
     grupo: 'Simbiosis Hongo + Alga',
-    confundibleCon: ['Planta', 'Alga', 'Hongo'],
-    porQueConfunde: 'Crece en piedras y cortezas como una costra vegetal, pero no es ni planta, ni alga, ni hongo: es la unión permanente e inseparable de los dos últimos.',
+    confundibleCon: ['Planta', 'Alga', 'Bacteria'],
+    porQueConfunde: 'Crece en piedras y cortezas como una costra vegetal, pero no es una planta: es la asociación de un hongo con un alga o, en parte de los líquenes, con una cianobacteria, que es la que hace la fotosíntesis. Se nombra y clasifica por su hongo, pero lo que ves en la roca es la pareja, y los dos simbiontes pueden aislarse y cultivarse por separado.',
     curiosidad: 'Algunos líquenes tienen más de 9.000 años de antigüedad. Pueden sobrevivir en el espacio exterior y son los primeros colonizadores de las rocas desnudas.',
     nivel: 'intermedio',
   },
@@ -261,7 +264,7 @@ export const organismosNaturaleza: OrganismoNaturaleza[] = [
     nombre: 'Alga roja (Nori)',
     grupo: 'Protista (Alga)',
     confundibleCon: ['Planta', 'Hongo', 'Animal (Cnidario)'],
-    porQueConfunde: 'Su color rojo oscuro y textura la hacen parecer una planta marina, pero carece de los tejidos vasculares que definen a las plantas.',
+    porQueConfunde: 'Su color rojo oscuro y textura la hacen parecer una planta marina, pero su cuerpo es un talo sin tejidos ni órganos diferenciados, y no desciende de las plantas terrestres: en el sistema de 6 reinos de este quiz, las algas rojas son protistas.',
     curiosidad: 'El agar-agar usado en cocina y laboratorios se extrae de algas rojas. El nori de los sushis también es un alga roja.',
     nivel: 'intermedio',
   },
@@ -320,8 +323,11 @@ export const organismosNaturaleza: OrganismoNaturaleza[] = [
     id: 'fitoplancton',
     nombre: 'Fitoplancton',
     grupo: 'Protista (Alga)',
-    confundibleCon: ['Planta', 'Bacteria', 'Animal (Cnidario)'],
-    porQueConfunde: 'Hace fotosíntesis y es verde-azulado como las plantas, pero es microscópico, unicelular y sin ningún tipo de tejido.',
+    // Hallazgo 3713: «Bacteria» era distractora, y el fitoplancton incluye cianobacterias
+    // (Prochlorococcus, Synechococcus). Ahora es «Hongo», y la explicación dice que es una categoría
+    // ecológica, no un grupo taxonómico.
+    confundibleCon: ['Planta', 'Hongo', 'Animal (Cnidario)'],
+    porQueConfunde: 'Hace fotosíntesis como las plantas, pero es microscópico, unicelular y sin ningún tipo de tejido. No es un grupo taxonómico, sino el conjunto de lo que hace la fotosíntesis a la deriva en el agua: buena parte son microalgas protistas (diatomeas, dinoflagelados), y también incluye cianobacterias.',
     curiosidad: 'El fitoplancton produce más del 50% del oxígeno del planeta. Respiramos gracias al océano tanto como gracias a los bosques.',
     nivel: 'intermedio',
   },
@@ -364,7 +370,7 @@ export const organismosNaturaleza: OrganismoNaturaleza[] = [
     grupo: 'Procariota (Bacteria)',
     confundibleCon: ['Agente Acelular (no ser vivo)', 'Protista (Alga)', 'Hongo'],
     porQueConfunde: 'Se confunde con virus porque ambos causan enfermedades, pero la bacteria sí es un ser vivo con metabolismo, reproducción propia y célula (sin núcleo).',
-    curiosidad: 'Las bacterias llevan 3.500 millones de años en la Tierra. El 90% de las células de tu cuerpo son bacterias que viven en simbiosis contigo.',
+    curiosidad: 'Las bacterias llevan 3.500 millones de años en la Tierra. Tu cuerpo alberga unas 1,3 por cada célula humana (Sender, Fuchs y Milo, 2016).',
     nivel: 'avanzado',
   },
 
@@ -402,8 +408,11 @@ export const organismosNaturaleza: OrganismoNaturaleza[] = [
     id: 'prion',
     nombre: 'Prión',
     grupo: 'Proteína mal plegada (no ser vivo)',
-    confundibleCon: ['Agente Acelular (no ser vivo)', 'Bacteria', 'Hongo'],
-    porQueConfunde: 'Causa enfermedades devastadoras como el mal de las vacas locas, lo que hace pensar en un patógeno con células o genoma. Pero es solo una proteína.',
+    // Hallazgo 3712: la distractora era «Agente Acelular (no ser vivo)», que describe al prión tan
+    // bien como la clave (las formas acelulares son virus, viroides y priones). Ahora es «Virus»,
+    // que sí es otra cosa: un virus tiene genoma y el prión no.
+    confundibleCon: ['Virus', 'Bacteria', 'Hongo'],
+    porQueConfunde: 'Causa enfermedades devastadoras como el mal de las vacas locas, lo que hace pensar en un virus o una bacteria. Pero es solo una proteína.',
     curiosidad: 'Un prión es una proteína con forma incorrecta que "contagia" su mal plegamiento a otras proteínas sanas. No tiene ADN ni ARN.',
     nivel: 'avanzado',
   },

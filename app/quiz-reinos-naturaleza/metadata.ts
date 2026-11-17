@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { FAQ_HONGOS } from './faq';
+import { FAQ_HONGOS, FAQ_REINOS } from './faq';
 
 export const metadata: Metadata = {
   title: 'Quiz Reinos de la Naturaleza - ¿Animal, Planta, Hongo o Bacteria? | meskeIA',
@@ -49,10 +49,10 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuántos reinos de la naturaleza existen?',
+      name: FAQ_REINOS.pregunta,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los sistemas de clasificación modernos reconocen entre 5 y 8 reinos según el criterio utilizado. El más extendido en la enseñanza secundaria distingue cinco: Animalia, Plantae, Fungi, Protista y Monera (bacterias). Clasificaciones más recientes dividen Monera en Bacteria y Archaea, llegando a seis dominios.',
+        text: FAQ_REINOS.respuesta,
       },
     },
     {
