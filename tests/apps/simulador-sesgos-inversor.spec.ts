@@ -420,8 +420,8 @@ test.describe('Hallazgos 17/11/2026', () => {
     expect(await dondeEstaElFoco(page)).toMatch(/^BUTTON\[aria-pressed\]/);
   });
 
-  test('ABIERTO — dos cifras del resultado no llegan a 3:1 (moderado en claro, alto en oscuro)', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4910) — dos cifras del resultado no llegaban a 3:1 (moderado en claro, alto en oscuro)', async ({ page }) => {
+    // REPARADO 17/11/2026: --rojo-texto, --ambar-texto y --verde-texto, que cambian con el tema.
     await abrir(page);
     await empezar(page);
     await contestar(page, [0, 2, 1, 0, 1, 1, 1, 1]); // 2 altos / 1 moderado / 5

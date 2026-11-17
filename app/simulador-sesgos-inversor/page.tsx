@@ -526,19 +526,20 @@ export default function SimuladorSesgosInversorPage() {
 
               <div className={styles.nivelStats}>
                 <div className={styles.nivelStat}>
-                  <span className={styles.nivelNum} style={{ color: '#dc2626' }}>
+                  {/* Hallazgo 4910: los colores puros daban 2,52:1 (alto, oscuro) y 2,81:1 (moderado, claro). */}
+                  <span className={styles.nivelNum} style={{ color: 'var(--rojo-texto, #b91c1c)' }}>
                     {sesgosDetectados.filter(s => s.nivel === 'alto').length}
                   </span>
                   <span className={styles.nivelLabel}><span aria-hidden="true">🔴</span> Alto impacto</span>
                 </div>
                 <div className={styles.nivelStat}>
-                  <span className={styles.nivelNum} style={{ color: '#ca8a04' }}>
+                  <span className={styles.nivelNum} style={{ color: 'var(--ambar-texto, #8a5a00)' }}>
                     {sesgosDetectados.filter(s => s.nivel === 'moderado').length}
                   </span>
                   <span className={styles.nivelLabel}><span aria-hidden="true">🟡</span> Moderado</span>
                 </div>
                 <div className={styles.nivelStat}>
-                  <span className={styles.nivelNum} style={{ color: '#16a34a' }}>
+                  <span className={styles.nivelNum} style={{ color: 'var(--verde-texto, #136e35)' }}>
                     {sesgosNoDetectados.length}
                   </span>
                   <span className={styles.nivelLabel}><span aria-hidden="true">✅</span> No detectados</span>
