@@ -335,7 +335,11 @@ export function calcularCuotaPatrimonioEstatal(baseLiquidable: number): number {
 // `aplicaItsgf` en los tres estados (16/11/2026, hallazgo 4880): el ITSGF deduce el Patrimonio
 // efectivamente satisfecho (art. 3.Quince), así que con un patrimonio neto alto también puede
 // salir a pagar donde el Patrimonio no está bonificado al 100 %.
+// `foral` (17/11/2026, hallazgos 4936 y 4937): Navarra (Ley Foral 13/1992, art. 31: otro límite,
+// otro tope y cálculo individual en la conjunta) y el País Vasco (Concierto, art. 24: tributo de
+// normativa autónoma) no siguen el art. 31 estatal. Sin cifra: la estatal no es la suya.
 export type ResultadoOrientacion =
+  | { tipo: 'foral'; mensaje: string; aplicaItsgf: false }
   | { tipo: 'descarte-bonificacion'; mensaje: string; aplicaItsgf: boolean }
   | { tipo: 'descarte-no-supera-limite'; mensaje: string; excesoOMargen: number; aplicaItsgf: boolean }
   | { tipo: 'posible'; reduccionEstimada: number; cuotaPatrimonioEstimada: number; mensaje: string; aplicaItsgf: boolean };
@@ -364,6 +368,17 @@ export function orientarLimiteConjunto(inputs: InputsOrientador): ResultadoOrien
   // Hasta el 16/11/2026: desde 3.000.000 € y solo en las CCAA con bonificación total (hallazgos
   // 4879 y 4880). Ahora, por encima de 3.700.000 € (sin cuota por debajo) en cualquier CCAA no foral.
   const aplicaItsgf = !ccaa?.foral && inputs.patrimonioNeto > ITSGF_PATRIMONIO_SIN_CUOTA;
+
+  // Caso 0: territorio foral. Hasta el 17/11/2026 se calculaba con el art. 31 estatal y daba a un
+  // navarro una reducción que su ley no concede (hallazgo 4936) y al País Vasco la cifra estatal sin
+  // aviso (4937).
+  if (ccaa?.foral) {
+    return {
+      tipo: 'foral',
+      aplicaItsgf: false,
+      mensaje: `En los territorios forales (Navarra y el País Vasco) el Impuesto sobre el Patrimonio tiene normativa propia, y su límite conjunto con el IRPF no es el del Art. 31 de la Ley 19/1991. Este orientador solo calcula el estatal, así que no te da una cifra que no sería la tuya. ${ccaa.nota}`,
+    };
+  }
 
   // Caso 1: CCAA con bonificación total
   if (ccaa?.bonificacion === 'total') {

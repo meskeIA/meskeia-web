@@ -100,6 +100,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
   const [form, setForm] = useState<FormState>(ESTADO_INICIAL);
   const [resultado, setResultado] = useState<ResultadoOrientacion | null>(null);
   const [error, setError] = useState<string>('');
+  const esForal = BONIFICACIONES_CCAA_PATRIMONIO.find(c => c.id === form.ccaaId)?.foral ?? false;
 
   const setCampo = useCallback(<K extends keyof FormState>(campo: K, valor: FormState[K]) => {
     setForm(prev => ({ ...prev, [campo]: valor }));
@@ -275,11 +276,15 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                   Conjunta (matrimonio)
                 </button>
               </div>
+              {/* Hallazgo 4936: en Navarra la Ley Foral 13/1992 (art. 31.3) calcula cada límite por
+                  separado, así que la pista estatal no vale en los territorios forales. */}
               {form.modo === 'conjunta' && (
                 <span className={styles.formHint}>
-                  En IRPF conjunta: indica los datos sumados de ambos cónyuges. Así es como lo calcula la ley:
-                  el límite se aplica acumulando las cuotas íntegras de Patrimonio de los dos, y la reducción se
-                  reparte entre ellos en proporción a esas cuotas (art. 31.Dos).
+                  <span>
+                    {esForal
+                      ? 'En IRPF conjunta: en los territorios forales el límite conjunto tiene normativa propia, y este orientador no lo calcula.'
+                      : 'En IRPF conjunta: indica los datos sumados de ambos cónyuges. Así es como lo calcula la ley estatal: el límite se aplica acumulando las cuotas íntegras de Patrimonio de los dos, y la reducción se reparte entre ellos en proporción a esas cuotas (art. 31.Dos).'}
+                  </span>
                 </span>
               )}
             </div>
@@ -417,7 +422,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
           <section
             id="resultado-orientacion"
             className={`${styles.resultadoCard} ${
-              resultado.tipo === 'descarte-bonificacion' ? styles.descarteBonificacion :
+              resultado.tipo === 'descarte-bonificacion' || resultado.tipo === 'foral' ? styles.descarteBonificacion :
               resultado.tipo === 'descarte-no-supera-limite' ? styles.descarteLimite :
               styles.posible
             }`}
@@ -426,12 +431,13 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
           >
             <div className={styles.resultadoHeader}>
               <span className={styles.resultadoIcon} aria-hidden="true">
-                {resultado.tipo === 'descarte-bonificacion' ? 'ℹ️' :
+                {resultado.tipo === 'descarte-bonificacion' || resultado.tipo === 'foral' ? 'ℹ️' :
                  resultado.tipo === 'descarte-no-supera-limite' ? '⚠️' :
                  '✅'}
               </span>
               <h2 className={styles.resultadoTitle}>
-                {resultado.tipo === 'descarte-bonificacion' ? 'No aplica en tu CCAA' :
+                {resultado.tipo === 'foral' ? 'Tu territorio tiene normativa foral propia' :
+                 resultado.tipo === 'descarte-bonificacion' ? 'No aplica en tu CCAA' :
                  resultado.tipo === 'descarte-no-supera-limite' ? 'La reducción no se activa en tu caso' :
                  'Podrías beneficiarte de la reducción'}
               </h2>
