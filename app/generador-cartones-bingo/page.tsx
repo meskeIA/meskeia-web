@@ -199,13 +199,24 @@ export default function GeneradorCartonesBingoPage() {
   const [semilla, setSemilla] = useState(0);
   const [cantados, setCantados] = useState<number[]>([]);
 
-  const generar = useCallback(() => {
-    const base = Number(semillaManual.replace(/\D/g, ''));
-    const nuevaSemilla = base > 0 ? base : Math.floor(Math.random() * 900000) + 100000;
-    setCartones(generarTirada(modalidad, cantidad, nuevaSemilla));
-    setSemilla(nuevaSemilla);
-    setCantados([]);
-  }, [modalidad, cantidad, semillaManual]);
+  /**
+   * `otraTirada`: «Otra tirada» sortea siempre un n.º de partida nuevo, distinto del actual, y
+   * vacía el campo. Antes tomaba el n.º del campo como «Generar» y, con un n.º escrito, repetía los
+   * mismos cartones (cabo C0808: el hallazgo 4948 de generador-laberintos).
+   */
+  const generar = useCallback(
+    (otraTirada: boolean) => {
+      let nuevaSemilla = otraTirada ? 0 : Number(semillaManual.replace(/\D/g, ''));
+      while (nuevaSemilla <= 0 || (otraTirada && nuevaSemilla === semilla)) {
+        nuevaSemilla = Math.floor(Math.random() * 900000) + 100000;
+      }
+      if (otraTirada) setSemillaManual('');
+      setCartones(generarTirada(modalidad, cantidad, nuevaSemilla));
+      setSemilla(nuevaSemilla);
+      setCantados([]);
+    },
+    [modalidad, cantidad, semillaManual, semilla],
+  );
 
   const totalBolas = DATOS_MODALIDAD[modalidad].bolas;
 
@@ -305,7 +316,7 @@ export default function GeneradorCartonesBingoPage() {
               />
             </label>
 
-            <button type="button" className={styles.btnPrimary} onClick={generar}>
+            <button type="button" className={styles.btnPrimary} onClick={() => generar(false)}>
               <span aria-hidden="true">✨</span> Generar cartones
             </button>
 
@@ -319,7 +330,7 @@ export default function GeneradorCartonesBingoPage() {
                   <button type="button" className={styles.btnSecundario} onClick={() => window.print()}>
                     <span aria-hidden="true">🖨️</span> Imprimir cartones
                   </button>
-                  <button type="button" className={styles.btnSecundario} onClick={generar}>
+                  <button type="button" className={styles.btnSecundario} onClick={() => generar(true)}>
                     <span aria-hidden="true">🔄</span> Otra tirada
                   </button>
                 </div>

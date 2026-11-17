@@ -369,7 +369,13 @@ export default function GeneradorCrucigramasPage() {
     return lista.filter((e) => (vistas.has(e.palabra) ? false : (vistas.add(e.palabra), true)));
   }, [entrada]);
 
-  const generar = useCallback(() => {
+  /**
+   * `otraDisposicion`: «Otra disposición» sortea siempre un n.º nuevo, distinto del del crucigrama
+   * actual, y vacía el campo. Antes tomaba el n.º del campo como «Generar» y, con un n.º escrito,
+   * repetía la misma disposición, justo cuando el aviso de palabras descartadas aconseja «generar
+   * otra disposición» (cabo C0808: el hallazgo 4948 de generador-laberintos).
+   */
+  const generar = useCallback((otraDisposicion: boolean) => {
     const lista = palabras();
 
     if (lista.length < 2) {
@@ -378,8 +384,11 @@ export default function GeneradorCrucigramasPage() {
       return;
     }
 
-    const base = Number(semillaManual.replace(/\D/g, ''));
-    const semilla = base > 0 ? base : Math.floor(Math.random() * 900000) + 100000;
+    let semilla = otraDisposicion ? 0 : Number(semillaManual.replace(/\D/g, ''));
+    while (semilla <= 0 || (otraDisposicion && semilla === crucigrama?.semilla)) {
+      semilla = Math.floor(Math.random() * 900000) + 100000;
+    }
+    if (otraDisposicion) setSemillaManual('');
     const resultado = generarCrucigrama(lista, semilla);
 
     setCrucigrama(resultado);
@@ -389,7 +398,7 @@ export default function GeneradorCrucigramasPage() {
         ? `No han podido cruzarse ${resultado.descartadas.length} palabra(s): ${resultado.descartadas.join(', ')}. Prueba a generar otra disposición o sustitúyelas por otras que compartan letras con el resto.`
         : '',
     );
-  }, [palabras, semillaManual]);
+  }, [palabras, semillaManual, crucigrama]);
 
   const numeroDeCelda = (fila: number, columna: number): number | null => {
     if (!crucigrama) return null;
@@ -465,7 +474,7 @@ export default function GeneradorCrucigramasPage() {
               />
             </label>
 
-            <button type="button" className={styles.btnPrimary} onClick={generar}>
+            <button type="button" className={styles.btnPrimary} onClick={() => generar(false)}>
               <span aria-hidden="true">✨</span> Generar crucigrama
             </button>
 
@@ -520,7 +529,7 @@ export default function GeneradorCrucigramasPage() {
                     <span aria-hidden="true">🖨️</span> Imprimir esta vista
                   </button>
 
-                  <button type="button" className={styles.btnSecundario} onClick={generar}>
+                  <button type="button" className={styles.btnSecundario} onClick={() => generar(true)}>
                     <span aria-hidden="true">🔄</span> Otra disposición
                   </button>
                 </div>

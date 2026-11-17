@@ -446,14 +446,23 @@ export default function GeneradorSudokusPage() {
 
   const nivel = NIVELES.find((n) => n.id === nivelId) ?? NIVELES[1];
 
-  const generar = useCallback(() => {
+  /**
+   * `otrosDistintos`: «Otros distintos» sortea siempre una raíz nueva, distinta de la de los
+   * sudokus actuales, y vacía el campo. Antes tomaba el n.º del campo como «Generar» y, con un n.º
+   * escrito, repetía los mismos sudokus (cabo C0808: el hallazgo 4948 de generador-laberintos).
+   */
+  const generar = useCallback((otrosDistintos: boolean) => {
     setGenerando(true);
     setMostrarSoluciones(false);
+    const raizActual = sudokus[0]?.semilla;
+    if (otrosDistintos) setSemillaManual('');
 
     // Se cede el hilo para que el aviso de «generando» llegue a pintarse
     window.setTimeout(() => {
-      const base = Number(semillaManual.replace(/\D/g, ''));
-      const raiz = base > 0 ? base : Math.floor(Math.random() * 900000) + 100000;
+      let raiz = otrosDistintos ? 0 : Number(semillaManual.replace(/\D/g, ''));
+      while (raiz <= 0 || (otrosDistintos && raiz === raizActual)) {
+        raiz = Math.floor(Math.random() * 900000) + 100000;
+      }
       const generados: Sudoku[] = [];
 
       for (let i = 0; i < cantidad; i++) {
@@ -463,7 +472,7 @@ export default function GeneradorSudokusPage() {
       setSudokus(generados);
       setGenerando(false);
     }, 30);
-  }, [nivel, cantidad, simetrico, semillaManual]);
+  }, [nivel, cantidad, simetrico, semillaManual, sudokus]);
 
   const claseCantidad =
     cantidad === 1 ? styles.rejillaUno : cantidad === 2 ? styles.rejillaDos : styles.rejillaCuatro;
@@ -559,7 +568,7 @@ export default function GeneradorSudokusPage() {
               />
             </label>
 
-            <button type="button" className={styles.btnPrimary} onClick={generar} disabled={generando}>
+            <button type="button" className={styles.btnPrimary} onClick={() => generar(false)} disabled={generando}>
               <span aria-hidden="true">{generando ? '⏳' : '✨'}</span>{' '}
               <span>{generando ? 'Generando y comprobando unicidad…' : 'Generar sudokus'}</span>
             </button>
@@ -620,7 +629,7 @@ export default function GeneradorSudokusPage() {
                     <span aria-hidden="true">🖨️</span> Imprimir esta vista
                   </button>
 
-                  <button type="button" className={styles.btnSecundario} onClick={generar}>
+                  <button type="button" className={styles.btnSecundario} onClick={() => generar(true)}>
                     <span aria-hidden="true">🔄</span> Otros distintos
                   </button>
                 </div>
