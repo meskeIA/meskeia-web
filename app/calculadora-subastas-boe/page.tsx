@@ -80,6 +80,9 @@ const PERFILES_COMPRADOR: { value: PerfilComprador; label: string }[] = [
 const pct = (n: number, decimales = 0): string => formatPercentage(n / 100, decimales);
 /** Los textos de los tipos reducidos llegan de data/ con el `%` pegado o con espacio normal: se
  * separa con espacio duro al pintarlos (CLAUDE.md global §2), sin tocar los datos compartidos. */
+/** Una norma que ya trae su paréntesis («art. 669.1 LEC (LO 1/2025)») va dentro de otro en las
+ * tarjetas: el de dentro pasa a corchetes, como pide la Ortografía de la RAE (hallazgo 4931). */
+const enParentesis = (norma: string): string => `(${norma.replace(/\(([^()]*)\)/g, '[$1]')})`;
 const separarPorcentajes = (texto: string): string => texto.replace(/(\d)[  ]?%/g, '$1 %');
 
 /**
@@ -617,7 +620,10 @@ export default function CalculadoraSubastasBoePage() {
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">💶</span>
-                <p>Ten el dinero del resto disponible antes de pujar: el plazo puede ser de solo 5 días hábiles.</p>
+                <p>
+                  Ten el dinero del resto disponible antes de pujar: el plazo puede ser de solo{' '}
+                  {PLAZO_PAGO_SUBASTA.seguridadSocial.dias} días hábiles.
+                </p>
               </div>
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">📄</span>
@@ -735,8 +741,8 @@ function Resultados({ resultado: r, regimen, reformaRige, ccaa }: ResultadosProp
         icon="🔒"
         description={
           r.deposito.minimoAplicado
-            ? `El ${pct(r.deposito.regla.porcentaje)} del ${baseNombre} no llega al mínimo de ${formatCurrency(r.deposito.regla.minimo ?? 0)} (${r.deposito.regla.norma}).`
-            : `El ${pct(r.deposito.regla.porcentaje)} del ${baseNombre} (${r.deposito.regla.norma}).`
+            ? `El ${pct(r.deposito.regla.porcentaje)} del ${baseNombre} no llega al mínimo de ${formatCurrency(r.deposito.regla.minimo ?? 0)} ${enParentesis(r.deposito.regla.norma)}.`
+            : `El ${pct(r.deposito.regla.porcentaje)} del ${baseNombre} ${enParentesis(r.deposito.regla.norma)}.`
         }
       />
       {regimen === 'judicial' && reformaRige && (
@@ -758,7 +764,7 @@ function Resultados({ resultado: r, regimen, reformaRige, ccaa }: ResultadosProp
         title="Resto a pagar si ganas"
         value={formatCurrency(r.resto)}
         icon="⏱️"
-        description={`En ${r.plazo.dias} días ${r.plazo.computo} (${r.plazo.norma}). Si no pagas, pierdes el depósito.`}
+        description={`En ${r.plazo.dias} días ${r.plazo.computo} ${enParentesis(r.plazo.norma)}. Si no pagas, pierdes el depósito.`}
       />
 
       {r.avisos.map((a) => (
@@ -790,7 +796,7 @@ function Resultados({ resultado: r, regimen, reformaRige, ccaa }: ResultadosProp
           description={
             itp.baseEsValorReferencia
               ? `Sobre el valor de referencia (${formatCurrency(itp.base)}), porque tu puja queda por debajo (art. 10.2 TRLITPAJD). Tipo efectivo: ${pct((itp.importe / itp.base) * 100, 2)}.`
-              : `Sobre tu puja, que supera el valor de referencia. Tipo efectivo: ${pct((itp.importe / itp.base) * 100, 2)}.`
+              : `Sobre tu puja, que iguala o supera el valor de referencia. Tipo efectivo: ${pct((itp.importe / itp.base) * 100, 2)}.`
           }
         />
       )}
@@ -884,7 +890,10 @@ interface TramoJudicialProps {
 
 function TramoJudicial({ tramo, porcentaje, reformaRige }: TramoJudicialProps) {
   const U = UMBRALES_REMATE_JUDICIAL;
-  const tuPuja = `Tu puja es el ${pct(porcentaje, 1)} del valor de subasta.`;
+  // Hallazgo 4926 (17/11/2026): redondear decía «70,0 %» con 69,975 % junto a «Por debajo del 70 %»
+  // (y «40,0 %» con 39,995 %). Truncada a la décima, la cifra no cruza el umbral que decide el tramo.
+  const porcentajeMostrado = Math.floor(porcentaje * 10) / 10;
+  const tuPuja = `Tu puja es el ${pct(porcentajeMostrado, 1)} del valor de subasta.`;
 
   if (tramo === 'aprobacion-directa') {
     return (

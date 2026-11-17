@@ -5,7 +5,7 @@
  * consolidado del BOE leído el 22/10/2026 (cabecera de `data/fiscal/subastas.ts`):
  *   · Depósito: art. 669.1 LEC (20 %, mínimo 1.000 €, LO 1/2025; 5 % antes) · art. 103 bis.1.b
  *     RGR (5 %) · arts. 117.e-f RGRSS (25 % en sobre, 30 % en el acto)
- *   · Plazo: art. 670.1 LEC (20 días; 40 antes) · art. 101.f RGR (15) · art. 117.g RGRSS (5 hábiles)
+ *   · Plazo: art. 670.1 LEC (20 días; 40 antes) · art. 101.4.f RGR (15) · art. 117.g RGRSS (5 hábiles)
  *   · ITP: art. 10.2 TRLITPAJD — el valor de referencia salvo que el precio sea mayor
  *   · Tipos de ITP de Madrid (6 %) y Andalucía (7 %), los de `TIPOS_ITP_CCAA_2025`
  *

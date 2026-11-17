@@ -66,7 +66,7 @@ export const jsonLd = generateWebAppSchema({
     'ITP sobre el valor de referencia del Catastro cuando la puja queda por debajo',
     'Aviso de lo que pasa con la puja según el porcentaje del valor de subasta',
     'Coste total que dice qué le falta si no conoces cargas, deudas de comunidad o IBI',
-    'Funciona 100 % en el navegador, sin registro ni instalación',
+    'Funciona 100 % en el navegador, sin registro ni instalación',
   ],
 });
 
@@ -84,8 +84,12 @@ export const PREGUNTAS_FRECUENTES: FAQItem[] = [
     answer: 'Sobre el valor de referencia del Catastro si tu puja queda por debajo de él, y sobre la puja si la supera: es la regla del art. 10.2 de la ley del impuesto, que la Dirección General de Tributos aplica a las subastas (consulta V0453-22) y que confirmó el Tribunal Superior de Justicia de Galicia en 2026. Quien gana una vivienda muy por debajo de su valor paga el impuesto como si la hubiera comprado a ese valor de referencia. En el País Vasco y Navarra la base la fija su norma foral.',
   },
   {
-    question: '¿Qué pasa si mi puja no llega al 70 % del valor de subasta?',
-    answer: `En la subasta judicial, una puja de al menos el ${pct(UMBRALES_REMATE_JUDICIAL.aprobacionDirecta)} se aprueba al día siguiente del cierre. Por debajo, el deudor tiene ${UMBRALES_REMATE_JUDICIAL.diasMejora} días para presentar a otra persona que ofrezca al menos el ${pct(UMBRALES_REMATE_JUDICIAL.mejoraTercero)}; si no lo hace, se aprueba tu puja si llega al ${pct(UMBRALES_REMATE_JUDICIAL.remateMinimo)}, o al ${pct(UMBRALES_REMATE_JUDICIAL.remateMinimoSiCubreCredito)} si cubre todo lo que se le debe al acreedor (art. 670 LEC). Si es la vivienda habitual del deudor, no se aprueba por menos del ${pct(UMBRALES_REMATE_JUDICIAL.viviendaHabitual)}, o del ${pct(UMBRALES_REMATE_JUDICIAL.viviendaHabitualSiCubreDeuda)} si cubre la deuda.`,
+    // Hallazgos 4927 y 4928 (17/11/2026): el 70 de la pregunta iba escrito a mano (y con espacio
+    // normal), y la respuesta daba como generales las reglas de la LO 1/2025, que solo valen para los
+    // procedimientos iniciados desde el 3 de abril de 2025 (DT 9.ª); los anteriores siguen el art.
+    // 670.4 en su redacción previa, el mismo texto que pinta la página con «Antes del 3 de abril».
+    question: `¿Qué pasa si mi puja no llega al ${pct(UMBRALES_REMATE_JUDICIAL.aprobacionDirecta)} del valor de subasta?`,
+    answer: `En la subasta judicial de un procedimiento iniciado desde el 3 de abril de 2025 (LO 1/2025), una puja de al menos el ${pct(UMBRALES_REMATE_JUDICIAL.aprobacionDirecta)} se aprueba al día siguiente del cierre. Por debajo, el deudor tiene ${UMBRALES_REMATE_JUDICIAL.diasMejora} días para presentar a otra persona que ofrezca al menos el ${pct(UMBRALES_REMATE_JUDICIAL.mejoraTercero)}; si no lo hace, se aprueba tu puja si llega al ${pct(UMBRALES_REMATE_JUDICIAL.remateMinimo)}, o al ${pct(UMBRALES_REMATE_JUDICIAL.remateMinimoSiCubreCredito)} si cubre todo lo que se le debe al acreedor (art. 670.3 LEC). Si es la vivienda habitual del deudor, no se aprueba por menos del ${pct(UMBRALES_REMATE_JUDICIAL.viviendaHabitual)}, o del ${pct(UMBRALES_REMATE_JUDICIAL.viviendaHabitualSiCubreDeuda)} si cubre la deuda. En los procedimientos iniciados antes, la puja de al menos el ${pct(UMBRALES_REMATE_JUDICIAL.aprobacionDirecta)} se aprueba sin más trámite; por debajo, el deudor tiene ${UMBRALES_REMATE_JUDICIAL.diasMejora} días para presentar a otra persona que ofrezca más del ${pct(UMBRALES_REMATE_JUDICIAL.mejoraTerceroAnterior)}, después el acreedor puede pedir que se le adjudique, y si no lo pide se aprueba tu puja si supera el ${pct(UMBRALES_REMATE_JUDICIAL.remateMinimo)} o cubre la cantidad reclamada (art. 670.4 LEC en su redacción anterior).`,
   },
   {
     question: '¿Qué deudas de la vivienda asume quien la compra en subasta?',

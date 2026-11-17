@@ -285,73 +285,77 @@ test.describe('Inspector 17/11/2026 · casos resueltos a mano', () => {
     await expect(r).not.toContainText('Depósito para pujar');
   });
 
-  // ─────────────────────────────────────────── HALLAZGOS ABIERTOS (fallan hoy a propósito)
+  // ─────────────────────────────────────────── HALLAZGOS REPARADOS el 17/11/2026
 
-  test('HALLAZGO · el porcentaje de la puja no se redondea al otro lado del umbral', async ({ page }) => {
-    // ABIERTO: TramoJudicial pinta pct(porcentaje, 1). Con 139.950 sobre 200.000 (69,975 %) dice
+  test('REPARADO (hallazgo 4926) · el porcentaje de la puja no se redondea al otro lado del umbral', async ({ page }) => {
+    // Antes: TramoJudicial pintaba pct(porcentaje, 1). Con 139.950 sobre 200.000 (69,975 %) decía
     // «Tu puja es el 70,0 % del valor de subasta. Por debajo del 70 %, aunque sea la mejor puja no
     // tienes la vivienda asegurada»; con 79.990 (39,995 %), «40,0 %» y «Por debajo del 40 % es muy
     // probable que no se apruebe». El 70 % del art. 670.1 es «igual o superior»: la cifra no puede
-    // decir que se llega cuando el texto dice que no.
-    test.fail();
+    // decir que se llega cuando el texto dice que no. Ahora se trunca a la décima: 69,9 y 39,9.
     const r = resultados(page);
     await escribirExacto(page, 'Lo que piensas pujar (€)', '139950');
     await expect(r).toContainText(/Por debajo del 70\s%/);
     await expect(r).not.toContainText(/Tu puja es el 70,0\s%/);
+    await expect(r).toContainText(/Tu puja es el 69,9\s%/);
     await escribirExacto(page, 'Lo que piensas pujar (€)', '79990');
     await expect(r).toContainText(/Por debajo del 40\s% es muy probable/);
     await expect(r).not.toContainText(/Tu puja es el 40,0\s%/);
+    await expect(r).toContainText(/Tu puja es el 39,9\s%/);
+    // El umbral justo sigue diciendo 70,0 (140.000 / 200.000)
+    await escribirExacto(page, 'Lo que piensas pujar (€)', '140000');
+    await expect(r).toContainText(/Tu puja es el 70,0\s%/);
   });
 
-  test('HALLAZGO · la FAQ del 70 % dice a qué procedimientos se aplica', async ({ page }) => {
-    // ABIERTO: la respuesta da las reglas de la LO 1/2025 (tercero con al menos el 60 %, aprobación
+  test('REPARADO (hallazgo 4927) · la FAQ del 70 % dice a qué procedimientos se aplica', async ({ page }) => {
+    // Antes: la respuesta daba las reglas de la LO 1/2025 (tercero con al menos el 60 %, aprobación
     // al día siguiente del cierre) sin decir que valen para los procedimientos iniciados desde el
     // 03/04/2025. Para los anteriores la propia app dice otra cosa: tercero con «más del 70 %»,
-    // adjudicación al acreedor y remate «sin más trámite». Las respuestas 1 y 2 sí lo distinguen.
-    test.fail();
+    // adjudicación al acreedor y remate «sin más trámite». Ahora la respuesta da los dos regímenes.
     const faq = await faqJsonLd(page);
     const p = faq.find((f) => f.name.includes('no llega al 70'));
     expect(p, 'la pregunta del 70 %').toBeTruthy();
     expect(p!.acceptedAnswer.text).toMatch(/3 de abril de 2025|antes de la reforma|procedimientos anteriores|desde la reforma/);
+    expect(p!.acceptedAnswer.text).toContain('sin más trámite');
+    expect(p!.acceptedAnswer.text).toMatch(/más del 70\s%/);
   });
 
-  test('HALLAZGO · los porcentajes escritos a mano en el JSON-LD llevan espacio duro', async ({ page }) => {
-    // ABIERTO: la pregunta «¿Qué pasa si mi puja no llega al 70 % del valor de subasta?» escribe el
+  test('REPARADO (hallazgo 4928) · los porcentajes escritos a mano en el JSON-LD llevan espacio duro', async ({ page }) => {
+    // Antes: la pregunta «¿Qué pasa si mi puja no llega al 70 % del valor de subasta?» escribía el
     // 70 a mano (es UMBRALES_REMATE_JUDICIAL.aprobacionDirecta) y con espacio normal, y la feature
     // «Funciona 100 % en el navegador» también; el resto de la app usa U+00A0 (CLAUDE.md global §2).
-    test.fail();
     const preguntas = (await faqJsonLd(page)).map((f) => f.name).join(' ');
     const features = (await featuresJsonLd(page)).join(' ');
     expect(preguntas).not.toMatch(/\d %/);
     expect(features).not.toMatch(/\d %/);
+    expect(preguntas).toContain('no llega al 70 %');
   });
 
-  test('HALLAZGO · con la puja igual al valor de referencia no dice que lo «supera»', async ({ page }) => {
-    // ABIERTO: puja 150.000 y valor de referencia 150.000 → «Sobre tu puja, que supera el valor de
+  test('REPARADO (hallazgo 4929) · con la puja igual al valor de referencia no dice que lo «supera»', async ({ page }) => {
+    // Antes: puja 150.000 y valor de referencia 150.000 → «Sobre tu puja, que supera el valor de
     // referencia». La cuota es la misma (6 % de 150.000 = 9000,00 €), pero no lo supera: lo iguala.
-    test.fail();
     await escribirExacto(page, 'Valor de referencia del Catastro (€)', '150000');
     const r = resultados(page);
     await expect(r).toContainText(/9000,00\s€/);
     await expect(r).not.toContainText('que supera el valor de referencia');
+    await expect(r).toContainText('que iguala o supera el valor de referencia');
   });
 
-  test('HALLAZGO · la cita del plazo de Hacienda es el art. 101.4.f del RGR', async ({ page }) => {
-    // ABIERTO: el plazo de 15 días está en la letra f) del APARTADO 4 del art. 101 RGR («En el Portal
-    // de Subastas se recogerán los datos esenciales…», texto consolidado leído el 17/11/2026); la app
-    // cita «art. 101.f», que no existe así (sale de PLAZO_PAGO_SUBASTA.aeat.norma).
-    test.fail();
+  test('REPARADO (hallazgo 4930) · la cita del plazo de Hacienda es el art. 101.4.f del RGR', async ({ page }) => {
+    // Antes: el plazo de 15 días está en la letra f) del APARTADO 4 del art. 101 RGR («En el Portal
+    // de Subastas se recogerán los datos esenciales…», texto consolidado leído el 17/11/2026, y otra
+    // vez al reparar); la app citaba «art. 101.f» (PLAZO_PAGO_SUBASTA.aeat.norma).
     await page.getByRole('button', { name: /Agencia Tributaria/ }).click();
     await expect(resultados(page)).toContainText(/art\. 101\.4\.f/);
   });
 
-  test('HALLAZGO · las citas del resultado no anidan paréntesis dentro de paréntesis', async ({ page }) => {
-    // ABIERTO: «El 20 % del valor de subasta (art. 669.1 LEC (LO 1/2025)).» y «En 20 días siguientes
+  test('REPARADO (hallazgo 4931) · las citas del resultado no anidan paréntesis dentro de paréntesis', async ({ page }) => {
+    // Antes: «El 20 % del valor de subasta (art. 669.1 LEC (LO 1/2025)).» y «En 20 días siguientes
     // al cierre de la subasta (art. 670.1 LEC (LO 1/2025)).»: dentro de un paréntesis el inciso va
-    // entre corchetes (Ortografía de la RAE, 2010), o se reescribe la cita.
-    test.fail();
+    // entre corchetes (Ortografía de la RAE, 2010). Ahora «(art. 669.1 LEC [LO 1/2025])».
     await expect(resultados(page)).toContainText('Depósito para pujar');
     const texto = await resultados(page).innerText();
     expect(texto).not.toMatch(/\([^()]*\([^()]*\)\)/);
+    expect(texto).toContain('(art. 669.1 LEC [LO 1/2025])');
   });
 });

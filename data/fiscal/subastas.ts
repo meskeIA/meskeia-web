@@ -73,8 +73,10 @@ export const PLAZO_PAGO_SUBASTA = {
   judicial: { dias: 20, computo: 'siguientes al cierre de la subasta', norma: 'art. 670.1 LEC (LO 1/2025)' },
   /** Art. 670.1 LEC (Ley 19/2015): «En el plazo de cuarenta días», tras aprobar el remate. */
   judicialAnterior: { dias: 40, computo: 'desde la aprobación del remate', norma: 'art. 670.1 LEC (redacción de la Ley 19/2015)' },
-  /** Art. 101.f RGR: «en los 15 días siguientes a que le sea notificada la adjudicación». */
-  aeat: { dias: 15, computo: 'siguientes a la notificación de la adjudicación', norma: 'art. 101.f del Reglamento General de Recaudación' },
+  /** Art. 101.4.f RGR (BOE-A-2005-14803, apartado 4, «En el Portal de Subastas se recogerán los
+   * datos esenciales…»): «en los 15 días siguientes a que le sea notificada la adjudicación». Se
+   * citaba «art. 101.f», sin el apartado (hallazgo 4930, cotejado en el BOE el 17/11/2026). */
+  aeat: { dias: 15, computo: 'siguientes a la notificación de la adjudicación', norma: 'art. 101.4.f del Reglamento General de Recaudación' },
   /** Art. 117.g RGRSS: «dentro de los cinco días hábiles siguientes al de dicha adjudicación». */
   seguridadSocial: { dias: 5, computo: 'hábiles siguientes al de la adjudicación', norma: 'art. 117.g del Reglamento General de Recaudación de la Seguridad Social' },
 } as const satisfies Record<string, PlazoPagoSubasta>;
