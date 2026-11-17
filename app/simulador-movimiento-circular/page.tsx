@@ -209,20 +209,29 @@ export default function SimuladorMovimientoCircularPage() {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Etiqueta "r"
-      const midRx = (cx + px) / 2;
-      const midRy = (cy + py) / 2;
-      ctx.fillStyle = textColor;
-      ctx.font = `bold ${Math.round(w * 0.028)}px system-ui`;
-      ctx.textAlign = 'center';
-      ctx.fillText('r', midRx + 8, midRy - 6);
-
       // Hallazgo 4932 (17/11/2026): los rótulos se pintaban antes que la partícula y que la flecha
       // a_t, que los tapaban (hasta el 97 % de «a_t» con r = 2 m, y «v» bajo la flecha roja al
       // arrancar el MCNU). Ahora se guardan y se pintan al final, y a una distancia mínima del
       // centro de la partícula para que debajo quede el fondo del lienzo y no el disco.
       const rotulos: Array<() => void> = [];
       const DISTANCIA_MIN_ROTULO = 24; // px desde el centro de la partícula (disco de 8 + 2 de trazo)
+
+      // Etiqueta "r", en la mitad del radio y apartada de él en PERPENDICULAR (cabo C0805): la
+      // flecha a_c va encima del radio, y con el desplazamiento fijo (+8, −6) y pintada antes que
+      // ella le pasaba por encima en parte de la vuelta (hasta el 64 % de la tinta con los valores
+      // de inicio). A 16 px de la línea queda fuera de la flecha y del rótulo «a_c», que va sobre ella.
+      const midRx = (cx + px) / 2;
+      const midRy = (cy + py) / 2;
+      const nrx = radioPx > 0 ? -(py - cy) / radioPx : 0;
+      const nry = radioPx > 0 ? (px - cx) / radioPx : -1;
+      rotulos.push(() => {
+        ctx.fillStyle = textColor;
+        ctx.font = `bold ${Math.round(w * 0.028)}px system-ui`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('r', midRx + nrx * 16, midRy + nry * 16);
+        ctx.textBaseline = 'alphabetic';
+      });
 
       // Vector velocidad tangencial (perpendicular al radio, sentido antihorario = convención positiva)
       if (omegaActual > 0.01) {

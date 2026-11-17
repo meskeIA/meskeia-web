@@ -2443,9 +2443,9 @@ type VentanaRotulos = Window & { __rotulos?: LecturaRotulo[] };
  * Espía de los rótulos del lienzo: guarda los píxeles de la caja de «v», «a_c» y «a_t» antes y
  * después de pintarlos y, al terminar el fotograma (el callback de requestAnimationFrame), cuenta
  * cuánta de su tinta ha cambiado: eso es lo que la flecha, la partícula u otro rótulo le han
- * pintado encima.
+ * pintado encima. Con `conRadio`, también el de «r» (cabo C0805): los demás casos no lo esperan.
  */
-function espiarRotulos(): void {
+function espiarRotulos(conRadio = false): void {
   const w = window as VentanaRotulos;
   w.__rotulos = [];
   interface Pendiente {
@@ -2465,7 +2465,7 @@ function espiarRotulos(): void {
   P.fillText = function (this: CanvasRenderingContext2D, t: string, x: number, y: number, max?: number) {
     const texto = String(t).trim();
     let caja: Omit<Pendiente, 'despues'> | null = null;
-    if (texto === 'v' || texto === 'a_c' || texto === 'a_t') {
+    if (texto === 'v' || texto === 'a_c' || texto === 'a_t' || (conRadio && texto === 'r')) {
       const met = this.measureText(String(t));
       const m = this.getTransform();
       const lienzo = this.canvas;
@@ -2715,4 +2715,25 @@ test.describe('Inspector 17/11/2026 — modo cambio: leerRespuestaAula, redondea
       expect(v.filter((l) => l.tapada > 0.5).length, 'ningún fotograma con más de la mitad de «v» bajo la flecha a_t').toBe(0);
     },
   );
+
+  test('REPARADO (cabo C0805) — en MCU la flecha a_c tapaba el rótulo «r» en parte de la vuelta, y en ningún ángulo queda sobre ella', async ({
+    page,
+  }) => {
+    // La flecha a_c va de la partícula hacia el centro, ENCIMA del radio, y «r» se pintaba antes
+    // que ella en (mitad del radio + 8, −6): con los valores de inicio (r = 2 m, ω = 2 rad/s) a_c
+    // mide más que el radio, así que la flecha cruza la mitad en toda la vuelta y, en los ángulos en
+    // que la dirección del radio se acerca a la de ese desplazamiento fijo, le pasaba por encima.
+    // Ahora «r» se pinta al final, con los demás rótulos, y apartado del radio en perpendicular.
+    test.setTimeout(30_000);
+    await page.addInitScript(espiarRotulos, true);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="range"]']);
+    await vaciarRotulos(page);
+    await page.waitForTimeout(3400); // T = π s: más de una vuelta
+    const r = (await lecturasRotulos(page)).filter((l) => l.t === 'r');
+    expect(r.length, '«r» pintado').toBeGreaterThan(60);
+    expect(Math.max(...r.map((l) => l.tapada)), '«r» no queda tapado en ningún ángulo').toBeLessThan(0.15);
+    // Y debajo queda el fondo del lienzo, no la flecha: el contraste se mide contra él.
+    expect(r.filter((l) => l.fondo.join(',') !== '248,250,252').length, '«r» sobre el fondo del lienzo').toBe(0);
+  });
 });
