@@ -1596,7 +1596,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-inversiones/', icon: '📊', name: 'Simulador de Inversión', description: 'Cuánto rinde tu capital' },
   ],
   'visualizador-farmacocinetica': [
-    { url: '/visualizador-higado/', icon: '🫀', name: 'El Hígado', description: 'Metabolismo hepático y CYP450 en detalle' },
+    { url: '/visualizador-higado/', icon: '🧪', name: 'El Hígado', description: 'Metabolismo hepático y CYP450 en detalle' },
     { url: '/visualizador-rinon-filtracion/', icon: '🫘', name: 'El Riñón', description: 'Excreción renal de fármacos' },
     { url: '/visualizador-enzimas-cuerpo-humano/', icon: '🧫', name: 'Enzimas', description: 'CYP450 y otras enzimas metabólicas' },
     { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Hormonas con cinética similar a fármacos' },
@@ -1614,7 +1614,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-estructura-atomo/', icon: '⚛️', name: 'Estructura del Átomo', description: 'Física cuántica que inspiró los qubits' },
   ],
   'visualizador-piel': [
-    { url: '/visualizador-higado/', icon: '🫀', name: 'El Hígado', description: 'Detoxificación de tóxicos externos' },
+    { url: '/visualizador-higado/', icon: '🧪', name: 'El Hígado', description: 'Detoxificación de tóxicos externos' },
     { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Células de Langerhans en la piel' },
     { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Vitamina D y hormonas' },
     { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: '2m² de superficie, 1.5kg de peso' },
@@ -1626,7 +1626,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Glucagón, insulina y glucemia' },
   ],
   'visualizador-rinon-filtracion': [
-    { url: '/visualizador-higado/', icon: '🫀', name: 'El Hígado', description: 'Primer órgano de detoxificación' },
+    { url: '/visualizador-higado/', icon: '🧪', name: 'El Hígado', description: 'Primer órgano de detoxificación' },
     { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'La Sangre', description: 'El riñón la filtra continuamente' },
     { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Aldosterona, ADH, SRAA' },
     { url: '/simulador-osmosis/', icon: '🧫', name: 'Ósmosis', description: 'El paso de agua que concentra la orina' },
@@ -1635,7 +1635,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-cerebro-emociones/', icon: '🧠', name: 'Cerebro y Emociones', description: 'Neuroplasticidad y envejecimiento cerebral' },
     { url: '/visualizador-sistema-inmune/', icon: '🛡️', name: 'Sistema Inmune', description: 'Inmunosenescencia y SASP' },
     { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Longevidad y límites fisiológicos' },
-    { url: '/visualizador-higado/', icon: '🫀', name: 'El Hígado', description: 'Detoxificación y disfunción mitocondrial' },
+    { url: '/visualizador-higado/', icon: '🧪', name: 'El Hígado', description: 'Detoxificación y disfunción mitocondrial' },
   ],
   'visualizador-cerebro-emociones': [
     { url: '/visualizador-envejecimiento-celular/', icon: '🔬', name: 'Envejecimiento Celular', description: 'Neuroplasticidad y senescencia neuronal' },
@@ -1953,7 +1953,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-indice-glucemico/', icon: '📊', name: 'Índice Glucémico', description: 'Cómo los alimentos afectan la glucemia al romper el ayuno' },
   ],
   'visualizador-metabolismo-alcohol': [
-    { url: '/visualizador-higado/', icon: '🫀', name: 'Hígado', description: 'Anatomía y funciones del órgano que metaboliza el alcohol' },
+    { url: '/visualizador-higado/', icon: '🧪', name: 'Hígado', description: 'Anatomía y funciones del órgano que metaboliza el alcohol' },
     { url: '/visualizador-farmacocinetica/', icon: '⚗️', name: 'Farmacocinética', description: 'El proceso ADME que también aplica al etanol' },
     { url: '/visualizador-microbioma/', icon: '🦠', name: 'Microbioma', description: 'Las bacterias orales producen acetaldehído directamente' },
     { url: '/visualizador-cerebro-emociones/', icon: '💭', name: 'Cerebro y Emociones', description: 'El alcohol actúa sobre GABA y NMDA en el cerebro' },
@@ -4811,7 +4811,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-diabetes-mecanismo': [
     { url: '/visualizador-sistema-endocrino/', icon: '⚗️', name: 'Sistema Endocrino', description: 'La insulina y el glucagón son las hormonas pancreáticas dentro del sistema endocrino completo' },
-    { url: '/visualizador-higado/', icon: '🫀', name: 'Hígado', description: 'El hígado es el órgano central de la gluconeogénesis y el almacenamiento de glucógeno regulado por insulina' },
+    { url: '/visualizador-higado/', icon: '🧪', name: 'Hígado', description: 'El hígado es el órgano central de la gluconeogénesis y el almacenamiento de glucógeno regulado por insulina' },
     { url: '/visualizador-proteinas-plegamiento/', icon: '🧬', name: 'Plegamiento de Proteínas', description: 'La insulina es una proteína pequeña cuya estructura 3D es esencial para su unión al receptor' },
     { url: '/visualizador-ciclo-viral/', icon: '🦠', name: 'Ciclo Viral', description: 'Algunos virus (Coxsackie B4) se han propuesto como desencadenantes del proceso autoinmune en la diabetes tipo 1' },
   ],

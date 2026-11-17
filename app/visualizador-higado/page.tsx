@@ -706,7 +706,9 @@ export default function VisualizadorHigado() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}><span aria-hidden="true">🫀</span> Visualizador del Hígado</h1>
+        {/* Cabo C0802: era 🫀 (corazón anatómico). Sin emoji de hígado en Unicode, el de
+            laboratorio, como el botón «Hígado» de visualizador-metabolismo-alcohol (hallazgo 4920). */}
+        <h1 className={styles.title}><span aria-hidden="true">🧪</span> Visualizador del Hígado</h1>
         <p className={styles.subtitle}>El laboratorio del cuerpo: detoxificación, metabolismo y síntesis</p>
       </header>
 

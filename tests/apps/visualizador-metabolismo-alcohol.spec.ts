@@ -239,6 +239,21 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     await expect(pestana).not.toContainText('\u{1FAC0}');
   });
 
+  test('REPARADO (cabo C0802): la tarjeta relacionada «Hígado» y la cabecera de visualizador-higado llevaban el emoji del corazón', async ({ page }) => {
+    // El icono de catálogo de visualizador-higado era 🫀 (U+1FAC0, ANATOMICAL HEART) en
+    // data/applications.ts y en sus seis tarjetas de data/app-relations.ts: la relacionada de esta
+    // app salía con el corazón. Ahora 🧪, como el botón del hallazgo 4920.
+    const tarjeta = page.locator('a[href^="/visualizador-higado/"]').first();
+    await tarjeta.scrollIntoViewIfNeeded();
+    await expect(tarjeta).toContainText('Hígado');
+    await expect(tarjeta).not.toContainText('\u{1FAC0}');
+    await expect(tarjeta).toContainText('🧪');
+    await page.goto('/visualizador-higado/');
+    const h1 = page.getByRole('heading', { level: 1 });
+    await expect(h1).toContainText('Visualizador del Hígado');
+    await expect(h1).not.toContainText('\u{1FAC0}');
+  });
+
   test('REPARADO (hallazgo 4921) [contenido/bajo]: el FAQPage traía cinco preguntas que la página no mostraba', async ({ page }) => {
     // REPARADO 17/11/2026: la guía pinta PREGUNTAS_FRECUENTES, de donde sale también el FAQPage.
     // ENTRADA  los dos bloques JSON-LD y el texto de la página (guía incluida)
