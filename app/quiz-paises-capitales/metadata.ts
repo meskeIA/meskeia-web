@@ -1,5 +1,13 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { countries } from '@/data/countries';
+
+/**
+ * Hallazgo 3639: el FAQPage y la FAQ visible respondían a «¿Cuántos países…?» con dos textos, y el
+ * del FAQPage callaba Taiwán y las entradas del quiz. Una sola fuente, que importan las dos.
+ */
+export const PREGUNTA_PAISES = '¿Cuántos países hay en el mundo?';
+export const RESPUESTA_PAISES = `La ONU tiene 193 Estados miembros y 2 Estados observadores no miembros (Ciudad del Vaticano y Palestina): 195 en total. Otros organismos y fuentes ofrecen cifras distintas según qué territorios consideren. Este quiz incluye esos 195 y, además, Taiwán, que no es miembro ni observador de la ONU: ${countries.length} entradas en total.`;
 
 export const metadata: Metadata = {
   title: 'Quiz Países y Capitales del Mundo - Adivina la Capital | meskeIA',
@@ -48,10 +56,10 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuántos países y capitales hay que aprender en el mundo?',
+      name: PREGUNTA_PAISES,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La ONU cuenta 193 Estados miembros y 2 observadores (Ciudad del Vaticano y Palestina): 195 países, cada uno con su capital; otras fuentes dan cifras distintas según qué territorios incluyan. Algunas capitales pueden resultar sorprendentes: por ejemplo, la capital de Australia es Camberra (no Sídney), la de Brasil es Brasilia (no Río de Janeiro) y la de Sudáfrica está dividida entre tres ciudades: Pretoria, Ciudad del Cabo y Bloemfontein.',
+        text: RESPUESTA_PAISES,
       },
     },
     {

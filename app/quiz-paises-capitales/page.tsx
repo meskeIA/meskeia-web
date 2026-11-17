@@ -8,6 +8,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { countries, Country } from '@/data/countries';
+import { PREGUNTA_PAISES, RESPUESTA_PAISES } from './metadata';
 import EducationalSection from '@/components/EducationalSection';
 import { formatPercentage, enfocarSinCentrar, traerALaVista } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
@@ -640,10 +641,8 @@ export default function QuizPaisesCapitalesPage() {
           <h4 id="edu-faq">Preguntas frecuentes sobre capitales del mundo</h4>
           <dl className={styles.faqList}>
             <div className={styles.faqItem}>
-              <dt>¿Cuántos países hay en el mundo?</dt>
-              <dd>
-                La ONU tiene <strong>193 Estados miembros</strong> y 2 Estados observadores no miembros (Ciudad del Vaticano y Palestina): 195 en total. Otros organismos y fuentes ofrecen cifras distintas según qué territorios consideren. Este quiz incluye esos 195 y, además, Taiwán, que no es miembro ni observador de la ONU: {countries.length} entradas en total.
-              </dd>
+              <dt>{PREGUNTA_PAISES}</dt>
+              <dd>{RESPUESTA_PAISES}</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Por qué la capital no siempre es la ciudad más grande?</dt>

@@ -1323,8 +1323,8 @@ test.describe('Inspector 28/10/2026 · hallazgos', () => {
   });
 
   test('hallazgo · «¿Cuántos países…?» tiene UNA sola respuesta en la FAQ visible y en el FAQPage', async ({ page }) => {
-    test.fail(); // ABIERTO
-    // metadata.ts:51-55 (FAQPage, lo que leen buscadores y asistentes): «¿Cuántos países y capitales
+    // REPARADO (hallazgo 3639): PREGUNTA_PAISES y RESPUESTA_PAISES de metadata.ts, que importan las
+    // dos bocas. Antes, metadata.ts:51-55 (FAQPage, lo que leen buscadores y asistentes): «¿Cuántos países y capitales
     // hay que aprender en el mundo?» → «… 195 países, cada uno con su capital …», sin Taiwán ni las
     // 196 entradas del quiz. page.tsx:643-646 (FAQ visible): «¿Cuántos países hay en el mundo?» →
     // «… 195 en total … Este quiz incluye esos 195 y, además, Taiwán […] 196 entradas en total.»
