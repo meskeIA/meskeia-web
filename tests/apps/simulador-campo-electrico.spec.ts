@@ -2489,7 +2489,8 @@ test.describe('Inspector 17/11/2026 — lectura de la respuesta, redondeo de la 
     await expect(await corregir(page, '58,435')).toContainText('el SIGNO no'); // control de H1
   });
 
-  // HALLAZGO H1 (bajo, cálculo) · ABIERTO (17/11/2026).
+  // HALLAZGO H1 (bajo, cálculo) · REPARADO el 17/11/2026 (hallazgo 4933): leerRespuestaAula mide
+  // la cercanía de la lectura decimal en valor absoluto, así que con el signo cambiado lee 8,99.
   // comprobarRespuesta (casos.ts) nombra el signo cambiado, «el error típico del tema». Desde
   // 447183de la casilla se lee con leerRespuestaAula, que elige la lectura decimal de «X.YYY» solo
   // si queda cerca de la RESPUESTA: con el signo cambiado la lectura decimal queda a dos veces la
@@ -2499,14 +2500,14 @@ test.describe('Inspector 17/11/2026 — lectura de la respuesta, redondeo de la 
   //       SIGNO no…» (lo que da «8,990») · obtenido «No es correcto. Te has desviado 8998,99 de la
   //       respuesta.». Práctica 1480853 (U = −4,50 nJ, exacto −4,495), «4.495» → esperado SIGNO ·
   //       obtenido «Te has desviado 4499,5».
-  test.fail('HALLAZGO H1 · el signo cambiado con punto decimal se nombra igual que con coma', async () => {
+  test('REPARADO (hallazgo 4933) H1 · el signo cambiado con punto decimal se nombra igual que con coma', async () => {
     expect(corregirComoLaApp('8.990', 3).motivo).toContain('el SIGNO no');
     const p = generarEjercicioAleatorio(1480853);
     const leido = leerRespuestaAula('4.495', p.respuesta);
     expect(comprobarRespuesta(leido, p.respuesta, p.datos.magnitud).motivo).toContain('el SIGNO no');
   });
 
-  test.fail('HALLAZGO H1 · en la página, «8.990» en el caso 3 dice «el SIGNO no», como «8,990»', async ({ page }) => {
+  test('REPARADO (hallazgo 4933) H1 · en la página, «8.990» en el caso 3 dice «el SIGNO no», como «8,990»', async ({ page }) => {
     await esperarHidratacion(page, ['#casos-respuesta']);
     await seccion(page).getByRole('button', { name: /^Caso 3:/ }).click();
     await expect(await corregir(page, '8.990')).toContainText('el SIGNO no', { timeout: 3000 });

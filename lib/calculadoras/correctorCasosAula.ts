@@ -232,6 +232,13 @@ function mayuscula(texto: string): string {
  * mil veces más pequeña: «33.510» L (el diámetro usado como radio, 8 veces la respuesta 4188,79)
  * pasaba a 33,51, el aviso del error típico no salía y la desviación enseñada era de otro número.
  * Cuando ninguna lectura es buena, manda la convención del sitio, que es la española.
+ *
+ * ⚠️ 17/11/2026 (hallazgo 4933 de simulador-campo-electrico) — la cercanía se mide en VALOR
+ * ABSOLUTO. Con el signo cambiado («8.990» para −8,99) la lectura decimal quedaba a dos veces la
+ * respuesta, fuera de la banda, y se leía 8990: el aviso del error de signo, que el corrector da con
+ * «8,990», no salía, y la desviación enseñada era de un número que el alumno no escribió. Comparar
+ * magnitudes deja la elección igual con el signo bueno y conserva el signo que se escribió, así que
+ * el corrector de cada app sigue viendo el signo cambiado.
  */
 export function leerRespuestaAula(texto: string, esperado: number): number {
   const leido = parseSpanishNumber(texto);
@@ -244,9 +251,10 @@ export function leerRespuestaAula(texto: string, esperado: number): number {
     .replace(/^[+-]/, '');
   if (!/^[1-9]\d{0,2}\.\d{3}$/.test(cuerpo)) return leido;
   const decimal = Math.sign(leido) * Number(cuerpo);
-  const distanciaDecimal = Math.abs(decimal - esperado);
-  const cerca = distanciaDecimal <= Math.max(0.5, Math.abs(esperado) * BANDA_LECTURA_DECIMAL);
-  return cerca && distanciaDecimal < Math.abs(leido - esperado) ? decimal : leido;
+  const magnitudEsperada = Math.abs(esperado);
+  const distanciaDecimal = Math.abs(Math.abs(decimal) - magnitudEsperada);
+  const cerca = distanciaDecimal <= Math.max(0.5, magnitudEsperada * BANDA_LECTURA_DECIMAL);
+  return cerca && distanciaDecimal < Math.abs(Math.abs(leido) - magnitudEsperada) ? decimal : leido;
 }
 
 /**

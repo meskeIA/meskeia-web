@@ -451,6 +451,21 @@ test.describe('leerRespuestaAula', () => {
     expect(leerRespuestaAula('1.700', 1.2)).toBe(1.7); // a media unidad, el suelo de la banda
   });
 
+  /*
+   * Hallazgo 4933 (simulador-campo-electrico), 17/11/2026. Valores a mano: el caso 3 espera
+   * Eₓ = −8,99 N/C. «8.990» con el signo cambiado tiene que leerse 8,99 —como «8,990»— para que el
+   * corrector nombre el error de signo; se leía 8990, porque 8,99 queda a 17,98 de −8,99, fuera de la
+   * banda de 0,899. En valor absoluto queda a 0. Lo mismo con «-2.493» para +2,493.
+   */
+  test('4933 — con el signo cambiado, la lectura decimal cercana EN VALOR ABSOLUTO sigue ganando', () => {
+    expect(leerRespuestaAula('8.990', -8.99)).toBe(8.99);
+    expect(leerRespuestaAula('4.495', -4.5)).toBe(4.495);
+    expect(leerRespuestaAula('-2.493', 2.493)).toBe(-2.493);
+    // Lejos en valor absoluto, manda la española aunque el signo cambie
+    expect(leerRespuestaAula('33.510', -4188.79)).toBe(33510);
+    expect(leerRespuestaAula('-1.500', 1500)).toBe(-1500);
+  });
+
   test('sin una respuesta esperada que sea número, no adivina', () => {
     expect(leerRespuestaAula('2.493', NaN)).toBe(2493);
     expect(leerRespuestaAula('2.493', Infinity)).toBe(2493);
