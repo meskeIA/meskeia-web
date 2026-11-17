@@ -543,9 +543,24 @@
     font-size: 2.6mm;
   }
 
-  /* El laberinto aprovecha el ancho útil de la hoja */
+  /* La hoja entera (título, laberinto, leyenda y pie) cabe en una página y no se parte */
+  .printArea {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* El laberinto aprovecha el ancho útil de la hoja, pero su alto se acota a lo que cabe en
+     una página: con más filas que columnas, el alto proporcional al ancho pasaba de la página
+     y el laberinto salía partido en 2-5 hojas (hallazgo 4947). Presupuesto: Carta, la más
+     baja de las dos, deja 259 mm útiles con el @page de 10 mm; menos los 16 mm de relleno de
+     la hoja y ~35 mm de título, leyenda y pie, quedan ~205 mm. Con el alto acotado, el viewBox
+     (xMidYMid meet) encoge el dibujo y lo centra en el ancho. */
   .lienzo {
     max-width: 100%;
+  }
+
+  .svg {
+    max-height: 190mm;
   }
 
   .pared {

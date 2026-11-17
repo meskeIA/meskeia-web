@@ -329,21 +329,25 @@ test('CASO 3 (rechazo) · un n.º que no es un número («abc», «0») no se us
 // hoy no se cumple, de ahí el test.fail().
 // ─────────────────────────────────────────────────────────────────────────────
 
-test('HALLAZGO (17/11/2026, ABIERTO) · un laberinto con más filas que columnas se imprime en una sola hoja', async ({ page, browserName }) => {
-  // FAQ visible: «Cada generación produce una hoja». La hoja ocupa el ancho útil del papel y el
-  // alto sale de la proporción: con más filas que columnas el dibujo pasa de una página. Medido
-  // en A4 (Chromium, @page 10 mm): 10 × 20 → 3 páginas, 8 × 32 → 4, con el laberinto partido;
-  // 15 de las 49 combinaciones de tamaño lo cortan en A4, y en Carta todas las de más filas que
-  // columnas salen en dos hojas o más.
+test('HALLAZGO 4947 (17/11/2026, REPARADO) · un laberinto con más filas que columnas se imprime en una sola hoja, en A4 y en Carta', async ({ page, browserName }) => {
+  // FAQ visible: «Cada generación produce una hoja». La hoja ocupaba el ancho útil del papel y
+  // el alto salía de la proporción: con más filas que columnas el dibujo pasaba de una página.
+  // Medido en A4 (Chromium, @page 10 mm): 10 × 20 → 3 páginas, 8 × 32 → 4, con el laberinto
+  // partido; en Carta, todas las de más filas que columnas en dos hojas o más. Ahora el alto del
+  // dibujo se acota en print a lo que cabe en la página más baja (Carta). Se prueban los dos
+  // extremos alargados, el cuadrado mayor y el apaisado mayor, en los dos papeles.
   test.skip(browserName !== 'chromium', 'page.pdf solo existe en Chromium');
-  test.fail();
   const paginas = (pdf: Buffer): number => (pdf.toString('latin1').match(/\/Type\s*\/Page(?!s)/g) ?? []).length;
   for (const [columnas, filas] of [
     [10, 20],
     [8, 32],
+    [32, 32],
+    [32, 8],
   ]) {
     await generar(page, { columnas, filas, semilla: '4242' });
-    expect(paginas(await page.pdf({ format: 'A4' })), `${columnas}×${filas} en A4`).toBe(1);
+    for (const format of ['A4', 'Letter'] as const) {
+      expect(paginas(await page.pdf({ format })), `${columnas}×${filas} en ${format}`).toBe(1);
+    }
   }
 });
 
