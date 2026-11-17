@@ -132,7 +132,8 @@ export default function PalabrasAgudasLlanasEsdrujulasPage() {
               aria-describedby="palabra-ayuda"
             />
             <p className={styles.ayuda} id="palabra-ayuda">
-              Una sola palabra, con sus tildes si las tiene.
+              Una sola palabra, con sus tildes si las tiene. Se analiza tal como la escribes:
+              no comprueba si existe ni corrige más faltas que las de tilde.
             </p>
 
             <div className={styles.ejemplos} role="group" aria-label="Ejemplos">

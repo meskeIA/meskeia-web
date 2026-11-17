@@ -86,6 +86,11 @@ export const PREGUNTAS_FRECUENTES: FAQItem[] = [
       'Porque sin tilde nada en la escritura dice cómo suena la palabra: «arbol» podría pronunciarse con la fuerza en la última sílaba, y entonces sería aguda y sin tilde. Para eso puedes tocar la sílaba que oyes más fuerte, «ar», y la app te dice que es llana terminada en l y que se escribe árbol. Las tildes que sobran, en cambio, sí las detecta sola.',
   },
   {
+    question: '¿Comprueba si la palabra existe o está bien escrita?',
+    answer:
+      'No. Analiza la palabra tal como la escribes: la separa en sílabas, busca la tónica y aplica las reglas de acentuación, así que también clasifica una palabra inventada o con otras faltas. Solo vigila la tilde: avisa de las que sobran y, si tocas la sílaba que suena más fuerte, te dice si falta. Para saber si una palabra existe o si va con b o v, con h o sin ella, o con ll o y, consulta un diccionario.',
+  },
+  {
     question: '¿Qué es la ley del hiato?',
     answer:
       'Cuando una i o una u tónica va junto a una vocal abierta (a, e, o) en otra sílaba, lleva tilde siempre, aunque la regla general diga lo contrario. Por eso maíz lleva tilde aunque sea aguda terminada en z, y búho aunque sea llana terminada en vocal.',
