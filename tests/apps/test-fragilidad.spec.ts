@@ -617,6 +617,28 @@ test.describe('CASO 15 — en móvil', () => {
     await expect(veredicto(page)).toContainText('Pre-frágil — Riesgo moderado');
     await expect(veredicto(page)).toContainText('No es un diagnóstico');
   });
+
+  test('REPARADO (cabo C0786) · tras «Evaluar fragilidad» el veredicto se ve entero, bajo la barra del logo', async ({
+    page,
+  }) => {
+    // En móvil la tarjeta del resultado va debajo del cuestionario: el inspector del 16/11/2026
+    // midió el veredicto 206 px bajo el pliegue (Pixel 7) sin desplazamiento ni foco. Ahora la
+    // tarjeta sube con traerALaVista cuando el veredicto no se ve entero.
+    await abrir(page);
+    for (const id of IDS) await opcion(page, id, 'no').tap();
+    await expect(contador(page)).toHaveText('Las 5 preguntas respondidas · 0 con «Sí»');
+    await botonEvaluar(page).tap();
+    await expect(veredicto(page)).toContainText('Robusto');
+    await expect
+      .poll(async () =>
+        veredicto(page).evaluate((el) => {
+          const r = el.getBoundingClientRect();
+          const barra = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+          return r.top >= barra - 1 && r.bottom <= window.innerHeight + 1;
+        }),
+      )
+      .toBe(true);
+  });
 });
 
 // ── Hallazgos de la re-inspección del 16/11/2026 ──

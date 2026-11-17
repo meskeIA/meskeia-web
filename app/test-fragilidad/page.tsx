@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { traerALaVista } from '@/lib';
 import styles from './TestFragilidad.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import DataReference from '@/components/DataReference';
@@ -156,6 +157,14 @@ export default function TestFragilidad() {
   const [respuestas, setRespuestas] = useState<Respuestas>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const tarjetaResultadoRef = useRef<HTMLDivElement>(null);
+  const veredictoRef = useRef<HTMLDivElement>(null);
+  // En móvil la tarjeta del resultado va DEBAJO del cuestionario: tras pulsar «Evaluar» el
+  // veredicto quedaba 206 px bajo el pliegue sin que nada lo dijera (cabo C0786, Pixel 7). Solo se
+  // sube cuando el veredicto no se ve entero; en escritorio, al lado, no se mueve nada.
+  useEffect(() => {
+    if (resultado) traerALaVista(tarjetaResultadoRef.current, veredictoRef.current);
+  }, [resultado]);
 
   const sinResponder = ITEMS_FRAIL.filter(item => respuestas[item.id] === undefined);
   const contestadas = ITEMS_FRAIL.length - sinResponder.length;
@@ -287,7 +296,7 @@ export default function TestFragilidad() {
         </div>
 
         {/* Resultado */}
-        <div className={styles.card}>
+        <div className={styles.card} ref={tarjetaResultadoRef}>
           <h2 className={styles.cardTitle}>Resultado orientativo</h2>
 
           {!resultado ? (
@@ -297,6 +306,7 @@ export default function TestFragilidad() {
           ) : (
             <div className={styles.resultados}>
               <div
+                ref={veredictoRef}
                 className={`${styles.nivelBox} ${styles[`nivel${resultado.nivel.charAt(0).toUpperCase() + resultado.nivel.slice(1)}`]}`}
                 role="status"
               >
