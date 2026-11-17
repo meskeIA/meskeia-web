@@ -254,6 +254,7 @@ export const implementedAppsUrls = [
   "/generador-lorem-ipsum/",    // Generador de texto de prueba
   "/contador-silabas/",         // Separar y contar sílabas en español
   "/diccionario-rimas/",        // Rimario: rima consonante y asonante del español
+  "/palabras-agudas-llanas-esdrujulas/", // Sílaba tónica, tipo de palabra y tilde razonada (S0279)
   "/conversor-formatos/",       // JSON, CSV, Excel, XML, YAML
   "/conjugador-verbos/",        // Conjugador de verbos español con irregulares
   "/tablas-multiplicar/",       // Entrenador tablas multiplicar gamificado

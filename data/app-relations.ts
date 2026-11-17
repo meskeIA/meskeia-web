@@ -2475,8 +2475,17 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'conjugador-verbos': [
     { url: '/buscador-palabras-patron/', icon: '🔍', name: 'Buscador por Patrón', description: 'Palabras con huecos' },
     { url: '/quiz-verbos-irregulares/', icon: '📝', name: 'Quiz Verbos Inglés', description: 'Aprende verbos irregulares' },
+    { url: '/palabras-agudas-llanas-esdrujulas/', icon: '✏️', name: 'Agudas, Llanas y Esdrújulas', description: 'Sílaba tónica y cuándo lleva tilde' },
     { url: '/generador-anagramas/', icon: '🔤', name: 'Generador Anagramas', description: 'Reordena letras' },
     { url: '/detector-idioma/', icon: '🌍', name: 'Detector Idioma', description: 'Identifica el idioma' },
+  ],
+  // Ortografía de la tilde (S0279, 17/11/2026): quien clasifica palabras está separando sílabas
+  // y estudiando Lengua, así que las tarjetas van al silabeador y a las apps de clase de Lengua.
+  'palabras-agudas-llanas-esdrujulas': [
+    { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa en sílabas una palabra o un texto entero' },
+    { url: '/conjugador-verbos/', icon: '🔁', name: 'Conjugador Verbos', description: 'Todas las formas de un verbo, con sus tildes' },
+    { url: '/quiz-figuras-retoricas/', icon: '🎭', name: 'Quiz Figuras Retóricas', description: 'Metáfora, hipérbole, anáfora… con ejemplos' },
+    { url: '/diccionario-rimas/', icon: '🎵', name: 'Diccionario de Rimas', description: 'Palabras que riman en consonante o asonante' },
   ],
   'tablas-multiplicar': [
     { url: '/calculadora-notas/', icon: '📊', name: 'Calculadora Notas', description: 'Calcula tu nota media' },
