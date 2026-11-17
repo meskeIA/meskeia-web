@@ -50,6 +50,9 @@ const factorAislamiento: Record<Aislamiento, number> = { bueno: 0.9, medio: 1, m
 const factorSol: Record<Nivel, number> = { poca: 0.95, media: 1, mucha: 1.1 };
 const factorCristal: Record<Cristal, number> = { pequeno: 0.95, medio: 1, grande: 1.1 };
 const FACTOR_CUBIERTA = 1.1;
+// Altura de techo que dan por supuesta los W/m² de calefacción (la misma que la regla de las
+// «100 frigorías por metro cuadrado» de la guía)
+const ALTURA_REFERENCIA = 2.5;
 const W_POR_PERSONA = 100; // calor sensible + latente de una persona en reposo
 
 // Tamaños comerciales habituales de equipo, en BTU/h. Sin marcas ni precios: es la escala
@@ -106,7 +109,9 @@ export default function CalculadoraFrigoriasBtuPage() {
     const pers = parseSpanishNumber(ocupantes);
     const equip = parseSpanishNumber(equipos);
 
-    if (sup === null || alt === null || pers === null || equip === null) {
+    // parseSpanishNumber devuelve NaN (nunca null) con un campo vacío o que no es un número,
+    // y NaN no cumple ninguna comparación de rango: hay que preguntarlo aparte.
+    if (![sup, alt, pers, equip].every(Number.isFinite)) {
       return 'Revisa los datos: hay algún campo vacío o que no es un número.';
     }
     if (sup < 4 || sup > 300) return 'Introduce una superficie de entre 4 y 300 m².';
@@ -122,7 +127,7 @@ export default function CalculadoraFrigoriasBtuPage() {
     const alt = parseSpanishNumber(altura);
     const pers = parseSpanishNumber(ocupantes);
     const equip = parseSpanishNumber(equipos);
-    if (sup === null || alt === null || pers === null || equip === null) return null;
+    if (![sup, alt, pers, equip].every(Number.isFinite)) return null;
 
     const volumen = sup * alt;
 
@@ -135,7 +140,16 @@ export default function CalculadoraFrigoriasBtuPage() {
     const frioW = envolvente + cargaPersonas + equip;
 
     // --- Calefacción: pérdida por transmisión, sin restar las cargas internas ---
-    const calorW = sup * cargaCalefaccion[zonaInvierno][aislamiento] * (bajoCubierta ? FACTOR_CUBIERTA : 1);
+    // Los W/m² de la tabla son los de una estancia con el techo de referencia (2,5 m): con más
+    // altura hay más muro por el que se escapa el calor y más aire que calentar, así que se
+    // escalan con la altura (equivale a dimensionar por metro cúbico, como el frío). El vidrio
+    // pierde calor varias veces más rápido que el muro: corrige igual que en refrigeración.
+    const calorW =
+      sup *
+      cargaCalefaccion[zonaInvierno][aislamiento] *
+      (alt / ALTURA_REFERENCIA) *
+      factorCristal[cristal] *
+      (bajoCubierta ? FACTOR_CUBIERTA : 1);
 
     const frioBtu = frioW * BTU_POR_W;
     const equipoBtu = tamanosComerciales.find((t) => t >= frioBtu) ?? null;
@@ -466,7 +480,10 @@ export default function CalculadoraFrigoriasBtuPage() {
             se sale de ese molde deja de servir: un salón de 25 m² en una casa antigua con techos de
             3,5 metros tiene un 40 % más de aire que enfriar que el mismo salón en un piso moderno.
             Por eso aquí la carga base se calcula sobre los metros cúbicos y las correcciones se
-            aplican después.
+            aplican después. La calefacción sigue el mismo criterio: sus vatios por metro cuadrado
+            son los de una estancia con techo de 2,5 metros, crecen en proporción a la altura (hay
+            más muro por el que se escapa el calor) y suben o bajan con la superficie acristalada,
+            porque el vidrio pierde calor mucho más deprisa que la pared.
           </p>
 
           <h3>Qué hacen las correcciones</h3>

@@ -14,7 +14,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *                × cristal {0,95 · 1 · 1,1} × (bajo cubierta ? 1,1 : 1)
  *   frío W = base × corrección + personas × 100 W + aparatos W
  *   calor W = superficie × {suave 55/75/95 · frío 75/100/125 · muy frío 95/125/155 (bueno/medio/escaso)}
- *             × (bajo cubierta ? 1,1 : 1)          ← ni la altura ni el cristal entran
+ *             × altura / 2,5 × cristal {0,95 · 1 · 1,1} × (bajo cubierta ? 1,1 : 1)
+ *             (REPARADO, hallazgo 4971: antes ni la altura ni el cristal entraban)
  *   equipo = primer tamaño de [9000, 12000, 18000, 24000, 30000, 36000, 42000, 48000] BTU ≥ carga
  *   consumo = frío W / 8 … frío W / 4,5
  *
@@ -175,7 +176,9 @@ test.describe('Calculadora de Frigorías y BTU — lo que promete el <h1>', () =
     // 67,5 m³ × 30 = 2025 · × 1,089 = 2205,225 · + 300 + 300 = 2805,225 W
     expect(t).toContain('2412 frigorías/h 9572 BTU/h · 2805 W');
     expect(t).toContain('Equipo equivalente: 12.000 BTU (3024 frigorías), el primer tamaño comercial que cubre la carga, con un margen del 25 %.');
-    expect(t).toContain('1,88 kW 6398 BTU/h'); // 25 × 75 = 1875 W
+    // 25 × 75 × (2,7 / 2,5) × 1,1 (mucha cristal) = 2227,5 W → 7600,5 BTU/h. 2,2275 kW es un empate
+    // exacto en la segunda decimal: el redondeo en coma flotante puede dar 2,22 o 2,23.
+    expect(t).toMatch(/2,2[23] kW 7601 BTU\/h/);
     expect(t).toContain('0,35-0,62 kW');
     expect(t).toContain('67,5 m³ 96 frig/m²');
     expect(t).toContain('Desglose de los 2805 W de refrigeración');
@@ -236,7 +239,8 @@ test.describe('Calculadora de Frigorías y BTU — lo que promete el <h1>', () =
     expect(t).toContain('126.190 frigorías/h 500.761 BTU/h · 146.759 W');
     expect(t).toContain('La carga supera el mayor tamaño de equipo doméstico habitual');
     expect(t).not.toContain('Equipo equivalente');
-    expect(t).toContain('51,15 kW 174.531 BTU/h'); // 300 × 155 × 1,1 = 51.150 W
+    // 300 × 155 × (6 / 2,5) × 1,1 (cristal) × 1,1 (cubierta) = 135.036 W × 3,412142 = 460.762 BTU/h
+    expect(t).toContain('135,04 kW 460.762 BTU/h');
     expect(t).toContain('18,34-32,61 kW');
     expect(t).toContain('1800,0 m³ 421 frig/m²');
     expect(t).toContain('Volumen de aire (1800,0 m³ × 50 W/m³) 90.000 61 %');
@@ -257,7 +261,7 @@ test.describe('Calculadora de Frigorías y BTU — lo que promete el <h1>', () =
     expect(t).toContain('Equipo equivalente: 9000 BTU (2268 frigorías)');
     expect(t).toContain('con un margen del 999 %.');
     expect(t).toContain('Ese tamaño comercial queda un 999 % por encima de lo calculado.');
-    expect(t).toContain('0,30 kW 1024 BTU/h'); // 4 × 75 = 300 W
+    expect(t).toContain('0,24 kW 819 BTU/h'); // 4 × 75 × (2 / 2,5) = 240 W
     expect(t).toContain('0,03-0,05 kW');
     expect(t).toContain('8,0 m³ 52 frig/m²');
     expect(t).toContain('Personas (0 × 100 W) 0 0 %');
@@ -283,14 +287,13 @@ test.describe('Calculadora de Frigorías y BTU — lo que promete el <h1>', () =
     }
   });
 
-  test('HALLAZGO · un campo vacío o que no es un número se rechaza, no da «No definido» ni «más de un equipo»', async ({ page }) => {
-    // ABIERTO: la validación compara parseSpanishNumber(…) === null, pero parseSpanishNumber
+  test('HALLAZGO 4970 · un campo vacío o que no es un número se rechaza, no da «No definido» ni «más de un equipo»', async ({ page }) => {
+    // REPARADO (ahora pregunta Number.isFinite). Antes: la validación compara parseSpanishNumber(…) === null, pero parseSpanishNumber
     // devuelve NaN (nunca null) con lo que no es un número; NaN < 4 y NaN > 300 son falsos, así que
     // el aviso «Revisa los datos…» no sale nunca y la app calcula con NaN: «No definido frigorías/h»,
     // «No definido BTU/h · No definido W» y, como ningún tamaño es ≥ NaN, «La carga supera el mayor
     // tamaño de equipo doméstico habitual: la estancia pide más de un equipo». Con la altura vacía
     // muestra además una calefacción válida (1,50 kW) junto a la refrigeración «No definido».
-    test.fail();
     for (const [sel, valor, valido] of [
       [SUPERFICIE, '', '20'],
       [SUPERFICIE, '12abc', '20'],
@@ -319,31 +322,35 @@ test.describe('Calculadora de Frigorías y BTU — lo que promete el <h1>', () =
     expect(await resultado(page)).not.toMatch(/Personas \(3 × 100 W\) 250/);
   });
 
-  test('HALLAZGO · la calefacción crece con la altura del techo', async ({ page }) => {
-    // ABIERTO: calor = superficie × W/m² × cubierta; la altura no entra. 20 m² con 2 m y con 6 m dan
+  test('HALLAZGO 4971 · la calefacción crece con la altura del techo', async ({ page }) => {
+    // REPARADO: los W/m² son los de un techo de 2,5 m y se escalan con la altura. 20 m² × 75 W/m²:
+    // con 2 m, 1500 × 0,8 = 1200 W → «1,20 kW»; con 6 m, 1500 × 2,4 = 3600 W → «3,60 kW».
+    // Antes: calor = superficie × W/m² × cubierta; la altura no entraba. 20 m² con 2 m y con 6 m dan
     // los dos «1,50 kW», mientras el frío pasa de 2000 a 5200 W. La propia app dice que el calor «se
     // escapa […] a través de la envolvente» (la superficie de muro se triplica con la altura) y que
     // «el volumen manda sobre los metros cuadrados»; su JSON-LD promete estimar la calefacción «a
     // partir de su superficie y altura». Esperado: más kW de calefacción con 6 m que con 2 m.
-    test.fail();
     await poner(page, ALTURA, '2');
     const con2m = await kwCalefaccion(page);
     await poner(page, ALTURA, '6');
     const con6m = await kwCalefaccion(page);
     expect(con6m, `2 m → ${con2m} kW · 6 m → ${con6m} kW`).not.toBe(con2m);
+    expect(con2m).toBe('1,20');
+    expect(con6m).toBe('3,60');
   });
 
-  test('HALLAZGO · la calefacción crece con la superficie acristalada', async ({ page }) => {
-    // ABIERTO: el cristal solo corrige el frío. Poca y mucha cristalera dan «1,50 kW» de calefacción,
+  test('HALLAZGO 4971 · la calefacción crece con la superficie acristalada', async ({ page }) => {
+    // REPARADO: el cristal corrige también la calefacción. Mucha: 1500 × 1,1 = 1650 W → «1,65 kW».
+    // Antes: el cristal solo corregía el frío. Poca y mucha cristalera dan «1,50 kW» de calefacción,
     // y el FAQPage de la app afirma que «un metro cuadrado de ventana deja pasar varias veces más
     // calor que un metro cuadrado de pared»; su JSON-LD lista la superficie acristalada entre lo que
     // estima la carga «de refrigeración y de calefacción».
-    test.fail();
     await elegir(page, /^Poca una ventana/);
     const poca = await kwCalefaccion(page);
     await elegir(page, /^Mucha ventanal/);
     const mucha = await kwCalefaccion(page);
     expect(mucha, `poca → ${poca} kW · mucha → ${mucha} kW`).not.toBe(poca);
+    expect(mucha).toBe('1,65');
   });
 
   test('HALLAZGO · la guía cuenta las correcciones con los factores que aplica la calculadora', async ({ page }) => {
