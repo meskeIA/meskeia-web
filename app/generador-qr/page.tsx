@@ -1072,10 +1072,10 @@ export default function GeneradorQRPage() {
               type="button"
               onClick={() => setHtmlExpanded(!htmlExpanded)}
               className={styles.btnToggleCode}
-              aria-label={htmlExpanded ? 'Ocultar código' : 'Mostrar código'}
-              aria-pressed={htmlExpanded}
+              aria-expanded={htmlExpanded}
             >
-              {htmlExpanded ? <><span aria-hidden="true">▼</span> Ocultar código</> : <><span aria-hidden="true">▶</span> Ver código HTML</>}
+              {/* Desplegable (C0779): el nombre no cambia, el estado lo dice aria-expanded */}
+              <span aria-hidden="true">{htmlExpanded ? '▼' : '▶'}</span> Ver código HTML
             </button>
           </div>
 
