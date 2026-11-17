@@ -268,9 +268,12 @@ test.describe('guia-metrica-estrofas', () => {
   // ─────────────────────────────── HALLAZGOS DEL CONTADOR ───────────────────────────────
 
   test('HALLAZGO [calculo/alto] CASO 3 (difícil) · la «u» muda de «qu» cuenta como vocal: «quiero», «quien» suman una sílaba', async ({ page }) => {
-    // ABIERTO. silabasPalabra() trata la «u» de «qu» como núcleo: en «quie-» une u+i en un diptongo
-    // y deja la «e» como sílaba aparte (qu-i|e → 2 en vez de 1). Afecta a quiero, quien, siguiente…
-    test.fail();
+    // REPARADO (hallazgo 4978). silabasPalabra() trataba la «u» de «qu» como núcleo: en «quie-» unía
+    // u+i en un diptongo y dejaba la «e» como sílaba aparte (qu-i|e → 2 en vez de 1). Afectaba a
+    // quiero, quien, siguiente… Ahora la «u» de «qu» y la de «gu» ante e/i no cuentan.
+    // Control de «gu»: «guerra» = gue-rra (2) y «guapo» = gua-po (2: ante «a» la «u» sí suena).
+    expect((await contar(page, 'guerra')).silabas).toBe(2);
+    expect((await contar(page, 'guapo')).silabas).toBe(2);
     // Lorca (fichas Romance y Rima de la app): ver-de que te quie-ro ver-de = 8 · obtenido 9, eneasílabo
     // (expect.soft: cada verso es una comprobación aparte y el informe enseña las tres)
     const lorca = await contar(page, 'Verde que te quiero verde');
@@ -283,9 +286,11 @@ test.describe('guia-metrica-estrofas', () => {
   });
 
   test('HALLAZGO [calculo/alto] · la conjunción «y» no hace sinalefa: los ejemplos de romance, lira y décima de la app salen con una sílaba de más', async ({ page }) => {
-    // ABIERTO. VOCALES = 'aeiouáéíóúü': la «y» conjunción (que suena /i/) nunca cuenta como vocal en
-    // contacto, así que «y_el», «pobre_y» no se funden.
-    test.fail();
+    // REPARADO (hallazgo 4979). VOCALES = 'aeiouáéíóúü': la «y» conjunción (que suena /i/) nunca
+    // contaba como vocal en contacto, así que «y_el», «pobre_y» no se fundían. Control: la «y»
+    // consonante de «yo» no entra en sinalefa (ca-sa yo = 3, ninguna).
+    const yo = await contar(page, 'casa yo');
+    expect(yo.insignias.join(' ')).not.toContain('sinalefa');
     // Romance (Lorca), v. 4: y_el ca-ba-llo_en la mon-ta-ña = 10 − 2 = 8 · obtenido 9 (1 sinalefa)
     const romance = await contar(page, 'y el caballo en la montaña');
     expect.soft(romance.silabas, 'y el caballo en la montaña').toBe(8);
@@ -297,9 +302,8 @@ test.describe('guia-metrica-estrofas', () => {
   });
 
   test('HALLAZGO [calculo/medio] CASO 2 (límite) · un monosílabo final sin tilde se toma por llana y no suma 1', async ({ page }) => {
-    // ABIERTO. acento() decide por la última letra (vocal, n o s → llana) sin mirar que la palabra
-    // tiene UNA sílaba: «va», «yo», «di», «fe» son tónicos y el verso es agudo.
-    test.fail();
+    // REPARADO (hallazgo 4981). acento() decidía por la última letra (vocal, n o s → llana) sin mirar
+    // que la palabra tiene UNA sílaba: «va», «yo», «di», «fe» son tónicos y el verso es agudo.
     // Bécquer, Rima XXXVIII: sa-bes tú_a-dón-de va = 7 − 1 + 1 = 7 · obtenido 6, hexasílabo, «llana»
     const becquer = await contar(page, '¿sabes tú adónde va?');
     expect.soft(becquer.silabas, '¿sabes tú adónde va?').toBe(7);
@@ -313,23 +317,25 @@ test.describe('guia-metrica-estrofas', () => {
   });
 
   test('HALLAZGO [calculo/medio] · la diéresis no separa: «süave», el ejemplo de la propia app, sale con 2 sílabas', async ({ page }) => {
-    // ABIERTO. La regla «Diptongo y diéresis» dice que con diéresis las dos vocales cuentan «como dos
-    // sílabas separadas (ü en palabras como "süave")»; esDiptongo() trata la ü como vocal débil átona.
-    test.fail();
+    // REPARADO (hallazgo 4982). La regla «Diptongo y diéresis» dice que con diéresis las dos vocales
+    // cuentan «como dos sílabas separadas (ü en palabras como "süave")»; esDiptongo() trataba la ü
+    // como vocal débil átona.
     await expect(reglaCard(page, 'Diptongo y diéresis')).toContainText('süave');
     // (el contador SÍ resuelve bien la tilde que rompe el diptongo: «día» = dí-a = 2)
     expect((await contar(page, 'día')).silabas).toBe(2);
     // sü-a-ve = 3, llana → 3 · obtenido 2
     expect((await contar(page, 'süave')).silabas).toBe(3);
+    // Control: la diéresis de «güi» no es poética, solo dice que la «u» suena: pin-güi-no = 3
+    expect((await contar(page, 'pingüino')).silabas).toBe(3);
   });
 
   test('HALLAZGO [operativa/bajo] CASO 3 (rechazo) · una entrada sin letras pinta un cómputo «0 · - · Última palabra: -»', async ({ page }) => {
-    // ABIERTO. Sin ninguna palabra no hay verso que medir: debe avisarse, no pintar un 0.
-    test.fail();
+    // REPARADO (hallazgo 4996). Sin ninguna palabra no hay verso que medir: se avisa, no se pinta un 0.
     await page.locator(ENTRADA).fill('12345 ¿?');
     await esperarValorEnReact(page, ENTRADA, '12345 ¿?');
-    await expect.soft(page.locator(NUMERO)).not.toHaveText('0', { timeout: 2000 });
-    await expect.soft(page.locator(TIPO)).not.toHaveText('-', { timeout: 2000 });
+    await expect(page.getByText('No hay ninguna palabra que medir')).toBeVisible();
+    await expect(page.locator(NUMERO)).toHaveCount(0);
+    await expect(page.locator(TIPO)).toHaveCount(0);
   });
 
   // ─────────────────────────────── HALLAZGOS DE LAS FICHAS ───────────────────────────────

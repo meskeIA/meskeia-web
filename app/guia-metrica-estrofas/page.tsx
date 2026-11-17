@@ -10,42 +10,56 @@ type TabId = 'reglas' | 'versos' | 'rima' | 'estrofas' | 'formas';
 // ──────────────────────────────────────────────
 // Algoritmo de cuenta silábica (orientativo)
 // ──────────────────────────────────────────────
-const VOCALES = 'aeiouáéíóúü';
-const DEBILES = 'iuü';
+const VOCALES = 'aeiouáéíóúüï';
+const DEBILES = 'iuüï';
 const DEBILES_ACENT = 'íú';
+/** Letras que se conservan al limpiar una palabra (las vocales con diéresis incluidas) */
+const NO_LETRA = /[^a-záéíóúüïñ]/g;
 
 function esVocal(c: string): boolean {
   return VOCALES.includes(c.toLowerCase());
 }
 
-function esDiptongo(v1: string, v2: string): boolean {
-  const c1 = v1.toLowerCase();
-  const c2 = v2.toLowerCase();
-  const d1 = DEBILES.includes(c1) && !DEBILES_ACENT.includes(c1);
-  const d2 = DEBILES.includes(c2) && !DEBILES_ACENT.includes(c2);
+/**
+ * Diptongo entre dos vocales contiguas: una de ellas es cerrada y átona. La diéresis poética
+ * (`süave`, `rüido`, `dïamante`) marca justo lo contrario, un hiato (hallazgo 4982); la de
+ * «güe», «güi» (`pingüino`) solo dice que la «u» suena, y sí forma diptongo.
+ */
+function esDiptongo(v1: string, v2: string, dieresisPoetica: boolean): boolean {
+  if (dieresisPoetica) return false;
+  const d1 = DEBILES.includes(v1) && !DEBILES_ACENT.includes(v1);
+  const d2 = DEBILES.includes(v2) && !DEBILES_ACENT.includes(v2);
   return d1 || d2;
 }
 
 function silabasPalabra(palabra: string): number {
-  const limpia = palabra.toLowerCase().replace(/[^a-záéíóúüñ]/g, '');
+  const limpia = palabra.toLowerCase().replace(NO_LETRA, '');
   let count = 0;
-  let i = 0;
-  while (i < limpia.length) {
+  // Vocal anterior del mismo grupo (vocales seguidas), para decidir si la siguiente abre sílaba
+  let anterior: { v: string; poetica: boolean } | null = null;
+  for (let i = 0; i < limpia.length; i++) {
     const c = limpia[i];
-    if (c === 'h') { i++; continue; }
-    if (esVocal(c)) {
-      count++;
-      if (i + 1 < limpia.length && esVocal(limpia[i + 1])) {
-        if (esDiptongo(c, limpia[i + 1])) i++;
-      }
+    const previa = limpia[i - 1] ?? '';
+    const siguiente = limpia[i + 1] ?? '';
+    // La «u» de «qu», y la de «gu» ante e/i, no suena: no es núcleo (hallazgo 4978)
+    const uMuda = c === 'u' && (previa === 'q' || (previa === 'g' && 'eiéí'.includes(siguiente)));
+    if (!esVocal(c) || uMuda) {
+      anterior = null;
+      continue;
     }
-    i++;
+    const poetica = (c === 'ü' && previa !== 'g') || c === 'ï';
+    if (anterior && esDiptongo(anterior.v, c, anterior.poetica || poetica)) {
+      // Mismo núcleo silábico (diptongo, o triptongo si ya venía de uno)
+    } else {
+      count++;
+    }
+    anterior = { v: c, poetica };
   }
   return Math.max(count, 1);
 }
 
 function acento(palabra: string): 'aguda' | 'llana' | 'esdrujula' {
-  const limpia = palabra.toLowerCase().replace(/[^a-záéíóúüñ]/g, '');
+  const limpia = palabra.toLowerCase().replace(NO_LETRA, '');
   const posAcent = limpia.search(/[áéíóú]/);
   if (posAcent >= 0) {
     const sylTotal = silabasPalabra(limpia);
@@ -55,8 +69,24 @@ function acento(palabra: string): 'aguda' | 'llana' | 'esdrujula' {
     if (tras === 1) return 'llana';
     return 'esdrujula';
   }
+  // Un monosílabo al final del verso es tónico: el verso es agudo (hallazgo 4981)
+  if (silabasPalabra(limpia) === 1) return 'aguda';
   const ult = limpia.slice(-1);
   return (esVocal(ult) || ult === 'n' || ult === 's') ? 'llana' : 'aguda';
+}
+
+/**
+ * ¿Termina la palabra en sonido vocálico? Vale también la «y» final (`hoy`, `muy`, la
+ * conjunción «y»), que suena /i/ y entra en la sinalefa (hallazgo 4979).
+ */
+function terminaEnVocal(p: string): boolean {
+  const ult = p.slice(-1);
+  return esVocal(ult) || ult === 'y';
+}
+
+/** ¿Empieza en sonido vocálico? La conjunción «y» sí; «yo», «ya»… no: ahí la «y» es consonante. */
+function empiezaEnVocal(p: string): boolean {
+  return esVocal(p[0]) || p === 'y';
 }
 
 interface ConteoResultado {
@@ -66,17 +96,18 @@ interface ConteoResultado {
   acentoFinal: string;
 }
 
-function contarVerso(verso: string): ConteoResultado {
-  const palabras = verso.trim().split(/\s+/).filter((p) => p.replace(/[^a-záéíóúü]/gi, '').length > 0);
-  if (!palabras.length) return { silabas: 0, sinalefas: 0, tipoVerso: '-', acentoFinal: '-' };
+/** Sin ninguna palabra con letras no hay verso que medir: devuelve null (hallazgo 4996). */
+function contarVerso(verso: string): ConteoResultado | null {
+  const palabras = verso.trim().split(/\s+/).filter((p) => p.toLowerCase().replace(NO_LETRA, '').length > 0);
+  if (!palabras.length) return null;
 
   let total = palabras.reduce((s, p) => s + silabasPalabra(p), 0);
   let sinalefas = 0;
 
   for (let i = 0; i < palabras.length - 1; i++) {
-    const p1 = palabras[i].toLowerCase().replace(/[^a-záéíóúü]/g, '');
-    const p2 = palabras[i + 1].toLowerCase().replace(/^h+/, '').replace(/[^a-záéíóúü]/g, '');
-    if (p1 && p2 && esVocal(p1.slice(-1)) && esVocal(p2[0])) {
+    const p1 = palabras[i].toLowerCase().replace(NO_LETRA, '');
+    const p2 = palabras[i + 1].toLowerCase().replace(NO_LETRA, '').replace(/^h+/, '');
+    if (p1 && p2 && terminaEnVocal(p1) && empiezaEnVocal(p2)) {
       total--;
       sinalefas++;
     }
@@ -257,6 +288,7 @@ export default function GuiaMetricaEstrofasPage() {
   const [estrofaAbierta, setEstrofaAbierta] = useState<string | null>(null);
 
   const resultado = verso.trim() ? contarVerso(verso) : null;
+  const sinPalabras = verso.trim() !== '' && resultado === null;
 
   const EJEMPLOS_CONTADOR = [
     'Yo no nací sino para quereros',
@@ -333,6 +365,9 @@ export default function GuiaMetricaEstrofasPage() {
                   </div>
                 </div>
               )}
+              <p className={styles.contadorNota} aria-live="polite">
+                <span>{sinPalabras ? 'No hay ninguna palabra que medir: escribe un verso con letras.' : ''}</span>
+              </p>
               <p className={styles.contadorNota}>
                 Resultado orientativo. La métrica literaria requiere conocer el acento exacto de cada palabra y las licencias del autor.
               </p>
