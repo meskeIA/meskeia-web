@@ -1087,7 +1087,7 @@ export default function TemporizadorPomodoroPage() {
 
         {/* ── SECCIÓN 6: Warning Box ── */}
         <section className={styles.guideSection}>
-          <div className={styles.warningBox} role="alert">
+          <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores comunes que sabotean la técnica</h3>

@@ -488,7 +488,7 @@ export default function SelectorFormaJuridica() {
           los beneficios a reservas hasta que el capital social alcance los 3.000 €.
         </p>
 
-        <div className={styles.warningBox} role="alert">
+        <div className={styles.warningBox}>
           Esta herramienta es orientativa. La elección de forma jurídica tiene implicaciones
           fiscales y legales importantes. Los resultados dependen de múltiples factores
           individuales (actividad, CCAA, situación familiar, proyección de ingresos...).

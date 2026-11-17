@@ -1017,7 +1017,7 @@ export default function VisualizadorTiposActivosPage() {
             </div>
 
             {/* warningBox — requisito v2.0 */}
-            <div className={styles.warningBox} role="alert">
+            <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
                 <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
                 Errores frecuentes al invertir por clases de activos

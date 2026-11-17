@@ -666,7 +666,7 @@ export default function OrientadorContratoMercantilPage() {
           </section>
 
           {/* Warning box — indicador v2.0 obligatorio */}
-          <div className={styles.warningBox} role="alert">
+          <div className={styles.warningBox}>
             <span aria-hidden="true">⚠️</span>{' '}
             <strong>Aviso legal:</strong> Estos contenidos son orientativos. Siempre consulta con un
             abogado para redactar contratos con implicaciones económicas o de responsabilidad. El

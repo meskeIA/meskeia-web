@@ -615,7 +615,7 @@ export default function QuizReinosNaturalezaPage() {
         {/* 6. WARNING BOX */}
         <section aria-labelledby="edu-errores">
           <h4 id="edu-errores"><span aria-hidden="true">🚫</span> Errores Más Comunes en Biología</h4>
-          <div className={styles.warningBox} role="alert">
+          <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>Confusiones frecuentes que penalizan en el examen</strong>

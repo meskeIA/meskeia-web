@@ -813,7 +813,7 @@ export default function PlanificadorItinerario() {
         </div>
 
         {/* ── SECCIÓN 6: Warning Box — 6 errores ── */}
-        <div className={styles.warningBox} role="alert">
+        <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
             <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>6 errores que arruinan un viaje</strong>

@@ -530,7 +530,7 @@ export default function ComparadorCosteVida() {
           </div>
 
           {/* ===== SECCIÓN 6: WARNING BOX — ERRORES FRECUENTES ===== */}
-          <div className={styles.warningBox} role="alert">
+          <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>Errores frecuentes al comparar ciudades</strong>

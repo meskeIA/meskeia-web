@@ -203,7 +203,7 @@ export default function CalculadoraPiscinasPage() {
         <LegalNotice />
 
         {/* Advertencia de seguridad */}
-        <div className={styles.warningBox} role="alert">
+        <div className={styles.warningBox}>
           <strong><span aria-hidden="true">⚠️</span> Importante:</strong> Los productos químicos para piscinas son sustancias reactivas.
           Sigue siempre las instrucciones del fabricante, usa guantes y no mezcles productos entre sí.
           Las dosis de esta calculadora son orientativas; ajusta siempre con un test de agua.

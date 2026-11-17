@@ -294,9 +294,10 @@ test.describe('comparador-coste-vida — comparar dos ciudades (escritorio)', ()
     await expect(page.getByRole('combobox', { name: /Ciudad A/ })).toHaveCount(1);
   });
 
-  test('ABIERTO: la caja estática «Errores frecuentes» lleva role="alert"', async ({ page }) => {
-    test.fail(); // ABIERTO: no es un aviso que aparezca por una acción; con la guía plegada no está en el árbol
+  test('REPARADO (4513): la caja estática «Errores frecuentes» no lleva role="alert"', async ({ page }) => {
+    // No es un aviso que aparezca por una acción (C0767, 17/11/2026: quitado en esta app y en otras 20)
     await abrirGuia(page);
+    await expect(page.getByText('Errores frecuentes al comparar ciudades')).toBeVisible();
     await expect(page.getByRole('alert').filter({ hasText: 'Errores frecuentes al comparar ciudades' })).toHaveCount(0);
   });
 

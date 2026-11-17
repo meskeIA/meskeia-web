@@ -700,7 +700,7 @@ export default function ListaTareasPage() {
 
         {/* ── SECCIÓN 6: Warning Box ── */}
         <section className={styles.guideSection}>
-          <div className={styles.warningBox} role="alert">
+          <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores comunes que inutilizan la lista de tareas</h3>

@@ -1177,7 +1177,7 @@ export default function PlanificadorBodaPage() {
 
         {/* ── SECCIÓN 6: WARNING BOX — ERRORES QUE DISPARAN EL PRESUPUESTO ── */}
         <section className={styles.guideSection}>
-          <div className={styles.warningBox} role="alert">
+          <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>6 Errores que Disparan el Presupuesto de tu Boda</h3>

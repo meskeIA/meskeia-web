@@ -1053,7 +1053,7 @@ export default function ConversorUnidadesRFPage() {
 
         {/* SECCIÓN 6: Warning Box */}
         <section className={styles.guideSection}>
-          <div className={styles.warningBox} role="alert">
+          <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h2>Errores Comunes en el Trabajo con RF</h2>

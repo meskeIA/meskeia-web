@@ -704,7 +704,7 @@ export default function SimuladorCicloExplotacionPage() {
           </section>
 
           {/* Warning Box — errores frecuentes */}
-          <div className={styles.warningBox} role="alert">
+          <div className={styles.warningBox}>
             <h3>
               <span aria-hidden="true">⚠️</span> Errores frecuentes en la gestión del ciclo
             </h3>

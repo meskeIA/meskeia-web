@@ -1145,7 +1145,7 @@ export default function VisualizadorUrbanismo() {
           </div>
 
           {/* ── Sección 6: Warning Box ── */}
-          <div className={styles.warningBox} role="alert">
+          <div className={styles.warningBox}>
             <strong><span aria-hidden="true">⚠️</span> Errores frecuentes al interpretar datos urbanos</strong>
             <ul>
               <li><strong>Confundir densidad con masificación:</strong> la densidad se mide en hab/km², no en la percepción subjetiva de agobio. Una ciudad puede tener alta densidad y mucho espacio público de calidad.</li>

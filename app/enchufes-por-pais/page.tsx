@@ -538,7 +538,7 @@ export default function EnchufesPais() {
           </div>
 
           {/* ── SECCIÓN 6: Warning Box ── */}
-          <div className={styles.warningBox} role="alert">
+          <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon} aria-hidden="true">⚡</span>
               <strong>Errores frecuentes que pueden dañar tus dispositivos</strong>

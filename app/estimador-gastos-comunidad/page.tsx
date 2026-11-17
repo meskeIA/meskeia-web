@@ -682,7 +682,7 @@ export default function CalculadoraGastosComunidadPage() {
         </section>
 
         {/* ===== WARNING BOX ===== */}
-        <div className={styles.warningBox} role="alert">
+        <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
             <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes que debes evitar</strong>

@@ -751,7 +751,7 @@ export default function SimuladorPunnettPage() {
         </section>
 
         {/* ERRORES FRECUENTES (warningBox) */}
-        <div className={styles.warningBox} role="alert">
+        <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
             <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             Errores frecuentes que debes evitar

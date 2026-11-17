@@ -635,7 +635,7 @@ export default function CalculadoraEdadMascotasPage() {
 
         {/* 6. WARNING BOX */}
         <section>
-          <div className={styles.warningBox} role="alert">
+          <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>6 errores que acortan la vida de tu mascota</strong>

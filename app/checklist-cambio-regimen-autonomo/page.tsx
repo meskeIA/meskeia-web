@@ -440,7 +440,7 @@ export default function ChecklistCambioRegimenPage() {
           subtitle="Todo lo que necesitas saber antes de cambiar de régimen fiscal"
         >
           {/* Aviso de advertencia — warningBox */}
-          <div className={styles.warningBox} role="alert">
+          <div className={styles.warningBox}>
             <span aria-hidden="true">⚠️</span>
             <p>
               <strong>Importante:</strong> El cambio de régimen fiscal es irreversible durante al menos 3 años.

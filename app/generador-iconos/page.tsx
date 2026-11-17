@@ -1262,7 +1262,7 @@ export default function GeneradorIconosPage() {
 
         {/* ── SECCIÓN 6: Warning Box ── */}
         <section>
-          <div className={styles.warningBox} role="alert">
+          <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores frecuentes al trabajar con iconos</h3>

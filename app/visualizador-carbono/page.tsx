@@ -354,7 +354,7 @@ export default function VisualizadorCarbono(): React.ReactNode {
                 <strong>Absorción oceánica neta:</strong> ~2,5 Gt C/año
               </div>
             </div>
-            <div className={styles.warningBox} role="alert">
+            <div className={styles.warningBox}>
               <span aria-hidden="true">⚠️</span> Desequilibrio neto: +~7,5 Gt C/año permanecen en la atmósfera → CO₂ acumulado → calentamiento global
             </div>
           </div>
