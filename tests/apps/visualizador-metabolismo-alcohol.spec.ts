@@ -206,8 +206,8 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     expect(t[0]).toMatch(/mayoría de las personas de origen europeo/);
   });
 
-  test('HALLAZGO ABIERTO [contenido/bajo]: «carcinógeno Tipo 1» en vez de «Grupo 1» del IARC', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 17/11/2026) [contenido/bajo]
+  test('REPARADO (hallazgo 4919) [contenido/bajo]: «carcinógeno Tipo 1» en vez de «Grupo 1» del IARC', async ({ page }) => {
+    // REPARADO 17/11/2026: «Grupo 1» en los dos sitios, atribuido al agente y no al cáncer.
     // ENTRADA  pestaña «Ruta metabólica» (aviso) y «Órganos afectados» → «Boca y esófago»
     // ESPERADO «Grupo 1», como dicen el aviso médico de la propia app y la OMS (04/01/2023: «a Group 1
     //          carcinogen by the International Agency for Research on Cancer»)
@@ -219,10 +219,13 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     await organo(page, 'Boca y esófago').click();
     await expect(seccion(page, H2_ORGANOS)).toContainText('cáncer de cavidad oral');
     await expect(seccion(page, H2_ORGANOS)).not.toContainText('Tipo 1', { timeout: 2000 });
+    await expect(seccion(page, H2_ORGANOS)).toContainText('Grupo 1 de carcinógenos');
+    await irA(page, /Ruta metabólica/);
+    await expect(seccion(page, H2_RUTA)).toContainText('carcinógeno del Grupo 1 (IARC)');
   });
 
-  test('HALLAZGO ABIERTO [contenido/bajo]: el hígado lleva el emoji del corazón y el estómago el de los pulmones', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 17/11/2026) [contenido/bajo]
+  test('REPARADO (hallazgo 4920) [contenido/bajo]: el hígado llevaba el emoji del corazón y el estómago el de los pulmones', async ({ page }) => {
+    // REPARADO 17/11/2026: 🧪 para el hígado, 🍽️ para el estómago y 🩺 en la pestaña.
     // ENTRADA  pestaña «Órganos afectados»
     // ESPERADO un icono que no sea otro órgano (o ninguno)
     // OBTENIDO «Hígado» y la pestaña «Órganos afectados» con 🫀 (U+1FAC0, ANATOMICAL HEART) y «Estómago»
@@ -231,6 +234,9 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     const icono = (nombre: string) => organo(page, nombre).locator('span[aria-hidden="true"]').innerText();
     expect(await icono('Hígado')).not.toBe('\u{1FAC0}');
     expect(await icono('Estómago')).not.toBe('\u{1FAC1}');
+    expect(await icono('Hígado')).toBe('🧪');
+    const pestana = pestanas(page).filter({ hasText: /Órganos afectados/ });
+    await expect(pestana).not.toContainText('\u{1FAC0}');
   });
 
   test('REPARADO (hallazgo 4921) [contenido/bajo]: el FAQPage traía cinco preguntas que la página no mostraba', async ({ page }) => {
@@ -255,8 +261,8 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     expect(n).toBeLessThanOrEqual(8);
   });
 
-  test('HALLAZGO ABIERTO [contenido/bajo]: el «%» va pegado a la cifra y «10g» sin espacio', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 17/11/2026) [contenido/bajo]
+  test('REPARADO (hallazgo 4923) [contenido/bajo]: el «%» iba pegado a la cifra y «10g» sin espacio', async ({ page }) => {
+    // REPARADO 17/11/2026: espacio duro antes de «%» y de «g».
     // ENTRADA  pestañas «Órganos afectados» y «Variante ALDH2», y la guía
     // ESPERADO «90-95 %», «~85 %», «al 5 %» con espacio duro (CLAUDE.md global §2, desde el
     //          25/09/2026) y «10 g»
@@ -267,6 +273,10 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     await irA(page, /Órganos afectados/);
     await expect(seccion(page, H2_ORGANOS)).toContainText('alcohol ingerido');
     await expect(seccion(page, H2_ORGANOS)).not.toContainText(/\d%|\d+g\b/, { timeout: 2000 });
+    await expect(seccion(page, H2_ORGANOS)).toContainText('10 g de alcohol');
+    const guia = (await page.locator('[data-guia-educativa]').textContent()) ?? '';
+    expect(guia).toContain('(200 ml al 5 %)');
+    expect(guia).not.toMatch(/\d%/);
   });
 
   test('REPARADO (hallazgo 4924) [contenido/bajo]: las cifras de las pestañas no citaban fuente', async ({ page }) => {
@@ -287,8 +297,8 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     await expect(seccion(page, H2_ORGANOS)).not.toContainText('10-100 veces', { timeout: 2000 });
   });
 
-  test('HALLAZGO ABIERTO [contenido/bajo]: erratas «Via MEOS», «(posibles adicción)» y la sigla inglesa «BBB»', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 17/11/2026) [contenido/bajo]
+  test('REPARADO (hallazgo 4925) [contenido/bajo]: erratas «Via MEOS», «(posibles adicción)» y la sigla inglesa «BBB»', async ({ page }) => {
+    // REPARADO 17/11/2026: «Vía MEOS», «(posible papel en la adicción)» y «barrera hematoencefálica».
     // ENTRADA  paso 4 de la ruta; ficha «Cerebro» de «Órganos afectados»
     // ESPERADO «Vía MEOS»; «(posible adicción)» o similar; «barrera hematoencefálica» (BHE), sin sigla inglesa
     // OBTENIDO «Via MEOS (consumo elevado)»; «tetrahidroisoquinolinas (posibles adicción)»; «cruzar
@@ -299,6 +309,7 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     await organo(page, 'Cerebro').click();
     await expect(seccion(page, H2_ORGANOS)).toContainText('tetrahidroisoquinolinas');
     await expect(seccion(page, H2_ORGANOS)).not.toContainText(/posibles adicción|\bBBB\b/, { timeout: 2000 });
+    await expect(seccion(page, H2_ORGANOS)).toContainText('cruzar parcialmente la barrera hematoencefálica');
   });
 });
 

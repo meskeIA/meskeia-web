@@ -77,7 +77,7 @@ const PASOS_METABOLICOS: PasoMetabolico[] = [
   },
   {
     numero: 4,
-    reactivo: 'Via MEOS (consumo elevado)',
+    reactivo: 'Vía MEOS (consumo elevado)',
     enzima: 'CYP2E1 (Citocromo P450 2E1)',
     producto: 'Acetaldehído + Radicales libres',
     icono: '🔥',
@@ -90,7 +90,8 @@ const ORGANOS: OrganoInfo[] = [
   {
     id: 'higado',
     nombre: 'Hígado',
-    icono: '🫀',
+    // Hallazgo 4920: era 🫀 (corazón anatómico); no hay emoji de hígado, así que uno de laboratorio.
+    icono: '🧪',
     color: '#C0392B',
     mecanismo: 'Entre el 90 y el 98 % del alcohol ingerido se oxida a acetato, sobre todo en el hígado (Goodman & Gilman, 12.ª ed., 2011, citado por HSDB). La acumulación de NADH altera la beta-oxidación de ácidos grasos, provocando su acumulación (esteatosis). El acetaldehído forma adductos covalentes con proteínas y ADN del hepatocito, iniciando fibrosis.',
     acetaldehido: 'Concentración local máxima: es el órgano más expuesto. Los adductos proteína-acetaldehído activan células estrelladas → fibrosis → cirrosis.',
@@ -100,7 +101,7 @@ const ORGANOS: OrganoInfo[] = [
       'Fibrosis: cicatrización del tejido hepático, parcialmente reversible',
       'Cirrosis: estadio final, irreversible, riesgo de hepatocarcinoma',
     ],
-    datosClave: 'El hígado tarda ~1 hora en procesar una UBE (Unidad de Bebida Estándar: 10g de alcohol). No hay forma de "acelerar" este proceso.',
+    datosClave: 'El hígado tarda ~1 hora en procesar una UBE (Unidad de Bebida Estándar: 10 g de alcohol). No hay forma de "acelerar" este proceso.',
   },
   {
     id: 'boca',
@@ -110,7 +111,7 @@ const ORGANOS: OrganoInfo[] = [
     mecanismo: 'Las bacterias de la microbiota oral (Streptococcus, Fusobacterium, Candida) poseen su propia ADH bacteriana: convierten el alcohol de la saliva en acetaldehído local. Este acetaldehído no pasa por el hígado: actúa directamente sobre la mucosa.',
     acetaldehido: 'El acetaldehído que se forma en la saliva actúa sobre la mucosa sin pasar antes por el hígado, y se considera uno de los factores del riesgo de cáncer oral y esofágico asociado al alcohol.',
     consecuencias: [
-      'Riesgo de cáncer de cavidad oral (clasificado como carcinógeno Tipo 1 por IARC)',
+      'Riesgo de cáncer de cavidad oral (el IARC clasifica en el Grupo 1 de carcinógenos el alcohol y el acetaldehído asociado a su consumo)',
       'Riesgo de cáncer de esófago (especialmente en portadores de mutación ALDH2)',
       'Daño directo a la mucosa oral por acetaldehído local',
       'El alcohol de los enjuagues bucales puede contribuir si contienen etanol',
@@ -120,7 +121,8 @@ const ORGANOS: OrganoInfo[] = [
   {
     id: 'estomago',
     nombre: 'Estómago',
-    icono: '🫁',
+    // Hallazgo 4920: era 🫁 (pulmones).
+    icono: '🍽️',
     color: '#8E44AD',
     mecanismo: 'La mucosa gástrica tiene su propia ADH, pero en menor cantidad que el hígado. El alcohol inhibe parcialmente esta ADH gástrica, permitiendo que más etanol pase al torrente sanguíneo sin ser metabolizado. Esto explica por qué el alcohol en ayunas llega más rápido y con mayor concentración al cerebro.',
     acetaldehido: 'La producción local de acetaldehído en el estómago causa irritación directa de la mucosa gástrica. Las bebidas fermentadas (vino, cerveza) contienen también acetaldehído preformado.',
@@ -137,7 +139,7 @@ const ORGANOS: OrganoInfo[] = [
     nombre: 'Cerebro',
     icono: '🧠',
     color: '#2E86AB',
-    mecanismo: 'El etanol cruza la barrera hematoencefálica con facilidad. Potencia los receptores GABA-A (inhibe la actividad neuronal) y bloquea los receptores NMDA (glutamato, principal excitador). El acetaldehído también puede cruzar parcialmente la BBB y formar condensación con dopamina → tetrahidroisoquinolinas (posibles adicción).',
+    mecanismo: 'El etanol cruza la barrera hematoencefálica con facilidad. Potencia los receptores GABA-A (inhibe la actividad neuronal) y bloquea los receptores NMDA (glutamato, principal excitador). El acetaldehído también puede cruzar parcialmente la barrera hematoencefálica y condensarse con la dopamina → tetrahidroisoquinolinas (posible papel en la adicción).',
     acetaldehido: 'Las concentraciones cerebrales de acetaldehído son bajas pero suficientes para interferir con neurotransmisores. La interacción acetaldehído-dopamina es una de las hipótesis sobre el desarrollo de la dependencia alcohólica.',
     consecuencias: [
       'Sedación y desinhibición: potenciación GABA, bloqueo NMDA',
@@ -187,7 +189,7 @@ export default function MetabolismoAlcoholPage() {
 
   const tabs: { id: TabId; label: string; icono: string }[] = [
     { id: 'ruta', label: 'Ruta metabólica', icono: '🔬' },
-    { id: 'organos', label: 'Órganos afectados', icono: '🫀' },
+    { id: 'organos', label: 'Órganos afectados', icono: '🩺' },
     { id: 'aldh2', label: 'Variante ALDH2', icono: '🧬' },
     { id: 'cerebro', label: 'Cerebro y adicción', icono: '🧠' },
   ];
@@ -274,7 +276,7 @@ export default function MetabolismoAlcoholPage() {
           </div>
 
           <div className={styles.warningBox}>
-            <strong><span aria-hidden="true">⚠️</span> El acetaldehído es un carcinógeno Tipo 1 (IARC):</strong> Forma adductos covalentes
+            <strong><span aria-hidden="true">⚠️</span> El acetaldehído asociado al consumo de alcohol es carcinógeno del Grupo 1 (IARC):</strong> Forma adductos covalentes
             con el ADN celular, causando mutaciones. No existe un &ldquo;umbral seguro&rdquo; conocido.
             El daño es acumulativo con cada exposición.
           </div>
@@ -485,8 +487,8 @@ export default function MetabolismoAlcoholPage() {
       >
         <h3>El concepto de Unidad de Bebida Estándar (UBE)</h3>
         <p>
-          En España, una <strong>UBE</strong> equivale a 10 gramos de alcohol puro. Una caña (200 ml al 5%),
-          un vaso de vino (100 ml al 12%) o un shot de destilado (25 ml al 40%) contienen aproximadamente
+          En España, una <strong>UBE</strong> equivale a 10 gramos de alcohol puro. Una caña (200 ml al 5{' '}%),
+          un vaso de vino (100 ml al 12{' '}%) o un shot de destilado (25 ml al 40{' '}%) contienen aproximadamente
           1 UBE. El hígado necesita aproximadamente 1 hora para metabolizar cada UBE. No existe ninguna
           sustancia, alimento ni técnica que acelere este proceso.
         </p>
