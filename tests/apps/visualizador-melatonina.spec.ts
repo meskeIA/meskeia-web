@@ -289,22 +289,23 @@ test.describe('visualizador-melatonina', () => {
   });
 
   test('HALLAZGO [calculo/alto] CASO 1: la curva sube desde las 16-17 h y a las 20:00 ya va por el 55 %', async ({ page }) => {
-    // ABIERTO. ENTRADA  la curva de 24 h, horas 18, 19 y 20 (la «Noche» de la leyenda empieza a las 20:00)
+    // REPARADO (hallazgo 4955). ENTRADA  la curva de 24 h, horas 18, 19 y 20 (la «Noche» de la leyenda
+    //          empieza a las 20:00)
     // ESPERADO nivel basal (≤ 10 % del pico): la FAQ dice «empezando hacia las 21:00-22:00 h», el
     //          recuadro «~2 horas antes de la hora habitual de dormir» y CIMA (5.1) «aumenta poco
     //          después del anochecer»
-    // OBTENIDO 18 h = 20 %, 19 h = 35 %, 20 h = 55 % (y 21 h = 70 %): la subida empieza a las 16-17 h
-    test.fail();
+    // OBTENIDO 18 h = 20 %, 19 h = 35 %, 20 h = 55 % (y 21 h = 70 %): la subida empezaba a las 16-17 h
     const { melatonina } = await curva(page);
-    for (const h of [18, 19, 20]) expect(melatonina[h], `melatonina a las ${h}:00`).toBeLessThanOrEqual(10);
+    for (const h of [16, 17, 18, 19, 20]) expect(melatonina[h], `melatonina a las ${h}:00`).toBeLessThanOrEqual(10);
+    // …y sí sube tras el anochecer: a las 22 h ya está claramente por encima del basal
+    expect(melatonina[22], 'melatonina a las 22:00').toBeGreaterThan(20);
   });
 
   test('HALLAZGO [calculo/medio] CASO 2 (medianoche): la curva baja entre las 22:00 y las 0:00 antes del pico', async ({ page }) => {
-    // ABIERTO. ENTRADA  la curva, de las 21:00 a las 3:00 cruzando la medianoche
+    // REPARADO (hallazgo 4956). ENTRADA  la curva, de las 21:00 a las 3:00 cruzando la medianoche
     // ESPERADO no decreciente hasta el pico de las 2-4 h (CIMA 5.1: aumenta tras el anochecer y
     //          alcanza el máximo entre las 2 y las 4)
     // OBTENIDO 21 h 70 · 22 h 75 · 23 h 65 · 0 h 60 · 1 h 80 · 2 h 95 · 3 h 100: un valle de 15 puntos
-    test.fail();
     const { melatonina } = await curva(page);
     const tramo = [21, 22, 23, 0, 1, 2, 3].map((h) => melatonina[h]);
     for (let i = 1; i < tramo.length; i++) {

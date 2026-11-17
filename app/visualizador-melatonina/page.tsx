@@ -68,7 +68,11 @@ interface TarjetaJetLag {
 
 const HORAS_DIA = ['0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
 
-const DATOS_MELATONINA = [60, 80, 95, 100, 95, 80, 55, 20, 5, 3, 2, 2, 2, 2, 2, 3, 5, 10, 20, 35, 55, 70, 75, 65];
+// Nivel relativo al pico (100). CIMA, ficha técnica 88821, 5.1: la secreción aumenta poco después
+// del anochecer y alcanza el máximo entre las 2 y las 4. Basal de día y hasta las 20 h; sube desde las
+// 21 h sin bajar hasta el pico de las 3 h (antes subía desde las 16-17 h y tenía un valle a medianoche:
+// hallazgos 4955 y 4956). Curva ilustrativa, no una medición.
+const DATOS_MELATONINA = [70, 85, 95, 100, 95, 80, 55, 20, 5, 3, 2, 2, 2, 2, 2, 3, 3, 4, 5, 6, 8, 20, 35, 50];
 
 const DATOS_CORTISOL = [15, 10, 8, 10, 20, 50, 80, 100, 90, 75, 60, 50, 45, 40, 38, 42, 45, 40, 35, 30, 25, 22, 18, 15];
 
