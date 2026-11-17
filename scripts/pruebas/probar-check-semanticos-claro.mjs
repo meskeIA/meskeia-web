@@ -69,6 +69,17 @@
  *  36-38. El literal sobre un fondo claro fijo, en un ::before a 3:1 y en @media print. Deben CALLAR.
  *  39. El literal sobre un tinte translúcido, que en oscuro se compone sobre la tarjeta. Debe FALLAR.
  *  40. Un selector con dos partes y variante oscura solo para una. Debe FALLAR.
+ *
+ * Y la `opacity` de la misma regla, que compone el texto con su fondo (cabo C0785, 17/11/2026):
+ *  41. visualizador-adn-codigo-genetico en 3e5d4bc19: .intronBloque con la receta roja sobre su
+ *      tinte y opacity 0.7 en la misma regla (3,52:1). Lo encontró la ampliación al nacer. FALLAR.
+ *  42. La misma hoja hoy, sin la opacidad. Debe CALLAR.
+ *  45. LÍMITE ACEPTADO · test-fragilidad antes de d9ff5b2e1 (hallazgo 4864, el caso del cabo):
+ *      .nivelSalvedad solo declara la opacity y HEREDA el color de .nivelRobusto, que el TSX elige
+ *      con plantilla (styles[`nivel${…}`]), el límite de C0774. CALLA: lo mide el píxel
+ *      (tests/apps/test-fragilidad.spec.ts, hallazgo 4864).
+ *  43. Un literal que cumple sobre blanco, al 70 %. Debe FALLAR.
+ *  44. La receta con opacity 1, y un gris (no semántico) al 50 %. Deben CALLAR.
  * Y la manera de dar verde sin mirar, que debe PLANTARLO:
  *
  *  16. Un árbol sin ningún `.module.css`.
@@ -92,6 +103,8 @@ const LIMITES = 'app/tabla-limites-notables/TablaLimitesNotables.module.css';
 const LIMITES_TSX = 'app/tabla-limites-notables/page.tsx';
 const CHECKLIST = 'app/checklist-coberturas-seguros/ChecklistCoberturasSeguro.module.css';
 const CONJUGADOR = 'app/conjugador-verbos/ConjugadorVerbos.module.css';
+const FRAGILIDAD = 'app/test-fragilidad/TestFragilidad.module.css';
+const ADN = 'app/visualizador-adn-codigo-genetico/AdnCodigoGenetico.module.css';
 
 const CASOS = [
   { n: 1, nombre: 'CASO DE ORIGEN · mi-ip antes de f9af2556', falla: true, css: deGit('f9af2556^', MI_IP) },
@@ -181,6 +194,11 @@ const CASOS = [
   { n: 38, nombre: 'el literal dentro de @media print, sobre papel', falla: false, css: '@media print {\n  .total { color: #c0392b; }\n}\n' },
   { n: 39, nombre: 'el literal sobre un tinte translúcido, compuesto en oscuro sobre la tarjeta', falla: true, debeDecir: '(C0708)', css: '.aviso { background: rgba(220, 38, 38, 0.1); color: #b91c1c; }\n' },
   { n: 40, nombre: 'dos partes de selector y variante oscura solo para una', falla: true, debeDecir: '(C0708)', css: '.a, .b { color: #b91c1c; }\n[data-theme=\'dark\'] .a { color: #fca5a5; }\n' },
+  { n: 41, nombre: 'CASO DE ORIGEN · adn-codigo-genetico en 3e5d4bc19 (.intronBloque, receta con opacity 0.7)', falla: true, debeDecir: 'quita la opacity', css: deGit('3e5d4bc19', ADN) },
+  { n: 42, nombre: 'CASO DE ORIGEN REPARADO · adn-codigo-genetico hoy, sin la opacidad', falla: false, css: fs.readFileSync(path.join(RAIZ, ADN), 'utf8') },
+  { n: 43, nombre: 'un literal que cumple sobre blanco, al 70 %', falla: true, debeDecir: 'quita la opacity', css: '.a { color: #b91c1c; opacity: 0.7; }\n[data-theme=\'dark\'] .a { color: #fca5a5; }\n' },
+  { n: 44, nombre: 'la receta con opacity 1 y un gris al 50 %', falla: false, css: '.a { color: var(--verde-texto, #16a34a); opacity: 1; }\n.b { color: #6b7280; opacity: 0.5; }\n' },
+  { n: 45, nombre: 'LÍMITE ACEPTADO · test-fragilidad antes de d9ff5b2e1: el color se hereda de una clase que el TSX elige con plantilla', falla: false, css: deGit('d9ff5b2e1^', FRAGILIDAD) },
 ];
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'semanticos-claro-'));

@@ -66,6 +66,17 @@
  * dinámica no se ve, y la receta lo empeoraría. Si sospechas, mídelo por píxel con
  * scripts/contraste-semanticos/medir-reserva-oscuro.mjs (la reserva es el literal de antes).
  *
+ * LA OPACIDAD DE LA MISMA REGLA (cabo C0785, 17/11/2026)
+ * ──────────────────────────────────────────────────────
+ * Una `opacity` en la regla del color compone el texto con lo de debajo: un color que cumple
+ * deja de hacerlo. Ahora se mide compuesto (sobre el fondo de la regla, el heredado o el blanco;
+ * si la regla pone su fondo, los dos sobre la página), también la RECETA, que sin opacidad se da
+ * por buena. Rompe con «quita la opacity». Al nacer encendió 1 regla: .intronBloque de
+ * visualizador-adn-codigo-genetico, el rótulo «Intrón» al 70 % sobre su tinte (3,52:1), reparada
+ * en el mismo commit. El caso del cabo (hallazgo 4864, test-fragilidad) NO lo ve: allí la regla
+ * con la opacidad no declara color, lo HEREDA de una clase que el TSX elige con plantilla
+ * (`styles[\`nivel${…}\`]`), el límite de abajo. Lo mide su spec por píxel.
+ *
  * QUÉ NO JUZGA, Y POR QUÉ
  * ───────────────────────
  *   · El texto cuyo fondo es OSCURO: el de la propia regla o el de una clase antecesora del
@@ -90,7 +101,8 @@
  *   · Los portales con paleta propia (home y páginas de Coquinum, Cronicum, Delegum y Stemum,
  *     y sus pies): su oro y su terracota son marca, no semánticos, y van sobre héroes y pies
  *     oscuros que pone el TSX. La marca la vigila check:contraste-marca.
- *   · Lo que va con `opacity` en un antecesor: el contraste real lo mide el píxel.
+ *   · Lo que va con `opacity` en un antecesor, o en una regla que no declara el color (lo
+ *     hereda): el contraste real lo mide el píxel. Solo se compone la de la regla del color.
  * Que el sustituto cumpla en su fondo REAL lo mide por píxel tests/contraste-semanticos-claro.spec.ts.
  *
  * DE DÓNDE SALE
@@ -273,6 +285,16 @@ export function anidamientoDeTsx(fuentes) {
 }
 
 const ultimoFondo = (decls) => decls.filter((d) => /^background(-color)?$/.test(d.prop)).at(-1);
+
+/** La `opacity` de la regla, de 0 a 1 (1 si no la declara o no se sabe leer). Cabo C0785. */
+function opacidadDe(decls) {
+  const v = decls.filter((d) => d.prop === 'opacity').at(-1)?.valor.replace(/\s*!important\s*$/i, '').trim();
+  if (!v) return 1;
+  const m = v.match(/^(\d*\.?\d+)(%)?$/);
+  if (!m) return 1;
+  const n = m[2] ? +m[1] / 100 : +m[1];
+  return n >= 0 && n < 1 ? n : 1;
+}
 /** Los compuestos de un selector (`.a > .b .c` → ['.a', '.b', '.c']). */
 const compuestos = (sel) => sel.replace(/\s*[>+~]\s*/g, ' ').trim().split(/\s+/);
 const clasesDe = (comp) => (comp.match(/\.[A-Za-z0-9_-]+/g) ?? []);
@@ -346,6 +368,7 @@ export function analizarHoja(css, { dom = null } = {}) {
 
   const casos = [];
   for (const b of claros) {
+    const opacidad = opacidadDe(b.decls);
     for (const d of b.decls) {
       if (!/^(color|-webkit-text-fill-color)$/.test(d.prop)) continue;
       const importante = /!important\s*$/i.test(d.valor);
@@ -354,13 +377,19 @@ export function analizarHoja(css, { dom = null } = {}) {
       let via = 'literal';
       const mv = valor.match(/^var\(\s*(--[\w-]+)\s*(?:,\s*([^)]+))?\)$/);
       if (!hex && mv) {
-        if (Object.values(FAMILIAS).some((f) => f.token === mv[1])) {
+        const receta = Object.values(FAMILIAS).find((f) => f.token === mv[1]);
+        if (receta) {
           // Ya es la receta. Sin reserva y sin declararlo el módulo, en oscuro no hay color:
           // el token no existe en ese tema y `color` cae a lo heredado.
           if (!mv[2] && !(mv[1] in tokens)) casos.push({ linea: d.linea, selector: b.selector, valor: d.valor, accion: 'sin-reserva' });
-          continue;
+          // La receta cumple sobre los fondos claros de la casa, pero no con una `opacity` en la
+          // misma regla, que la compone con lo de debajo (cabo C0785): se mide con su valor del
+          // claro. Sin opacidad, nada que medir.
+          if (opacidad === 1) continue;
+          hex = (tokens[mv[1]] && aHex(tokens[mv[1]])) || receta.claro.toLowerCase();
+          via = 'receta';
         }
-        if (tokens[mv[1]] && aHex(tokens[mv[1]])) { hex = aHex(tokens[mv[1]]); via = 'token-modulo'; }
+        else if (tokens[mv[1]] && aHex(tokens[mv[1]])) { hex = aHex(tokens[mv[1]]); via = 'token-modulo'; }
         else if (GLOBALES[mv[1]] && /^--(error|success|warning)$/.test(mv[1])) { hex = GLOBALES[mv[1]]; via = 'token-global'; }
         else if (mv[2] && aHex(mv[2])) { hex = aHex(mv[2]); via = 'reserva'; }
       }
@@ -378,12 +407,20 @@ export function analizarHoja(css, { dom = null } = {}) {
       const heredado = fDecl ? null : fondoHeredado(b.selector, hex);
       const fondo = fDecl ? resolverFondo(fDecl.valor, tokens) : heredado ? { hex: heredado, heredado: true } : { tipo: 'ninguno' };
       const hexFondo = fondo.hex ?? '#ffffff';
-      const ratio = contraste(hex, hexFondo);
+      // Con `opacity` en la regla, el texto se ve compuesto con lo de debajo (cabo C0785). Si la
+      // regla pone además su fondo, los dos se componen sobre la página; si no, el texto sobre el
+      // fondo que tiene debajo.
+      const ratio = opacidad === 1
+        ? contraste(hex, hexFondo)
+        : fDecl && fondo.hex
+          ? contraste(sobre(hex, opacidad, '#fafafa'), sobre(hexFondo, opacidad, '#fafafa'))
+          : contraste(sobre(hex, opacidad, hexFondo), hexFondo);
       if (ratio >= umbral) continue;
 
       const caso = {
         linea: d.linea, desde: d.desde, hasta: d.hasta, selector: b.selector, valor: d.valor, hex, fam, via,
         fondo: fondo.hex ?? fondo.tipo, ratio: Math.round(ratio * 100) / 100, umbral,
+        ...(opacidad < 1 ? { opacidad } : {}),
       };
       const esc = [lineas[d.linea - 1], lineas[d.linea - 2]].map((l) => l?.match(RE_ESCAPE)).find(Boolean);
       if (esc) caso.escape = esc[1]?.replace(/\*\/.*$/, '').trim() || '';
@@ -394,6 +431,9 @@ export function analizarHoja(css, { dom = null } = {}) {
       else if (padreOscuro) Object.assign(caso, { accion: 'aparte', motivo: 'fondo oscuro del antecesor' });
       else if (fondo.tipo === 'degradado' || fondo.tipo === 'otro') Object.assign(caso, { accion: 'aparte', motivo: `fondo ${fondo.tipo}` });
       else if (via === 'reserva') Object.assign(caso, { accion: 'aparte', motivo: 'var() que pone el TSX' });
+      else if (opacidad < 1 && (via === 'receta' || contraste(hex, hexFondo) >= umbral)) {
+        Object.assign(caso, { accion: 'opacidad', nuevo: `quita la opacity: ${opacidad} de la regla (el color cumple, la opacidad lo compone con el fondo)` });
+      }
       else Object.assign(caso, { accion: 'receta', nuevo: `var(${FAMILIAS[fam].token}, ${valor})${importante ? ' !important' : ''}` });
       casos.push(caso);
     }
