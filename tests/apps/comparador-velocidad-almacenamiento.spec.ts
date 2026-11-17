@@ -479,3 +479,28 @@ test.describe('Hallazgos de contenido (16/11/2026)', () => {
     expect(fondo).not.toBe('rgb(124, 58, 237)');
   });
 });
+
+test.describe('Hallazgos de contenido (17/11/2026, cabo C0788)', () => {
+  test('HALLAZGO (17/11/2026, ABIERTO) · la generación del bus de UFS 4.0 («HS-G4») no tiene fuente', async ({ page }) => {
+    // ABIERTO (cabo C0788): la tabla de la guía da a UFS 4.0 la interfaz «MIPI M-PHY HS-G4» y el
+    // FAQPage «(HS-G4, 2 lanes)», junto a 4.200 MB/s de lectura. Ni el repositorio ni la red de
+    // fuentes oficiales (sin JEDEC ni MIPI) dan la tasa por carril de cada generación M-PHY ni la que
+    // fija la norma UFS 4.0, y la app no da la de HS-G4 en ningún sitio: no se puede comprobar que dos
+    // carriles HS-G4 lleguen a esos 4.200 MB/s (criterio C0203). Pasa a verde cuando la celda y el
+    // FAQPage retiren la generación («bus MIPI M-PHY», como ya dice la FAQ visible) o la maticen; el
+    // bus y la velocidad se quedan.
+    test.fail();
+    const tabla = page.locator('table').filter({ has: page.locator('th', { hasText: /^Interfaz$/ }) });
+    const columna = (await tabla.locator('thead th').allTextContents()).map(normalizar).indexOf('Interfaz');
+    expect(columna).toBeGreaterThan(0);
+    const fila = tabla.locator('tbody tr').filter({ hasText: 'UFS 4.0 (móvil)' });
+    await expect(fila).toHaveCount(1);
+    await expect(fila.locator('td').nth(1)).toHaveText('~4.200 MB/s');
+    const interfaz = normalizar((await fila.locator('td').nth(columna).textContent()) ?? '');
+    expect(interfaz).toContain('M-PHY');
+    const faq = await respuestaFaqPage(page, /¿Qué es UFS/);
+    expect(faq).toContain('4.200 MB/s');
+    expect(interfaz, 'celda «Interfaz» de UFS 4.0 en la tabla de la guía').not.toMatch(/HS-G\d/);
+    expect(faq, 'respuesta del FAQPage a «¿Qué es UFS…?»').not.toMatch(/HS-G\d/);
+  });
+});

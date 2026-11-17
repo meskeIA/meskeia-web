@@ -512,3 +512,39 @@ test.describe('Hallazgos 17/11/2026', () => {
     expect((await page.locator('[data-guia-educativa]').textContent()) ?? '').not.toMatch(/\d[€%]/);
   });
 });
+
+// ============================================================
+// CABO C0804 (17/11/2026) — la cifra de Barber y Odean del FAQPage
+// ============================================================
+test.describe('Cabo C0804', () => {
+  test('ABIERTO (cabo C0804) — el FAQPage atribuye a Barber y Odean «hasta 2-3 puntos porcentuales anuales» sin fuente', async ({ page }) => {
+    // ABIERTO (cabo C0804): `test.fail()` mientras la cifra siga; al matizarla o retirarla, este caso
+    // pasa a verde y se quita la línea de abajo.
+    test.fail();
+    // La respuesta a «¿Cómo afecta el exceso de confianza…?» de faqJsonLd (metadata.ts) dice que
+    // «Estudios de Barber y Odean mostraron que los inversores más activos obtienen rentabilidades
+    // hasta 2-3 puntos porcentuales anuales menores que los pasivos». Ni el repositorio la ancla (sin
+    // revista, año ni tabla en app/, data/ o tests/) ni la red de fuentes trata finanzas conductuales
+    // (la búsqueda de ecb.europa.eu no se pinta sin JavaScript). La página visible no da la cifra: su
+    // tabla se queda en «Más operaciones, más costes, menor rentabilidad neta». Criterio C0203
+    // (decisión del usuario del 30/10/2026): sin fuente, se matiza o se retira.
+    await page.goto(RUTA);
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques
+      .map((b) => JSON.parse(b) as Record<string, unknown>)
+      .find((j) => j['@type'] === 'FAQPage');
+    // Precondición: el FAQPage se sirve (que el caso no pase en verde por no encontrarlo).
+    expect(faq).toBeDefined();
+    const respuestas = ((faq?.mainEntity as Array<{ acceptedAnswer: { text: string } }> | undefined) ?? [])
+      .map((q) => q.acceptedAnswer.text);
+    expect(respuestas.length).toBeGreaterThan(0);
+    for (const texto of respuestas) {
+      // Ni la cifra en puntos porcentuales ni otro diferencial de rentabilidad atribuido a Barber y
+      // Odean (en % o en puntos). Un año de publicación en la cita no lo dispara.
+      expect(texto).not.toMatch(/puntos porcentuales/);
+      if (/Barber|Odean/.test(texto)) {
+        expect(texto).not.toMatch(/\d+(?:[.,]\d+)?\s*(?:[-–]\s*\d+(?:[.,]\d+)?\s*)?(?:%|puntos|p\.\s?p\.)/);
+      }
+    }
+  });
+});
