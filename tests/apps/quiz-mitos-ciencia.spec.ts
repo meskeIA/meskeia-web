@@ -63,7 +63,7 @@ const CLAVE: [RegExp, boolean, Cat][] = [
   [/koalas/, true, 'animales'],
   [/rayos nunca caen/, false, 'fisica'],
   [/átomos son partículas sólidas/, false, 'fisica'],
-  [/Sol es una estrella de tamaño mediano/, true, 'fisica'],
+  [/Sol es más grande que la mayoría de las estrellas/, true, 'fisica'],
   [/sonido no puede propagarse/, true, 'fisica'],
   [/Napoleón/, false, 'historia'],
   [/Gran Muralla/, false, 'historia'],
@@ -422,7 +422,10 @@ test.describe('Inspector 28/10/2026 · nota y formato', () => {
   test('hallazgo · pulsar siempre «Mito» sin leer no da un nivel de «buen conocimiento científico»', async ({ page }) => {
     // 18 de las 25 son mitos y el orden es fijo: «Mito» a todo da 18/25 = 72 % → «Investigador/a»
     // («Buen conocimiento científico. Separas la mayoría de los mitos de la realidad»).
-    test.fail();
+    // REPARADO (hallazgo 3737): para pasar de «Aprendiz» hay que acertar al menos la cuarta parte de
+    // las verdades (⌈7/4⌉ = 2) y de los mitos (⌈18/4⌉ = 5). «Siempre Mito» acierta 0 de 7 verdades:
+    // se queda en «Aprendiz» y la pantalla dice por qué. El caso normal de 13/25 (Cuerpo, Física e
+    // Historia bien: 3 verdades y 10 mitos) sigue siendo «Curioso/a», más abajo.
     test.setTimeout(90_000);
     await abrir(page);
     await page.getByRole('button', { name: 'Comenzar quiz' }).click();
@@ -434,6 +437,8 @@ test.describe('Inspector 28/10/2026 · nota y formato', () => {
     const r = await resultado(page);
     expect(r.puntos).toBe('18'); // valor a mano: 25 − 7 verdades
     expect(r.nivel, 'la estrategia ciega «siempre Mito» alcanza «Investigador/a»').not.toBe('Investigador/a');
+    expect(r.nivel).toBe('Aprendiz');
+    await expect(page.locator('[class*="nivelDesc"]')).toContainText('Has acertado 0 de 7 verdades y 18 de 18 mitos');
   });
 
   test('hallazgo · el porcentaje va separado con espacio duro («80 %»)', async ({ page }) => {
@@ -497,7 +502,8 @@ test.describe('Inspector 28/10/2026 · contenido', () => {
   });
 
   test('hallazgo · cifras que no cuadran en las explicaciones (Betelgeuse, Gran Muralla, Hänig)', () => {
-    test.fail();
+    // REPARADO (hallazgo 3739): Betelgeuse «hasta el cinturón de asteroides», el cabello «a unos 5
+    // metros», Hänig «de 1901» y el metaanálisis de JAMA de 1995 que reúne los ensayos.
     const fallos: string[] = [];
     // Betelgeuse: la propia app dice «unas 700 veces» el diámetro del Sol → radio 700 × 695.700 km
     // = 4,87·10⁸ km = 3,26 UA, y Júpiter orbita a 5,20 UA: llega al cinturón de asteroides, no a Júpiter.
@@ -512,14 +518,23 @@ test.describe('Inspector 28/10/2026 · contenido', () => {
     // Wilson y White, 1995) que reúne esos ensayos, no los ensayos.
     if (/Más de 12 estudios con doble ciego en JAMA/.test(FUENTE)) fallos.push('estudios «en JAMA»');
     expect(fallos).toEqual([]);
+    expect(FUENTE).toContain('hasta el cinturón de asteroides');
+    expect(FUENTE).toContain('un cabello humano a unos 5 metros');
+    expect(FUENTE).toContain('un estudio alemán de 1901');
+    expect(FUENTE).toContain('Un metaanálisis publicado en JAMA (1995)');
   });
 
   test('hallazgo · «el Sol es una estrella de tamaño mediano» se da por VERDAD sin decir que la mayoría de las estrellas son más pequeñas', () => {
     // La explicación lo justifica con «las estrellas brillantes a ojo desnudo», un sesgo de
     // selección: la mayoría de las estrellas de la galaxia son enanas rojas, más pequeñas y menos
     // masivas que el Sol. Quien contesta «Mito» por eso tiene un argumento y pierde el punto.
-    test.fail();
-    const exp = FUENTE.slice(FUENTE.indexOf('El Sol es una estrella de tamaño mediano'), FUENTE.indexOf("emoji: '☀️'"));
+    // REPARADO (hallazgo 3738): la afirmación pasa a tener una sola respuesta, «El Sol es más grande
+    // que la mayoría de las estrellas de nuestra galaxia» (VERDAD), y la explicación lo razona con
+    // las enanas rojas y nombra el sesgo de las estrellas visibles.
+    expect(FUENTE).not.toMatch(/El Sol es una estrella de tamaño mediano/);
+    const ini = FUENTE.indexOf('El Sol es más grande que la mayoría de las estrellas');
+    expect(ini).toBeGreaterThan(-1);
+    const exp = FUENTE.slice(ini, FUENTE.indexOf("emoji: '☀️'", ini));
     expect(exp).toMatch(/enanas rojas|mayoría de las estrellas (de la galaxia|de la Vía Láctea) son (más )?pequeñas/i);
   });
 

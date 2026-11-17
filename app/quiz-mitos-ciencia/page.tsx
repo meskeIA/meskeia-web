@@ -72,7 +72,7 @@ const PREGUNTAS: Pregunta[] = [
     id: 6,
     afirmacion: 'La lengua humana tiene zonas específicas para cada sabor',
     esVerdad: false,
-    explicacion: 'El "mapa de la lengua" proviene de una mala traducción de un estudio alemán del siglo XIX. En realidad, los receptores de los cinco sabores básicos (dulce, salado, ácido, amargo y umami) están distribuidos por toda la lengua, el paladar y la faringe. Cualquier zona puede detectar cualquier sabor.',
+    explicacion: 'El "mapa de la lengua" proviene de una mala lectura de un estudio alemán de 1901 (D. P. Hänig). En realidad, los receptores de los cinco sabores básicos (dulce, salado, ácido, amargo y umami) están distribuidos por toda la lengua, el paladar y la faringe. Cualquier zona puede detectar cualquier sabor.',
     categoria: 'cuerpo',
     emoji: '👅',
   },
@@ -169,9 +169,12 @@ const PREGUNTAS: Pregunta[] = [
   },
   {
     id: 18,
-    afirmacion: 'El Sol es una estrella de tamaño mediano comparada con otras estrellas',
+    // Hallazgo 3738: decía «tamaño mediano comparada con otras estrellas» y lo justificaba con las
+    // estrellas que se ven a ojo desnudo, un sesgo de selección: quien contestaba «Mito» porque la
+    // mayoría de las estrellas son enanas rojas tenía razón y perdía el punto.
+    afirmacion: 'El Sol es más grande que la mayoría de las estrellas de nuestra galaxia',
     esVerdad: true,
-    explicacion: 'Aunque el Sol parece inmenso (su diámetro es 109 veces el de la Tierra), es una estrella de tamaño medio en el contexto del universo. Estrellas como Betelgeuse tienen un diámetro unas 700 veces mayor; si estuviera en el lugar del Sol, englobaría la órbita de Júpiter. La mayoría de las estrellas brillantes a ojo desnudo son gigantes o supergigantes mucho mayores.',
+    explicacion: 'La gran mayoría de las estrellas de la Vía Láctea son enanas rojas, más pequeñas, frías y tenues que el Sol, así que el Sol (109 veces el diámetro de la Tierra) es más grande que la mayoría. Parece «una estrella mediana» porque las que vemos a ojo desnudo son las más brillantes, y muchas son gigantes o supergigantes: Betelgeuse tiene un diámetro unas 700 veces el del Sol; en su lugar llegaría más allá de la órbita de Marte, hasta el cinturón de asteroides.',
     categoria: 'fisica',
     emoji: '☀️',
   },
@@ -196,7 +199,7 @@ const PREGUNTAS: Pregunta[] = [
     id: 21,
     afirmacion: 'La Gran Muralla China se ve a simple vista desde el espacio',
     esVerdad: false,
-    explicacion: 'Yang Liwei, el primer taikonauta chino, confirmó en 2003 que no pudo verla desde la órbita. Con 4-8 metros de anchura, es demasiado estrecha para distinguirse a ojo desnudo desde los 400 km de altitud de la órbita baja. Equivaldría a intentar ver un cabello humano desde 2 km de distancia.',
+    explicacion: 'Yang Liwei, el primer taikonauta chino, confirmó en 2003 que no pudo verla desde la órbita. Con 4-8 metros de anchura, es demasiado estrecha para distinguirse a ojo desnudo desde los 400 km de altitud de la órbita baja. Equivaldría a intentar distinguir un cabello humano a unos 5 metros de distancia.',
     categoria: 'historia',
     emoji: '🏯',
   },
@@ -213,7 +216,7 @@ const PREGUNTAS: Pregunta[] = [
     id: 23,
     afirmacion: 'El azúcar causa hiperactividad en los niños',
     esVerdad: false,
-    explicacion: 'Más de una docena de estudios controlados con doble ciego, incluyendo metaanálisis publicados en JAMA, han demostrado de forma consistente que el azúcar no causa hiperactividad. El efecto es puramente psicológico: los padres que creen que sus hijos consumieron azúcar los perciben como más activos, aunque hayan tomado un placebo.',
+    explicacion: 'Más de una docena de estudios controlados con doble ciego, reunidos en un metaanálisis publicado en JAMA en 1995, han mostrado de forma consistente que el azúcar no causa hiperactividad. El efecto es puramente psicológico: los padres que creen que sus hijos consumieron azúcar los perciben como más activos, aunque hayan tomado un placebo.',
     categoria: 'biologia',
     emoji: '🍬',
   },
@@ -251,6 +254,9 @@ const NIVELES = [
   { min: 0,  emoji: '🌱', nombre: 'Principiante', descripcion: 'Los mitos populares son muy convincentes. Lee las explicaciones: aprenderás mucho.' },
 ];
 
+const TOTAL_VERDADES = PREGUNTAS.filter(p => p.esVerdad).length;
+const TOTAL_MITOS = PREGUNTAS.length - TOTAL_VERDADES;
+
 export default function QuizMitosCiencia() {
   const [fase, setFase] = useState<Fase>('inicio');
   const [indice, setIndice] = useState(0);
@@ -260,7 +266,20 @@ export default function QuizMitosCiencia() {
   const pregunta = PREGUNTAS[indice];
   const puntuacion = aciertos.filter(Boolean).length;
   const porcentaje = Math.round((puntuacion / PREGUNTAS.length) * 100);
-  const nivel = NIVELES.find(n => puntuacion >= n.min) ?? NIVELES[NIVELES.length - 1];
+  const nivelPorPuntos = NIVELES.find(n => puntuacion >= n.min) ?? NIVELES[NIVELES.length - 1];
+  /**
+   * Hallazgo 3737: 18 de las 25 afirmaciones son mitos y el orden es fijo, así que pulsar siempre
+   * «Mito» sin leer daba 18/25 e «Investigador/a: buen conocimiento científico». Para pasar de
+   * «Aprendiz» hay que acertar al menos la cuarta parte de las verdades Y de los mitos: contestar
+   * siempre lo mismo deja uno de los dos tipos a cero y no distingue unas afirmaciones de otras.
+   */
+  const aciertosVerdad = aciertos.filter((a, i) => a && PREGUNTAS[i].esVerdad).length;
+  const aciertosMito = aciertos.filter((a, i) => a && !PREGUNTAS[i].esVerdad).length;
+  const sinDistinguir =
+    aciertosVerdad < Math.ceil(TOTAL_VERDADES / 4) || aciertosMito < Math.ceil(TOTAL_MITOS / 4);
+  const nivelAprendiz = NIVELES.find(n => n.nombre === 'Aprendiz') ?? nivelPorPuntos;
+  const nivelRecortado = sinDistinguir && nivelPorPuntos.min > nivelAprendiz.min;
+  const nivel = nivelRecortado ? nivelAprendiz : nivelPorPuntos;
 
   /**
    * Doble toque (hallazgos 3734, 3735 y 3736). No había guarda: el 2.º clic de «Siguiente» o de
@@ -448,7 +467,11 @@ export default function QuizMitosCiencia() {
           <div className={styles.finPanel} ref={resultadoRef} tabIndex={-1}>
             <div className={styles.nivelEmoji}>{nivel.emoji}</div>
             <h2 className={styles.nivelNombre}>{nivel.nombre}</h2>
-            <p className={styles.nivelDesc}>{nivel.descripcion}</p>
+            <p className={styles.nivelDesc}>
+              {nivelRecortado
+                ? `Has acertado ${aciertosVerdad} de ${TOTAL_VERDADES} verdades y ${aciertosMito} de ${TOTAL_MITOS} mitos. Como casi tres de cada cuatro afirmaciones son mitos, contestar casi siempre lo mismo suma aciertos sin distinguir unas de otras: para pasar de «Aprendiz» hay que acertar al menos la cuarta parte de cada tipo.`
+                : nivel.descripcion}
+            </p>
 
             <div className={styles.puntuacionBig}>
               <span className={styles.puntNum}>{puntuacion}</span>
@@ -542,7 +565,7 @@ export default function QuizMitosCiencia() {
                 <td><span aria-hidden="true">🧬</span> Biología</td>
                 <td>El azúcar causa hiperactividad en niños</td>
                 <td>Efecto nocebo: los padres perciben lo que esperan percibir</td>
-                <td>Más de 12 estudios con doble ciego en JAMA lo desmienten consistentemente</td>
+                <td>Un metaanálisis publicado en JAMA (1995), que reúne más de una docena de estudios con doble ciego, no encontró efecto del azúcar en la conducta</td>
               </tr>
               <tr>
                 <td><span aria-hidden="true">🐙</span> Sorpresas</td>
@@ -599,7 +622,7 @@ export default function QuizMitosCiencia() {
           </div>
           <div className={styles.faqItem}>
             <h4>¿Son igual de difíciles las preguntas de verdad que las de mito?</h4>
-            <p>Las verdades sorprendentes (pulpos con 3 corazones, Sol de tamaño mediano, miel que dura miles de años) suelen ser las más difíciles porque el instinto es marcarlas como &quot;mito&quot; por lo extraordinarias que parecen. Las verdades científicas a veces superan en sorpresa a los propios mitos.</p>
+            <p>Las verdades sorprendentes (pulpos con 3 corazones, un Sol más grande que la mayoría de las estrellas, miel que dura miles de años) suelen ser las más difíciles porque el instinto es marcarlas como &quot;mito&quot; por lo extraordinarias que parecen. Las verdades científicas a veces superan en sorpresa a los propios mitos.</p>
             <div className={styles.faqTip}>El truco cognitivo del quiz: lo que parece absurdo puede ser verdad, y lo que parece obvio puede ser completamente falso. La ciencia desafía ambas direcciones.</div>
           </div>
           <div className={styles.faqItem}>
