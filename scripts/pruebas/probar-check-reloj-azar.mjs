@@ -30,6 +30,13 @@
  *  16. `hoyISOLocal()` sin argumentos en el inicializador: el ayudante canónico también lee el
  *      reloj. Debe FALLAR.
  *
+ * La forma C, el cálculo de un `useMemo` (cabo C0809, 17/11/2026):
+ *  17. CASO DE ORIGEN · visualizador-seleccion-natural en 3e5d4bc19 (baraja con Math.random en
+ *      generarPoblacion, que llama un useMemo), como fichero NUEVO. Debe FALLAR.
+ *  18. El mismo ya commiteado, y el commit solo añade un comentario. Debe CALLAR: es pasivo.
+ *  19. Math.random dentro de un useCallback: no corre en el render. Debe CALLAR.
+ *  20. Un useMemo con new Date(2026, 0, 1), con argumentos. Debe CALLAR.
+ *
  * No escribe NADA en el repositorio: todo vive en directorios temporales.
  */
 
@@ -49,6 +56,12 @@ const GASTOS = 'app/control-gastos/page.tsx';
 const MASCOTA = 'app/planificador-mascota/page.tsx';
 const ACTAS = 'app/generador-actas/page.tsx';
 const KMEANS = 'app/simulador-kmeans/page.tsx';
+const SELECCION = 'app/visualizador-seleccion-natural/page.tsx';
+const SELECCION_ORIGEN = version('3e5d4bc19', SELECCION);
+if (!SELECCION_ORIGEN[SELECCION].includes('useMemo(() => generarPoblacion(generacion)')) {
+  console.error('❌ El caso de origen de la forma C ya no es el que era: visualizador-seleccion-natural en 3e5d4bc19 no llama a generarPoblacion desde un useMemo');
+  process.exit(1);
+}
 
 const GASTOS_ANTES = version('8a4c1c03^', GASTOS);
 const ACTAS_REPARADO = version('e3ba909f', ACTAS);
@@ -114,6 +127,20 @@ const CASOS = [
   {
     n: 16, nombre: 'hoyISOLocal() sin argumentos en el inicializador', debeFallar: true,
     despues: pagina('  const [fecha] = useState(hoyISOLocal());\n  return <input type="date" value={fecha} readOnly />;'),
+  },
+  { n: 17, nombre: 'CASO DE ORIGEN · visualizador-seleccion-natural: el azar llega a un useMemo por una función local', debeFallar: true, despues: SELECCION_ORIGEN },
+  {
+    n: 18, nombre: 'pasivo de la forma C: el commit solo añade un comentario', debeFallar: false,
+    antes: SELECCION_ORIGEN,
+    despues: { [SELECCION]: SELECCION_ORIGEN[SELECCION].replace("'use client';", "'use client';\n// retocado") },
+  },
+  {
+    n: 19, nombre: 'Math.random dentro de un useCallback, que no corre en el render', debeFallar: false,
+    despues: pagina('  const [n, setN] = useState(0);\n  const tirar = useCallback(() => setN(Math.random()), []);\n  return <button type="button" onClick={tirar}>{n}</button>;'),
+  },
+  {
+    n: 20, nombre: 'useMemo con new Date con argumentos', debeFallar: false,
+    despues: pagina('  const mes = useMemo(() => new Date(2026, 0, 1).getMonth(), []);\n  return <p>{mes}</p>;'),
   },
 ];
 

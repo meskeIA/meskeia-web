@@ -18,6 +18,11 @@
  *        useState<Acta>({ …, fecha: new Date().toISOString()… })     ← generador-actas
  *   B. El `min` o el `max` de un `<input>` de fecha calculados en el render:
  *        const hoy = new Date().toISOString().split('T')[0];  …  max={hoy}   ← planificador-mascota
+ *   C. El cálculo de un `useMemo` que llega al reloj o al azar (cabo C0809, 17/11/2026):
+ *        useMemo(() => generarPoblacion(generacion), [generacion])   ← visualizador-seleccion-natural
+ *      baraja con Math.random: el HTML servido trae otro orden y React no corrige los atributos
+ *      (25 de 40 aria-label distintos de sus props, medido por el Inspector). `useCallback` no
+ *      cuenta: su función no corre en el render. Como las otras dos, solo rompe en lo AÑADIDO.
  *
  * Fuentes que cuenta: `Math.random()`, `crypto.randomUUID()`, `Date.now()`, `new Date()` SIN
  * argumentos y los ayudantes de `@/lib` que leen el reloj cuando se llaman sin argumentos
@@ -48,7 +53,8 @@
  * se prerenderiza, se ve bien. Eso se decide app a app, y lo decide el Inspector.
  *
  * NO ve lo que llega al reloj a través de otro fichero (un hook propio, un motor importado) ni
- * el texto calculado en el render fuera de un `useState` o de un `min`/`max`. Eso se mide en
+ * el texto calculado en el render fuera de un `useState`, un `useMemo` o un `min`/`max` (una
+ * constante suelta en el cuerpo del componente, por ejemplo). Eso se mide en
  * navegador comparando el DOM servido con el estado tras hidratar.
  *
  * Escape: «reloj-ok: <razón>» en la línea del sitio, en la anterior, o junto a la fuente. La
@@ -219,10 +225,12 @@ function buscarFuentes(nodo, saltos = SALTOS, vistos = new Set(), via = null) {
 
 // ─── Sitios ───────────────────────────────────────────────────────────────────
 
-const esUseState = (n) =>
+const esLlamadaA = (gancho) => (n) =>
   ts.isCallExpression(n) && n.arguments.length > 0 && (
-    (ts.isIdentifier(n.expression) && n.expression.text === 'useState') ||
-    (ts.isPropertyAccessExpression(n.expression) && n.expression.name.text === 'useState'));
+    (ts.isIdentifier(n.expression) && n.expression.text === gancho) ||
+    (ts.isPropertyAccessExpression(n.expression) && n.expression.name.text === gancho));
+const esUseState = esLlamadaA('useState');
+const esUseMemo = esLlamadaA('useMemo');
 
 function tipoDeInput(atributos) {
   for (const a of atributos.properties) {
@@ -240,6 +248,12 @@ function sitiosDe(sf) {
     if (esUseState(n)) {
       const fuentes = buscarFuentes(n.arguments[0]);
       if (fuentes.length) sitios.push({ forma: 'A', nodo: n, fuentes, que: 'valor inicial de useState' });
+    }
+    // Forma C (cabo C0809): el cálculo de un useMemo también corre en el render, en el build y al
+    // hidratar. useCallback no: su función no se ejecuta al renderizar.
+    if (esUseMemo(n)) {
+      const fuentes = buscarFuentes(n.arguments[0]);
+      if (fuentes.length) sitios.push({ forma: 'C', nodo: n, fuentes, que: 'cálculo de useMemo' });
     }
     if ((ts.isJsxSelfClosingElement(n) || ts.isJsxOpeningElement(n))
         && n.tagName.getText() === 'input' && TIPOS_FECHA.has(tipoDeInput(n.attributes))) {
@@ -273,7 +287,7 @@ for (const rel of objetivos()) {
   const abs = path.join(RAIZ, rel);
   if (!fs.existsSync(abs)) continue;
   const texto = fs.readFileSync(abs, 'utf8');
-  if (!/useState|type=/.test(texto)) continue;
+  if (!/useState|useMemo|type=/.test(texto)) continue;
   const lineas = texto.split('\n');
   const sf = ts.createSourceFile(rel, texto, ts.ScriptTarget.Latest, true,
     rel.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
