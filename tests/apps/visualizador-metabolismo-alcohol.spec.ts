@@ -228,8 +228,8 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     expect(await icono('Estómago')).not.toBe('\u{1FAC1}');
   });
 
-  test('HALLAZGO ABIERTO [contenido/bajo]: el FAQPage trae cinco preguntas que la página no muestra', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 17/11/2026) [contenido/bajo]
+  test('REPARADO (hallazgo 4921) [contenido/bajo]: el FAQPage traía cinco preguntas que la página no mostraba', async ({ page }) => {
+    // REPARADO 17/11/2026: la guía pinta PREGUNTAS_FRECUENTES, de donde sale también el FAQPage.
     // ENTRADA  los dos bloques JSON-LD y el texto de la página (guía incluida)
     // ESPERADO cada pregunta del FAQPage pintada en una FAQ visible, las dos de PREGUNTAS_FRECUENTES
     //          (CLAUDE.md §1.ter, cabo C0593)
@@ -237,14 +237,17 @@ test.describe('visualizador-metabolismo-alcohol', () => {
     await comprobarFaqPageUnico(page);
   });
 
-  test('HALLAZGO ABIERTO [contenido/bajo]: el JSON-LD no es WebApplication ni declara características', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 17/11/2026) [contenido/bajo]
+  test('REPARADO (hallazgo 4922) [contenido/bajo]: el JSON-LD no era WebApplication ni declaraba características', async ({ page }) => {
+    // REPARADO 17/11/2026: generateWebAppSchema con url y cinco características vistas en la app.
     // ENTRADA  el bloque JSON-LD que no es el FAQPage
     // ESPERADO WebApplication con url y 4-8 características reales (CLAUDE.md §1.ter)
     // OBTENIDO «@type»: «EducationalContent», sin url, sin featureList ni features
     const app = (await jsonLd(page)).find((n) => n['@type'] !== 'FAQPage');
     expect(app?.['@type']).toBe('WebApplication');
-    expect((app?.featureList ?? app?.features ?? []).length).toBeGreaterThanOrEqual(4);
+    expect(app?.url).toBe('https://meskeia.com/visualizador-metabolismo-alcohol/');
+    const n = (app?.featureList ?? app?.features ?? []).length;
+    expect(n).toBeGreaterThanOrEqual(4);
+    expect(n).toBeLessThanOrEqual(8);
   });
 
   test('HALLAZGO ABIERTO [contenido/bajo]: el «%» va pegado a la cifra y «10g» sin espacio', async ({ page }) => {

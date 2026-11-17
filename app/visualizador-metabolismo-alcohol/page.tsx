@@ -11,6 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 // ─── Tipos ───────────────────────────────────────────
 type TabId = 'ruta' | 'organos' | 'aldh2' | 'cerebro';
@@ -515,6 +516,15 @@ export default function MetabolismoAlcoholPage() {
           <strong> dónde</strong> actúa —la exposición local de las mucosas, con picos breves en la saliva—
           y no por su cantidad: la exposición dominante procede del etanol.
         </p>
+
+        {/* FAQ visible: la misma fuente que el FAQPage (PREGUNTAS_FRECUENTES, hallazgo 4921). */}
+        <h3>Preguntas frecuentes</h3>
+        {PREGUNTAS_FRECUENTES.map((f) => (
+          <div key={f.question}>
+            <h4>{f.question}</h4>
+            <p>{f.answer}</p>
+          </div>
+        ))}
       </EducationalSection>
 
       <RelatedApps />
