@@ -12,11 +12,14 @@ import { esperarPaginaAsentada } from './_hidratacion';
  * antes de abrir el navegador.
  *
  * LA TABLA (índice de opción 0 = A, 1 = B, 2 = C · «—» = sin sesgo)
- *   Esc. 1 «La oferta segura»          A aversión a las pérdidas ALTO · B —
+ *   Esc. 1 «La apuesta a cara o cruz»  A aversión a las pérdidas ALTO · B —   (apuesta mixta desde el
+ *                                      17/11/2026, hallazgo 4907; antes, dos ganancias sin pérdida)
  *   Esc. 2 «La acción que no sube»     A — · B efecto de disposición ALTO · C disposición MODERADO
  *   Esc. 3 «La investigación sesgada»  A confirmación ALTO · B — · C —
  *   Esc. 4 «La fiebre del Bitcoin»     A manada ALTO · B — · C —
- *   Esc. 5 «Los cuatro años buenos»    A recencia ALTO · B — · C recencia MODERADO
+ *   Esc. 5 «Los cuatro años buenos»    A recencia ALTO · B — · C —   (5C marcaba recencia MODERADO
+ *                                      hasta el 17/11/2026, hallazgo 4908: esperar una corrección no es
+ *                                      extrapolar la racha)
  *   Esc. 6 «El stock picker»           A exceso de confianza ALTO · B — · C exceso MODERADO
  *   Esc. 7 «El precio de compra»       A anclaje ALTO · B — · C —
  *   Esc. 8 «La cartera abandonada»     A statu quo ALTO · B — · C statu quo MODERADO
@@ -111,18 +114,19 @@ test.describe('Caso normal: A, A, B, A, C, B, C, C', () => {
   test('el recuento sigue la tabla escenario a escenario y el perfil sale «moderada-alta»', async ({ page }) => {
     await abrir(page);
     await empezar(page);
-    // Resuelto a mano con la tabla de la cabecera, antes de abrir el navegador:
-    //   1A aversión ALTO (1) · 2A — (1) · 3B — (1) · 4A manada ALTO (2) · 5C recencia MOD (3)
-    //   6B — (3) · 7C — (3) · 8C statu quo MOD (4)
+    // Resuelto a mano con la tabla de la cabecera, antes de abrir el navegador. Desde el 17/11/2026
+    // (hallazgo 4908) 5C no marca sesgo, así que el recorrido da 3 y no 4:
+    //   1A aversión ALTO (1) · 2A — (1) · 3B — (1) · 4A manada ALTO (2) · 5C — (2)
+    //   6B — (2) · 7C — (2) · 8C statu quo MOD (3)
     const pasos: Array<{ opcion: number; veredicto: string; contador: string }> = [
       { opcion: 0, veredicto: '🔴 Aversión a las pérdidas detectado', contador: '1 sesgo detectado' },
       { opcion: 0, veredicto: '✅ Decisión racional', contador: '1 sesgo detectado' },
       { opcion: 1, veredicto: '✅ Decisión racional', contador: '1 sesgo detectado' },
       { opcion: 0, veredicto: '🔴 Efecto manada detectado', contador: '2 sesgos detectados' },
-      { opcion: 2, veredicto: '🟡 Sesgo de recencia detectado', contador: '3 sesgos detectados' },
-      { opcion: 1, veredicto: '✅ Decisión racional', contador: '3 sesgos detectados' },
-      { opcion: 2, veredicto: '✅ Decisión racional', contador: '3 sesgos detectados' },
-      { opcion: 2, veredicto: '🟡 Sesgo del statu quo detectado', contador: '4 sesgos detectados' },
+      { opcion: 2, veredicto: '✅ Decisión racional', contador: '2 sesgos detectados' },
+      { opcion: 1, veredicto: '✅ Decisión racional', contador: '2 sesgos detectados' },
+      { opcion: 2, veredicto: '✅ Decisión racional', contador: '2 sesgos detectados' },
+      { opcion: 2, veredicto: '🟡 Sesgo del statu quo detectado', contador: '3 sesgos detectados' },
     ];
     for (const [n, paso] of pasos.entries()) {
       await expect(page.getByText(`Escenario ${n + 1} de 8`)).toBeVisible();
@@ -132,26 +136,26 @@ test.describe('Caso normal: A, A, B, A, C, B, C, C', () => {
       await botonSiguiente(page).click();
     }
 
-    // 4 detectados, 2 altos → ni 0 ni ≥ 4 altos, pero ≥ 2: «Presencia moderada-alta»; icono 📊
+    // 3 detectados, 2 altos → ni 0 ni ≥ 4 altos, pero ≥ 2: «Presencia moderada-alta»; icono 📊
     // porque 2 < 3 altos.
-    await expect(tituloResultado(page)).toHaveText('4 sesgos detectados');
+    await expect(tituloResultado(page)).toHaveText('3 sesgos detectados');
     await expect(perfil(page)).toHaveText(/^Presencia moderada-alta de sesgos\./);
     await expect(tituloResultado(page).locator('xpath=preceding-sibling::span[1]')).toHaveText('📊');
     await expect(cifra(page, ALTO)).toHaveText('2');
-    await expect(cifra(page, MODERADO)).toHaveText('2');
-    await expect(cifra(page, NO_DETECTADOS)).toHaveText('4'); // 8 − 4
+    await expect(cifra(page, MODERADO)).toHaveText('1');
+    await expect(cifra(page, NO_DETECTADOS)).toHaveText('5'); // 8 − 3
     // Los altos van delante de los moderados (el `sort` de `sesgosOrdenados`); el orden entre
     // dos altos no lo promete la app, así que se comparan como conjunto.
     await expect(insignias(page)).toHaveText([
-      '🔴 Impacto alto', '🔴 Impacto alto', '🟡 Impacto moderado', '🟡 Impacto moderado',
+      '🔴 Impacto alto', '🔴 Impacto alto', '🟡 Impacto moderado',
     ]);
     const nombres = await tarjetas(page).allInnerTexts();
     expect(nombres.slice(0, 2).sort()).toEqual(['Aversión a las pérdidas', 'Efecto manada']);
-    expect(nombres.slice(2).sort()).toEqual(['Sesgo de recencia', 'Sesgo del statu quo']);
-    // Los cuatro que faltan, en el orden de INFO_SESGOS
+    expect(nombres.slice(2)).toEqual(['Sesgo del statu quo']);
+    // Los cinco que faltan, en el orden de INFO_SESGOS
     await expect(sinEvidencia(page)).toHaveText(
       // [\s\S] en vez del flag /s, que el target del tsconfig (anterior a es2018) no admite
-      /Efecto de disposición[\s\S]*Sesgo de confirmación[\s\S]*Exceso de confianza[\s\S]*Sesgo de anclaje/,
+      /Efecto de disposición[\s\S]*Sesgo de confirmación[\s\S]*Sesgo de recencia[\s\S]*Exceso de confianza[\s\S]*Sesgo de anclaje/,
     );
 
     // «Repetir simulación» vuelve al escenario 1 con el contador a cero
@@ -277,17 +281,17 @@ test.describe('Móvil (Pixel 7)', () => {
     hasTouch: true,
   });
 
-  test('el caso 1 a toques da el mismo 2 / 2 / 4 y la página no desborda en horizontal', async ({ page }) => {
+  test('el caso 1 a toques da el mismo 2 / 1 / 5 y la página no desborda en horizontal', async ({ page }) => {
     await abrir(page);
     await page.getByRole('button', { name: /Empezar simulación/ }).tap();
     for (const i of [0, 0, 1, 0, 2, 1, 2, 2]) {
       await opciones(page).nth(i).tap();
       await botonSiguiente(page).tap();
     }
-    await expect(tituloResultado(page)).toHaveText('4 sesgos detectados');
+    await expect(tituloResultado(page)).toHaveText('3 sesgos detectados');
     await expect(cifra(page, ALTO)).toHaveText('2');
-    await expect(cifra(page, MODERADO)).toHaveText('2');
-    await expect(cifra(page, NO_DETECTADOS)).toHaveText('4');
+    await expect(cifra(page, MODERADO)).toHaveText('1');
+    await expect(cifra(page, NO_DETECTADOS)).toHaveText('5');
     const [ancho, ventana] = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
     expect(ancho).toBeLessThanOrEqual(ventana);
   });
@@ -346,21 +350,24 @@ async function ponerTema(page: Page, tema: 'light' | 'dark'): Promise<void> {
 // repararlo se quita esa línea y queda como regresión.
 // ============================================================
 test.describe('Hallazgos 17/11/2026', () => {
-  test('ABIERTO — el escenario 1 diagnostica «aversión a las pérdidas» en una elección sin pérdidas', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4907) — el escenario 1 diagnosticaba «aversión a las pérdidas» en una elección sin pérdidas', async ({ page }) => {
     await abrir(page);
     await empezar(page);
-    // Las dos opciones son ganancias: 2.000 € seguros frente a 50 % de 4.000 € y 50 % de 0 €
-    // (valor esperado 2.000 € en las dos). No hay pérdida posible en ninguna, así que elegir la
-    // segura es preferencia por la certeza en el dominio de las ganancias —lo que el propio
-    // feedback llama «aversión a la incertidumbre»—, no la aversión a las PÉRDIDAS que la app
-    // define como «el dolor de perder 100 €». Y con utilidad cóncava esa elección es racional.
+    // Antes: las dos opciones eran ganancias (2.000 € seguros frente a 50 % de 4.000 € y 50 % de
+    // 0 €), así que elegir la segura era preferencia por la certeza, no aversión a las PÉRDIDAS. La
+    // ficha admitía dos arreglos: una apuesta mixta o cambiar el sesgo. Se hizo la apuesta mixta:
+    // cara gana 150 €, cruz pierde 100 €. Valor esperado 0,5 × 150 − 0,5 × 100 = +25 €, y rechazarla
+    // (la opción A) sí es la señal de aversión a las pérdidas; aceptarla, coherente con el valor esperado.
+    expect(0.5 * 150 - 0.5 * 100).toBe(25);
+    await expect(opciones(page).nth(0)).toContainText('perder 100');
+    await expect(page.locator('main')).toContainText('si sale cruz pierdes 100');
     await opciones(page).nth(0).click();
-    await expect(veredicto(page)).not.toContainText('Aversión a las pérdidas');
+    await expect(veredicto(page)).toContainText('Aversión a las pérdidas');
+    await expect(page.locator('main')).toContainText('+25');
+    await expect(page.locator('main')).not.toContainText('Elección racional');
   });
 
-  test('ABIERTO — elegir 5C («habrá una corrección») da una tarjeta que dice «esperas que siga subiendo»', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4908) — elegir 5C («habrá una corrección») daba una tarjeta que dice «esperas que siga subiendo»', async ({ page }) => {
     await abrir(page);
     await empezar(page);
     // Solo 5C con sesgo. La app marca «Sesgo de recencia» y la tarjeta del resultado le atribuye
@@ -368,8 +375,10 @@ test.describe('Hallazgos 17/11/2026', () => {
     // subiendo» y «Aumentas la exposición a riesgo justo antes de una corrección». Además el
     // feedback de 5A dice que «tras períodos prolongados de subidas las valoraciones suelen ser
     // más exigentes», que es el razonamiento de 5C.
+    // Ahora 5C no marca sesgo (esperar una corrección no es extrapolar la racha): perfil sin sesgos.
     await contestar(page, [1, 0, 1, 1, 2, 1, 1, 1]);
     await expect(page.locator('main')).not.toContainText('esperas que siga subiendo');
+    await expect(tituloResultado(page)).toHaveText('Sin sesgos detectados');
   });
 
   test('ABIERTO — al contestar, el foco cae a <body> y el veredicto no se anuncia', async ({ page }) => {

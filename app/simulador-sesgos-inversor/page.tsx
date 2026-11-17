@@ -46,7 +46,7 @@ const INFO_SESGOS: Record<string, InfoSesgo> = {
     nombre: 'Aversión a las pérdidas',
     emoji: '😨',
     descripcion: 'El dolor de perder 100€ es psicológicamente más intenso que la satisfacción de ganar 100€. Daniel Kahneman demostró que las pérdidas pesan aproximadamente el doble que las ganancias equivalentes.',
-    impacto: 'Vendes activos ganadores demasiado pronto para "asegurar" la ganancia. Aguantas posiciones perdedoras esperando recuperar. Evitas inversiones con buena rentabilidad esperada por miedo a la volatilidad.',
+    impacto: 'Puede llevarte a vender activos ganadores demasiado pronto para "asegurar" la ganancia, a aguantar posiciones perdedoras esperando recuperar y a evitar inversiones con buena rentabilidad esperada por miedo a la volatilidad.',
     comoEvitar: 'Define stop-loss antes de entrar. Evalúa siempre el valor futuro esperado, no el precio de compra. Automatiza las decisiones periódicas (p.ej. aportaciones mensuales) para eliminar la emoción del momento.',
   },
   'efecto-disposicion': {
@@ -101,23 +101,28 @@ const INFO_SESGOS: Record<string, InfoSesgo> = {
 };
 
 const ESCENARIOS: Escenario[] = [
+  // Hallazgo 4907 (17/11/2026): era «2.000 € seguros o 50 % de 4.000 €», dos ganancias sin pérdida
+  // posible, y diagnosticaba aversión a las PÉRDIDAS; preferir lo seguro con el mismo valor esperado
+  // es aversión al riesgo, que la utilidad esperada no tiene por irracional. Para medir aversión a las
+  // pérdidas hace falta una apuesta mixta: rechazar una pequeña, con valor esperado positivo y una
+  // pérdida asumible, es la señal que describieron Kahneman y Tversky.
   {
     id: 1,
-    titulo: 'La oferta segura',
-    contexto: 'Tienes 10.000€ para invertir. Tu asesor te presenta dos opciones con exactamente el mismo valor esperado matemático.',
-    pregunta: '¿Cuál eliges?',
+    titulo: 'La apuesta a cara o cruz',
+    contexto: 'Tienes 10.000€ invertidos. Te ofrecen una sola apuesta a cara o cruz con una moneda sin trucar: si sale cara ganas 150€; si sale cruz pierdes 100€. Perder esos 100€ no cambiaría tus planes.',
+    pregunta: '¿La aceptas?',
     opciones: [
       {
-        texto: 'A) Ganar 2.000€ asegurados',
+        texto: 'A) No: perder 100€ me pesa más que ganar 150€',
         sesgoId: 'aversion-perdidas',
         nivel: 'alto',
-        feedbackInmediato: 'Elegir la opción segura cuando el valor esperado es idéntico revela aversión a la incertidumbre. En inversión, esta preferencia lleva a evitar activos volátiles con mejor rentabilidad a largo plazo.',
+        feedbackInmediato: 'Rechazar una apuesta pequeña con valor esperado positivo (+25€) porque la pérdida pesa más que una ganancia mayor es la señal típica de aversión a las pérdidas. Con importes tan pequeños frente a tu patrimonio, el riesgo apenas lo explica.',
       },
       {
-        texto: 'B) 50% de probabilidad de ganar 4.000€ y 50% de no ganar nada',
+        texto: 'B) Sí: con importes así, gano 25€ de media por jugada',
         sesgoId: null,
         nivel: 'ninguno',
-        feedbackInmediato: 'Elección racional. Ambas opciones tienen el mismo valor esperado (2.000€). No mostrar preferencia irracional por la seguridad es una ventaja en inversión a largo plazo.',
+        feedbackInmediato: 'Decisión coherente con el valor esperado: 0,5 × 150€ − 0,5 × 100€ = +25€. Con una pérdida que no cambia tus planes, la aceptas sin dar a los 100€ más peso que a los 150€.',
       },
     ],
   },
@@ -217,11 +222,13 @@ const ESCENARIOS: Escenario[] = [
         nivel: 'ninguno',
         feedbackInmediato: 'Respuesta honesta y correcta. La incertidumbre genuina es la postura más realista. Los mercados pueden seguir subiendo, corregir o moverse lateralmente — y nadie lo sabe con certeza.',
       },
+      // Hallazgo 4908 (17/11/2026): marcaba «Sesgo de recencia», que la app define como extrapolar lo
+      // reciente, y su tarjeta decía «esperas que siga subiendo»: lo contrario de lo contestado.
       {
         texto: 'C) Probablemente habrá una corrección después de tanto tiempo subiendo',
-        sesgoId: 'recencia',
-        nivel: 'moderado',
-        feedbackInmediato: 'También puede ser un sesgo de recencia en sentido contrario ("mean reversion"). Los mercados pueden seguir subiendo más tiempo del que parece razonable. El tiempo en el mercado supera al timing del mercado.',
+        sesgoId: null,
+        nivel: 'ninguno',
+        feedbackInmediato: 'No extrapolas la racha, así que no es sesgo de recencia. Ten en cuenta, eso sí, que una racha larga no obliga a que llegue una corrección ni dice cuándo: las valoraciones pueden ser más exigentes, pero los mercados pueden seguir subiendo más tiempo del que parece razonable.',
       },
     ],
   },
@@ -530,7 +537,8 @@ export default function SimuladorSesgosInversorPage() {
                       <p className={styles.sesgoDesc}>{info.descripcion}</p>
                       <div className={styles.sesgoDetalle}>
                         <div className={styles.sesgoDetalleItem}>
-                          <strong>Cómo te afecta:</strong>
+                          {/* «puede»: la respuesta a un escenario no deja deducir la conducta (hallazgo 4907) */}
+                          <strong>Cómo puede afectarte:</strong>
                           <p>{info.impacto}</p>
                         </div>
                         <div className={styles.sesgoDetalleItem}>
