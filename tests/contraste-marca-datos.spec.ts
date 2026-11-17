@@ -227,6 +227,9 @@ const APPS: App[] = [
   { slug: 'visualizador-insulina-glucosa', todo: true },
   // 13/11/2026: en oscuro, el R₀ alto sobre su tinte rojo caía a la reserva #e74c3c de su receta (4,03:1)
   { slug: 'visualizador-modelos-epidemiologicos', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 17/11/2026 (de paso por C0297): el botón activo del estado de la curva de rendimientos, blanco
+  // sobre el color puro del estado con style (Normal en 22c55e, 2,28:1)
+  { slug: 'visualizador-ciclo-economico', todo: true },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

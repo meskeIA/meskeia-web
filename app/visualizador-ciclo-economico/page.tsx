@@ -3,6 +3,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import styles from './VisualizadorCicloEconomico.module.css';
+import { formatNumber } from '@/lib';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import LegalNotice from '@/components/LegalNotice';
@@ -522,6 +523,19 @@ export default function VisualizadorCicloEconomicoPage() {
     plana: '#eab308',
     invertida: '#ef4444',
   };
+  // El color del estado se queda en la curva y en el borde; el texto va en su tono de TEXTO por
+  // tema, y el blanco del botón activo sobre el color oscurecido, igual en los dos temas (C0297):
+  // sobre el color puro daba 2,28:1 (verde) y 1,92:1 (ámbar).
+  const textoCurva: Record<CurvaEstado, string> = {
+    normal: styles.svgTextoVerde,
+    plana: styles.svgTextoAmbar,
+    invertida: styles.svgTextoRojo,
+  };
+  const fondosBotonCurva: Record<CurvaEstado, string> = {
+    normal: '#136E35',
+    plana: '#8A5A00',
+    invertida: '#B91C1C',
+  };
 
   return (
     <div className={styles.container}>
@@ -572,8 +586,8 @@ export default function VisualizadorCicloEconomicoPage() {
               />
 
               {/* Etiquetas del eje */}
-              <text x={PADDING} y={SVG_H / 2 - 78} fontSize="10" fill="#9ca3af" textAnchor="middle">Pico</text>
-              <text x={PADDING} y={SVG_H / 2 + 88} fontSize="10" fill="#9ca3af" textAnchor="middle">Valle</text>
+              <text x={PADDING} y={SVG_H / 2 - 78} fontSize="10" className={styles.svgEje} textAnchor="middle">Pico</text>
+              <text x={PADDING} y={SVG_H / 2 + 88} fontSize="10" className={styles.svgEje} textAnchor="middle">Valle</text>
 
               {/* Curva del ciclo */}
               <path
@@ -624,10 +638,13 @@ export default function VisualizadorCicloEconomicoPage() {
               />
 
               {/* Etiquetas de fase sobre la curva */}
-              <text x={110} y={60} fontSize="11" fill="#22c55e" fontWeight="600" textAnchor="middle">Expansión</text>
-              <text x={265} y={45} fontSize="11" fill="#eab308" fontWeight="600" textAnchor="middle">Pico</text>
-              <text x={420} y={185} fontSize="11" fill="#ef4444" fontWeight="600" textAnchor="middle">Recesión</text>
-              <text x={570} y={90} fontSize="11" fill="#3b82f6" fontWeight="600" textAnchor="middle">Valle</text>
+              {/* El color de la fase va en la curva; el rótulo, en su tono de TEXTO por tema (C0297) */}
+              <text x={110} y={60} fontSize="11" className={styles.svgTextoVerde} fontWeight="600" textAnchor="middle">Expansión</text>
+              <text x={265} y={45} fontSize="11" className={styles.svgTextoAmbar} fontWeight="600" textAnchor="middle">Pico</text>
+              {/* Bajo el valle de la curva (y 180): en y 185 el punto de la fase elegida, en (427, 179),
+                  le caía encima (1,73:1) */}
+              <text x={420} y={207} fontSize="11" className={styles.svgTextoRojo} fontWeight="600" textAnchor="middle">Recesión</text>
+              <text x={570} y={90} fontSize="11" className={styles.svgTextoAzul} fontWeight="600" textAnchor="middle">Valle</text>
             </svg>
 
             <button
@@ -826,7 +843,7 @@ export default function VisualizadorCicloEconomicoPage() {
                 key={estado}
                 className={`${styles.btnPrimario} ${curvaEstado === estado ? styles.btnPrimarioActivo : styles.btnSecundario}`}
                 onClick={() => setCurvaEstado(estado)}
-                style={curvaEstado === estado ? { background: coloresCurva[estado] } : {}}
+                style={curvaEstado === estado ? { background: fondosBotonCurva[estado] } : {}}
                 aria-pressed={curvaEstado === estado}
               >
                 {estado === 'normal'
@@ -856,7 +873,7 @@ export default function VisualizadorCicloEconomicoPage() {
                 return (
                   <g key={v}>
                     <line x1={YC_PAD_L} y1={y} x2={YC_W - YC_PAD_R} y2={y} stroke="#f3f4f6" strokeWidth="1" />
-                    <text x={YC_PAD_L - 5} y={y + 4} fontSize="9" fill="#9ca3af" textAnchor="end">{v}%</text>
+                    <text x={YC_PAD_L - 5} y={y + 4} fontSize="9" className={styles.svgEje} textAnchor="end">{`${v} %`}</text>
                   </g>
                 );
               })}
@@ -865,7 +882,7 @@ export default function VisualizadorCicloEconomicoPage() {
               {YIELD_LABELS.map((label, i) => {
                 const x = YC_PAD_L + (i / (YIELD_LABELS.length - 1)) * (YC_W - YC_PAD_L - YC_PAD_R);
                 return (
-                  <text key={label} x={x} y={YC_H - YC_PAD_B + 16} fontSize="9" fill="#9ca3af" textAnchor="middle">
+                  <text key={label} x={x} y={YC_H - YC_PAD_B + 16} fontSize="9" className={styles.svgEje} textAnchor="middle">
                     {label}
                   </text>
                 );
@@ -878,8 +895,8 @@ export default function VisualizadorCicloEconomicoPage() {
                 return (
                   <g key={i}>
                     <circle cx={x} cy={y} r="4" fill={coloresCurva[curvaEstado]} stroke="white" strokeWidth="1.5" />
-                    <text x={x} y={y - 9} fontSize="9" fill={coloresCurva[curvaEstado]} textAnchor="middle" fontWeight="600">
-                      {v.toFixed(1)}%
+                    <text x={x} y={y - 9} fontSize="9" className={textoCurva[curvaEstado]} textAnchor="middle" fontWeight="600">
+                      {`${formatNumber(v, 1)} %`}
                     </text>
                   </g>
                 );

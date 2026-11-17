@@ -394,6 +394,10 @@ const APPS: App[] = [
   // encima del borde inferior de las elipses (3,82 en oscuro) y los rótulos de las curvas en su color
   // puro (el rojo 3,49-3,79 en claro y 3,43-3,76 en oscuro, el verde 2,85, la marca 4,07 y 3,50)
   { slug: 'visualizador-enzimas-cuerpo-humano', secciones: SECCIONES, extremos: true },
+  // 17/11/2026: Pico y Valle del eje y los ejes de la curva de rendimientos en #9ca3af fijo (2,35:1
+  // en claro), los rótulos de las cuatro fases en su color puro (Expansión 22c55e, Pico eab308,
+  // Recesión ef4444, Valle 3b82f6) y las cifras de la curva en el color del estado
+  { slug: 'visualizador-ciclo-economico', subestados: "button[aria-pressed]" },
 ];
 
 interface TextoSvg {

@@ -153,6 +153,20 @@
   display: block;
 }
 
+/* Texto de los SVG (C0297): los ejes en el gris de texto del tema y cada fase o estado en su tono
+   de TEXTO por tema; el color puro del dato se queda en la curva. Fondo: --hover en claro, #222 en
+   oscuro. En claro, ≥ 4,5:1 sobre #F5F5F5; en oscuro, sobre #222. */
+.svgEje { fill: var(--text-secondary); }
+.svgTextoVerde { fill: #136E35; }
+.svgTextoAmbar { fill: #8A5A00; }
+.svgTextoRojo { fill: #B91C1C; }
+.svgTextoAzul { fill: #1D4ED8; }
+
+[data-theme='dark'] .svgTextoVerde { fill: #86EFAC; }
+[data-theme='dark'] .svgTextoAmbar { fill: #FCD34D; }
+[data-theme='dark'] .svgTextoRojo { fill: #FCA5A5; }
+[data-theme='dark'] .svgTextoAzul { fill: #93C5FD; }
+
 .btnPausarAnim {
   position: absolute;
   top: var(--spacing-sm);
@@ -542,18 +556,20 @@
   margin-left: auto;
 }
 
+/* Blanco sobre el color del tipo oscurecido, igual en los dos temas (C0297): sobre el color puro
+   daba 2,28:1 (verde), 1,92:1 (ámbar) y 3,76:1 (rojo) */
 .tipoBadge_leading {
-  background: #22c55e;
+  background: #136E35;
   color: white;
 }
 
 .tipoBadge_coincident {
-  background: #eab308;
+  background: #8A5A00;
   color: white;
 }
 
 .tipoBadge_lagging {
-  background: #ef4444;
+  background: #B91C1C;
   color: white;
 }
 
