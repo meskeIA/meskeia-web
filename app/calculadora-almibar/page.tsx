@@ -100,7 +100,9 @@ export default function CalculadoraAlmibarPage() {
               <ul className={styles.warningList}>
                 <li><strong>Disuelve bien el azúcar.</strong> Remueve hasta que el líquido quede transparente; si quedan cristales, pueden agarrar.</li>
                 <li><strong>No lo hiervas de más</strong> si lo quieres ligero: cuanto más cuece, más se concentra y sube el °Brix.</li>
-                <li><strong>Deja enfriar antes de calar.</strong> El almíbar caliente reseca el bizcocho en vez de dar jugosidad.</li>
+                {/* Hallazgo 4935: «El almíbar caliente reseca el bizcocho» no tenía fuente y contradice lo que
+                    hace un líquido acuoso al empapar la miga; queda la instrucción, como en la FAQ (C0203). */}
+                <li><strong>Deja enfriar antes de calar.</strong></li>
                 <li><strong>Para puntos como bola o caramelo,</strong> usa la calculadora de puntos del azúcar: ahí manda la temperatura, no solo la proporción.</li>
               </ul>
             </div>
