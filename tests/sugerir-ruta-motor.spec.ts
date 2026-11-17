@@ -97,6 +97,25 @@ test.describe('sugerirRuta (página 404)', () => {
     expect(sugerirRuta('/', implementedAppsUrls)).toBeNull();
   });
 
+  test('cabo C0800 · un enlace Markdown mal pegado sugiere el slug que la ruta ya trae entero', () => {
+    // Casos reales del 16/11/2026 (pag:404 en Turso, con sugerencia «ninguna»): la basura de
+    // alrededor bajaba el parecido de la ruta completa por debajo del umbral. En el primero hay dos
+    // slugs; manda el destino del enlace, que en Markdown va detrás.
+    expect(
+      sugerirRuta(
+        '/simulador-campo-electrico/meskeia.com/simulador-ley-coulomb/](https:/meskeia.com/simulador-ley-coulomb/',
+        implementedAppsUrls,
+      ),
+    ).toBe('/simulador-ley-coulomb/');
+    expect(
+      sugerirRuta('/simulador-ley-coulomb/](https:/meskeia.com/simulador-ley-coulomb/', implementedAppsUrls),
+    ).toBe('/simulador-ley-coulomb/');
+    // Control: seguía acertando antes y tiene que seguir.
+    expect(sugerirRuta('/simulador-planificador-procesos/**/', implementedAppsUrls)).toBe(
+      '/simulador-planificador-procesos/',
+    );
+  });
+
   test('INVARIANTE: cada URL del catálogo se sugiere a sí misma', () => {
     const fallan = implementedAppsUrls.filter((u) => sugerirRuta(u, implementedAppsUrls) !== u);
     expect(fallan).toEqual([]);

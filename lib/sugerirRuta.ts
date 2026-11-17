@@ -183,5 +183,30 @@ export function sugerirRuta(ruta: string, urls: readonly string[]): string | nul
       mejor = url;
     }
   }
-  return mejorParecido >= UMBRAL_SUGERENCIA ? mejor : null;
+  if (mejorParecido >= UMBRAL_SUGERENCIA) return mejor;
+  return slugContenido(slug, candidatos, urls);
+}
+
+/**
+ * Último recurso, cuando el parecido no llega al umbral: un tramo de la ruta que ES un slug del
+ * catálogo, tal cual. Cabo C0800 (17/11/2026): un enlace Markdown mal pegado
+ * (`/simulador-ley-coulomb/](https:/meskeia.com/simulador-ley-coulomb/`) trae el slug entero, pero
+ * la basura de alrededor baja el parecido de la ruta completa y la 404 no sugería nada. Gana el
+ * tramo que acaba más a la derecha —en un enlace Markdown, el destino va detrás del texto— y, a
+ * igual final, el más largo (`visualizador-historia/roma` antes que `roma`).
+ *
+ * Va DESPUÉS del parecido y no antes: con él delante, `/visualizador-historia/romma/` propondría
+ * `/visualizador-historia/` en vez de la cronología con la errata.
+ */
+function slugContenido(slug: string, candidatos: readonly string[], urls: readonly string[]): string | null {
+  const indice = new Map<string, number>();
+  candidatos.forEach((c, i) => indice.set(c, i));
+  const tramos = slug.split('/').filter(Boolean);
+  for (let fin = tramos.length; fin > 0; fin--) {
+    for (let inicio = 0; inicio < fin; inicio++) {
+      const i = indice.get(tramos.slice(inicio, fin).join('/'));
+      if (i !== undefined) return urls[i];
+    }
+  }
+  return null;
 }
