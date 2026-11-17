@@ -455,7 +455,7 @@ export default function GuiaMetricaEstrofasPage() {
                 <div className={styles.rimaPar}>
                   <span className={styles.rimaVerso}>&ldquo;Cerrar podrá mis ojos la postrera&rdquo;</span>
                   <span className={styles.rimaVerso}>&ldquo;mas no de esotra parte en la ribera&rdquo;</span>
-                  <span className={styles.rimaIndicador}>-era / -era ✓ (consonante)</span>
+                  <span className={styles.rimaIndicador}>-era / -era <span aria-hidden="true">✓</span> (consonante)</span>
                 </div>
               </div>
               <div className={styles.rimaTipoCard}>
@@ -464,7 +464,7 @@ export default function GuiaMetricaEstrofasPage() {
                 <div className={styles.rimaPar}>
                   <span className={styles.rimaVerso}>&ldquo;Verde viento. Verdes ramas&rdquo;</span>
                   <span className={styles.rimaVerso}>&ldquo;y el caballo en la montaña&rdquo;</span>
-                  <span className={styles.rimaIndicador}>rá-mas / ta-ña: á-a / á-a ✓ (asonante: mismas vocales desde la tónica)</span>
+                  <span className={styles.rimaIndicador}>rá-mas / ta-ña: á-a / á-a <span aria-hidden="true">✓</span> (asonante: mismas vocales desde la tónica)</span>
                 </div>
               </div>
             </div>
