@@ -309,6 +309,35 @@ test.describe('Hallazgos de la inspección del 16/11/2026', () => {
 });
 
 /**
+ * Cabo C0784 (17/11/2026) — el alcance del hallazgo 4879 en la ficha de Delegum del mismo dato.
+ * Su tabla y su texto se corrigieron el 16/11 (884445f56); su FAQPage seguía diciendo que el ITSGF
+ * grava «los patrimonios netos superiores a 3.000.000 €», y /api/datos solo servía ese número con
+ * el nombre «umbralITSGF». Ley 38/2022 (BOE, ELI consolidado, leído el 17/11/2026), art. 3.Nueve:
+ * «La base imponible se reducirá, en concepto de mínimo exento, en 700.000 euros»; art. 3.Once: la
+ * escala grava al 0 % la base liquidable hasta 3.000.000 €. Con cuota: patrimonio neto > 3.700.000 €.
+ */
+test.describe('Cabo C0784: la ficha de Delegum del Impuesto sobre el Patrimonio', () => {
+  test('REPARADO (cabo C0784) · el FAQPage de la ficha no dice que el ITSGF grave a partir de 3.000.000 € de patrimonio', async ({ page }) => {
+    await page.goto('/delegum/datos-fiscales/impuesto-patrimonio/');
+    const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+    expect(jsonLd).toContain('FAQPage');
+    expect(jsonLd).not.toMatch(/patrimonios? netos? superiores? a 3\.000\.000/);
+    expect(jsonLd).not.toMatch(/patrimonio supere los 3\.000\.000/);
+    expect(jsonLd).toMatch(/patrimonio neto superior a 3\.700\.000/);
+    expect(jsonLd).not.toContain('Umbral ITSGF');
+  });
+
+  test('REPARADO (cabo C0784) · /api/datos sirve, junto al tramo al 0 %, el mínimo exento y el patrimonio con cuota', async ({ page }) => {
+    const r = await page.request.get('/api/datos/impuesto-patrimonio/');
+    expect(r.ok()).toBe(true);
+    const cuerpo = (await r.json()) as { datos: Record<string, unknown> };
+    expect(cuerpo.datos.umbralITSGF).toBe(3_000_000);
+    expect(cuerpo.datos.itsgfMinimoExento).toBe(700_000);
+    expect(cuerpo.datos.itsgfPatrimonioNetoConCuota).toBe(3_700_000);
+  });
+});
+
+/**
  * Cabo C0789 — comprobación puntual del 17/11/2026 (dos sospechas sin caso de la primera inspección).
  *
  * Norma (BOE, leída el 17/11/2026):

@@ -9,7 +9,7 @@ import {
   FISCAL_SUCESIONES_META, TARIFA_ESTATAL_IS, COEFICIENTES_IS, REDUCCIONES_PARENTESCO_IS, BONIFICACIONES_CCAA_IS,
   TARIFAS_PROPIAS_CCAA_ISD, MEJORAS_REDUCCIONES_CCAA_IS,
   FISCAL_DONACIONES_META, TARIFA_ESTATAL_ID, COEFICIENTES_ID, BONIFICACIONES_CCAA_ID, PLAZO_AUTOLIQUIDACION_DONACIONES,
-  FISCAL_PATRIMONIO_META, ESCALA_PATRIMONIO_ESTATAL, BONIFICACIONES_CCAA_PATRIMONIO, MINIMO_EXENTO_ESTATAL, EXENCION_VIVIENDA_HABITUAL, UMBRAL_OBLIGACION_DECLARAR, ITSGF_UMBRAL,
+  FISCAL_PATRIMONIO_META, ESCALA_PATRIMONIO_ESTATAL, BONIFICACIONES_CCAA_PATRIMONIO, MINIMO_EXENTO_ESTATAL, EXENCION_VIVIENDA_HABITUAL, UMBRAL_OBLIGACION_DECLARAR, ITSGF_UMBRAL, ITSGF_MINIMO_EXENTO, ITSGF_PATRIMONIO_SIN_CUOTA,
   FISCAL_AMORTIZACION_META, TABLA_AMORTIZACION_2026, MULTIPLICADORES_DEGRESIVO_2026,
   FISCAL_SOCIEDADES_META, TIPOS_IS_2025, TRAMOS_IS_MICROPYMES_2026, RETENCIONES_IS_2025, OBLIGACIONES_SL_2025,
   FISCAL_IPREM_META, IPREM_2026,
@@ -142,7 +142,7 @@ const DATASETS: Record<string, Dataset> = {
   'impuesto-patrimonio': {
     meta: {
       nombre: 'Impuesto sobre el Patrimonio por comunidad autónoma',
-      descripcion: 'Mínimo exento, escala estatal por tramos, bonificaciones autonómicas y umbral del Impuesto de Solidaridad de las Grandes Fortunas (ITSGF).',
+      descripcion: 'Mínimo exento, escala estatal por tramos, bonificaciones autonómicas, y mínimo exento y tramo al 0 % del Impuesto de Solidaridad de las Grandes Fortunas (ITSGF), que solo da cuota con un patrimonio neto superior a su suma.',
       fuente: FISCAL_PATRIMONIO_META.fuente, verificado: FISCAL_PATRIMONIO_META.verificado, vigencia: FISCAL_PATRIMONIO_META.vigencia,
       urlOficial: FISCAL_PATRIMONIO_META.urlOficial, paginaHumana: `${BASE}/datos-fiscales/impuesto-patrimonio`,
     },
@@ -150,7 +150,13 @@ const DATASETS: Record<string, Dataset> = {
       minimoExentoEstatal: MINIMO_EXENTO_ESTATAL,
       exencionViviendaHabitual: EXENCION_VIVIENDA_HABITUAL,
       umbralObligacionDeclarar: UMBRAL_OBLIGACION_DECLARAR,
+      // umbralITSGF es el tramo de base liquidable al 0 % (Ley 38/2022, art. 3.Once), no el
+      // patrimonio con cuota: se mantiene el nombre por quien ya lo consume y se añaden los dos
+      // datos que lo aclaran (art. 3.Nueve, mínimo exento).
       umbralITSGF: ITSGF_UMBRAL,
+      itsgfBaseLiquidableAlCero: ITSGF_UMBRAL,
+      itsgfMinimoExento: ITSGF_MINIMO_EXENTO,
+      itsgfPatrimonioNetoConCuota: ITSGF_PATRIMONIO_SIN_CUOTA,
       escalaEstatal: ESCALA_PATRIMONIO_ESTATAL,
       bonificacionesPorCCAA: BONIFICACIONES_CCAA_PATRIMONIO,
     },

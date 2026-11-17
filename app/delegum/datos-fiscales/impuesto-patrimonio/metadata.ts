@@ -1,5 +1,19 @@
 import { Metadata } from 'next';
-import { BONIFICACIONES_CCAA_PATRIMONIO, FISCAL_PATRIMONIO_META } from '@/data/fiscal';
+import {
+  BONIFICACIONES_CCAA_PATRIMONIO,
+  FISCAL_PATRIMONIO_META,
+  ITSGF_MINIMO_EXENTO,
+  ITSGF_PATRIMONIO_SIN_CUOTA,
+  ITSGF_UMBRAL,
+} from '@/data/fiscal';
+import { formatNumber } from '@/lib/formatters';
+
+// Ley 38/2022, art. 3.Nueve (mínimo exento de 700.000 €) y 3.Once (la base liquidable tributa al
+// 0 % hasta 3.000.000 €): el ITSGF solo da cuota con un patrimonio neto por encima de la suma.
+const euros = (n: number): string => `${formatNumber(n, 0)} €`;
+const ITSGF_CON_CUOTA = euros(ITSGF_PATRIMONIO_SIN_CUOTA);
+const ITSGF_TRAMO_CERO = euros(ITSGF_UMBRAL);
+const ITSGF_EXENTO = euros(ITSGF_MINIMO_EXENTO);
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/impuesto-patrimonio/';
 
@@ -56,7 +70,7 @@ export const jsonLd = {
   '@type': 'Dataset',
   name: 'Impuesto sobre el Patrimonio por comunidad autónoma (España)',
   description:
-    'Mínimo exento, escala estatal por tramos, bonificaciones autonómicas y umbral del Impuesto de Solidaridad de las Grandes Fortunas (ITSGF) del Impuesto sobre el Patrimonio en España.',
+    'Mínimo exento, escala estatal por tramos, bonificaciones autonómicas del Impuesto sobre el Patrimonio en España, y mínimo exento y tramo al 0 % del Impuesto de Solidaridad de las Grandes Fortunas (ITSGF).',
   url: URL_CANONICA,
   license: 'https://delegum.com/aviso-legal',
   creator: {
@@ -77,7 +91,8 @@ export const jsonLd = {
     'Bonificación autonómica IP (%)',
     'Mínimo exento (€)',
     'Escala estatal (tipo %)',
-    'Umbral ITSGF (€)',
+    'ITSGF: base liquidable al 0 % (€)',
+    'ITSGF: patrimonio neto a partir del cual hay cuota (€)',
   ],
   keywords: BONIFICACIONES_CCAA_PATRIMONIO.map((c) => `patrimonio ${c.nombre}`),
 };
@@ -108,7 +123,7 @@ export const faqJsonLd = {
       name: '¿Por qué en Madrid o Andalucía no se paga Patrimonio?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Porque tienen una bonificación autonómica cercana al 100% de la cuota (Madrid desde 2008, Andalucía y otras después). En la práctica no se paga Impuesto sobre el Patrimonio, salvo que el patrimonio supere los 3.000.000 €, en cuyo caso entra en juego el Impuesto de Solidaridad de las Grandes Fortunas (ITSGF) estatal, que actúa como suelo mínimo.',
+        text: `Porque tienen una bonificación autonómica cercana al 100 % de la cuota (Madrid desde 2008, Andalucía y otras después). En la práctica no se paga Impuesto sobre el Patrimonio; con un patrimonio neto superior a ${ITSGF_CON_CUOTA} entra en juego el Impuesto de Solidaridad de las Grandes Fortunas (ITSGF) estatal, que actúa como suelo mínimo.`,
       },
     },
     {
@@ -116,7 +131,7 @@ export const faqJsonLd = {
       name: '¿Qué es el Impuesto de Solidaridad de las Grandes Fortunas (ITSGF)?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es un impuesto estatal (Ley 38/2022) que grava los patrimonios netos superiores a 3.000.000 €. Se creó para que las comunidades con bonificación del 100% en Patrimonio (como Madrid) no dejaran sin tributar a las grandes fortunas. Si se paga Impuesto sobre el Patrimonio autonómico, esa cuota se descuenta del ITSGF para evitar doble imposición.',
+        text: `Es un impuesto estatal (Ley 38/2022). Tiene un mínimo exento de ${ITSGF_EXENTO} y su escala grava al 0 % los primeros ${ITSGF_TRAMO_CERO} de base liquidable, así que solo da cuota con un patrimonio neto superior a ${ITSGF_CON_CUOTA}. Se creó para que las comunidades con bonificación del 100 % en Patrimonio (como Madrid) no dejaran sin tributar a las grandes fortunas. Si se paga Impuesto sobre el Patrimonio autonómico, esa cuota se descuenta del ITSGF para evitar doble imposición.`,
       },
     },
     {
