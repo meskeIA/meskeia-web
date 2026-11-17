@@ -132,6 +132,15 @@ const clave = (t) => normal(t).normalize('NFD').replace(/[̀-ͯ]/g, '')
  * «¿Qué es un condensador electrolítico y cuándo conviene usarlo?» no: es otra pregunta.
  * Una reformulación con otras palabras («¿Por qué el handshake tiene 3 pasos y no 2?» frente a
  * «¿Por qué TCP necesita tres pasos y no dos?») NO la ve: eso sigue siendo del Inspector (2.bis).
+ * Límite ACEPTADO tras medirlo (cabo C0781, 17/11/2026), con el caso de revisor-lectura-facil:
+ * «¿Cuántas palabras debe tener una frase en lectura fácil?» frente a «¿Cuántas palabras puede
+ * tener una frase?», con respuestas distintas y una promesa en el FAQPage que el motor no cumple.
+ * Emparejar por solapamiento de palabras (Jaccard de la clave sin palabras vacías, ≥ 0,5 y ≥ 2
+ * comunes) encendía 183 pares en 519 apps con las dos FAQ por separado, y muchos son preguntas
+ * DISTINTAS con el mismo tema: «¿Cuánto cuesta tramitar una herencia?» / «¿cuánto tarda…?»,
+ * «¿Qué es Lorem Ipsum…?» / «¿hay variantes del lorem ipsum?», «¿Cuánto capital debería tener un
+ * seguro de vida?» / «¿puedo tener varios…?». Un candado que rompe no puede llevar ese ruido; el
+ * Inspector sí los juzga uno a uno, y fue él quien vio el de revisor-lectura-facil.
  */
 function mismaPregunta(a, b) {
   if (!a || !b) return false;
