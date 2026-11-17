@@ -192,7 +192,7 @@ export default function GeneradorUTMPage() {
       />
 
       {error && (
-        <div className={styles.errorBanner}>
+        <div className={styles.errorBanner} role="alert">
           <span aria-hidden="true">⚠️</span> {error}
         </div>
       )}
