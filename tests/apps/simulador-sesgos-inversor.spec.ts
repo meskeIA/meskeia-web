@@ -433,8 +433,8 @@ test.describe('Hallazgos 17/11/2026', () => {
     expect(await contrasteSobreFondoReal(cifra(page, ALTO))).toBeGreaterThanOrEqual(3);
   });
 
-  test('ABIERTO — el JSON-LD sale con `featureList` vacío', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4911) — el JSON-LD salía con `featureList` vacío', async ({ page }) => {
+    // REPARADO 17/11/2026: seis características vistas en la app.
     await page.goto(RUTA);
     const bloques = await page.locator('script[type="application/ld+json"]').allInnerTexts();
     const app = bloques.map((b) => JSON.parse(b) as Record<string, unknown>).find((j) => j['@type'] === 'WebApplication');
@@ -443,31 +443,37 @@ test.describe('Hallazgos 17/11/2026', () => {
     expect((app?.featureList as unknown[] | undefined)?.length ?? 0).toBeGreaterThanOrEqual(4);
   });
 
-  test('ABIERTO — Kahneman y Tversky «demostraron»: marcos conductuales presentados como leyes', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4912) — Kahneman y Tversky «demostraron»: marcos conductuales presentados como leyes', async ({ page }) => {
+    // REPARADO 17/11/2026: «estudiando», «estimaron», «identificaron» y «popularizó un modelo».
     await abrir(page);
     // §1.quinquies.3 nombra precisamente a Kahneman: «propuso», «identificó», «estimó».
     await expect(page.locator('main')).not.toContainText('llevan décadas demostrando');
     await empezar(page);
     await contestar(page, [0, 1, 0, 0, 0, 0, 0, 0]); // las 8 tarjetas, para leer sus descripciones
     await expect(page.locator('main')).not.toContainText('Kahneman demostró');
+    await expect(page.locator('main')).toContainText('Kahneman y Amos Tversky estimaron');
     await page.getByRole('button', { name: /guía educativa/i }).click();
-    await expect(page.getByText(/Kahneman y Amos Tversky/)).toBeVisible();
-    await expect(page.getByText(/Kahneman y Amos Tversky/)).not.toContainText('demostraron');
+    const parrafo = page.locator('[data-guia-educativa] p', { hasText: /Kahneman y Amos Tversky/ });
+    await expect(parrafo).toBeVisible();
+    await expect(parrafo).not.toContainText('demostraron');
+    await expect(parrafo).not.toContainText('El resultado es predecible');
+    await expect(parrafo).toContainText('popularizó un modelo de dos sistemas');
   });
 
-  test('ABIERTO — «el 80 % … por encima de la media, lo que matemáticamente es imposible»', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4913) — «el 80 % … por encima de la media, lo que matemáticamente es imposible»', async ({ page }) => {
+    // REPARADO 17/11/2026: retirada la cifra sin fuente y la imposibilidad que no lo es.
     await abrir(page);
     await empezar(page);
     await contestar(page, [0, 1, 0, 0, 0, 0, 0, 0]);
     // Que más de la mitad supere la MEDIA es posible: en {0, 10, 10, 10, 10} la media es 8 y el
     // 80 % la supera. Lo imposible es superar la MEDIANA. Y el 80 % va sin fuente ni año.
     await expect(page.locator('main')).not.toContainText('matemáticamente es imposible');
+    await expect(page.locator('main')).toContainText('creerse mejor que la mayoría');
   });
 
-  test('ABIERTO — escenario 6: «S&P 500» sin matiz, SPIVA sin año ni región y una frase al revés', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4914) — escenario 6: «S&P 500» sin matiz, SPIVA sin año ni región y una frase al revés', async ({ page }) => {
+    // REPARADO 17/11/2026: «un índice amplio del mercado en el que inviertes» y sin la cifra de
+    // SPIVA, que no se pudo citar con año y región; la FAQ visible tampoco la usa ya de prueba.
     await abrir(page);
     await empezar(page);
     await irAlEscenario(page, 6);
@@ -475,12 +481,18 @@ test.describe('Hallazgos 17/11/2026', () => {
     // de referencia (§1.quinquies.5 lo nombra).
     await expect(page.locator('main')).not.toContainText('con la del índice S&P 500 en ese período');
     await opciones(page).nth(0).click();
-    const texto = await page.locator('main p').filter({ hasText: 'SPIVA' }).first().innerText().catch(() => '');
+    await expect(veredicto(page)).toBeVisible();
+    // Sin esperar a un párrafo con SPIVA que ya no existe (un innerText() sobre él agotaba el test).
+    const texto = (await page.locator('main p').allInnerTexts()).find((t) => t.includes('SPIVA')) ?? '';
     // «El 85-90 % de los fondos … no baten al índice. Para los inversores individuales el
     // porcentaje es aún menor» dice que FALLAN MENOS los particulares, lo contrario de lo que quiere.
     expect(texto).not.toContain('el porcentaje es aún menor');
     // Y si cita SPIVA, con su año (los informes cambian cada semestre y por región)
     expect(!texto.includes('SPIVA') || /SPIVA[^.]*\b(19|20)\d{2}\b/.test(texto)).toBe(true);
+    await expect(page.locator('main')).toContainText('un índice amplio del mercado en el que inviertes');
+    await expect(page.locator('main')).toContainText('incluso para la gestión profesional');
+    const guia = (await page.locator('[data-guia-educativa]').textContent()) ?? '';
+    expect(guia).not.toContain('SPIVA');
   });
 
   test('ABIERTO — euros y porcentajes pegados a la cifra («2.000€», «50%»)', async ({ page }) => {

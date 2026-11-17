@@ -42,7 +42,15 @@ export const jsonLd = generateWebAppSchema({
   description: "8 escenarios reales para detectar tus sesgos cognitivos como inversor: aversión a pérdidas, efecto manada, exceso de confianza, sesgo de confirmación y más. Descubre qué frena tu rentabilidad.",
   url: "https://meskeia.com/simulador-sesgos-inversor/",
   category: 'FinanceApplication',
-  features: [],
+  // Hallazgo 4911 (17/11/2026): iba vacío. Lo que hace la app, visto en ella.
+  features: [
+    '8 escenarios de decisión de inversión con respuesta de opción múltiple',
+    'Detecta 8 sesgos: aversión a las pérdidas, efecto de disposición, confirmación, efecto manada, recencia, exceso de confianza, anclaje y statu quo',
+    'Explicación inmediata de cada respuesta',
+    'Clasifica cada sesgo detectado en impacto alto o moderado',
+    'Perfil final con recuento de sesgos y cómo mitigar cada uno',
+    'Repetir la simulación desde cero',
+  ],
 });
 
 export const faqJsonLd = {
@@ -62,7 +70,7 @@ export const faqJsonLd = {
       name: '¿Qué es la aversión a las pérdidas en finanzas conductuales?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La aversión a las pérdidas describe cómo el dolor de perder dinero es psicológicamente el doble de intenso que el placer de ganarlo, según los estudios de Kahneman y Tversky. Esto lleva a los inversores a mantener posiciones perdedoras demasiado tiempo o a vender prematuramente activos ganadores por miedo a perder el beneficio acumulado.',
+        text: 'La aversión a las pérdidas describe cómo el dolor de perder dinero pesa más que el placer de ganar la misma cantidad; Kahneman y Tversky estimaron que las pérdidas pesan aproximadamente el doble. Esto lleva a los inversores a mantener posiciones perdedoras demasiado tiempo o a vender prematuramente activos ganadores por miedo a perder el beneficio acumulado.',
       },
     },
     {

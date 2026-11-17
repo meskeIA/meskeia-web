@@ -47,7 +47,7 @@ const INFO_SESGOS: Record<string, InfoSesgo> = {
   'aversion-perdidas': {
     nombre: 'Aversión a las pérdidas',
     emoji: '😨',
-    descripcion: 'El dolor de perder 100€ es psicológicamente más intenso que la satisfacción de ganar 100€. Daniel Kahneman demostró que las pérdidas pesan aproximadamente el doble que las ganancias equivalentes.',
+    descripcion: 'El dolor de perder 100€ es psicológicamente más intenso que la satisfacción de ganar 100€. Daniel Kahneman y Amos Tversky estimaron que las pérdidas pesan aproximadamente el doble que las ganancias equivalentes.',
     impacto: 'Puede llevarte a vender activos ganadores demasiado pronto para "asegurar" la ganancia, a aguantar posiciones perdedoras esperando recuperar y a evitar inversiones con buena rentabilidad esperada por miedo a la volatilidad.',
     comoEvitar: 'Define stop-loss antes de entrar. Evalúa siempre el valor futuro esperado, no el precio de compra. Automatiza las decisiones periódicas (p.ej. aportaciones mensuales) para eliminar la emoción del momento.',
   },
@@ -82,7 +82,9 @@ const INFO_SESGOS: Record<string, InfoSesgo> = {
   'exceso-confianza': {
     nombre: 'Exceso de confianza',
     emoji: '🎯',
-    descripcion: 'La tendencia a sobreestimar la propia habilidad, conocimiento y capacidad de predicción. Los estudios muestran que el 80% de los inversores se creen por encima de la media, lo que matemáticamente es imposible.',
+    // Hallazgo 4913: daba «el 80% … por encima de la media, lo que matemáticamente es imposible», sin
+    // fuente, y superar la MEDIA sí es posible para la mayoría (lo imposible es la mediana).
+    descripcion: 'La tendencia a sobreestimar la propia habilidad, conocimiento y capacidad de predicción, y a creerse mejor que la mayoría de los demás inversores.',
     impacto: 'Haces más operaciones de las necesarias (generando más costes y errores). Concentras la cartera en pocas posiciones creyendo que "sabes" qué va a pasar. Hay evidencia sólida de que la mayoría de inversores individuales no baten al índice de referencia a largo plazo.',
     comoEvitar: 'Lleva un registro honesto de tus decisiones y compáralas con un índice pasivo. La humildad epistémica es una ventaja real: si no tienes información que el mercado no tiene, probablemente el índice sea tu mejor opción.',
   },
@@ -238,13 +240,16 @@ const ESCENARIOS: Escenario[] = [
     id: 6,
     titulo: 'El stock picker',
     contexto: 'Llevas 3 años eligiendo acciones individuales de forma activa. Crees que tu análisis y criterio te dan ventaja sobre el mercado.',
-    pregunta: '¿Cómo compararías tu rentabilidad con la del índice S&P 500 en ese período?',
+    // Hallazgo 4914 (17/11/2026): pedía compararse con el S&P 500 (un índice de EE. UU. para quien
+    // elige acciones desde España o Latinoamérica) y citaba SPIVA sin año ni región, con una frase que
+    // decía lo contrario de lo que quería («para los particulares el porcentaje es aún menor»).
+    pregunta: '¿Cómo compararías tu rentabilidad con la de un índice amplio del mercado en el que inviertes, en ese período?',
     opciones: [
       {
         texto: 'A) Mejor que el índice. Selecciono las empresas con criterio y veo cosas que el mercado no ve',
         sesgoId: 'exceso-confianza',
         nivel: 'alto',
-        feedbackInmediato: 'El 85-90% de los fondos de gestión activa no baten al índice a 10 años (datos SPIVA). Para los inversores individuales el porcentaje es aún menor. La confianza en tu capacidad de superar al mercado puede ser muy costosa.',
+        feedbackInmediato: 'Batir a un índice amplio de forma sostenida es difícil incluso para la gestión profesional, entre otras cosas por las comisiones. Sin medir tu rentabilidad frente a esa referencia, la confianza en superar al mercado no está contrastada y puede ser muy costosa.',
       },
       {
         texto: 'B) Probablemente similar o inferior. Es muy difícil batir al mercado de forma consistente',
@@ -418,7 +423,7 @@ export default function SimuladorSesgosInversorPage() {
           <div className={styles.inicio}>
             <div className={styles.inicioCard}>
               <p className={styles.inicioIntro}>
-                Las finanzas conductuales llevan décadas demostrando que los inversores no somos racionales: tomamos decisiones influenciados por emociones, atajos mentales y sesgos cognitivos que reducen nuestra rentabilidad de forma sistemática.
+                Las finanzas conductuales llevan décadas estudiando cómo los inversores nos apartamos de la decisión racional: emociones, atajos mentales y sesgos cognitivos que pueden reducir nuestra rentabilidad.
               </p>
               <p className={styles.inicioIntro}>
                 Este simulador presenta <strong>8 escenarios reales</strong> para detectar tus sesgos principales. No hay respuestas correctas ni incorrectas desde el punto de vista moral — solo patrones de comportamiento que conviene conocer.
@@ -607,7 +612,8 @@ export default function SimuladorSesgosInversorPage() {
         subtitle="Por qué el cerebro humano no está diseñado para invertir — y qué hacer al respecto"
       >
         <p>
-          Las finanzas conductuales, impulsadas por los trabajos de Daniel Kahneman y Amos Tversky, demostraron que los inversores no son los agentes racionales que asumía la teoría económica clásica. Operamos con dos sistemas de pensamiento: uno rápido, intuitivo y emocional, y otro lento, analítico y racional. En situaciones de incertidumbre financiera, el primero domina con frecuencia al segundo. El resultado es predecible: compramos caro y vendemos barato, exactamente al revés de lo que maximizaría la rentabilidad.
+          {/* Neutralidad (§1.quinquies.3, hallazgo 4912): marcos propuestos, no leyes demostradas. */}
+          Las finanzas conductuales, impulsadas por los trabajos de Daniel Kahneman y Amos Tversky, identificaron desviaciones sistemáticas respecto al agente racional que asumía la teoría económica clásica. Kahneman popularizó un modelo de dos sistemas de pensamiento: uno rápido, intuitivo y emocional, y otro lento, analítico. Según ese modelo, en situaciones de incertidumbre financiera el primero puede imponerse al segundo, y un resultado frecuente es comprar caro y vender barato, al revés de lo que maximizaría la rentabilidad.
         </p>
 
         <h3>Los 8 sesgos y su impacto real</h3>
@@ -665,7 +671,7 @@ export default function SimuladorSesgosInversorPage() {
           </div>
           <div className={styles.faqItem}>
             <p className={styles.faqTip}><strong>¿Los inversores profesionales también tienen estos sesgos?</strong></p>
-            <p>Sí, y hay estudios que lo documentan. De hecho, el 85-90% de los fondos de gestión activa no baten al índice a 10 años (datos SPIVA). La ventaja de un buen proceso no es eliminar los sesgos, sino sistematizar las decisiones para que interfieran menos.</p>
+            <p>Sí: los sesgos cognitivos se han estudiado también en gestores profesionales, no solo en particulares. La ventaja de un buen proceso no es eliminar los sesgos, sino sistematizar las decisiones para que interfieran menos.</p>
           </div>
           <div className={styles.faqItem}>
             <p className={styles.faqTip}><strong>¿La indexación pasiva elimina los sesgos?</strong></p>
