@@ -47,7 +47,7 @@ const INFO_SESGOS: Record<string, InfoSesgo> = {
   'aversion-perdidas': {
     nombre: 'Aversión a las pérdidas',
     emoji: '😨',
-    descripcion: 'El dolor de perder 100€ es psicológicamente más intenso que la satisfacción de ganar 100€. Daniel Kahneman y Amos Tversky estimaron que las pérdidas pesan aproximadamente el doble que las ganancias equivalentes.',
+    descripcion: 'El dolor de perder 100 € es psicológicamente más intenso que la satisfacción de ganar 100 €. Daniel Kahneman y Amos Tversky estimaron que las pérdidas pesan aproximadamente el doble que las ganancias equivalentes.',
     impacto: 'Puede llevarte a vender activos ganadores demasiado pronto para "asegurar" la ganancia, a aguantar posiciones perdedoras esperando recuperar y a evitar inversiones con buena rentabilidad esperada por miedo a la volatilidad.',
     comoEvitar: 'Define stop-loss antes de entrar. Evalúa siempre el valor futuro esperado, no el precio de compra. Automatiza las decisiones periódicas (p.ej. aportaciones mensuales) para eliminar la emoción del momento.',
   },
@@ -82,7 +82,7 @@ const INFO_SESGOS: Record<string, InfoSesgo> = {
   'exceso-confianza': {
     nombre: 'Exceso de confianza',
     emoji: '🎯',
-    // Hallazgo 4913: daba «el 80% … por encima de la media, lo que matemáticamente es imposible», sin
+    // Hallazgo 4913: daba «el 80 % … por encima de la media, lo que matemáticamente es imposible», sin
     // fuente, y superar la MEDIA sí es posible para la mayoría (lo imposible es la mediana).
     descripcion: 'La tendencia a sobreestimar la propia habilidad, conocimiento y capacidad de predicción, y a creerse mejor que la mayoría de los demás inversores.',
     impacto: 'Haces más operaciones de las necesarias (generando más costes y errores). Concentras la cartera en pocas posiciones creyendo que "sabes" qué va a pasar. Hay evidencia sólida de que la mayoría de inversores individuales no baten al índice de referencia a largo plazo.',
@@ -113,27 +113,27 @@ const ESCENARIOS: Escenario[] = [
   {
     id: 1,
     titulo: 'La apuesta a cara o cruz',
-    contexto: 'Tienes 10.000€ invertidos. Te ofrecen una sola apuesta a cara o cruz con una moneda sin trucar: si sale cara ganas 150€; si sale cruz pierdes 100€. Perder esos 100€ no cambiaría tus planes.',
+    contexto: 'Tienes 10.000 € invertidos. Te ofrecen una sola apuesta a cara o cruz con una moneda sin trucar: si sale cara ganas 150 €; si sale cruz pierdes 100 €. Perder esos 100 € no cambiaría tus planes.',
     pregunta: '¿La aceptas?',
     opciones: [
       {
-        texto: 'A) No: perder 100€ me pesa más que ganar 150€',
+        texto: 'A) No: perder 100 € me pesa más que ganar 150 €',
         sesgoId: 'aversion-perdidas',
         nivel: 'alto',
-        feedbackInmediato: 'Rechazar una apuesta pequeña con valor esperado positivo (+25€) porque la pérdida pesa más que una ganancia mayor es la señal típica de aversión a las pérdidas. Con importes tan pequeños frente a tu patrimonio, el riesgo apenas lo explica.',
+        feedbackInmediato: 'Rechazar una apuesta pequeña con valor esperado positivo (+25 €) porque la pérdida pesa más que una ganancia mayor es la señal típica de aversión a las pérdidas. Con importes tan pequeños frente a tu patrimonio, el riesgo apenas lo explica.',
       },
       {
-        texto: 'B) Sí: con importes así, gano 25€ de media por jugada',
+        texto: 'B) Sí: con importes así, gano 25 € de media por jugada',
         sesgoId: null,
         nivel: 'ninguno',
-        feedbackInmediato: 'Decisión coherente con el valor esperado: 0,5 × 150€ − 0,5 × 100€ = +25€. Con una pérdida que no cambia tus planes, la aceptas sin dar a los 100€ más peso que a los 150€.',
+        feedbackInmediato: 'Decisión coherente con el valor esperado: 0,5 × 150 € − 0,5 × 100 € = +25 €. Con una pérdida que no cambia tus planes, la aceptas sin dar a los 100 € más peso que a los 150 €.',
       },
     ],
   },
   {
     id: 2,
     titulo: 'La acción que no sube',
-    contexto: 'Compraste acciones de una empresa a 50€/acción hace un año. Hoy cotizan a 33€ (-34%). Un análisis independiente indica que la empresa tiene problemas estructurales serios.',
+    contexto: 'Compraste acciones de una empresa a 50 €/acción hace un año. Hoy cotizan a 33 € (-34 %). Un análisis independiente indica que la empresa tiene problemas estructurales serios.',
     pregunta: '¿Qué haces?',
     opciones: [
       {
@@ -143,7 +143,7 @@ const ESCENARIOS: Escenario[] = [
         feedbackInmediato: 'Decisión racional. La pérdida ya es real independientemente de si vendes o no. Lo relevante es dónde estará el valor en el futuro, no dónde estuvo en el pasado.',
       },
       {
-        texto: 'B) Espero a que vuelvan a 50€ para vender sin pérdidas',
+        texto: 'B) Espero a que vuelvan a 50 € para vender sin pérdidas',
         sesgoId: 'efecto-disposicion',
         nivel: 'alto',
         feedbackInmediato: 'Clásico efecto de disposición combinado con anclaje. El precio de compra no es relevante para la decisión actual. El mercado no sabe ni le importa cuánto pagaste tú.',
@@ -159,7 +159,7 @@ const ESCENARIOS: Escenario[] = [
   {
     id: 3,
     titulo: 'La investigación sesgada',
-    contexto: 'Llevas 6 meses invertido en un fondo de energías renovables. El fondo ha bajado un 22%. Te planteas si mantener o salir.',
+    contexto: 'Llevas 6 meses invertido en un fondo de energías renovables. El fondo ha bajado un 22 %. Te planteas si mantener o salir.',
     pregunta: '¿Qué información buscas para decidir?',
     opciones: [
       {
@@ -185,7 +185,7 @@ const ESCENARIOS: Escenario[] = [
   {
     id: 4,
     titulo: 'La fiebre del Bitcoin',
-    contexto: 'El Bitcoin ha subido un 240% en 8 meses. Todos tus conocidos hablan de él. Un compañero de trabajo dice que ha ganado 15.000€.',
+    contexto: 'El Bitcoin ha subido un 240 % en 8 meses. Todos tus conocidos hablan de él. Un compañero de trabajo dice que ha ganado 15.000 €.',
     pregunta: '¿Qué decides?',
     opciones: [
       {
@@ -211,7 +211,7 @@ const ESCENARIOS: Escenario[] = [
   {
     id: 5,
     titulo: 'Los cuatro años buenos',
-    contexto: 'La bolsa española ha tenido 4 años consecutivos con rentabilidades positivas (media del +13% anual). Te preguntan qué esperas para los próximos 2 años.',
+    contexto: 'La bolsa española ha tenido 4 años consecutivos con rentabilidades positivas (media del +13 % anual). Te preguntan qué esperas para los próximos 2 años.',
     pregunta: '¿Cuál es tu expectativa?',
     opciones: [
       {
@@ -268,14 +268,14 @@ const ESCENARIOS: Escenario[] = [
   {
     id: 7,
     titulo: 'El precio de compra',
-    contexto: 'Compraste un apartamento para invertir por 230.000€ hace 7 años. El mercado actual lo valora en 180.000€. Recibes una oferta en firme de 192.000€.',
+    contexto: 'Compraste un apartamento para invertir por 230.000 € hace 7 años. El mercado actual lo valora en 180.000 €. Recibes una oferta en firme de 192.000 €.',
     pregunta: '¿Qué decides?',
     opciones: [
       {
-        texto: 'A) La rechazo. Yo pagué 230.000€ y no vendo con pérdidas',
+        texto: 'A) La rechazo. Yo pagué 230.000 € y no vendo con pérdidas',
         sesgoId: 'anclaje',
         nivel: 'alto',
-        feedbackInmediato: 'Sesgo de anclaje claro. El precio que pagaste es un dato del pasado que no cambia el valor actual del activo. La oferta de 192.000€ está por encima del valor de mercado (180.000€) — es objetivamente una buena oferta.',
+        feedbackInmediato: 'Sesgo de anclaje claro. El precio que pagaste es un dato del pasado que no cambia el valor actual del activo. La oferta de 192.000 € está por encima del valor de mercado (180.000 €) — es objetivamente una buena oferta.',
       },
       {
         texto: 'B) La acepto. Está por encima del precio de mercado actual',
@@ -294,7 +294,7 @@ const ESCENARIOS: Escenario[] = [
   {
     id: 8,
     titulo: 'La cartera abandonada',
-    contexto: 'Tu cartera lleva 3 años sin tocar: 60% renta fija, 40% acciones. Con los cambios de mercado, la asignación ha derivado a 45% renta fija, 55% acciones. Tu horizonte y perfil no han cambiado.',
+    contexto: 'Tu cartera lleva 3 años sin tocar: 60 % renta fija, 40 % acciones. Con los cambios de mercado, la asignación ha derivado a 45 % renta fija, 55 % acciones. Tu horizonte y perfil no han cambiado.',
     pregunta: '¿Qué haces?',
     opciones: [
       {
@@ -707,7 +707,7 @@ export default function SimuladorSesgosInversorPage() {
             <span className={styles.stepNumber}>3</span>
             <div className={styles.stepContent}>
               <strong>Define reglas de rebalanceo por adelantado</strong>
-              <p>Establece una asignación objetivo y un umbral de desviación (p.ej. 5%) que active el rebalanceo. Así la inercia del statu quo se convierte en una regla, no en una excusa.</p>
+              <p>Establece una asignación objetivo y un umbral de desviación (p.ej. 5 %) que active el rebalanceo. Así la inercia del statu quo se convierte en una regla, no en una excusa.</p>
             </div>
           </div>
           <div className={styles.step}>

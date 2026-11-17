@@ -495,12 +495,20 @@ test.describe('Hallazgos 17/11/2026', () => {
     expect(guia).not.toContain('SPIVA');
   });
 
-  test('ABIERTO — euros y porcentajes pegados a la cifra («2.000€», «50%»)', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4915) — euros y porcentajes pegados a la cifra («2.000€», «50%»)', async ({ page }) => {
+    // REPARADO 17/11/2026: espacio duro (U+00A0) antes de «€» y «%» en todo page.tsx. El escenario 1
+    // ya no es el de «2.000€» y «50%» (hallazgo 4907): se mira su texto nuevo y el del escenario 2.
     await abrir(page);
     await empezar(page);
-    // Formato español del CLAUDE.md global §2: «1.234,56 €» y «15 %» (30 apariciones en page.tsx).
-    await expect(opciones(page).nth(0)).toHaveText(/2\.000\s€/);
-    await expect(opciones(page).nth(1)).toHaveText(/50\s%/);
+    // Formato español del CLAUDE.md global §2: «1.234,56 €» y «15 %».
+    await expect(page.locator('main')).toContainText('Tienes 10.000 € invertidos');
+    await expect(opciones(page).nth(0)).toHaveText(/perder 100 €/);
+    expect(await page.locator('main').innerText()).not.toMatch(/\d[€%]/);
+    await opciones(page).nth(1).click();
+    await botonSiguiente(page).click();
+    await expect(page.locator('main')).toContainText('(-34 %)');
+    expect(await page.locator('main').innerText()).not.toMatch(/\d[€%]/);
+    await page.getByRole('button', { name: /guía educativa/i }).click();
+    expect((await page.locator('[data-guia-educativa]').textContent()) ?? '').not.toMatch(/\d[€%]/);
   });
 });
