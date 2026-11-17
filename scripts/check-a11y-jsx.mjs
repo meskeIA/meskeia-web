@@ -130,9 +130,20 @@ const NO_SON_EMOJI = /[©®™←-⇿]/g;
  * Las de subdivisión (🏴󠁧󠁢󠁳󠁣󠁴󠁿) ya se veían por su 🏴; aquí solo hay que descontar sus etiquetas.
  */
 const BANDERA = /\p{Regional_Indicator}{2}/u;
+/**
+ * Las marcas ✓ (U+2713), ✕ (U+2715) y ✗ (U+2717) tampoco son `Extended_Pictographic` (sus
+ * vecinas ✔ U+2714 y ✖ U+2716 sí), pero el lector las lee igual dentro del nombre: «✕ Salir»
+ * se anuncia «multiplicación Salir». El CLAUDE.md global §5 trata ✕ como emoji (su ejemplo:
+ * `<button aria-label="Cerrar">✕</button>`). Fuera, a propósito, × (U+00D7): es el signo de
+ * multiplicar y en «3 × 4» es contenido.
+ * (Caso de origen: «✕ Salir» de `espejo`, hallazgo 4755 y cabo C0762, 15/11/2026; 555 usos en
+ * 269 ficheros de app/ al añadirla el 17/11, que no rompen: se juzgan solo las líneas añadidas.
+ * Casos: `scripts/pruebas/a11y-marcas.tsx`.)
+ */
+const MARCA = /[✓✕✗]/u;
 const esEmoji = (t) => {
   const limpio = t.replace(NO_SON_EMOJI, '');
-  return PICTOGRAFICO.test(limpio) || BANDERA.test(limpio);
+  return PICTOGRAFICO.test(limpio) || BANDERA.test(limpio) || MARCA.test(limpio);
 };
 /**
  * Si al quitar todo esto no queda nada, el nodo es SOLO emoji (y entonces es un aviso, no
@@ -142,7 +153,7 @@ const esEmoji = (t) => {
  * pedía envolverlo en un <span>, que es la corrección equivocada. Por lo mismo van los
  * indicadores regionales y las etiquetas (U+E0020–E007F) de las banderas.
  */
-const SOLO_EMOJI = /[\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Regional_Indicator}\u{E0020}-\u{E007F}️‍⃣\s]/gu;
+const SOLO_EMOJI = /[\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Regional_Indicator}\u{E0020}-\u{E007F}✓✕✗️‍⃣\s]/gu;
 const ARIA_ESTADO = ['aria-pressed', 'aria-selected', 'aria-checked', 'aria-expanded'];
 
 /**
