@@ -568,8 +568,9 @@ export default function GeneradorLaberintosPage() {
                 </div>
                 <p>
                   Apoyar siempre la mano derecha (o siempre la izquierda) en la pared y no despegarla
-                  garantiza llegar a la salida en un laberinto sin bucles. Es lento porque recorre todos
-                  los callejones, pero nunca falla y no requiere memoria.
+                  garantiza llegar a la salida en un laberinto sin bucles. Puede ser lento porque entra
+                  en todos los callejones que quedan del lado de esa mano (los del otro lado no se
+                  pisan), pero nunca falla y no requiere memoria.
                 </p>
               </div>
               <div className={styles.escenarioCard}>
@@ -580,9 +581,10 @@ export default function GeneradorLaberintosPage() {
                   <h3>Desde la salida hacia atrás</h3>
                 </div>
                 <p>
-                  Resolver en sentido inverso suele ser más rápido: cerca de la meta hay menos
-                  bifurcaciones que cerca de la entrada, porque el camino correcto ya ha descartado casi
-                  todas las ramas.
+                  Resolver en sentido inverso es otra forma de mirar el mismo laberinto: las
+                  bifurcaciones que cruza el camino correcto son las mismas en los dos sentidos, pero
+                  desde la meta aparecen en otro orden. No es un atajo garantizado, sino un cambio de
+                  perspectiva que sirve para salir de un atasco.
                 </p>
               </div>
               <div className={styles.escenarioCard}>

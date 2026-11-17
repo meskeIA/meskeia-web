@@ -325,8 +325,8 @@ test('CASO 3 (rechazo) · un n.º que no es un número («abc», «0») no se us
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HALLAZGOS ABIERTOS (inspección del 17/11/2026). Cada uno afirma lo que la página promete;
-// hoy no se cumple, de ahí el test.fail().
+// HALLAZGOS de la inspección del 17/11/2026, REPARADOS el mismo día (tanda de /reparar). Cada
+// uno afirma lo que la página promete.
 // ─────────────────────────────────────────────────────────────────────────────
 
 test('HALLAZGO 4947 (17/11/2026, REPARADO) · un laberinto con más filas que columnas se imprime en una sola hoja, en A4 y en Carta', async ({ page, browserName }) => {
@@ -382,16 +382,18 @@ test('HALLAZGO 4949 (17/11/2026, REPARADO) · tras cambiar de trazado sin regene
   await expect(pieDeHoja(page)).toContainText('Pasillos largos');
 });
 
-test('HALLAZGO (17/11/2026, ABIERTO) · «Desde la salida hacia atrás»: cerca de la meta NO hay menos bifurcaciones en los de pasillos largos', async ({ page }) => {
-  // La guía dice: «cerca de la meta hay menos bifurcaciones que cerca de la entrada, porque el
+test('HALLAZGO 4950 (17/11/2026, REPARADO) · «Desde la salida hacia atrás»: cerca de la meta NO hay menos bifurcaciones en los de pasillos largos', async ({ page }) => {
+  // La guía decía: «cerca de la meta hay menos bifurcaciones que cerca de la entrada, porque el
   // camino correcto ya ha descartado casi todas las ramas». En un árbol, las bifurcaciones que se
   // cruzan por el camino correcto y las ramas falsas de cada una son las mismas en los dos
   // sentidos. Medido aquí: 10 laberintos de 15 × 15 de pasillos largos (n.º 1001-1010), casillas
   // del camino con tres o más pasos abiertos en la mitad de la salida frente a la de la entrada:
   // 59 frente a 28 el 17/11/2026 (en el barrido de 30, n.º 1001-1030: 161 frente a 80, más en la
-  // mitad de la salida en 26 de 30). Si la frase se retira, el test pasa: quitar el test.fail.
-  test.fail();
+  // mitad de la salida en 26 de 30). La tarjeta dice ahora que las bifurcaciones son las mismas
+  // en los dos sentidos y que no es un atajo garantizado.
   const texto = await page.evaluate(() => document.body.textContent ?? '');
+  expect(texto).not.toContain('cerca de la meta hay menos');
+  expect(texto).toContain('son las mismas en los dos sentidos');
   const afirma = texto.includes('cerca de la meta hay menos');
   let entrada = 0;
   let salida = 0;
@@ -410,12 +412,14 @@ test('HALLAZGO (17/11/2026, ABIERTO) · «Desde la salida hacia atrás»: cerca 
   if (afirma) expect(salida, `bifurcaciones: mitad de la salida ${salida}, mitad de la entrada ${entrada}`).toBeLessThan(entrada);
 });
 
-test('HALLAZGO (17/11/2026, ABIERTO) · «La mano en la pared» no «recorre todos los callejones»', async ({ page }) => {
+test('HALLAZGO 4951 (17/11/2026, REPARADO) · «La mano en la pared» no «recorre todos los callejones»', async ({ page }) => {
   // En un laberinto perfecto con entrada y salida en el borde, seguir una pared recorre solo las
   // ramas de un lado del camino. Laberinto 12345 (15 × 15, pasillos largos): 20 callejones; con
-  // la mano derecha se pasa por 13 y con la izquierda por 7. Si la frase se retira, pasa.
-  test.fail();
+  // la mano derecha se pasa por 13 y con la izquierda por 7. La tarjeta dice ahora que entra en
+  // los callejones del lado de esa mano y que los del otro lado no se pisan: se comprueba abajo.
   const texto = await page.evaluate(() => document.body.textContent ?? '');
+  expect(texto).not.toContain('recorre todos los callejones');
+  expect(texto).toContain('los del otro lado no se');
   const afirma = texto.includes('recorre todos los callejones');
   await generar(page, { columnas: 15, filas: 15, trazado: 'Pasillos largos', semilla: '12345' });
   await expect(metrica(page, 'nº de laberinto')).toHaveText('12345');
@@ -455,15 +459,16 @@ test('HALLAZGO (17/11/2026, ABIERTO) · «La mano en la pared» no «recorre tod
   }
   expect(llegado, 'la mano derecha llega a la salida').toBe(true);
   const recorridos = [...visitadas].filter(esCallejon).length;
+  expect(recorridos, 'la mano derecha deja callejones sin pisar').toBeLessThan(a.callejones);
   if (afirma) expect(recorridos, `la mano derecha pasa por ${recorridos} de ${a.callejones} callejones`).toBe(a.callejones);
 });
 
-test('HALLAZGO (17/11/2026, ABIERTO) · el FAQPage no contradice a la página ni cita tamaños que no se pueden elegir', async ({ page }) => {
+test('HALLAZGO 4952 (17/11/2026, REPARADO) · el FAQPage no contradice a la página ni cita tamaños que no se pueden elegir', async ({ page }) => {
   // FAQPage, «¿Qué tamaño de laberinto es adecuado para cada edad?»: «de 12×12 a 16×16…» y «Más
   // que la edad, la señal fiable es la longitud del camino». La página dice «Los callejones sin
   // salida son el mejor indicador de dificultad», y el selector ofrece 8, 10, 12, 15, 20, 25 y
-  // 32 (ni 16 ni el «30×30» de la pregunta de la impresión).
-  test.fail();
+  // 32 (ni 16 ni el «30×30» de la pregunta de la impresión). Ahora la respuesta no da franjas de
+  // edad sin fuente, cita tamaños del selector y pone los callejones por delante, como la página.
   const faq = await page.evaluate(() => {
     for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
       const j = JSON.parse(s.textContent ?? '{}') as { '@type'?: string; mainEntity?: { acceptedAnswer: { text: string } }[] };
@@ -474,17 +479,21 @@ test('HALLAZGO (17/11/2026, ABIERTO) · el FAQPage no contradice a la página ni
   expect(faq.length).toBeGreaterThan(0);
   const opciones = await page.getByLabel('Ancho (columnas)').locator('option').evaluateAll((os) => os.map((o) => Number((o as HTMLOptionElement).value)));
   const tamanos = [...faq.matchAll(/(\d+)×(\d+)/g)].flatMap((m) => [Number(m[1]), Number(m[2])]);
+  expect(tamanos.length, 'el FAQPage sigue citando tamaños').toBeGreaterThan(0);
   for (const t of tamanos) expect(opciones, `«${t}» del FAQPage es un tamaño que se puede elegir`).toContain(t);
+  expect(faq, 'sin franjas de edad sin fuente').not.toMatch(/a partir de los \w+ años|método de un adulto/);
   const pagina = await page.evaluate(() => document.body.textContent ?? '');
   if (pagina.includes('callejones sin salida son el mejor indicador')) {
     expect(faq).not.toContain('la señal fiable es la longitud del camino');
   }
 });
 
-test('HALLAZGO (17/11/2026, ABIERTO) · la description no promete elegir un «nivel» que la app no tiene', async ({ page }) => {
-  // «Elige tamaño, tipo de trazado y nivel»: los controles son ancho, alto, trazado y n.º.
-  test.fail();
+test('HALLAZGO 4953 (17/11/2026, REPARADO) · la description no promete elegir un «nivel» que la app no tiene', async ({ page }) => {
+  // «Elige tamaño, tipo de trazado y nivel»: los controles son ancho, alto, trazado y n.º. Y
+  // «descárgalos» sin descarga: la app imprime, y el diálogo permite guardar como PDF.
   const descripcion = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
+  expect(descripcion).toContain('Elige tamaño y tipo de trazado');
+  expect(descripcion).not.toMatch(/desc[aá]rga/i);
   if (/\bnivel\b/i.test(descripcion)) {
     const controles =
       (await page.getByRole('combobox', { name: /nivel/i }).count()) +
@@ -494,9 +503,8 @@ test('HALLAZGO (17/11/2026, ABIERTO) · la description no promete elegir un «ni
   }
 });
 
-test('HALLAZGO (17/11/2026, ABIERTO) · las características del JSON-LD escriben el porcentaje con espacio duro', async ({ page }) => {
+test('HALLAZGO 4954 (17/11/2026, REPARADO) · las características del JSON-LD escriben el porcentaje con espacio duro', async ({ page }) => {
   // «Funciona 100% en el navegador»: el % va separado con U+00A0 (CLAUDE.md, formato español).
-  test.fail();
   const caracteristicas = await page.evaluate(() => {
     for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
       const j = JSON.parse(s.textContent ?? '{}') as { '@type'?: string; featureList?: string[] };
@@ -506,4 +514,5 @@ test('HALLAZGO (17/11/2026, ABIERTO) · las características del JSON-LD escribe
   });
   expect(caracteristicas.length).toBeGreaterThanOrEqual(4);
   for (const c of caracteristicas) expect(c, c).not.toMatch(/\d( )?%/);
+  expect(caracteristicas.join(' ')).toContain('100 %');
 });

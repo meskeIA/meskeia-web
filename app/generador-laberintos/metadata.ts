@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Generador de Laberintos para Imprimir | meskeIA',
   description:
-    'Crea laberintos con solución única y descárgalos para imprimir. Elige tamaño, tipo de trazado y nivel. Incluye la solución y el número de laberinto para repetirlo.',
+    'Crea laberintos con solución única para imprimir o guardar en PDF. Elige tamaño y tipo de trazado. Incluye la solución y el número de laberinto para repetirlo.',
   keywords:
     'generador de laberintos, laberintos para imprimir, laberinto con solución, laberintos para niños, crear laberinto, laberinto pdf, pasatiempos imprimibles, actividad infantil',
   authors: [{ name: 'meskeIA' }],
@@ -54,7 +54,7 @@ export const jsonLd = generateWebAppSchema({
     'Solución superpuesta que se activa y desactiva',
     'Número de laberinto reproducible para reimprimir el mismo',
     'Dibujo vectorial: se imprime nítido a cualquier tamaño',
-    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Funciona 100 % en el navegador, sin registro ni instalación',
   ],
 });
 
@@ -81,10 +81,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué tamaño de laberinto es adecuado para cada edad?',
+      name: '¿Qué tamaño de laberinto conviene elegir?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Como referencia práctica, de 8×8 a 10×10 funciona a partir de los cuatro años, de 12×12 a 16×16 entra en el rango escolar habitual, y de 20×20 en adelante ya exige método de un adulto. Más que la edad, la señal fiable es la longitud del camino: la app la muestra en casillas junto con el número de callejones sin salida.',
+        text: 'Depende de la práctica y de la vista de quien lo resuelve, más que de una edad concreta. Los tamaños pequeños (8×8 o 10×10) dejan casillas grandes, fáciles de seguir con el lápiz, y los mayores (25×25 o 32×32) las dejan diminutas en una hoja. El tamaño alarga el recorrido, pero la dificultad la marcan sobre todo los callejones sin salida: la app los cuenta junto con la longitud del camino.',
       },
     },
     {
@@ -100,7 +100,7 @@ export const faqJsonLd = {
       name: '¿Por qué el laberinto se imprime nítido a cualquier tamaño?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El dibujo es vectorial (SVG), no una imagen de puntos, de modo que las líneas se calculan en el momento de imprimir con la resolución de la impresora. Un laberinto de 30×30 sale con paredes limpias tanto en A4 como ampliado, algo que no ocurre con las capturas de pantalla o los JPEG descargados.',
+        text: 'El dibujo es vectorial (SVG), no una imagen de puntos, de modo que las líneas se calculan en el momento de imprimir con la resolución de la impresora. Un laberinto de 32×32 sale con paredes limpias tanto en A4 como ampliado, algo que no ocurre con las capturas de pantalla o los JPEG descargados.',
       },
     },
   ],
