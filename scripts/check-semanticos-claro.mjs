@@ -76,6 +76,14 @@
  *   · El fondo de un antecesor que el JSX del mismo fichero no deja ver: un hijo pintado por
  *     OTRO componente (otro fichero), un `className` que no es `styles.x` ni `styles['x']`, o
  *     un fondo de la antecesora que no está en su regla base (`.x` a secas). Lo mide el píxel.
+ *     Incluye la clase que el TSX elige con plantilla (`styles[\`${type}Box\`]`,
+ *     `styles[etiqueta.clase]`): así se escapó InfoBox a C0681 y a C0708 (successTitle a 1,37:1).
+ *     Límite ACEPTADO (cabo C0774, 17/11/2026): en la campaña de C0708 eran 7 de 103 sitios
+ *     (test-salud-negocio-freelance, visualizador-cambio-climatico-tipping-points,
+ *     guia-tejidos-fibras, orientador-medicamentos-mascotas, comparador-formas-juridicas, InfoBox),
+ *     revisados a mano, y solo InfoBox empeoraba. Resolver la plantilla contra las clases del módulo
+ *     que encajan (`Box` → successBox, medicalBox…) obliga a elegir contra cuál medir cuando
+ *     encajan varias, y en un candado sin pasivo cada lectura nueva rompe el build en el acto.
  *   · `var(--x, #lit)` con `--x` sin declarar en la hoja: lo pone el TSX en su `style`.
  *   · Los `style={{ color }}` de los `.tsx`, el `fill` de un SVG y el texto de un `<canvas>`.
  *   · Las apps congeladas (los cursos, 16/10/2026: publicados, sin drenar su pasivo).
