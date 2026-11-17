@@ -734,10 +734,11 @@ test('REPARADO (hallazgo 4867) · «unos 3,5 kg en una persona de 70» no decía
 //     por URL («Los valores de búsqueda enviados son incorrectos») y el de la OMS se pinta en el
 //     cliente y no devuelve resultados. Así que no se pudo comprobar si el criterio original lleva
 //     también un umbral relativo al peso (un porcentaje), que es justo lo que la frase niega.
-test.fail('HALLAZGO (17/11/2026, ABIERTO) · cabo C0787 · «con independencia del peso de partida» no se puede anclar a una fuente accesible', async ({
+test('REPARADO (hallazgo 4934, cabo C0787) · «con independencia del peso de partida» no se puede anclar a una fuente accesible', async ({
   page,
 }) => {
-  // ABIERTO: la frase afirma en absoluto que Fried fija 4,5 kg «con independencia del peso de
+  // REPARADO 17/11/2026: la frase se queda en que Fried es otra escala y de ahí viene la cifra.
+  // Antes: la frase afirmaba en absoluto que Fried fija 4,5 kg «con independencia del peso de
   // partida», y no hay fuente accesible que lo sostenga (criterio C0203: lo que no se puede
   // anclar se matiza o se retira). Esperado: la frase sin esa afirmación absoluta, que se quede
   // en que Fried es otra escala y de ahí viene la cifra de 4,5 kg. Si la reparación prefiere
@@ -754,4 +755,5 @@ test.fail('HALLAZGO (17/11/2026, ABIERTO) · cabo C0787 · «con independencia d
   await expect(aviso).toContainText('el umbral que usa este test');
 
   await expect(page.getByText(/con independencia del peso de partida/)).toHaveCount(0);
+  await expect(aviso).toContainText('Los criterios de Fried son otra escala, y de ellos viene la cifra de 4,5 kg');
 });
