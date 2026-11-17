@@ -370,15 +370,20 @@ test.describe('Cabo C0789 (17/11/2026): territorios forales y la STS de marzo de
     expect(avisaForal || !daCifraEstatal, 'aviso de régimen foral o sin la cifra estatal').toBe(true);
   });
 
-  // ABIERTO: la «STS de marzo 2024» no se ha podido anclar en ninguna fuente de la red (CENDOJ fuera,
-  // la sede de la AEAT da 403), y tal como está escrita es una obviedad: el art. 31.Uno.b solo excluye
-  // los elementos que «no sean susceptibles de producir los rendimientos gravados», y una acción que
-  // reparte dividendos los produce. Criterio C0203: retirarla o matizarla con fuente accesible.
-  test.fail('ABIERTO (cabo C0789) · «la STS de marzo 2024 … las acciones que reparten dividendos NO son improductivas» sin fuente que la ancle', async ({ page }) => {
+  // REPARADO (17/11/2026): la «STS de marzo 2024» no se ha podido anclar en ninguna fuente de la red
+  // (CENDOJ fuera, la sede de la AEAT da 403), y tal como estaba escrita era una obviedad: el
+  // art. 31.Uno.b solo excluye los elementos que «no sean susceptibles de producir los rendimientos
+  // gravados», y una acción que reparte dividendos los produce. Criterio C0203: retirada en sus cuatro
+  // sitios; queda el criterio literal de la ley.
+  test('REPARADO (hallazgo 4938) · «la STS de marzo 2024 … las acciones que reparten dividendos NO son improductivas» sin fuente que la ancle', async ({ page }) => {
     const sinAnclar = /acciones (que reparten dividendos|con dividendos) NO son improductivas/i;
     const guia = (await page.locator('[data-guia-educativa]').textContent()) ?? '';
     expect(guia).not.toMatch(sinAnclar);
+    expect(guia).not.toMatch(/STS/);
+    expect(guia).toContain('susceptible de producir los');
     await comprobar(page, { ccaa: 'cataluna', bi: '100.000', irpf: '35.000', ip: '40.000' });
-    expect((await resultado(page).textContent()) ?? '').not.toMatch(sinAnclar);
+    const texto = (await resultado(page).textContent()) ?? '';
+    expect(texto).not.toMatch(sinAnclar);
+    expect(texto).not.toMatch(/STS/);
   });
 });

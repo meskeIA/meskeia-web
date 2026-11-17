@@ -472,8 +472,8 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                   </p>
                   <p style={{ margin: 0, fontSize: '0.92rem', lineHeight: 1.6 }}>
                     Obras de arte, joyas, vehículos no afectos o inmuebles desocupados pueden quedar excluidos del
-                    cálculo del límite (Art. 31.1.b). La STS de marzo 2024 ha flexibilizado esto: las acciones que
-                    reparten dividendos NO son improductivas. Tu asesor fiscal aplicará la doctrina vigente.
+                    cálculo del límite (Art. 31.1.b). El criterio de la ley es si el bien puede producir rendimientos
+                    gravados en el IRPF; qué bienes encajan se discute caso a caso. Tu asesor fiscal aplicará la doctrina vigente.
                   </p>
                 </div>
               </>
@@ -670,9 +670,9 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 El Art. 31.1.b excluye del cálculo del límite conjunto los elementos patrimoniales que, por su
                 naturaleza, no producen rendimientos gravados en IRPF: ciertos inmuebles desocupados, obras de
                 arte, joyas, antigüedades… La idea es que la reducción no debe favorecer patrimonio "guardado" que
-                no genera renta. Sin embargo, esto ha sido muy litigado: la STS de marzo 2024 (recursos 8728/2022
-                y similares) ha aclarado que las acciones que reparten dividendos NO son improductivas, aunque
-                el contribuyente no las venda ese año.
+                no genera renta. El texto de la ley mira si el elemento es «susceptible de producir los
+                rendimientos gravados» por el IRPF, y la aplicación a cada tipo de bien se ha discutido en los
+                tribunales: tu asesor fiscal aplicará la doctrina vigente.
               </p>
             </div>
 
@@ -772,8 +772,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 <h4>Si el resultado es "posible", consulta a tu asesor</h4>
                 <p>
                   El cálculo exacto requiere repartir la reducción entre cónyuges, exclusión correcta de bienes
-                  improductivos, aplicación de la STS de marzo 2024 sobre acciones con dividendos y otros matices
-                  técnicos. Tu asesor fiscal lo aplicará en el modelo 714.
+                  improductivos según la doctrina vigente y otros matices técnicos. Tu asesor fiscal lo aplicará en el modelo 714.
                 </p>
               </div>
             </div>
@@ -905,8 +904,8 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
               </li>
               <li>
                 <strong>Olvidar la exclusión de bienes improductivos.</strong> Obras de arte, joyas, vehículos no
-                afectos o inmuebles desocupados pueden quedar excluidos. La STS marzo 2024 aclaró que las acciones
-                con dividendos NO son improductivas.
+                afectos o inmuebles desocupados pueden quedar excluidos si no pueden producir rendimientos
+                gravados en el IRPF.
               </li>
               <li>
                 <strong>Pensar que la reducción puede dejar la cuota de Patrimonio en 0 €.</strong> Imposible: el
