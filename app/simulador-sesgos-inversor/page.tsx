@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { enfocarALaVista, enfocarSinCentrar } from '@/lib/cromoFijo';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import LegalNotice from '@/components/LegalNotice';
@@ -322,7 +324,29 @@ export default function SimuladorSesgosInversorPage() {
   const haRespondido = seleccionada !== null;
   const opcionElegida = seleccionada !== null ? escenario?.opciones[seleccionada] : null;
 
+  // Hallazgo 4909 (17/11/2026): «Empezar», contestar (la opción se deshabilita) y «Siguiente» (se
+  // desmonta) dejaban el foco en <body>. La receta de la familia de quizzes (cabo C0018): foco al
+  // enunciado nuevo con enfocarALaVista y a «Siguiente» con enfocarSinCentrar; el veredicto, en una
+  // región viva. Y la guarda de doble toque, porque al mover la vista el 2.º toque cae en otra cosa.
+  const tituloEscenarioRef = useRef<HTMLParagraphElement>(null);
+  const tituloResultadoRef = useRef<HTMLHeadingElement>(null);
+  const siguienteRef = useRef<HTMLButtonElement>(null);
+  const accionUsuarioRef = useRef(false);
+  const marcarCambioPantalla = useGuardaRafaga();
+
+  useEffect(() => {
+    if (!accionUsuarioRef.current) return;
+    if (fase === 'test') enfocarALaVista(tituloEscenarioRef.current);
+    if (fase === 'resultado') enfocarALaVista(tituloResultadoRef.current);
+  }, [fase, indice]);
+
+  useEffect(() => {
+    if (haRespondido) enfocarSinCentrar(siguienteRef.current);
+  }, [haRespondido]);
+
   function iniciar() {
+    accionUsuarioRef.current = true;
+    marcarCambioPantalla();
     setIndice(0);
     setSeleccionada(null);
     setSesgosDetectados([]);
@@ -331,6 +355,7 @@ export default function SimuladorSesgosInversorPage() {
 
   function elegir(i: number) {
     if (haRespondido) return;
+    marcarCambioPantalla({ soloMismoPunto: true });
     setSeleccionada(i);
     const opcion = escenario.opciones[i];
     if (opcion.sesgoId && opcion.nivel !== 'ninguno') {
@@ -343,6 +368,7 @@ export default function SimuladorSesgosInversorPage() {
   }
 
   function siguiente() {
+    marcarCambioPantalla();
     if (indice + 1 >= ESCENARIOS.length) {
       setFase('resultado');
     } else {
@@ -431,7 +457,7 @@ export default function SimuladorSesgosInversorPage() {
             </div>
 
             <div className={styles.escenarioCard}>
-              <p className={styles.escenarioTitulo}><span aria-hidden="true">📋</span> {escenario.titulo}</p>
+              <p ref={tituloEscenarioRef} tabIndex={-1} className={styles.escenarioTitulo}><span aria-hidden="true">📋</span> {escenario.titulo}</p>
               <div className={styles.contexto}>
                 <p>{escenario.contexto}</p>
               </div>
@@ -460,6 +486,7 @@ export default function SimuladorSesgosInversorPage() {
                 })}
               </div>
 
+              <div aria-live="polite">
               {haRespondido && opcionElegida && (
                 <div className={`${styles.feedback} ${opcionElegida.sesgoId ? styles.feedbackSesgo : styles.feedbackNeutral}`}>
                   {opcionElegida.sesgoId && (
@@ -471,11 +498,12 @@ export default function SimuladorSesgosInversorPage() {
                     <p className={styles.feedbackSesgoNombre}><span aria-hidden="true">✅</span> Decisión racional</p>
                   )}
                   <p className={styles.feedbackTexto}>{opcionElegida.feedbackInmediato}</p>
-                  <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
+                  <button ref={siguienteRef} type="button" className={styles.btnSiguiente} onClick={siguiente}>
                     {indice + 1 >= ESCENARIOS.length ? 'Ver mi perfil →' : 'Siguiente escenario →'}
                   </button>
                 </div>
               )}
+              </div>
             </div>
           </div>
         )}
@@ -488,7 +516,7 @@ export default function SimuladorSesgosInversorPage() {
                 <span className={styles.resumenEmoji} aria-hidden="true">
                   {sesgosDetectados.length === 0 ? '🏆' : sesgosDetectados.filter(s => s.nivel === 'alto').length >= 3 ? '⚠️' : '📊'}
                 </span>
-                <h2 className={styles.resumenTitulo}>
+                <h2 ref={tituloResultadoRef} tabIndex={-1} className={styles.resumenTitulo}>
                   {sesgosDetectados.length === 0
                     ? 'Sin sesgos detectados'
                     : `${sesgosDetectados.length} sesgo${sesgosDetectados.length > 1 ? 's' : ''} detectado${sesgosDetectados.length > 1 ? 's' : ''}`}

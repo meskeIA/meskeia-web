@@ -381,8 +381,8 @@ test.describe('Hallazgos 17/11/2026', () => {
     await expect(tituloResultado(page)).toHaveText('Sin sesgos detectados');
   });
 
-  test('ABIERTO — al contestar, el foco cae a <body> y el veredicto no se anuncia', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4909) — al contestar, el foco caía a <body> y el veredicto no se anunciaba', async ({ page }) => {
+    // REPARADO 17/11/2026: foco a «Siguiente» (enfocarSinCentrar) y el veredicto en aria-live.
     await abrir(page);
     await empezar(page);
     await opciones(page).nth(0).focus();
@@ -400,8 +400,8 @@ test.describe('Hallazgos 17/11/2026', () => {
     expect(anunciado).toBe(true);
   });
 
-  test('ABIERTO — tras «Empezar» y «Siguiente» el foco cae a <body> y el Tab salta las opciones', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4909) — tras «Empezar» y «Siguiente» el foco caía a <body> y el Tab saltaba las opciones', async ({ page }) => {
+    // REPARADO 17/11/2026: foco al título del escenario con enfocarALaVista (lib/cromoFijo.ts).
     await abrir(page);
     await page.getByRole('button', { name: /Empezar simulación/ }).focus();
     await page.keyboard.press('Enter');
