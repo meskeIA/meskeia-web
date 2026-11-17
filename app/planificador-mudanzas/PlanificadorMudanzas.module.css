@@ -66,6 +66,26 @@
   color: var(--primary-texto);
 }
 
+/* El nombre se edita con un botón (C0778): hereda la tipografía del h2 y no pinta caja */
+.botonNombre {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  text-align: left;
+}
+
+.botonNombre:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .editIcon {
   font-size: 1rem;
   opacity: 0.5;

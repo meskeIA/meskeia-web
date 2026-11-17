@@ -468,6 +468,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
             {modoEdicionNombre ? (
               <input
                 type="text"
+                aria-label="Nombre de la mudanza"
                 value={datos.nombre}
                 onChange={(e) => setDatos(prev => ({ ...prev, nombre: e.target.value }))}
                 onBlur={() => setModoEdicionNombre(false)}
@@ -476,8 +477,15 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                 autoFocus
               />
             ) : (
-              <h2 onClick={() => setModoEdicionNombre(true)} className={styles.tituloMudanza}>
-                {datos.nombre} <span className={styles.editIcon} aria-hidden="true">✏️</span>
+              <h2 className={styles.tituloMudanza}>
+                <button
+                  type="button"
+                  className={styles.botonNombre}
+                  onClick={() => setModoEdicionNombre(true)}
+                >
+                  {datos.nombre} <span className={styles.editIcon} aria-hidden="true">✏️</span>
+                  <span className="sr-only"> (editar nombre de la mudanza)</span>
+                </button>
               </h2>
             )}
           </div>
