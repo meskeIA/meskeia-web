@@ -23,7 +23,8 @@ import { contrasteSobreFondoReal } from './_contraste';
  * CONJUNTOS ESPERADOS (40 fichas)
  *   Forma ...... Larga 10 · Corta 14 · Rellena 5 · Lámina 2 · Sopa 4 · Especial 5 (Gnocchi es
  *                «Especial» aunque el comentario del código lo cuente entre las 15 cortas)
- *   Región ..... Norte 14 · Centro 8 · Sur 11 · Sicilia/Cerdeña 4 · Internacional 3
+ *   Región ..... Norte 15 · Centro 8 · Sur 10 · Sicilia/Cerdeña 4 · Internacional 3
+ *                (Linguine pasó de Sur a Norte al reparar el hallazgo 1, 18/11/2026)
  *   Dificultad . Fácil 12 · Media 9 · Avanzada 19
  *   Larga + Pesto ......... 1 (Linguine)
  *   Rellena + Norte ....... 5 (las cinco rellenas son del Norte)
@@ -34,6 +35,7 @@ import { contrasteSobreFondoReal } from './_contraste';
  *
  * HALLAZGOS ABIERTOS (cada uno con su test `test.fail()` al final; al repararlo, ese test pasa,
  * `test.fail` lo pone en rojo y hay que convertirlo en un test normal y marcarlo REPARADO)
+ *   REPARADOS el 18/11/2026: 1, 3, 4 y 7.
  *   1. Linguine en «Sur» con origen «Génova/Liguria»; Capellini, mismo origen, en «Norte».
  *   2. «Internacional» agrupa tres pastas cuyo origen es «Italia»; Spätzle y Couscous, no italianas,
  *      van en regiones italianas.
@@ -211,15 +213,16 @@ test.describe('los filtros devuelven exactamente su conjunto', () => {
     await expect(fichas(page)).toHaveText(['Ditalini']);
   });
 
-  test('CASO 1.bis — las regiones de las fichas, tal como están hoy (control de los hallazgos 1 y 2)', async ({
+  test('CASO 1.bis — las regiones de las fichas (control de los hallazgos 1 y 2)', async ({
     page,
   }) => {
     await pulsar(page, 'Región', 'Sur');
-    await expect(fichas(page)).toHaveCount(11);
-    // Linguine en el Sur con origen ligur, que es el hallazgo 1.
-    expect(await origenes(page)).toContain('Linguine → Génova/Liguria');
+    await expect(fichas(page)).toHaveCount(10);
+    // REPARADO (hallazgo 1, 18/11/2026): Linguine, de origen ligur, ya no está en el Sur.
+    expect(await origenes(page)).not.toContain('Linguine → Génova/Liguria');
     await pulsar(page, 'Región', 'Norte');
-    await expect(fichas(page)).toHaveCount(14);
+    await expect(fichas(page)).toHaveCount(15);
+    expect(await origenes(page)).toContain('Linguine → Génova/Liguria');
     expect(await origenes(page)).toContain('Capellini / Cabello de ángel → Génova/Liguria');
     expect(await origenes(page)).toContain('Trofie → Liguria');
     await pulsar(page, 'Región', 'Internacional');
@@ -332,9 +335,9 @@ test.describe('hallazgos abiertos (18/11/2026)', () => {
     await abrir(page);
   });
 
-  // ABIERTO (hallazgo 1) — Región «Sur» lista Linguine con origen «Génova/Liguria», mientras
-  // Capellini (mismo origen) y Trofie (Liguria) van en «Norte». Esperado: Linguine en Norte.
-  test.fail('ABIERTO 1 — Linguine (Génova/Liguria) está en Norte, como Capellini y Trofie', async ({ page }) => {
+  // REPARADO (hallazgo 1, 18/11/2026) — Región «Sur» listaba Linguine con origen «Génova/Liguria»,
+  // mientras Capellini (mismo origen) y Trofie (Liguria) iban en «Norte». Ahora Linguine es Norte.
+  test('REPARADO 1 — Linguine (Génova/Liguria) está en Norte, como Capellini y Trofie', async ({ page }) => {
     await pulsar(page, 'Región', 'Norte');
     await expect(fichas(page)).toContainText(['Linguine'], { timeout: 2000 });
   });
@@ -346,25 +349,37 @@ test.describe('hallazgos abiertos (18/11/2026)', () => {
     expect(italianas).toEqual([]);
   });
 
-  // ABIERTO (hallazgo 3) — el consejo y el FAQPage dicen «pasta larga + salsa lisa», y ponen de
-  // ejemplo el ragù (salsa con tropezones de carne) con tagliatelle; la tabla dice «Pasta larga
-  // plana → Carne» y las fichas de Tagliatelle, Pappardelle y Pici llevan Carne.
-  test.fail('ABIERTO 3 — el consejo de maridaje no contradice a la tabla ni a las fichas', async ({ page }) => {
+  // REPARADO (hallazgo 3, 18/11/2026) — el consejo y el FAQPage decían «pasta larga + salsa lisa»
+  // y ponían de ejemplo el ragù (salsa con tropezones de carne) con tagliatelle; la tabla dice
+  // «Pasta larga plana → Carne» y las fichas de Tagliatelle, Pappardelle y Pici llevan Carne.
+  // Ahora los tres separan la larga FINA (salsa ligera) de la larga PLANA (carne).
+  test('REPARADO 3 — el consejo de maridaje no contradice a la tabla ni a las fichas', async ({ page }) => {
     const texto = await textoDeLaPagina(page);
     expect(texto).not.toContain('Por eso el ragù va con tagliatelle (lisa)');
+    expect(texto).toContain('Salsa ligera con pasta fina; salsa con tropezones con pasta ancha o con hueco.');
+    expect(texto).toContain('el ragù va con tagliatelle (ancha y porosa, al huevo)');
     const faq = await leerFaqPage(page);
     const larga = faq.find((p) => p.q === '¿Qué diferencia hay entre pasta corta y pasta larga?');
     expect(larga?.a ?? '').not.toContain('La pasta larga (spaghetti, linguine, tagliatelle) se adapta mejor a salsas líquidas o aceitosas');
+    expect(larga?.a ?? '').toContain('La pasta larga y plana al huevo (tagliatelle, pappardelle) aguanta salsas de carne como el ragù');
   });
 
-  // ABIERTO (hallazgo 4) — FAQPage: «la pasta fresca suele estar lista en 2-4 minutos» frente a
-  // 4-6/5-7/6-8/10-12 min (fresca) de las fichas y 4-7/3-6 de la tabla; y «angel hair».
-  test.fail('ABIERTO 4 — el FAQPage da para la pasta fresca los tiempos de la página', async ({ page }) => {
+  // REPARADO (hallazgo 4, 18/11/2026) — el FAQPage daba «la pasta fresca suele estar lista en
+  // 2-4 minutos» frente a 4-6/5-7/6-8/10-12 min (fresca) de las fichas y 4-7/3-6 de la tabla, y
+  // «angel hair». Ahora: fresca al huevo 3-7 (rellenas 3-6), pici y orecchiette 6-12, capellini 2-3.
+  test('REPARADO 4 — el FAQPage da para la pasta fresca los tiempos de la página', async ({ page }) => {
     const faq = await leerFaqPage(page);
     const tiempo = faq.find((p) => p.q === '¿Cuánto tiempo se tarda en cocer la pasta al dente?');
     expect(tiempo).toBeDefined();
     expect(tiempo?.a ?? '').not.toContain('la pasta fresca suele estar lista en 2-4 minutos');
     expect(tiempo?.a ?? '').not.toContain('angel hair');
+    expect(tiempo?.a ?? '').toContain('capellini o cabello de ángel) necesita 2-3 minutos');
+    expect(tiempo?.a ?? '').toContain('la pasta fresca al huevo, entre 3 y 7 minutos (las rellenas, de 3 a 6)');
+    expect(tiempo?.a ?? '').toContain('como los pici o las orecchiette, de 6 a 12 minutos');
+    // Las cifras salen de las fichas: Capellini 2-3, Tortellini 3-5, Pappardelle 5-7, Orecchiette 10-12.
+    await expect(ficha(page, 'Capellini / Cabello de ángel')).toContainText('2-3 min');
+    await expect(ficha(page, 'Tortellini')).toContainText('3-5 min (fresca)');
+    await expect(ficha(page, 'Orecchiette')).toContainText('10-12 min (fresca)');
   });
 
   // ABIERTO (hallazgo 5) — «tiempo de cocción exacto» (la página da rangos y manda guiarse por el
@@ -388,15 +403,19 @@ test.describe('hallazgos abiertos (18/11/2026)', () => {
     expect(features.length).toBeGreaterThanOrEqual(4);
   });
 
-  // ABIERTO (hallazgo 7) — «macarrones», «espaguetis», «ñoquis», «lasaña» y «canelones» dan
-  // «No hay pastas que coincidan». La propia ficha de Gnocchi traduce «ñoquis» en su curiosidad.
-  test.fail('ABIERTO 7 — el buscador encuentra cada pasta por su nombre en español', async ({ page }) => {
+  // REPARADO (hallazgo 7, 18/11/2026) — «macarrones», «espaguetis», «ñoquis», «lasaña» y
+  // «canelones» daban «No hay pastas que coincidan». Ahora el buscador mira también
+  // NOMBRES_EN_ESPANOL (también «tallarines», «fideos» y «raviolis»).
+  test('REPARADO 7 — el buscador encuentra cada pasta por su nombre en español', async ({ page }) => {
     const casos: [string, string][] = [
       ['macarrones', 'Maccheroni'],
       ['espaguetis', 'Spaghetti'],
       ['ñoquis', 'Gnocchi'],
       ['lasaña', 'Lasagna'],
       ['canelones', 'Cannelloni'],
+      ['tallarines', 'Tagliatelle'],
+      ['fideos', 'Vermicelli'],
+      ['raviolis', 'Ravioli'],
     ];
     for (const [consulta, esperada] of casos) {
       await buscar(page, consulta);

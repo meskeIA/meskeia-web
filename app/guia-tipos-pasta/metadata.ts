@@ -61,7 +61,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre pasta corta y pasta larga?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La pasta larga (spaghetti, linguine, tagliatelle) se adapta mejor a salsas líquidas o aceitosas que se adhieren a la superficie. La pasta corta (penne, fusilli, rigatoni) atrapa mejor las salsas espesas con trocitos, gracias a sus canales y ranuras interiores. En general, a mayor textura exterior de la pasta, mejor agarra la salsa.',
+        text: 'Depende también del grosor. La pasta larga y fina (spaghetti, linguine, capellini) va mejor con salsas ligeras de aceite, marisco o tomate, que se reparten por toda la hebra. La pasta larga y plana al huevo (tagliatelle, pappardelle) aguanta salsas de carne como el ragù. La pasta corta (penne, fusilli, rigatoni) atrapa las salsas espesas con trocitos en sus canales y ranuras. En general, a mayor textura exterior de la pasta, mejor agarra la salsa.',
       },
     },
     {
@@ -69,7 +69,7 @@ export const faqJsonLd = {
       name: '¿Cuánto tiempo se tarda en cocer la pasta al dente?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El tiempo varía según el tipo y el grosor. La pasta seca fina (angel hair, fideos) necesita 2-4 minutos; la pasta seca estándar (spaghetti, penne) entre 8 y 12 minutos; la pasta fresca suele estar lista en 2-4 minutos. El punto al dente se alcanza cuando el interior conserva una ligera resistencia al morder. Siempre guíate por el paquete y prueba antes de escurrir.',
+        text: 'El tiempo varía según el tipo y el grosor. La pasta seca muy fina (capellini o cabello de ángel) necesita 2-3 minutos; la pasta seca estándar (spaghetti, penne) entre 8 y 12 minutos; la pasta fresca al huevo, entre 3 y 7 minutos (las rellenas, de 3 a 6), y las frescas más gruesas, como los pici o las orecchiette, de 6 a 12 minutos. El punto al dente se alcanza cuando el interior conserva una ligera resistencia al morder. Siempre guíate por el paquete y prueba antes de escurrir.',
       },
     },
     {

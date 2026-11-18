@@ -60,7 +60,7 @@ const pastas: TipoPasta[] = [
     nombre: 'Linguine',
     nombreOriginal: 'Linguine',
     forma: 'Larga',
-    region: 'Sur',
+    region: 'Norte',
     origen: 'Génova/Liguria',
     tiempoCoccion: '9-11 min',
     salsasIdeales: ['Pesto', 'Mar', 'Aceite-ajo'],
@@ -693,6 +693,32 @@ const pastas: TipoPasta[] = [
   },
 ];
 
+/**
+ * Nombres con que se busca cada pasta en español (España y Latinoamérica). El buscador los
+ * mira además del nombre italiano: quien escribe «macarrones» o «ñoquis» tiene que encontrar
+ * su ficha. Las claves son el `nombre` de la ficha.
+ */
+const NOMBRES_EN_ESPANOL: Record<string, string[]> = {
+  Spaghetti: ['espaguetis', 'espagueti'],
+  Tagliatelle: ['tallarines'],
+  Fettuccine: ['fetuchinis', 'fetuchini'],
+  Vermicelli: ['fideos', 'fideo'],
+  'Capellini / Cabello de ángel': ['fideos finos'],
+  Penne: ['plumas', 'plumitas'],
+  Fusilli: ['espirales', 'hélices', 'tornillos'],
+  Farfalle: ['lazos', 'moñitos', 'mariposas', 'corbatitas'],
+  Conchiglie: ['conchas', 'conchitas'],
+  Maccheroni: ['macarrones', 'macarrón'],
+  Gnocchi: ['ñoquis', 'ñoqui'],
+  Ravioli: ['raviolis', 'ravioles'],
+  Tortellini: ['tortelinis'],
+  Lasagna: ['lasaña', 'lasañas'],
+  Cannelloni: ['canelones', 'canelón', 'canelons'],
+  'Pastina / Stelline': ['estrellitas'],
+  'Anelli / Anellini': ['anillos', 'anillitos'],
+  Couscous: ['cuscús', 'alcuzcuz'],
+};
+
 const TODAS_FORMAS: FormaPasta[] = [
   'Larga',
   'Corta',
@@ -735,6 +761,7 @@ export default function GuiaTiposPastaPage() {
         const coincide =
           normalizarBusqueda(pasta.nombre).includes(texto) ||
           normalizarBusqueda(pasta.nombreOriginal).includes(texto) ||
+          (NOMBRES_EN_ESPANOL[pasta.nombre] ?? []).some((n) => normalizarBusqueda(n).includes(texto)) ||
           pasta.salsasIdeales.some((s) => normalizarBusqueda(s).includes(texto)) ||
           pasta.platosClasicos.some((p) => normalizarBusqueda(p).includes(texto)) ||
           normalizarBusqueda(pasta.descripcion).includes(texto) ||
@@ -1194,9 +1221,11 @@ export default function GuiaTiposPastaPage() {
                 grumos en lugar de fundirse en crema.
               </li>
               <li>
-                <strong>Pasta corta + salsa con tropezones; pasta larga + salsa lisa.</strong> Esta
-                regla italiana evita que los trozos se queden en el plato sin pasta. Por eso el ragù
-                va con tagliatelle (lisa) y la salsa de salchicha con rigatoni (tubo).
+                <strong>Salsa ligera con pasta fina; salsa con tropezones con pasta ancha o con
+                hueco.</strong> Esta regla italiana evita que los trozos se queden en el plato sin
+                pasta. Los spaghetti y los capellini piden aceite, marisco o tomate ligero; el ragù
+                va con tagliatelle (ancha y porosa, al huevo) y la salsa de salchicha con rigatoni
+                (tubo).
               </li>
               <li>
                 <strong>Compra pasta de sémola de trigo duro 100%.</strong> Lee el ingrediente: debe
