@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Atractor de Lorenz: Visualizador del Caos y el Efecto Mariposa',
     description:
-      'Dos trayectorias separadas por 0.01 que acaban en lugares completamente distintos. El caos visualizado.',
+      'Dos trayectorias separadas por 0,01 que acaban en lugares completamente distintos. El caos visualizado.',
     type: 'website',
     images: [{
       url: 'https://meskeia.com/og-image.png',
@@ -34,7 +34,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Visualiza el atractor de Lorenz y el efecto mariposa: dos trayectorias casi idénticas que divergen completamente. Caos determinista, sensibilidad a condiciones iniciales y sistemas caóticos reales.",
   url: "https://meskeia.com/visualizador-caos-mariposa/",
   category: 'EducationalApplication',
-  features: [],
+  // Hallazgo 5145 (18/11/2026): estaba vacía. Lo que la app hace, visto en la inspección
+  features: [
+    'Dos trayectorias del sistema de Lorenz (σ = 10, ρ = 28, β = 8/3) en la proyección x-z, integradas con RK4',
+    'Diferencia inicial ε ajustable entre 0,001 y 1 en escala logarítmica',
+    'Progreso de la simulación hasta 7.000 pasos',
+    'Aviso del paso en que las trayectorias se separan y marcador en el lienzo',
+    'Explicación del exponente de Lyapunov, los atractores extraños y el determinismo sin predicción',
+    'Seis ejemplos de sistemas caóticos reales',
+  ],
 });
 
 export const faqJsonLd = {

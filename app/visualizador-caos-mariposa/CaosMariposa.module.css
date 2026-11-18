@@ -89,6 +89,16 @@
   font-weight: 500;
 }
 
+/* Leyenda en tonos de TEXTO por tema (hallazgo 5140, 18/11/2026): el #E67E22 y el #E74C3C de las
+   trazas daban 2,73:1 y 3,66:1 sobre el fondo claro. En oscuro, los tonos claros de los tokens */
+.leyendaTrayectoria2 {
+  color: var(--naranja-texto, #B93E0B);
+}
+
+.leyendaDivergencia {
+  color: var(--rojo-texto, #B91C1C);
+}
+
 /* ── Controles ── */
 .controles {
   background: var(--bg-card);

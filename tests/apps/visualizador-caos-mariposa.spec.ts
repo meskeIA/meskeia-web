@@ -49,8 +49,12 @@ const EPS = '#diferencia-inicial';
 const PROGRESO = '#progreso-simulacion';
 
 // ── Referencia: el sistema de Lorenz con RK4 (dt = 0,001), muestreado cada 0,01 como la app ──
-// Válida para la condición inicial de la leyenda (x₀ = 0,1, y₀ = z₀ = 0) y el umbral de la app
-// (|Δx| + |Δz| > 5). Si la reparación cambia cualquiera de los dos, se cambia aquí.
+// REPARADO el 18/11/2026 (hallazgos 5136 y 5137): la app integra ahora con RK4 (dt = 0,001) y las
+// dos trayectorias salen de un punto YA en el atractor —el que se alcanza desde (0,1, 0, 0) tras
+// t = 10—, no de junto al origen (equilibrio inestable, que daba cruces espurios del umbral en los
+// pasos 20-54 con ε ≥ 0,0126). Umbral de la app: |Δx| + |Δz| > 5. Con esa salida la referencia está
+// convergida (dt 0,0005 y 0,00025 dan lo mismo): ε = 0,01 → 826 · ε = 0,001 → 1.377 · posición 19
+// → 825 · ε = 1 → 497 (.reparar-trabajo/caos-convergencia.mjs de la tanda).
 const SIGMA = 10;
 const RHO = 28;
 const BETA = 8 / 3;
@@ -73,10 +77,18 @@ function pasoRk4(p: Punto, dt: number): Punto {
   ];
 }
 
+/** Punto del atractor: desde (0,1, 0, 0), 1.000 pasos de 0,01 (t = 10) con RK4 dt = 0,001. */
+function puntoDelAtractor(): Punto {
+  let p: Punto = [X0, 0, 0];
+  for (let i = 0; i < 10000; i++) p = pasoRk4(p, 0.001);
+  return p;
+}
+
 /** Primer «paso» (de 0,01) en que las dos trayectorias de Lorenz se separan más de 5. */
 function pasoDivergenciaLorenz(eps: number): number {
-  let a: Punto = [X0, 0, 0];
-  let b: Punto = [X0 + eps, 0, 0];
+  const p0 = puntoDelAtractor();
+  let a: Punto = [p0[0], p0[1], p0[2]];
+  let b: Punto = [p0[0] + eps, p0[1], p0[2]];
   for (let i = 0; i < 7000; i++) {
     for (let s = 0; s < 10; s++) {
       a = pasoRk4(a, 0.001);
@@ -153,9 +165,9 @@ async function textoDeLaPagina(page: Page): Promise<string> {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-test('la referencia RK4 reproduce los valores convergidos del Inspector: 2.681 (ε = 0,01) y 2.849 (ε = 0,001)', () => {
-  expect(pasoDivergenciaLorenz(0.01)).toBe(2681);
-  expect(pasoDivergenciaLorenz(0.001)).toBe(2849);
+test('la referencia RK4 desde el atractor da los valores convergidos: 826 (ε = 0,01) y 1.377 (ε = 0,001)', () => {
+  expect(pasoDivergenciaLorenz(0.01)).toBe(826);
+  expect(pasoDivergenciaLorenz(0.001)).toBe(1377);
 });
 
 test.describe('Dinámica del sistema de Lorenz', () => {
@@ -205,45 +217,49 @@ test.describe('Dinámica del sistema de Lorenz', () => {
     await expect(avisoDivergencia(page)).not.toContainText(/NaN|Infinity/);
   });
 
-  test.fail('HALLAZGO ABIERTO (cálculo): con ε = 0,01 el paso anunciado es el de las ecuaciones de Lorenz (2.681), no el del Euler con dt = 0,01 (1.458)', async ({ page }) => {
-    // Euler explícito de primer orden con dt = 0,01: λ máx = 1,04 frente a 0,906, y la divergencia
-    // con ε = 0,01 sale en el paso 1.458. RK4 convergido: 2.681 (RK4 con dt = 0,01 da 2.757 y
-    // Heun con dt = 0,01, 2.821: la tolerancia de ±150 admite cualquier integrador de orden ≥ 2).
-    const referencia = pasoDivergenciaLorenz(0.01);
-    const n = await pasoAnunciado(page);
-    expect(Math.abs(n - referencia), `app ${n} · Lorenz ${referencia}`).toBeLessThanOrEqual(150);
+  test('REPARADO 5137 (cálculo): el paso anunciado es el de las ecuaciones de Lorenz (RK4 convergido), no el de un Euler con dt = 0,01', async ({ page }) => {
+    // Antes: Euler explícito con dt = 0,01 (λ máx = 1,04 frente a 0,906): con ε = 0,01 salía el paso
+    // 1.458 frente a 2.681 de la referencia con la misma salida. Ahora RK4 con dt = 0,001: 826.
+    for (const [posicion, eps] of [[20, 0.01], [30, 0.001], [0, 1]] as const) {
+      if (posicion !== 20) await sembrarValor(page, EPS, posicion);
+      const referencia = pasoDivergenciaLorenz(eps);
+      const n = await pasoAnunciado(page);
+      expect(Math.abs(n - referencia), `ε = ${eps}: app ${n} · Lorenz ${referencia}`).toBeLessThanOrEqual(2);
+    }
   });
 
-  test.fail('HALLAZGO ABIERTO (cálculo): con ε = 0,0126 la divergencia anunciada no es la salida desde el origen (hoy paso 54; se separan de verdad en el 1.455)', async ({ page }) => {
+  test('REPARADO 5136 (cálculo): con ε = 0,0126 la divergencia anunciada ya no es la salida desde el origen (antes paso 54)', async ({ page }) => {
     // Entre las posiciones 19 y 20 (ε × 0,79) la ley d(t) ≈ ε·e^(λt) mueve la divergencia ≈ 25
-    // pasos; hoy 54 frente a 1.458, porque el primer cruce de 5 es la salida rápida desde el
-    // equilibrio inestable del origen, tras la que las trayectorias vuelven a juntarse.
+    // pasos; antes 54 frente a 1.458, porque el primer cruce de 5 era la salida rápida desde el
+    // equilibrio inestable del origen. Ahora las trayectorias salen de un punto del atractor.
     await sembrarValor(page, EPS, 19);
     expect(await epsilonMostrada(page)).toBeCloseTo(0.0126, 4);
     const n19 = await pasoAnunciado(page);
+    expect(n19).toBeGreaterThan(100);
     await sembrarValor(page, EPS, 20);
     const n20 = await pasoAnunciado(page);
     expect(Math.abs(n19 - n20), `posición 19: paso ${n19} · posición 20: paso ${n20}`).toBeLessThanOrEqual(150);
   });
 
-  test.fail('HALLAZGO ABIERTO (cálculo): con ε = 0,1 el «● Punto de divergencia» anunciado se ve en el lienzo', async ({ page }) => {
-    // Hoy: «divergen en el paso 39», en (x 3,22 · z 0,82), que cae bajo el borde inferior del
-    // lienzo (z < 2): el marcador no se pinta.
-    await sembrarValor(page, EPS, 10);
-    expect(await epsilonMostrada(page)).toBeCloseTo(0.1, 9);
-    const n = await pasoAnunciado(page);
-    expect(n).toBeLessThan(7000);
-    expect(await pixelesMarcador(page), `paso ${n} con el progreso en 7.000`).toBeGreaterThan(0);
+  test('REPARADO 5136 (cálculo): con ε = 0,1 y ε = 1 el «● Punto de divergencia» anunciado se ve en el lienzo', async ({ page }) => {
+    // Antes: «divergen en el paso 39», en (x 3,22 · z 0,82), bajo el borde inferior del lienzo.
+    for (const posicion of [10, 0]) {
+      await sembrarValor(page, EPS, posicion);
+      const n = await pasoAnunciado(page);
+      expect(n).toBeLessThan(7000);
+      expect(await pixelesMarcador(page), `posición ${posicion}: paso ${n} con el progreso en 7.000`).toBeGreaterThan(0);
+    }
   });
 
-  test.fail('HALLAZGO ABIERTO (operativa): la pista «← … · … →» nombra bien el extremo de la ε más pequeña', async ({ page }) => {
+  test('REPARADO 5138 (operativa): la pista «← … · … →» nombra bien el extremo de la ε más pequeña', async ({ page }) => {
     await sembrarValor(page, EPS, 30);
     const epsDerecha = await epsilonMostrada(page);
     await sembrarValor(page, EPS, 0);
     const epsIzquierda = await epsilonMostrada(page);
     const pista = await page.locator('small', { hasText: 'ε' }).innerText();
     const [izquierda, derecha] = pista.split('·');
-    // Hoy: la derecha da ε = 0,001 y la pista dice «ε más grande →»
+    // Antes: la derecha daba ε = 0,001 y la pista decía «ε más grande →»
+    expect(epsDerecha).toBeLessThan(epsIzquierda);
     if (epsDerecha < epsIzquierda) {
       expect(derecha, `derecha: ε = ${epsDerecha}`).toContain('pequeña');
       expect(izquierda, `izquierda: ε = ${epsIzquierda}`).toContain('grande');
@@ -259,16 +275,17 @@ test.describe('Formato español', () => {
     await abrir(page);
   });
 
-  test.fail('CABO C0499 — HALLAZGO ABIERTO: la ε del rótulo va con coma decimal (hoy «1.00e-2» y «1.00e-3»)', async ({ page }) => {
-    for (const [posicion, eps] of [[20, 0.01], [30, 0.001]] as const) {
+  test('CABO C0499 — REPARADO 5143: la ε del rótulo va con coma decimal (antes «1.00e-2» y «1.00e-3»)', async ({ page }) => {
+    for (const [posicion, eps, texto] of [[20, 0.01, '1,00 × 10⁻²'], [30, 0.001, '1,00 × 10⁻³'], [0, 1, '1,00 × 10⁰']] as const) {
       if (posicion !== 20) await sembrarValor(page, EPS, posicion);
-      const texto = await rotuloEpsilon(page).innerText();
-      expect(texto, `ε = ${eps}`).not.toMatch(/\d\.\d/);
-      expect(valorEpsilon(texto)).toBeCloseTo(eps, 9);
+      const visto = await rotuloEpsilon(page).innerText();
+      expect(visto, `ε = ${eps}`).not.toMatch(/\d\.\d/);
+      expect(visto).toBe(texto);
+      expect(valorEpsilon(visto)).toBeCloseTo(eps, 9);
     }
   });
 
-  test.fail('HALLAZGO ABIERTO: ninguna cifra de la página con punto decimal (x₀ = 0.1, 0.506127, 0.00001, 0.9, 2.06)', async ({ page }) => {
+  test('REPARADO 5143: ninguna cifra de la página con punto decimal (antes x₀ = 0.1, 0.506127, 0.00001, 0.9, 2.06)', async ({ page }) => {
     const bloques = ['El Atractor de Lorenz', 'Conceptos clave', 'Sistemas caóticos en el mundo real'];
     let texto = '';
     for (const titulo of bloques) {
@@ -285,14 +302,14 @@ test.describe('Accesibilidad', () => {
     await abrir(page);
   });
 
-  test.fail('HALLAZGO ABIERTO: la leyenda «Trayectoria 2» y «Punto de divergencia» llega a 4,5:1 en el tema claro', async ({ page }) => {
-    // Hoy: #E67E22 = 2,73:1 y #E74C3C = 3,66:1 sobre rgb(250, 250, 250), en style={{…}} en línea
+  test('REPARADO 5140: la leyenda «Trayectoria 2» y «Punto de divergencia» llega a 4,5:1 en el tema claro', async ({ page }) => {
+    // Antes: #E67E22 = 2,73:1 y #E74C3C = 3,66:1 sobre rgb(250, 250, 250), en style={{…}} en línea
     expect(await contrasteSobreFondoReal(page.getByText(/^■ Trayectoria 1/)), 'Trayectoria 1 (control)').toBeGreaterThanOrEqual(4.5);
     expect(await contrasteSobreFondoReal(page.getByText(/^■ Trayectoria 2/)), 'Trayectoria 2').toBeGreaterThanOrEqual(4.5);
     expect(await contrasteSobreFondoReal(page.getByText(/Punto de divergencia$/)), 'Punto de divergencia').toBeGreaterThanOrEqual(4.5);
   });
 
-  test.fail('HALLAZGO ABIERTO: el deslizador de ε anuncia la ε, no su índice 0-30 (hoy «Diferencia inicial epsilon», «20»)', async ({ page }) => {
+  test('REPARADO 5139: el deslizador de ε anuncia la ε, no su índice 0-30 (antes «Diferencia inicial epsilon», «20»)', async ({ page }) => {
     const deslizador = page.getByRole('slider', { name: /Diferencia inicial/ });
     await expect(deslizador).toHaveValue('20');
     const visible = (await rotuloEpsilon(page).innerText()).trim();
@@ -307,25 +324,30 @@ test.describe('Textos y datos estructurados', () => {
     await abrir(page);
   });
 
-  test.fail('HALLAZGO ABIERTO: λ ≈ 0,906 no son «0.9 bits» ni «un bit cada segundo» (son 1,31 bits por unidad; el FAQPage: se duplica cada 0,77)', async ({ page }) => {
+  test('REPARADO 5141: λ ≈ 0,906 no son «0.9 bits» ni «un bit cada segundo» (son 1,31 bits por unidad; se duplica cada 0,77)', async ({ page }) => {
     const texto = await textoDeLaPagina(page);
     expect(texto).not.toMatch(/0[.,]9\s*bits/);
     expect(texto).not.toMatch(/bit[^.]*cada segundo/);
+    expect(texto).toContain('1,31 bits');
+    expect(texto).toContain('0,77 unidades');
   });
 
-  test.fail('HALLAZGO ABIERTO: la fibrilación no es el ejemplo del corazón «demasiado regular»', async ({ page }) => {
+  test('REPARADO 5142: la fibrilación no es el ejemplo del corazón «demasiado regular»', async ({ page }) => {
     const texto = await textoDeLaPagina(page);
     expect(texto).toContain('Cardiología');
     expect(texto).not.toMatch(/demasiado regular[^.]*fibrilaci/i);
+    expect(texto).toContain('como la fibrilación, son en cambio ritmos irregulares y desorganizados');
   });
 
-  test.fail('HALLAZGO ABIERTO: el límite de unas dos semanas es del pronóstico del TIEMPO, y Mandelbrot no «mostró» que los precios sean caóticos', async ({ page }) => {
+  test('REPARADO 5144: el límite de unas dos semanas es del pronóstico del TIEMPO, y Mandelbrot no «mostró» que los precios sean caóticos', async ({ page }) => {
     const texto = await textoDeLaPagina(page);
     expect(texto).not.toContain('predecir el clima');
     expect(texto).not.toMatch(/Mandelbrot mostró que los precios tienen estructura caótica/);
+    expect(texto).toContain('el pronóstico del tiempo pierde fiabilidad más allá de unas dos semanas');
+    expect(texto).toContain('Mandelbrot describió colas pesadas y escalado fractal en los precios');
   });
 
-  test.fail('HALLAZGO ABIERTO: el WebApplication declara de 4 a 8 características (hoy featureList vacío)', async ({ page }) => {
+  test('REPARADO 5145: el WebApplication declara de 4 a 8 características (antes featureList vacío)', async ({ page }) => {
     const caracteristicas = await page.evaluate(() => {
       for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
         const j = JSON.parse(s.textContent ?? '{}') as { '@type'?: string; featureList?: string[] };
@@ -338,6 +360,7 @@ test.describe('Textos y datos estructurados', () => {
     expect((caracteristicas ?? []).length).toBeLessThanOrEqual(8);
   });
 
+  // Sigue ABIERTO (5146): la reparación de la tanda del 18/11/2026 no lo tocó
   test.fail('HALLAZGO ABIERTO: las cinco preguntas del FAQPage están en la página (hoy ninguna)', async ({ page }) => {
     await comprobarFaqPageUnico(page);
   });

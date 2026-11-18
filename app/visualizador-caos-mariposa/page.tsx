@@ -21,27 +21,84 @@ const RHO = 28;
 const BETA = 8 / 3;
 const DT = 0.01;
 const N_STEPS = 7000;
+/** Cada paso de 0,01 se integra con RK4 en 10 subpasos de 0,001 (convergido: 0,0005 y 0,00025 dan lo mismo). */
+const SUBPASOS = 10;
+/** Transitorio desde (0,1, 0, 0) hasta caer en el atractor: 1.000 pasos (t = 10). */
+const PASOS_TRANSITORIO = 1000;
+/** Separación |Δx| + |Δz| a partir de la cual se dice que las trayectorias han divergido. */
+const UMBRAL_DIVERGENCIA = 5;
+
+type Estado = [number, number, number];
 
 interface LorenzPoint {
   x: number;
   z: number;
 }
 
-function computeLorenz(x0: number, y0: number, z0: number): LorenzPoint[] {
+function derivada([x, y, z]: Estado): Estado {
+  return [SIGMA * (y - x), x * (RHO - z) - y, x * y - BETA * z];
+}
+
+function pasoRk4(p: Estado, h: number): Estado {
+  const k1 = derivada(p);
+  const k2 = derivada([p[0] + (k1[0] * h) / 2, p[1] + (k1[1] * h) / 2, p[2] + (k1[2] * h) / 2]);
+  const k3 = derivada([p[0] + (k2[0] * h) / 2, p[1] + (k2[1] * h) / 2, p[2] + (k2[2] * h) / 2]);
+  const k4 = derivada([p[0] + k3[0] * h, p[1] + k3[1] * h, p[2] + k3[2] * h]);
+  return [
+    p[0] + (h / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
+    p[1] + (h / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]),
+    p[2] + (h / 6) * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2]),
+  ];
+}
+
+/** Un paso de DT = 0,01 en SUBPASOS de RK4. */
+function avanzar(p: Estado): Estado {
+  let q = p;
+  for (let s = 0; s < SUBPASOS; s++) q = pasoRk4(q, DT / SUBPASOS);
+  return q;
+}
+
+/**
+ * Punto de partida de las dos trayectorias: un punto YA en el atractor. Hallazgo 5136
+ * (18/11/2026): salían de (0,1, 0, 0), junto al origen, que es un equilibrio inestable; en la
+ * salida desde él la separación crecía como ε·e^(11,8t) y, con ε ≥ 0,0126, cruzaba el umbral en
+ * los pasos 20-54 aunque luego volvieran a juntarse, y el punto anunciado quedaba bajo el lienzo.
+ */
+let puntoAtractorCache: Estado | null = null;
+function puntoDelAtractor(): Estado {
+  if (puntoAtractorCache) return puntoAtractorCache;
+  let p: Estado = [0.1, 0, 0];
+  for (let i = 0; i < PASOS_TRANSITORIO; i++) p = avanzar(p);
+  puntoAtractorCache = p;
+  return p;
+}
+
+/**
+ * Hallazgo 5137 (18/11/2026): integraba con Euler explícito y dt = 0,01, que no reproduce el
+ * sistema de Lorenz (exponente de Lyapunov 1,04 frente a 0,906, z hasta 50 y el paso de divergencia
+ * de la discretización). Ahora RK4 con dt = 0,001.
+ */
+function computeLorenz(inicio: Estado): LorenzPoint[] {
   const points: LorenzPoint[] = [];
-  let x = x0,
-    y = y0,
-    z = z0;
+  let p = inicio;
   for (let i = 0; i < N_STEPS; i++) {
-    const dx = SIGMA * (y - x);
-    const dy = x * (RHO - z) - y;
-    const dz = x * y - BETA * z;
-    x += dx * DT;
-    y += dy * DT;
-    z += dz * DT;
-    points.push({ x, z });
+    p = avanzar(p);
+    points.push({ x: p[0], z: p[2] });
   }
   return points;
+}
+
+const SUPERINDICE: Record<string, string> = {
+  '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻',
+};
+
+/** ε en notación científica española: «1,00 × 10⁻²» (cabo C0499 y hallazgo 5143: salía «1.00e-2»). */
+function formatearEpsilon(eps: number): string {
+  const exponente = Math.floor(Math.log10(eps) + 1e-9);
+  const mantisa = eps / Math.pow(10, exponente);
+  const mantisaTexto = mantisa.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const expTexto = String(exponente).split('').map((c) => SUPERINDICE[c] ?? c).join('');
+  return `${mantisaTexto} × 10${expTexto}`;
 }
 
 // ─────────────────────────────────────────────
@@ -53,13 +110,13 @@ const CONCEPTOS = [
     icono: '🦋',
     titulo: 'El Efecto Mariposa',
     texto:
-      'Edward Lorenz (1972) acuñó la metáfora: "¿Puede el aleteo de una mariposa en Brasil desencadenar un tornado en Texas?" La respuesta real es: no exactamente, pero sí que pequeñas perturbaciones en sistemas caóticos se amplifican exponencialmente. Lorenz lo descubrió en 1961 cuando reinició su simulación meteorológica desde el medio, redondeando 0.506127 a 0.506. El resultado fue completamente diferente.',
+      'Edward Lorenz (1972) acuñó la metáfora: "¿Puede el aleteo de una mariposa en Brasil desencadenar un tornado en Texas?" La respuesta real es: no exactamente, pero sí que pequeñas perturbaciones en sistemas caóticos se amplifican exponencialmente. Lorenz lo descubrió en 1961 cuando reinició su simulación meteorológica desde el medio, redondeando 0,506127 a 0,506. El resultado fue completamente diferente.',
   },
   {
     icono: '📐',
     titulo: 'Sensibilidad a las condiciones iniciales',
     texto:
-      'La característica definitoria del caos: dos estados que difieren en ε = 0.00001 se separan siguiendo la ley d(t) ≈ ε · e^(λt), donde λ es el exponente de Lyapunov. Para el atractor de Lorenz, λ ≈ 0.9 bits/s, lo que significa que el sistema pierde un "bit" de predictibilidad cada segundo. Después de ~10 unidades de tiempo, el pronóstico es imposible.',
+      'La característica definitoria del caos: dos estados que difieren en ε = 0,00001 se separan siguiendo la ley d(t) ≈ ε · e^(λt), donde λ es el exponente de Lyapunov. Para el atractor de Lorenz, λ ≈ 0,906 por unidad de tiempo (adimensional): el error se duplica cada 0,77 unidades, unos 1,31 bits de predictibilidad perdidos por unidad. Después de ~10 unidades de tiempo, el pronóstico es imposible.',
   },
   {
     icono: '🌀',
@@ -71,7 +128,7 @@ const CONCEPTOS = [
     icono: '🔀',
     titulo: 'Atractores extraños',
     texto:
-      'El atractor de Lorenz es un "atractor extraño": el sistema nunca se repite (no es periódico), nunca diverge al infinito, siempre está en ese conjunto de mariposa. Tiene dimensión fractal ≈ 2.06, entre 2D y 3D. Es la huella del caos: un objeto infinitamente complejo en un espacio finito.',
+      'El atractor de Lorenz es un "atractor extraño": el sistema nunca se repite (no es periódico), nunca diverge al infinito, siempre está en ese conjunto de mariposa. Tiene dimensión fractal ≈ 2,06, entre 2D y 3D. Es la huella del caos: un objeto infinitamente complejo en un espacio finito.',
   },
 ];
 
@@ -80,13 +137,13 @@ const SISTEMAS = [
     icono: '🌦️',
     titulo: 'Meteorología',
     texto:
-      'Lorenz trabajaba en predicción del tiempo. Por eso no podemos predecir el clima con exactitud más allá de ~2 semanas.',
+      'Lorenz trabajaba en predicción del tiempo. Por eso el pronóstico del tiempo pierde fiabilidad más allá de unas dos semanas (el clima, que es un promedio a largo plazo, se estudia de otra forma).',
   },
   {
     icono: '❤️',
     titulo: 'Cardiología',
     texto:
-      'La variabilidad del ritmo cardíaco es caótica — y eso es sano. Un corazón demasiado regular indica patología (fibrilación).',
+      'La variabilidad del ritmo cardíaco tiene una dinámica compleja, que algunos estudios describen como caótica. Algunas arritmias, como la fibrilación, son en cambio ritmos irregulares y desorganizados.',
   },
   {
     icono: '🌊',
@@ -98,7 +155,7 @@ const SISTEMAS = [
     icono: '📈',
     titulo: 'Mercados financieros',
     texto:
-      'Mandelbrot mostró que los precios tienen estructura caótica. Los modelos financieros clásicos (Black-Scholes) subestiman la frecuencia de eventos extremos.',
+      'Mandelbrot describió colas pesadas y escalado fractal en los precios; que sean caos determinista no está establecido. Los modelos financieros clásicos (Black-Scholes) subestiman la frecuencia de eventos extremos.',
   },
   {
     icono: '🌙',
@@ -128,12 +185,13 @@ export default function CaosMariposaPage() {
   const sliderVal = Math.round(-Math.log10(epsilon) * 10);
 
   const { tray1, tray2, divergeStep } = useMemo(() => {
-    const t1 = computeLorenz(0.1, 0, 0);
-    const t2 = computeLorenz(0.1 + epsilon, 0, 0);
+    const p0 = puntoDelAtractor();
+    const t1 = computeLorenz(p0);
+    const t2 = computeLorenz([p0[0] + epsilon, p0[1], p0[2]]);
     let divStep = N_STEPS;
     for (let i = 0; i < N_STEPS; i++) {
       const dist = Math.abs(t1[i].x - t2[i].x) + Math.abs(t1[i].z - t2[i].z);
-      if (dist > 5) {
+      if (dist > UMBRAL_DIVERGENCIA) {
         divStep = i;
         break;
       }
@@ -240,12 +298,13 @@ export default function CaosMariposaPage() {
         {/* Leyenda */}
         <div className={styles.leyenda}>
           <span className={styles.leyendaItem} style={{ color: 'var(--primary-texto)' }}>
-            ■ Trayectoria 1 (x₀ = 0.1)
+            ■ Trayectoria 1 (punto de partida en el atractor)
           </span>
-          <span className={styles.leyendaItem} style={{ color: '#E67E22' }}>
-            ■ Trayectoria 2 (x₀ = 0.1 + ε)
+          {/* Hallazgo 5140: el naranja y el rojo en línea daban 2,73:1 y 3,66:1 en claro */}
+          <span className={`${styles.leyendaItem} ${styles.leyendaTrayectoria2}`}>
+            ■ Trayectoria 2 (el mismo punto, con x + ε)
           </span>
-          <span className={styles.leyendaItem} style={{ color: '#E74C3C' }}>
+          <span className={`${styles.leyendaItem} ${styles.leyendaDivergencia}`}>
             ● Punto de divergencia
           </span>
         </div>
@@ -274,7 +333,7 @@ export default function CaosMariposaPage() {
 
           <div className={styles.controlGrupo}>
             <label htmlFor="diferencia-inicial" className={styles.controlLabel}>
-              Diferencia inicial (ε): <strong>{epsilon.toExponential(2)}</strong>
+              Diferencia inicial (ε): <strong>{formatearEpsilon(epsilon)}</strong>
             </label>
             <input
               id="diferencia-inicial"
@@ -289,8 +348,10 @@ export default function CaosMariposaPage() {
               }}
               className={styles.slider}
               aria-label="Diferencia inicial epsilon"
+              aria-valuetext={`ε = ${formatearEpsilon(epsilon)}`}
             />
-            <small className={styles.sliderHint}>← ε más pequeña &nbsp;·&nbsp; ε más grande →</small>
+            {/* Hallazgo 5138: ε = 10^(−valor/10), así que la izquierda es la ε más GRANDE */}
+            <small className={styles.sliderHint}>← ε más grande &nbsp;·&nbsp; ε más pequeña →</small>
           </div>
 
           <div className={styles.estadoDiv} role="alert" aria-live="polite">
@@ -373,10 +434,11 @@ export default function CaosMariposaPage() {
           <h3>El exponente de Lyapunov</h3>
           <p>
             El exponente de Lyapunov (λ) cuantifica la velocidad de separación de trayectorias
-            cercanas. Si λ &gt; 0, el sistema es caótico. Para el atractor de Lorenz, λ ≈ 0.9 bits
-            por unidad de tiempo. Esto significa que cada unidad de tiempo se pierde casi un bit de
-            información predictiva. Después de 10-15 unidades, la predicción es esencialmente
-            imposible.
+            cercanas. Si λ &gt; 0, el sistema es caótico. Para el atractor de Lorenz, λ ≈ 0,906 por
+            unidad de tiempo (en base e): el error se duplica cada ln 2 / 0,906 ≈ 0,77 unidades, es
+            decir, se pierden unos 1,31 bits de información predictiva por unidad de tiempo (el tiempo
+            del sistema de Lorenz es adimensional, no son segundos). Después de 10-15 unidades, la
+            predicción es esencialmente imposible.
           </p>
           <h3>Caos vs. aleatoriedad</h3>
           <p>
