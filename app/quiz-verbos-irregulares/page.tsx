@@ -539,7 +539,7 @@ export default function QuizVerbosIrregularesPage() {
           </div>
 
           {/* Tarjeta de pregunta */}
-          <div className={styles.preguntaCard} ref={preguntaRef} tabIndex={-1}>
+          <div className={styles.preguntaCard} ref={preguntaRef} tabIndex={-1} id="pregunta-actual">
             <p className={styles.preguntaNumero}>Pregunta {preguntaActual + 1} de {totalPreguntas}</p>
             <p className={styles.preguntaEtiqueta}>
               {modoPartida === 'escribir'
@@ -611,6 +611,9 @@ export default function QuizVerbosIrregularesPage() {
                         onChange={(e) => (campo.clave === 'pasado' ? setTextoPasado : setTextoParticipio)(e.target.value)}
                         readOnly={correccion !== null}
                         aria-invalid={ok === false ? true : undefined}
+                        // Hallazgo 3616: al escribir, el foco va a esta casilla y su nombre era solo
+                        // «Past Simple»: el verbo no se anunciaba nunca. Ahora la describe la tarjeta.
+                        aria-describedby="pregunta-actual"
                         autoComplete="off"
                         autoCapitalize="none"
                         autoCorrect="off"

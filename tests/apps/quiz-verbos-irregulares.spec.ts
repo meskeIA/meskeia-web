@@ -2016,10 +2016,11 @@ test.describe('Inspector 28/10/2026', () => {
    * dice «Past Simple, editar texto» y el verbo que se pregunta no se anuncia nunca, ni al
    * empezar ni tras «Siguiente». Medido con el árbol de accesibilidad de Chromium el 28/10/2026.
    * Esperado: lo que se anuncia al llegar a la pregunta incluye el infinitivo.
+   * REPARADO (3616, 18/11/2026): las dos casillas llevan aria-describedby="pregunta-actual", la
+   * tarjeta con el número, el enunciado, el infinitivo y su traducción.
    */
-  test('hallazgo · escribiendo, lo que se anuncia al llegar a cada pregunta incluye el verbo', async ({ page }) => {
-    // ABIERTO (Inspector 28/10/2026): mide que el elemento enfocado nombre o describa el verbo.
-    test.fail();
+  test('3616 · escribiendo, lo que se anuncia al llegar a cada pregunta incluye el verbo', async ({ page }) => {
+    // Mide que el elemento enfocado nombre o describa el verbo.
     await abrirHidratada(page);
     await arrancarEscribiendo(page, 'A1 Básico', 10);
     const anunciado = (): Promise<string> =>
