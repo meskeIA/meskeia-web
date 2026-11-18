@@ -4,6 +4,8 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorTestHipotesis.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { formatNumber } from '@/lib';
+import { FAQ_BILATERAL_UNILATERAL } from './faq';
 
 // ============================================
 // TIPOS
@@ -73,6 +75,16 @@ function fmt(n: number, decimales = 4): string {
   return n.toFixed(decimales).replace('.', ',');
 }
 
+/** Porcentaje con espacio duro (U+00A0) antes del «%», CLAUDE.md global §2. */
+function fmtPct(n: number, decimales: number): string {
+  return `${fmt(n, decimales)} %`;
+}
+
+/** α en formato español con dos decimales: 0,01 · 0,05 · 0,10 (hallazgo 5113: salía «0.05» y «0.1»). */
+function fmtAlpha(a: number): string {
+  return formatNumber(a, 2);
+}
+
 // Calcula valores críticos según el tipo de test
 function valoresCriticos(tipo: TipoTest, alpha: number): { lo: number | null; hi: number | null } {
   if (tipo === 'bilateral') {
@@ -119,13 +131,24 @@ export default function SimuladorTestHipotesisPage() {
   const [sigma, setSigma] = useState(10);
   const [n, setN] = useState(30);
   const [alpha, setAlpha] = useState<Alpha>(0.05);
-  const [xBar, setXBar] = useState(53.5);
+  const [xBarElegido, setXBar] = useState(53.5);
   const [mostrarH1, setMostrarH1] = useState(true);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Error estándar (común a H₀ y H₁)
   const ee = useMemo(() => sigma / Math.sqrt(n), [sigma, n]);
+
+  // Rango del deslizador de X̄ (y del lienzo): de min(μ₀, μ₁) − 5·EE a max(μ₀, μ₁) + 5·EE.
+  // Hallazgo 5115: al cambiar n, σ, μ₀ o μ₁ el deslizador se recentraba pero la app seguía
+  // decidiendo con el X̄ anterior, fuera de su rango y fuera del lienzo. Ahora X̄ se acota al rango.
+  const xBarMin = Math.min(mu0, mu1) - 5 * ee;
+  const xBarMax = Math.max(mu0, mu1) + 5 * ee;
+  const xBar = Math.min(xBarMax, Math.max(xBarMin, xBarElegido));
+
+  // ¿Cumple μ₁ la H₁ elegida? Hallazgo 5110: si no (μ₁ = μ₀, o al otro lado en un unilateral), H₀
+  // es cierta con esa media, no hay error tipo II posible y «potencia» no tiene sentido.
+  const mu1EnH1 = tipo === 'bilateral' ? mu1 !== mu0 : tipo === 'derecho' ? mu1 > mu0 : mu1 < mu0;
 
   // Z observado
   const zObs = useMemo(() => (xBar - mu0) / ee, [xBar, mu0, ee]);
@@ -197,19 +220,22 @@ export default function SimuladorTestHipotesisPage() {
     const colorRechazo = 'rgba(168, 46, 104, 0.45)';
     const colorBeta = 'rgba(224, 122, 31, 0.32)';
     const colorPVal = 'rgba(46, 134, 171, 0.40)';
-    const colorObs = '#7C3AED';
+    // X̄ en gris casi negro (claro) o casi blanco (oscuro): hallazgo 5116, era el violeta #7C3AED,
+    // prohibido en meskeIA
+    const colorObs = isDark ? '#E5E5E5' : '#2B2B2B';
     // Tonos de TEXTO por tema (cabo C0297, 06/11/2026): con el color de su curva, μ₀ y H₀
     // quedaban a 3,93:1 en claro y 4,24 en oscuro, μ₁ y H₁ a 2,89 en claro y X̄ a 3,05 en oscuro
     const textoH0 = isDark ? '#3FA5D1' : '#26718F';
     const textoH1 = isDark ? '#E07A1F' : '#B4530A';
-    const textoObs = isDark ? '#A78BFA' : colorObs;
+    const textoObs = colorObs;
 
     ctx.clearRect(0, 0, W, H);
 
     // Rango: cubrir ambas distribuciones
     const muMin = Math.min(mu0, mu1);
     const muMax = Math.max(mu0, mu1);
-    const halfWidth = Math.max(4 * ee, (muMax - muMin) / 2 + 4 * ee);
+    // ±5·EE alrededor de μ₀ y μ₁, el mismo rango que el deslizador de X̄ (hallazgo 5115)
+    const halfWidth = (muMax - muMin) / 2 + 5 * ee;
     const xMin = (muMin + muMax) / 2 - halfWidth;
     const xMax = (muMin + muMax) / 2 + halfWidth;
     const xToPx = (x: number) => pad.left + ((x - xMin) / (xMax - xMin)) * plotW;
@@ -457,7 +483,7 @@ export default function SimuladorTestHipotesisPage() {
         <p className={styles.descriptionCard}>
           Test sobre la media: <strong>H₀: μ = {fmt(mu0, 1)}</strong> vs{' '}
           <strong>{tipo === 'bilateral' ? `H₁: μ ≠ ${fmt(mu0, 1)}` : tipo === 'derecho' ? `H₁: μ > ${fmt(mu0, 1)}` : `H₁: μ < ${fmt(mu0, 1)}`}</strong>.
-          Decide a nivel <strong>α = {alpha}</strong>. Mueve X̄ observado y mira cómo cambia el p-valor; mueve μ₁
+          Decide a nivel <strong>α = {fmtAlpha(alpha)}</strong>. Mueve X̄ observado y mira cómo cambia el p-valor; mueve μ₁
           (la media verdadera asumida bajo H₁) y mira cómo cambian β y la potencia.
         </p>
 
@@ -537,7 +563,7 @@ export default function SimuladorTestHipotesisPage() {
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
               <label id="nivel-significacion-label" className={styles.controlLabel}>
-                Nivel de significación (α = <strong>{alpha}</strong>)
+                Nivel de significación (α = <strong>{fmtAlpha(alpha)}</strong>)
               </label>
               <div className={styles.discreteSteps} role="group" aria-labelledby="nivel-significacion-label" aria-label="Nivel alfa">
                 {ALPHAS.map(v => (
@@ -548,7 +574,7 @@ export default function SimuladorTestHipotesisPage() {
                     onClick={() => setAlpha(v)}
                     aria-pressed={alpha === v}
                   >
-                    {v}
+                    {fmtAlpha(v)}
                   </button>
                 ))}
               </div>
@@ -560,8 +586,8 @@ export default function SimuladorTestHipotesisPage() {
               <input
                 id="media-observada"
                 type="range"
-                min={Math.min(mu0, mu1) - 5 * ee}
-                max={Math.max(mu0, mu1) + 5 * ee}
+                min={xBarMin}
+                max={xBarMax}
                 step={(10 * ee) / 200}
                 value={xBar}
                 onChange={e => setXBar(parseFloat(e.target.value))}
@@ -616,19 +642,23 @@ export default function SimuladorTestHipotesisPage() {
         <div className={styles.resultsPanel}>
           <div className={rechazaH0 ? styles.resultCardOk : styles.resultCardBad}>
             <span className={styles.resultLabel}>p-valor</span>
-            <span className={styles.resultValueLarge} style={{ color: rechazaH0 ? 'var(--secondary-texto)' : '#A82E68' }}>
+            {/* Hallazgo 5108: el color va por clase con variante oscura (el #A82E68 en línea daba
+                1,94:1 y 1,77:1 en oscuro). Hallazgo 5118: sin ✅/❌, que la tabla de la página
+                reserva a los aciertos y errores, y el acierto de una decisión depende de una
+                realidad que nadie conoce */}
+            <span className={`${styles.resultValueLarge} ${rechazaH0 ? styles.textoRechaza : styles.textoNoRechaza}`}>
               {fmt(p, 5)}
             </span>
-            <span className={styles.decisionBadge} style={{
-              background: rechazaH0 ? 'rgba(72, 169, 166, 0.18)' : 'rgba(168, 46, 104, 0.18)',
-              color: rechazaH0 ? 'var(--secondary-texto)' : '#A82E68'
-            }}>
-              {rechazaH0 ? <><span aria-hidden="true">✅</span> Rechazar H₀</> : <><span aria-hidden="true">❌</span> NO rechazar H₀</>}
+            <span
+              className={`${styles.decisionBadge} ${rechazaH0 ? styles.textoRechaza : styles.textoNoRechaza}`}
+              style={{ background: rechazaH0 ? 'rgba(72, 169, 166, 0.18)' : 'rgba(168, 46, 104, 0.18)' }}
+            >
+              {rechazaH0 ? 'Rechazar H₀' : 'NO rechazar H₀'}
             </span>
             <span className={styles.resultRange}>
               {rechazaH0
-                ? `p < α (${alpha}): hay evidencia estadística contra H₀`
-                : `p ≥ α (${alpha}): no hay suficiente evidencia para rechazar H₀`}
+                ? `p < α (${fmtAlpha(alpha)}): hay evidencia estadística contra H₀`
+                : `p ≥ α (${fmtAlpha(alpha)}): no hay suficiente evidencia para rechazar H₀`}
             </span>
           </div>
 
@@ -646,23 +676,32 @@ export default function SimuladorTestHipotesisPage() {
 
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>α (riesgo tipo I)</span>
-            <span className={styles.resultValue}>{(alpha * 100).toFixed(1)} %</span>
+            <span className={styles.resultValue}>{fmtPct(alpha * 100, 1)}</span>
             <span className={styles.resultRange}>P(rechazar H₀ | H₀ cierta)</span>
           </div>
+
+          {mostrarH1 && !mu1EnH1 && (
+            <p className={styles.avisoMu1}>
+              μ₁ = {fmt(mu1, 1)} no cumple H₁ ({tipo === 'bilateral' ? `μ ≠ ${fmt(mu0, 1)}` : tipo === 'derecho' ? `μ > ${fmt(mu0, 1)}` : `μ < ${fmt(mu0, 1)}`}):
+              con esa media H₀ es cierta, así que no hay error tipo II ni potencia. Las tarjetas dan la
+              probabilidad de no rechazar o de rechazar H₀ si μ = μ₁.
+            </p>
+          )}
 
           {mostrarH1 && (
             <>
               <div className={styles.resultCard}>
-                <span className={styles.resultLabel}>β (riesgo tipo II)</span>
-                <span className={styles.resultValue}>{fmt(beta * 100, 2)} %</span>
-                <span className={styles.resultRange}>P(no rechazar | H₁ cierta)</span>
+                <span className={styles.resultLabel}>{mu1EnH1 ? 'β (riesgo tipo II)' : 'P(no rechazar H₀ | μ = μ₁)'}</span>
+                <span className={styles.resultValue}>{fmtPct(beta * 100, 2)}</span>
+                <span className={styles.resultRange}>{mu1EnH1 ? 'P(no rechazar | H₁ cierta)' : 'decisión correcta: μ₁ no cumple H₁'}</span>
               </div>
               <div className={styles.resultCard}>
-                <span className={styles.resultLabel}>Potencia (1 − β)</span>
-                <span className={styles.resultValue} style={{ color: potencia > 0.8 ? 'var(--secondary-texto)' : '#E07A1F' }}>
-                  {fmt(potencia * 100, 2)} %
+                <span className={styles.resultLabel}>{mu1EnH1 ? 'Potencia (1 − β)' : 'P(rechazar H₀ | μ = μ₁)'}</span>
+                {/* Hallazgo 5109: el naranja #E07A1F en línea daba 2,89:1 en claro */}
+                <span className={`${styles.resultValue} ${mu1EnH1 && potencia > 0.8 ? styles.textoRechaza : styles.potenciaBaja}`}>
+                  {fmtPct(potencia * 100, 2)}
                 </span>
-                <span className={styles.resultRange}>P(rechazar | H₁ cierta)</span>
+                <span className={styles.resultRange}>{mu1EnH1 ? 'P(rechazar | H₁ cierta)' : 'error tipo I, como mucho α'}</span>
               </div>
             </>
           )}
@@ -677,7 +716,7 @@ export default function SimuladorTestHipotesisPage() {
                   : fmt(criticosZ.lo ?? 0, 3)}
             </span>
             <span className={styles.resultRange}>
-              {tipo === 'bilateral' ? 'a/2 a cada cola' : tipo === 'derecho' ? 'cola derecha' : 'cola izquierda'}
+              {tipo === 'bilateral' ? 'α/2 a cada cola' : tipo === 'derecho' ? 'cola derecha' : 'cola izquierda'}
             </span>
           </div>
         </div>
@@ -744,8 +783,9 @@ export default function SimuladorTestHipotesisPage() {
           </div>
           <p>
             <strong>α</strong> y <strong>β</strong> están en tensión: bajar α (ser más exigente para
-            rechazar) sube β (menos potencia). La única forma de bajar ambos es <em>aumentar n</em>: más
-            datos = mejor capacidad de distinguir realidades.
+            rechazar) sube β (menos potencia), con lo demás fijo. Para bajar los dos a la vez hay que
+            ganar precisión: <em>aumentar n</em> o <em>reducir σ</em> (medir mejor o diseñar mejor el
+            experimento), porque los dos estrechan el error estándar σ/√n.
           </p>
         </section>
 
@@ -756,7 +796,7 @@ export default function SimuladorTestHipotesisPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">💊</span>
               <strong>Ensayos clínicos</strong>
-              <p>H₀: el fármaco no es mejor que el placebo. H₁: sí lo es. Si el p-valor es muy bajo, se rechaza H₀ y se concluye que el fármaco tiene efecto. La FDA exige potencia ≥ 80 %.</p>
+              <p>H₀: el fármaco no es mejor que el placebo. H₁: sí lo es. Si el p-valor es muy bajo, se rechaza H₀ y se concluye que el fármaco tiene efecto. Por convención, el tamaño muestral se suele planificar para una potencia ≥ 80&nbsp;%.</p>
             </div>
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">🏭</span>
@@ -799,9 +839,9 @@ export default function SimuladorTestHipotesisPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>¿Cuándo uso bilateral y cuándo unilateral?</h4>
-              <p><strong>Bilateral</strong> cuando solo te importa si μ es distinto de μ₀, sin saber si por encima o por debajo. <strong>Unilateral</strong> cuando tienes una hipótesis direccional clara (un fármaco solo puede mejorar, no empeorar; un proceso solo puede degradarse).</p>
-              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Los unilaterales tienen mayor potencia para una desviación dada, pero NO los uses post-hoc al ver los datos: eso infla α y es mala práctica.</p>
+              <h4>{FAQ_BILATERAL_UNILATERAL.pregunta}</h4>
+              <p>{FAQ_BILATERAL_UNILATERAL.respuesta}</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> {FAQ_BILATERAL_UNILATERAL.consejo}</p>
             </div>
 
             <div className={styles.faqItem}>

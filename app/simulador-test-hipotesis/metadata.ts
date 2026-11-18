@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FAQ_BILATERAL_UNILATERAL } from './faq';
 
 export const metadata: Metadata = {
   title: 'Simulador de Test de Hipótesis: α, β, p-valor y Potencia | meskeIA',
@@ -81,10 +82,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cuándo se usa un test bilateral y cuándo uno unilateral?',
+      name: FAQ_BILATERAL_UNILATERAL.pregunta,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un test bilateral comprueba si la media difiere de μ₀ en cualquier dirección (H₁: μ ≠ μ₀) y reparte α entre ambas colas. Un test unilateral (derecho o izquierdo) solo detecta diferencias en una dirección específica (H₁: μ > μ₀ o μ < μ₀) y concentra toda la región de rechazo en una cola. El test unilateral es más potente para detectar el efecto esperado, pero no detecta desviaciones en el sentido opuesto.',
+        text: `${FAQ_BILATERAL_UNILATERAL.respuesta} ${FAQ_BILATERAL_UNILATERAL.consejo}`,
       },
     },
     {

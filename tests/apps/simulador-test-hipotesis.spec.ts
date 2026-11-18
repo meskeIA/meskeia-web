@@ -76,7 +76,7 @@ async function elegirN(page: Page, n: number): Promise<void> {
   await expect(page.locator('#tamano-muestral-label')).toHaveText(`Tamaño muestral (n = ${n})`);
 }
 
-/** Los botones de α llevan el número tal cual lo pinta JS («0.1»): ver el hallazgo de formato. */
+/** Los botones de α van en formato español con dos decimales («0,10»); hasta el 18/11/2026, «0.1». */
 async function elegirAlfa(page: Page, textoBoton: string): Promise<void> {
   const boton = grupoAlfa(page).getByRole('button', { name: textoBoton, exact: true });
   await boton.click();
@@ -200,7 +200,7 @@ test.describe('Contraste z para la media: casos resueltos a mano', () => {
     await abrir(page);
     await elegirTipo(page, /^Unilateral izquierdo/);
     await elegirN(page, 100);
-    await elegirAlfa(page, '0.01');
+    await elegirAlfa(page, '0,01');
     await sembrarValor(page, '#media-h1', 47);
     await sembrarValor(page, '#media-observada', 47.6);
     await expect(page.locator('label[for="media-observada"]')).toHaveText('Media observada (X̄ = 47,60)');
@@ -216,7 +216,7 @@ test.describe('Contraste z para la media: casos resueltos a mano', () => {
   test('caso 2 · límite: X̄ = μ₀ = μ₁ = 50, α 0,10 → z 0,000, p 1,00000, β 90,00 %, potencia = α', async ({ page }) => {
     await abrir(page);
     await elegirN(page, 100);
-    await elegirAlfa(page, '0.1');
+    await elegirAlfa(page, '0,10');
     await sembrarValor(page, '#media-h1', 50);
     await sembrarValor(page, '#media-observada', 50);
     const p = tarjeta(page, 'p-valor');
@@ -224,9 +224,11 @@ test.describe('Contraste z para la media: casos resueltos a mano', () => {
     await expect(p.segundo).toContainText('NO rechazar H₀');
     await expect(tarjeta(page, 'z observado').valor).toHaveText('0,000');
     await expect(tarjeta(page, 'z* críticos').valor).toHaveText('±1,645'); // α/2 = 0,05 por cola
-    // Con μ₁ = μ₀ la probabilidad de rechazar es α: P(|Z| > 1,645) = 0,10.
-    await expect(tarjeta(page, 'β (riesgo tipo II)').valor).toHaveText('90,00 %');
-    await expect(tarjeta(page, 'Potencia (1 − β)').valor).toHaveText('10,00 %');
+    // Con μ₁ = μ₀ la probabilidad de rechazar es α: P(|Z| > 1,645) = 0,10. Pero μ₁ = μ₀ no cumple
+    // H₁ (hallazgo 5110): no es «β (riesgo tipo II)» ni «potencia», sino P(no rechazar | μ = μ₁) y
+    // P(rechazar | μ = μ₁), un error tipo I.
+    await expect(tarjeta(page, 'P(no rechazar H₀ | μ = μ₁)').valor).toHaveText('90,00 %');
+    await expect(tarjeta(page, 'P(rechazar H₀ | μ = μ₁)').valor).toHaveText('10,00 %');
   });
 
   test('caso 3 · rechazo: σ = 0 se acota a 1 y μ₀ = 100 a 80; z −145,146 y p 0,00000, sin ∞ ni NaN', async ({ page }) => {
@@ -250,7 +252,7 @@ test.describe('Contraste z para la media: casos resueltos a mano', () => {
   test('α 0,01 y σ 5 con n 30 fijo: α y β bajan a la vez (β 62,41 % → 23,87 %)', async ({ page }) => {
     await abrir(page);
     await expect(tarjeta(page, 'β (riesgo tipo II)').valor).toHaveText('62,41 %');
-    await elegirAlfa(page, '0.01');
+    await elegirAlfa(page, '0,01');
     await sembrarValor(page, '#desviacion-poblacional', 5);
     await expect(tarjeta(page, 'Error estándar (σ/√n)').valor).toHaveText('0,913'); // 5/√30
     await expect(tarjeta(page, 'z observado').valor).toHaveText('3,834');
@@ -261,8 +263,8 @@ test.describe('Contraste z para la media: casos resueltos a mano', () => {
   });
 });
 
-test.describe('Hallazgos abiertos de la primera inspección (18/11/2026)', () => {
-  test('ABIERTO · con μ₁ fuera de H₁ la app sigue llamando a P(no rechazar) «riesgo tipo II» bajo «H₁ cierta»', async ({ page }) => {
+test.describe('Hallazgos de la primera inspección (18/11/2026), REPARADOS el 18/11/2026', () => {
+  test('REPARADO 5110 · con μ₁ fuera de H₁ la app ya no llama a P(no rechazar) «riesgo tipo II» bajo «H₁ cierta»', async ({ page }) => {
     // Unilateral izquierdo (H₁: μ < 50) con el μ₁ = 53 de partida: 53 no cumple H₁, así que no hay
     // error tipo II posible y «potencia» no tiene sentido. La app pinta β = 99,95 % y potencia
     // 0,05 % (1 − Φ(−3,288) = 0,999496) con el pie «P(no rechazar | H₁ cierta)». Lo mismo con
@@ -273,59 +275,70 @@ test.describe('Hallazgos abiertos de la primera inspección (18/11/2026)', () =>
     await expect(page.getByText('Test sobre la media:')).toContainText('H₁: μ < 50,0');
     await expect(page.locator('label[for="media-h1"]')).toHaveText('Media verdadera bajo H₁ (μ₁ = 53,0)');
     await expect(tarjeta(page, 'p-valor').valor).toHaveText('0,97238'); // Φ(1,917029)
-    test.fail();
-    // Hoy: «99,95 %» con el pie «P(no rechazar | H₁ cierta)».
-    await expect(tarjeta(page, 'β (riesgo tipo II)').pie).not.toHaveText('P(no rechazar | H₁ cierta)', { timeout: 2000 });
+    // Antes: «β (riesgo tipo II) 99,95 %» con el pie «P(no rechazar | H₁ cierta)» y «Potencia 0,05 %».
+    await expect(page.getByText('β (riesgo tipo II)', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Potencia (1 − β)', { exact: true })).toHaveCount(0);
+    const noRechazar = tarjeta(page, 'P(no rechazar H₀ | μ = μ₁)');
+    await expect(noRechazar.valor).toHaveText('99,95 %'); // 1 − Φ(−3,288) = 0,999496
+    await expect(noRechazar.pie).toHaveText('decisión correcta: μ₁ no cumple H₁');
+    await expect(page.getByText(/μ₁ = 53,0 no cumple H₁ \(μ < 50,0\)/)).toBeVisible();
+    // Y al volver a un μ₁ que sí cumple H₁, vuelven β y potencia
+    await sembrarValor(page, '#media-h1', 47);
+    await expect(tarjeta(page, 'β (riesgo tipo II)').pie).toHaveText('P(no rechazar | H₁ cierta)');
+    await expect(page.getByText(/no cumple H₁ \(/)).toHaveCount(0);
   });
 
-  test('ABIERTO · en oscuro el p-valor y «NO rechazar H₀» (#A82E68) no llegan a 3:1 (1,94 y 1,77)', async ({ page }) => {
+  test('REPARADO 5108 · en oscuro el p-valor y «NO rechazar H₀» llegan a 3:1 (antes 1,94 y 1,77 con #A82E68)', async ({ page }) => {
     await abrir(page);
     await prepararParaMedir(page);
     const p = tarjeta(page, 'p-valor');
     await expect(p.segundo).toContainText('NO rechazar H₀');
-    await activarTemaOscuro(page);
-    const valor = await contrasteDe(p.valor);
-    const insignia = await contrasteDe(p.segundo);
-    test.fail();
-    expect(valor.ratio, valor.detalle).toBeGreaterThanOrEqual(valor.umbral);
-    expect(insignia.ratio, insignia.detalle).toBeGreaterThanOrEqual(insignia.umbral);
+    for (const tema of ['claro', 'oscuro']) {
+      if (tema === 'oscuro') await activarTemaOscuro(page);
+      const valor = await contrasteDe(p.valor);
+      const insignia = await contrasteDe(p.segundo);
+      expect(valor.ratio, `${tema}: ${valor.detalle}`).toBeGreaterThanOrEqual(valor.umbral);
+      expect(insignia.ratio, `${tema}: ${insignia.detalle}`).toBeGreaterThanOrEqual(insignia.umbral);
+    }
   });
 
-  test('ABIERTO · en claro la potencia por debajo del 80 % (#E07A1F, 20,8 px negrita) da 2,89:1, bajo 3:1', async ({ page }) => {
+  test('REPARADO 5109 · en claro la potencia por debajo del 80 % llega a 3:1 (antes 2,89 con #E07A1F)', async ({ page }) => {
     await abrir(page);
     await prepararParaMedir(page);
     const potencia = tarjeta(page, 'Potencia (1 − β)').valor;
     await expect(potencia).toHaveText('37,59 %');
-    const m = await contrasteDe(potencia);
-    test.fail();
-    expect(m.ratio, m.detalle).toBeGreaterThanOrEqual(m.umbral);
+    for (const tema of ['claro', 'oscuro']) {
+      if (tema === 'oscuro') await activarTemaOscuro(page);
+      const m = await contrasteDe(potencia);
+      expect(m.ratio, `${tema}: ${m.detalle}`).toBeGreaterThanOrEqual(m.umbral);
+    }
   });
 
-  test('ABIERTO · α en formato español: «α = 0,05», «5,0 %» y «p ≥ α (0,05)», no «0.05» ni «5.0 %»', async ({ page }) => {
-    // Hoy: «Nivel de significación (α = 0.05)», «Decide a nivel α = 0.05», botones «0.01 / 0.05 /
+  test('REPARADO 5113 · α en formato español: «α = 0,05», «5,0 %» y «p ≥ α (0,05)», no «0.05» ni «5.0 %»', async ({ page }) => {
+    // Antes: «Nivel de significación (α = 0.05)», «Decide a nivel α = 0.05», botones «0.01 / 0.05 /
     // 0.1», «5.0 %» en la tarjeta de α y «p ≥ α (0.05)» junto a un p-valor con coma («0,05523»).
     await abrir(page);
     await expect(tarjeta(page, 'p-valor').valor).toHaveText('0,05523');
-    test.fail();
-    await expect(page.locator('#nivel-significacion-label')).toHaveText('Nivel de significación (α = 0,05)', { timeout: 2000 });
-    await expect(tarjeta(page, 'p-valor').pie).toContainText('(0,05)', { timeout: 2000 });
+    await expect(page.locator('#nivel-significacion-label')).toHaveText('Nivel de significación (α = 0,05)');
+    await expect(page.getByText('Test sobre la media:')).toContainText('α = 0,05');
+    await expect(tarjeta(page, 'p-valor').pie).toContainText('(0,05)');
+    await expect(grupoAlfa(page).getByRole('button')).toHaveText(['0,01', '0,05', '0,10']);
     // Coma decimal y espacio duro (U+00A0) antes del «%» (CLAUDE.md global §2); toHaveText no los
     // distingue de un espacio normal, de ahí el textContent.
     const ESPACIO_DURO = String.fromCharCode(160);
     expect(await tarjeta(page, 'α (riesgo tipo I)').valor.textContent()).toBe(`5,0${ESPACIO_DURO}%`);
+    expect(await tarjeta(page, 'β (riesgo tipo II)').valor.textContent()).toBe(`62,41${ESPACIO_DURO}%`);
   });
 
-  test('ABIERTO · el pie de los z* bilaterales dice «a/2 a cada cola»; es «α/2»', async ({ page }) => {
+  test('REPARADO 5114 · el pie de los z* bilaterales dice «α/2 a cada cola» (antes «a/2»)', async ({ page }) => {
     await abrir(page);
     await expect(tarjeta(page, 'z* críticos').valor).toHaveText('±1,960');
-    test.fail();
-    await expect(tarjeta(page, 'z* críticos').pie).toHaveText('α/2 a cada cola', { timeout: 2000 });
+    await expect(tarjeta(page, 'z* críticos').pie).toHaveText('α/2 a cada cola');
   });
 
-  test('ABIERTO · tras subir n a 500 y bajar σ a 1, se decide con un X̄ = 53,5 que ni el deslizador ni el lienzo muestran', async ({ page }) => {
-    // El deslizador de X̄ pasa a [49,776; 53,224] y el lienzo a [49,82; 53,18], pero el estado
-    // sigue en 53,5: la etiqueta dice 53,50, z = 78,262 y «Rechazar H₀», el pulgar está en el tope
-    // y la línea de X̄ no se dibuja (0 píxeles de su color).
+  test('REPARADO 5115 · tras subir n a 500 y bajar σ a 1, X̄ se acota al rango del deslizador y del lienzo', async ({ page }) => {
+    // El deslizador de X̄ pasa a [49,776; 53,224], y el estado seguía en 53,5: la etiqueta decía
+    // 53,50, z = 78,262 y «Rechazar H₀», con el pulgar en el tope y la línea de X̄ fuera del lienzo.
     await abrir(page);
     await elegirN(page, 500);
     await sembrarValor(page, '#desviacion-poblacional', 1);
@@ -333,14 +346,15 @@ test.describe('Hallazgos abiertos de la primera inspección (18/11/2026)', () =>
     const deslizador = page.locator('#media-observada');
     const min = Number(await deslizador.getAttribute('min'));
     const max = Number(await deslizador.getAttribute('max'));
+    expect(max).toBeCloseTo(53 + 5 / Math.sqrt(500), 3); // 53,2236
     const xBar = await xBarDeLaEtiqueta(page);
-    test.fail();
-    // Hoy: X̄ = 53,50 con el deslizador en [49,776; 53,224] (y z = 78,262, «Rechazar H₀»).
     expect(xBar, `X̄ ${xBar} dentro de [${min}; ${max}]`).toBeLessThanOrEqual(max + 0.005);
     expect(xBar).toBeGreaterThanOrEqual(min - 0.005);
+    // z con el X̄ acotado: (53,2236 − 50) / 0,044721 = 72,08 (antes 78,262, con 53,5)
+    await expect(tarjeta(page, 'z observado').valor).toHaveText('72,082');
   });
 
-  test('ABIERTO · la línea y la etiqueta de X̄ del lienzo usan el violeta prohibido #7C3AED', async ({ page }) => {
+  test('REPARADO 5116 · la línea y la etiqueta de X̄ del lienzo ya no usan el violeta prohibido #7C3AED', async ({ page }) => {
     await abrir(page);
     await expect(tarjeta(page, 'z observado').valor).toHaveText('1,917');
     // Píxeles opacos del lienzo y, de ellos, los del violeta #7C3AED (124, 58, 237).
@@ -358,12 +372,11 @@ test.describe('Hallazgos abiertos de la primera inspección (18/11/2026)', () =>
       });
     // Esperar a que el lienzo esté dibujado (curvas, ejes y rótulos), para no dar por bueno uno vacío.
     await expect.poll(async () => (await pixeles()).pintados).toBeGreaterThan(1000);
-    test.fail();
-    // Hoy: 681 píxeles violeta (línea de X̄ y su rótulo «X̄ = 53,5» en claro).
+    // Antes: 681 píxeles violeta (línea de X̄ y su rótulo «X̄ = 53,5» en claro).
     expect((await pixeles()).violeta).toBe(0);
   });
 
-  test('ABIERTO · la misma pregunta «bilateral o unilateral» va con dos respuestas, y la visible da una premisa falsa', async ({ page }) => {
+  test('REPARADO 5111 · la pregunta «bilateral o unilateral» va una sola vez, sin la premisa falsa y con el aviso post-hoc', async ({ page }) => {
     // FAQPage: «¿Cuándo se usa un test bilateral y cuándo uno unilateral?» — calla el aviso de no
     // elegir el unilateral a posteriori. FAQ visible: «¿Cuándo uso bilateral y cuándo unilateral?»
     // — justifica el unilateral con «un fármaco solo puede mejorar, no empeorar», que la respuesta
@@ -382,37 +395,39 @@ test.describe('Hallazgos abiertos de la primera inspección (18/11/2026)', () =>
     expect(faq).not.toBeNull();
     const visible = page.locator('h4', { hasText: /bilateral/ }).locator('xpath=..');
     await expect(visible).toHaveCount(1);
-    test.fail();
-    // Hoy: dos redacciones de la misma pregunta, y la visible con la premisa falsa.
-    await expect(visible.locator('h4')).toHaveText(faq?.pregunta ?? '', { timeout: 2000 });
-    await expect(visible).not.toContainText('un fármaco solo puede mejorar, no empeorar', { timeout: 2000 });
+    // Antes: dos redacciones de la misma pregunta, y la visible con la premisa falsa.
+    await expect(visible.locator('h4')).toHaveText(faq?.pregunta ?? '');
+    await expect(visible).not.toContainText('un fármaco solo puede mejorar, no empeorar');
     expect(faq?.respuesta).toMatch(/post-hoc|a posteriori|tras ver los datos|al ver los datos/);
+    expect(faq?.respuesta).toMatch(/no detecta desviaciones en la contraria/);
+    const textoVisible = ((await visible.textContent()) ?? '').replace(/\s+/g, ' ');
+    expect(textoVisible).toContain('a posteriori');
   });
 
-  test('ABIERTO · «La única forma de bajar ambos es aumentar n» contradice la propia FAQ (reducir σ) y el simulador', async ({ page }) => {
+  test('REPARADO 5112 · ya no dice «La única forma de bajar ambos es aumentar n»: también reducir σ', async ({ page }) => {
     // El caso que lo refuta está arriba: «α 0,01 y σ 5 con n 30 fijo» baja α de 5 a 1 % y β de
     // 62,41 a 23,87 %.
     await abrir(page);
     const texto = await textoDelCuerpo(page);
     expect(texto).toContain('reducir σ');
-    test.fail();
     expect(texto).not.toContain('La única forma de bajar ambos es aumentar n');
+    expect(texto).toContain('aumentar n o reducir σ');
   });
 
-  test('ABIERTO · «La FDA exige potencia ≥ 80 %» sin fuente, cuando la propia página lo llama «estándar de la industria»', async ({ page }) => {
+  test('REPARADO 5117 · el 80 % de potencia es una convención, no «La FDA exige»', async ({ page }) => {
     // Tres sitios de la página hablan del 80 %: «La FDA exige potencia ≥ 80 %» (ensayos clínicos),
     // «Estándar de la industria: potencia ≥ 80 %» (FAQ) y «potencia objetivo (≥ 80 %)» (consejos).
     await abrir(page);
     const texto = await textoDelCuerpo(page);
-    test.fail();
     expect(texto).not.toContain('La FDA exige potencia ≥ 80 %');
+    expect(texto).toContain('Por convención, el tamaño muestral se suele planificar para una potencia ≥ 80');
   });
 
-  test('ABIERTO · la insignia marca «NO rechazar H₀» con ❌, que la tabla de la página reserva a los errores tipo I y II', async ({ page }) => {
+  test('REPARADO 5118 · la insignia ya no marca «NO rechazar H₀» con ❌ ni «Rechazar H₀» con ✅', async ({ page }) => {
     await abrir(page);
     const insignia = tarjeta(page, 'p-valor').segundo;
-    await expect(insignia).toContainText('NO rechazar H₀');
-    test.fail();
-    await expect(insignia).not.toContainText('❌', { timeout: 2000 });
+    await expect(insignia).toHaveText('NO rechazar H₀');
+    await elegirN(page, 100); // X̄ 53,5 con EE 1: z = 3,5, se rechaza
+    await expect(insignia).toHaveText('Rechazar H₀');
   });
 });

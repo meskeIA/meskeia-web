@@ -393,6 +393,38 @@
   margin-top: var(--spacing-xs);
 }
 
+/* Color del p-valor y de la insignia de decisión (hallazgo 5108, 18/11/2026): el #A82E68 en línea
+   daba 1,94:1 y 1,77:1 sobre el tinte magenta en oscuro. En oscuro, un magenta claro (≈ 6:1) */
+.textoRechaza {
+  color: var(--secondary-texto);
+}
+
+.textoNoRechaza {
+  color: #A82E68;
+}
+
+[data-theme='dark'] .textoNoRechaza {
+  color: #F0A0C4;
+}
+
+/* Potencia por debajo del 80 % (hallazgo 5109): el #E07A1F en línea daba 2,89:1 en claro */
+.potenciaBaja {
+  color: var(--naranja-texto, #B4530A);
+}
+
+/* Aviso de μ₁ fuera de H₁ (hallazgo 5110) */
+.avisoMu1 {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 4px solid var(--primary);
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
 /* FORMULA BOX */
 .formulaBox {
   background: var(--bg-primary);
