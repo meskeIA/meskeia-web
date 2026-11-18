@@ -138,28 +138,33 @@ test.describe('Lotka-Volterra clásico: casos resueltos a mano', () => {
     await expect(page.locator('label[for="beta"]')).toHaveText('β (depredación): 0,001');
   });
 
-  test('ABIERTO · sobrepesca: el clásico no se extingue, la órbita llega a t = 80 y las presas rebrotan a 231', async ({ page }) => {
-    // Hallazgo de esta inspección: la regla «x < 0,001 y y < 0,001 → (0, 0) y break» de
-    // simular() para la simulación en t = 34,9 con «0 individuos» y «0 individuos». El modelo
-    // (RK4 h = 0,0001, y el propio RK4 de la app sin el corte) conserva V = 10,1724 y devuelve
-    // las presas hasta 231,2 en t = 61,18. Contradice la FAQ visible: «El Lotka-Volterra clásico
-    // nunca predice extinción matemática».
+  test('4057 · sobrepesca: el clásico no se extingue, la órbita llega a t = 80 y las presas rebrotan a 231', async ({ page }) => {
+    // Hallazgo 4057: la regla «x < 0,001 y y < 0,001 → (0, 0) y break» de simular() paraba la
+    // simulación en t = 34,9 con «0 individuos» y «0 individuos». El modelo (RK4 h = 0,0001, y el
+    // propio RK4 de la app sin el corte) conserva V = 10,1724 y devuelve las presas hasta 231,2 en
+    // t = 61,18. Contradecía la FAQ visible: «El Lotka-Volterra clásico nunca predice extinción
+    // matemática». REPARADO el 18/11/2026: sin el corte, y el preset ya no vende un «colapso».
     test.setTimeout(120_000);
     await abrir(page);
+    await expect(page.getByRole('button', { name: /Sobrepesca/ })).not.toContainText('colapso');
     await page.getByRole('button', { name: /Sobrepesca/ }).click();
     await expect(page.locator('label[for="beta"]')).toHaveText('β (depredación): 0,400');
     await expect(page.locator('label[for="tTotal"]')).toHaveText('Tiempo total: 80 u.t.');
     await simular(page);
+    // 4x: la animación de 80 u.t. tarda un cuarto (desde el 4058 la velocidad funciona).
+    const velocidad = page.getByRole('button', { name: /Velocidad/ });
+    await velocidad.click();
+    await velocidad.click();
     await esperarFin(page, 90_000);
-    test.fail();
     await expect(fila(page, 'Tiempo simulado')).toHaveText('80,0 u.t.');
     await expect(eje(page, 'Población')).toHaveText('Población — máx: 231');
   });
 
-  test('ABIERTO · «Velocidad 4x» avanza más deprisa que 1x', async ({ page }) => {
-    // Hallazgo de esta inspección: el efecto de la animación depende de puntosVisibles, así que
-    // se reinicia en cada fotograma, pone ultimoTiempoRef a 0 y el incremento sale siempre
-    // max(1, 0) = 1 muestra por fotograma. Medido: 1x 3,7 → 10,9 u.t. en 2 s; 4x 4,0 → 11,3.
+  test('4058 · «Velocidad 4x» avanza más deprisa que 1x', async ({ page }) => {
+    // Hallazgo 4058: el efecto de la animación dependía de puntosVisibles, así que se reiniciaba
+    // en cada fotograma, ponía ultimoTiempoRef a 0 y el incremento salía siempre max(1, 0) = 1
+    // muestra por fotograma. Medido: 1x 3,7 → 10,9 u.t. en 2 s; 4x 4,0 → 11,3. REPARADO el
+    // 18/11/2026: 60 muestras por segundo × velocidad, con la fracción acumulada.
     test.setTimeout(60_000);
     await abrir(page);
     const tiempo = fila(page, 'Tiempo simulado');
@@ -178,8 +183,9 @@ test.describe('Lotka-Volterra clásico: casos resueltos a mano', () => {
     await expect(velocidad).toHaveText(/Velocidad 4x/);
     const avance4 = await avanceEn(1500);
     expect(avance1).toBeGreaterThan(0);
-    test.fail();
     expect(avance4).toBeGreaterThan(2 * avance1);
+    // La guía ya no remite a un botón «Acelerar» que no existe.
+    expect(await textoPrincipal(page)).not.toContain('Usa "Acelerar"');
   });
 
   test('ABIERTO · el rótulo «Modo» del resultado no cambia al pulsar otro modo sin volver a simular', async ({ page }) => {
@@ -238,13 +244,15 @@ test.describe('Lotka-Volterra con capacidad de carga', () => {
 });
 
 test.describe('Textos de la guía, FAQ y datos estructurados', () => {
-  test('ABIERTO · δ = 0,075 con β = 0,1 son β/δ = 1,33 presas por depredador nacido, no ~13', async ({ page }) => {
+  test('4060 · δ = 0,075 con β = 0,1 son β/δ = 1,33 presas por depredador nacido, no ~13', async ({ page }) => {
     // En dx/dt = αx − βxy, dy/dt = δxy − γy se comen βxy presas y nacen δxy depredadores:
     // depredadores por presa = δ/β = 0,75, presas por depredador = β/δ = 1,33. «~13» es 1/δ, que
     // solo valdría con β = 1; la definición «cuántos depredadores genera cada presa» es δ/β.
+    // REPARADO el 18/11/2026.
     await abrir(page);
-    test.fail();
-    expect(await textoPrincipal(page)).not.toContain('~13 presas por depredador nacido');
+    const texto = await textoPrincipal(page);
+    expect(texto).not.toContain('~13 presas por depredador nacido');
+    expect(texto).toContain('δ = 0,075 con β = 0,1 → 0,75 depredadores por presa comida (unas 1,33 presas por depredador nacido)');
   });
 
   test('ABIERTO · con γ = 1,5 la vida media es 1/γ = 0,67 u.t.; 0,46 es la semivida (ln 2/γ)', async ({ page }) => {
@@ -276,7 +284,9 @@ test.describe('Textos de la guía, FAQ y datos estructurados', () => {
     await expect(page.getByRole('button', { name: /Caos/ })).toHaveCount(0);
   });
 
-  test('ABIERTO · la FAQ del JSON-LD no afirma un «umbral de extinción» que el modelo no tiene', async ({ page }) => {
+  test('4059 · la FAQ del JSON-LD no afirma un «umbral de extinción» que el modelo no tiene', async ({ page }) => {
+    // REPARADO el 18/11/2026: la respuesta dice que en el clásico no hay umbral (ciclos cerrados)
+    // y que con capacidad de carga, si K ≤ γ/δ, desaparecen los depredadores y las presas van a K.
     // Con los valores iniciales y β subida a 0,5 (máximo), el modelo y la app dan órbitas
     // cerradas (V conservada, presas máx 80,6, en t = 100 «2» y «1» individuos): ninguna
     // extinción. En el clásico ningún β ni α positivo cruza umbral alguno.
@@ -288,8 +298,8 @@ test.describe('Textos de la guía, FAQ y datos estructurados', () => {
         .flatMap((j) => (j.mainEntity as { acceptedAnswer: { text: string } }[]).map((q) => q.acceptedAnswer.text)),
     );
     expect(respuestas.length).toBeGreaterThanOrEqual(5);
-    test.fail();
     expect(respuestas.join(' ')).not.toMatch(/umbral de extinción|también se extinguen/);
+    expect(respuestas.join(' ')).toContain('En el modelo clásico no hay un umbral así');
   });
 
   test('ABIERTO · un solo FAQPage y con las preguntas de la FAQ visible', async ({ page }) => {

@@ -70,7 +70,8 @@ const PRESETS: Preset[] = [
     id: 'sobrepesca',
     nombre: 'Sobrepesca',
     icono: '🎣',
-    descripcion: 'Tasa de depredación alta — colapso del ecosistema',
+    // Decía «colapso del ecosistema»: en el clásico las dos poblaciones se recuperan (hallazgo 4057)
+    descripcion: 'Tasa de depredación alta — ciclos extremos, al borde de la extinción',
     modo: 'clasico',
     x0: 40, y0: 30, alfa: 0.8, beta: 0.4, delta: 0.05, gamma: 0.3, K: 200, tTotal: 80,
   },
@@ -145,11 +146,10 @@ function simular(
     if (i % muestreo === 0) {
       puntos.push({ t: i * dt, x: xActual, y: yActual });
     }
-    // Cortar si extinción mutua
-    if (xActual < 0.001 && yActual < 0.001) {
-      puntos.push({ t: i * dt, x: 0, y: 0 });
-      break;
-    }
+    // Hasta el 18/11/2026 se cortaba aquí con «x < 0,001 e y < 0,001» y se pintaba una extinción
+    // mutua que el modelo no tiene: sus órbitas son cerradas y las dos poblaciones se recuperan
+    // (Sobrepesca: presas a 1,9·10⁻⁷ en t=34,92 y 231 en t=61,18). La simulación se paraba antes
+    // del tiempo pedido sin avisar (hallazgo 4057). Ahora llega siempre al final.
   }
   return puntos;
 }
@@ -289,32 +289,28 @@ export default function Page() {
     setVelocidad((v) => (v >= 4 ? 1 : v * 2));
   }, []);
 
-  // Animación
+  // Animación: 60 muestras por segundo × velocidad.
+  // Hasta el 18/11/2026 el efecto dependía de `puntosVisibles`: se desmontaba y se volvía a montar
+  // en cada fotograma, ponía ultimoTiempoRef a 0, dtMs salía 0 y avanzaba siempre 1 muestra por
+  // fotograma, así que «Velocidad 2x/4x» no cambiaba nada (hallazgo 4058). Ahora el bucle vive
+  // mientras dure la animación y acumula la fracción de muestra de cada fotograma.
   useEffect(() => {
     if (!animando || pausado || puntos.length === 0) return;
-    if (puntosVisibles >= puntos.length) {
-      setAnimando(false);
-      return;
-    }
 
+    let acumulado = 0;
+    ultimoTiempoRef.current = 0;
     const animar = (tiempo: number): void => {
       if (ultimoTiempoRef.current === 0) ultimoTiempoRef.current = tiempo;
       const dtMs = tiempo - ultimoTiempoRef.current;
-      const incremento = Math.max(1, Math.floor((dtMs / 1000) * 60 * velocidad));
       ultimoTiempoRef.current = tiempo;
-
-      setPuntosVisibles((v) => {
-        const nuevoValor = v + incremento;
-        if (nuevoValor >= puntos.length) {
-          return puntos.length;
-        }
-        return nuevoValor;
-      });
-
+      acumulado += (dtMs / 1000) * 60 * velocidad;
+      const incremento = Math.floor(acumulado);
+      if (incremento > 0) {
+        acumulado -= incremento;
+        setPuntosVisibles((v) => Math.min(puntos.length, v + incremento));
+      }
       animFrameRef.current = requestAnimationFrame(animar);
     };
-
-    ultimoTiempoRef.current = 0;
     animFrameRef.current = requestAnimationFrame(animar);
 
     return () => {
@@ -323,7 +319,12 @@ export default function Page() {
         animFrameRef.current = null;
       }
     };
-  }, [animando, pausado, puntos.length, velocidad, puntosVisibles]);
+  }, [animando, pausado, puntos.length, velocidad]);
+
+  // Al llegar al último punto, la animación termina
+  useEffect(() => {
+    if (animando && puntos.length > 0 && puntosVisibles >= puntos.length) setAnimando(false);
+  }, [animando, puntos.length, puntosVisibles]);
 
   // Datos derivados
   const puntosMostrar = useMemo(() => puntos.slice(0, puntosVisibles), [puntos, puntosVisibles]);
@@ -778,8 +779,11 @@ export default function Page() {
                 <tr>
                   <td>Eficiencia conversión</td>
                   <td>δ (delta)</td>
-                  <td>Cuántos depredadores nuevos genera cada presa consumida</td>
-                  <td>δ = 0,075 → ~13 presas por depredador nacido</td>
+                  {/* Decía «cuántos depredadores genera cada presa» y «~13 presas por depredador»,
+                      que es 1/δ: se comen βxy presas y nacen δxy depredadores, así que cada presa
+                      comida da δ/β depredadores y cada depredador cuesta β/δ presas (hallazgo 4060). */}
+                  <td>Ritmo al que nacen depredadores por los encuentros; cada presa comida da δ/β depredadores</td>
+                  <td>δ = 0,075 con β = 0,1 → 0,75 depredadores por presa comida (unas 1,33 presas por depredador nacido)</td>
                 </tr>
                 <tr>
                   <td>Mortalidad depredador</td>
@@ -870,7 +874,7 @@ export default function Page() {
               <div className={styles.stepNumber}>2</div>
               <div className={styles.stepContent}>
                 <strong>Lanza la simulación</strong>
-                <p>Pulsa &quot;Simular&quot; y observa cómo evolucionan las dos curvas en el gráfico temporal. Usa &quot;Acelerar&quot; si quieres saltar al final rápidamente.</p>
+                <p>Pulsa &quot;Simular&quot; y observa cómo evolucionan las dos curvas en el gráfico temporal. Usa &quot;Velocidad&quot; (1x, 2x o 4x) si quieres que avance más deprisa.</p>
               </div>
             </div>
             <div className={styles.step}>

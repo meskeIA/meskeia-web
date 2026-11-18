@@ -78,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Qué ocurre si la tasa de caza supera la tasa de reproducción de las presas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Si la depredación es demasiado intensa respecto a la reproducción de las presas, la población de presas colapsa hacia cero. Al desaparecer las presas, los depredadores también se extinguen por falta de alimento. Este escenario se puede explorar en el simulador aumentando el parámetro de depredación o reduciendo la tasa de crecimiento de la presa hasta cruzar el umbral de extinción.',
+        text: 'En el modelo clásico no hay un umbral así: para cualquier valor positivo de los cuatro parámetros las trayectorias son ciclos cerrados alrededor del equilibrio (x* = γ/δ, y* = α/β), y las poblaciones se acercan a cero sin llegar nunca. Una depredación más intensa (β mayor) baja el número medio de depredadores y cambia la amplitud de los ciclos, pero no extingue a nadie. Además, α y β no se pueden comparar directamente: tienen unidades distintas. En el modelo con capacidad de carga K, si K no supera γ/δ son los depredadores los que no se sostienen y desaparecen, mientras las presas tienden a K. La extinción real, cuando una población baja a muy pocos individuos, la provocan factores aleatorios que un modelo determinista como este no incluye.',
       },
     },
     {
