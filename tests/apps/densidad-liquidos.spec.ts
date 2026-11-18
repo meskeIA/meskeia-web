@@ -94,9 +94,12 @@ async function convertir(
   await expect(pestana).toHaveAttribute('aria-selected', 'true');
   await page.fill('#cantidad', cantidad);
   await esperarValorEnReact(page, '#cantidad', cantidad);
+  // Desde el 18/11/2026 la región role=status está siempre montada (hallazgo 5015): sin resultado,
+  // anuncia «Introduce una cantidad.», que aquí cuenta como «no hay resultado».
   const estado = panel(page).getByRole('status');
   if ((await estado.count()) === 0) return null;
-  return (await estado.innerText()).replace(/\s+/g, ' ').trim();
+  const texto = (await estado.innerText()).replace(/\s+/g, ' ').trim();
+  return texto === 'Introduce una cantidad.' ? null : texto;
 }
 
 /** Comprueba que la app NO pinta resultado y sí el aviso de cantidad. */
@@ -160,12 +163,11 @@ test.describe('Los tres casos resueltos a mano', () => {
     await expect(page.locator('main')).not.toContainText(/NaN|Infinity|undefined|No definido|∞/);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el punto de millar se lee como decimal: «1.000» ml de agua dan «1 g»', async ({
+  test('HALLAZGO (18/11/2026, REPARADO) · el punto de millar se lee como decimal: «1.000» ml de agua dan «1 g»', async ({
     page,
   }) => {
-    // num() = parseFloat(v.replace(',', '.')): «1.000» → 1, «12.500» → 12,5, «1.234,5» → 1,234.
-    // El canónico es parseSpanishNumber de @/lib (con un solo separador gana el español).
-    test.fail();
+    // REPARADO: num() = parseFloat(v.replace(',', '.')) leía «1.000» → 1, «12.500» → 12,5,
+    // «1.234,5» → 1,234. Ahora parseSpanishNumber de @/lib (con un solo separador gana el español).
     // 1000 ml × 1 g/ml = 1000 g
     expect(await convertir(page, 'agua', 'ml-a-g', '1.000')).toBe('1000 g densidad 1,00 g/ml');
     // 12500 ml × 1,42 = 17750 g
@@ -176,10 +178,9 @@ test.describe('Los tres casos resueltos a mano', () => {
     expect(await convertir(page, 'miel', 'g-a-ml', '142.000')).toBe('100.000 ml densidad 1,42 g/ml');
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · «12abc» y «1e3» se aceptan como 12 y 1000', async ({ page }) => {
-    // parseFloat se queda con el prefijo numérico y entiende la notación científica; con
-    // parseSpanishNumber las dos son NaN. La app da «11 g» (12 × 0,92 = 11,04) y «920 g».
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · «12abc» y «1e3» se aceptan como 12 y 1000', async ({ page }) => {
+    // REPARADO: parseFloat se quedaba con el prefijo numérico y entendía la notación científica
+    // («11 g» y «920 g»); con parseSpanishNumber las dos son NaN y se rechazan.
     await esperarRechazo(page, 'aceite', '12abc');
     await esperarRechazo(page, 'aceite', '1e3');
   });
@@ -205,30 +206,32 @@ test.describe('Textos frente al motor de la misma página', () => {
     expect(todo).toContain('1,03 g/ml');
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el bloque educativo dice que 100 ml de miel pesan «casi 145 gramos»; el conversor da 142', async ({
+  test('HALLAZGO (18/11/2026, REPARADO) · el bloque educativo dice que 100 ml de miel pesan «casi 145 gramos»; el conversor da 142', async ({
     page,
   }) => {
-    // 100 ml × 1,42 g/ml = 142 g: lo que da el conversor y lo que dice el FAQPage («unos 142
-    // gramos»). El párrafo «Mismo volumen, distinto peso» dice «casi 145 gramos».
-    test.fail();
+    // REPARADO: 100 ml × 1,42 g/ml = 142 g: lo que da el conversor y lo que dice el FAQPage («unos
+    // 142 gramos»). El párrafo «Mismo volumen, distinto peso» decía «casi 145 gramos».
     expect(await convertir(page, 'miel', 'ml-a-g', '100')).toBe('142 g densidad 1,42 g/ml');
-    const parrafo = (await page.locator('p', { hasText: '100 ml de miel' }).textContent()) ?? '';
+    // Por una frase propia del párrafo: desde la FAQ visible (5014) la respuesta de la miel también
+    // dice «100 ml de miel»
+    const parrafo = (await page.locator('p', { hasText: 'un litro de aceite no llega al kilo' }).textContent()) ?? '';
     expect(parrafo).not.toContain('casi 145');
     expect(parrafo).toMatch(/100 ml de miel pesan[^.]*142/);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · las densidades no dicen a qué temperatura valen', async ({ page }) => {
-    // PubChem (agua, CID 962; Merck Index vía HSDB): 1,000000 g/ml a 3,98 °C y 0,999868 a 0 °C.
-    // Ni el selector, ni el resultado, ni la tabla «Densidades de cocina» dan la temperatura.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · las densidades no dicen a qué temperatura valen', async ({ page }) => {
+    // REPARADO: PubChem (agua, CID 962; Merck Index vía HSDB): 1,000000 g/ml a 3,98 °C y 0,999868 a
+    // 0 °C. Ni el selector, ni el resultado, ni la tabla «Densidades de cocina» daban la temperatura.
+    // Ahora una nota bajo el resultado y el título de la tabla dicen «unos 20 °C» (temperatura de
+    // cocina: con dos decimales el agua sigue en 1,00).
     const texto = (await page.locator('main').textContent()) ?? '';
     expect(texto).toMatch(/\d\s?°C/);
+    await expect(panel(page)).toContainText('Densidades aproximadas a temperatura ambiente (unos 20 °C)');
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el FAQPage pregunta lo que la página no muestra', async ({ page }) => {
-    // Las cinco preguntas de faqJsonLd no están en la página: no hay FAQ visible. §1.ter: el
-    // FAQPage sale de PREGUNTAS_FRECUENTES, que la página pinta.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · el FAQPage pregunta lo que la página no muestra', async ({ page }) => {
+    // REPARADO: las cinco preguntas de faqJsonLd no estaban en la página. §1.ter: el FAQPage sale
+    // ahora de PREGUNTAS_FRECUENTES, que la página pinta.
     await comprobarFaqPageUnico(page);
   });
 
@@ -251,23 +254,22 @@ test.describe('Accesibilidad', () => {
     }
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · al rechazar la cantidad desaparece la región viva y el aviso no se anuncia', async ({
+  test('HALLAZGO (18/11/2026, REPARADO) · al rechazar la cantidad desaparece la región viva y el aviso no se anuncia', async ({
     page,
   }) => {
-    // La región role="status" aria-live solo existe mientras hay resultado; con «-5» se
-    // desmonta y «Introduce una cantidad.» es un <p> sin región viva.
-    test.fail();
+    // REPARADO: la región role="status" aria-live solo existía mientras había resultado; con «-5»
+    // se desmontaba y «Introduce una cantidad.» era un <p> sin región viva. Ahora está siempre.
     await convertir(page, 'aceite', 'ml-a-g', '-5');
     const viva = panel(page).locator('[aria-live], [role="status"], [role="alert"]');
     await expect(viva).toHaveCount(1, { timeout: 1000 });
     await expect(viva).toContainText('Introduce una cantidad');
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el lector lee el emoji de cada opción del selector', async ({ page }) => {
-    // Las opciones se pintan como «{emoji} {nombre}»: el nombre accesible es «🫒 Aceite (oliva /
-    // girasol) (0,92 g/ml)» y un <option> no admite <span aria-hidden>.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · el lector lee el emoji de cada opción del selector', async ({ page }) => {
+    // REPARADO: las opciones se pintaban como «{emoji} {nombre}»: el nombre accesible era «🫒 Aceite
+    // (oliva / girasol) (0,92 g/ml)» y un <option> no admite <span aria-hidden>.
     const arbol = await page.locator('#liquido').ariaSnapshot();
     expect(arbol).not.toMatch(/\p{Extended_Pictographic}/u);
+    expect(arbol).toContain('Aceite (oliva / girasol) (0,92 g/ml)');
   });
 });

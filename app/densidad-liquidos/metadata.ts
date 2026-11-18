@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { generateWebAppSchema } from '@/lib/schema-templates';
+import { generateWebAppSchema, type FAQItem } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Conversor de líquidos: mililitros a gramos por densidad | meskeIA',
@@ -32,14 +32,22 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La pintan la FAQ visible y el FAQPage (§1.ter): hasta el 18/11/2026 solo existía en el JSON-LD
+// y la página no mostraba ninguna de las cinco preguntas (hallazgo 5014)
+export const PREGUNTAS_FRECUENTES: FAQItem[] = [
+  { question: '¿Un mililitro es igual a un gramo?', answer: 'Solo en el caso del agua, que pesa 1 gramo por mililitro. Otros líquidos pesan distinto: el aceite pesa menos (unos 0,92 g/ml) y la miel mucho más (alrededor de 1,42 g/ml). Por eso, cuando una receta da un líquido en gramos y tú lo mides en mililitros, hay que usar la densidad de ese líquido para convertir bien.' },
+  { question: '¿Cuánto pesa un litro de aceite?', answer: 'Un litro de aceite pesa unos 920 gramos, no un kilo, porque su densidad es de aproximadamente 0,92 g/ml, menor que la del agua. Por eso el aceite flota sobre el agua. Esa diferencia importa cuando una receta de repostería da el aceite en gramos y solo tienes una jarra medidora en mililitros.' },
+  { question: '¿Por qué la miel pesa tanto?', answer: 'La miel es muy densa, alrededor de 1,42 g/ml, porque es una solución muy concentrada de azúcares con poca agua. Eso significa que 100 ml de miel pesan unos 142 gramos. Lo mismo ocurre con los siropes y la leche condensada: son líquidos pesados, así que conviene medirlos por peso para mayor precisión.' },
+  { question: '¿Cuándo importa la densidad de un líquido?', answer: 'Importa sobre todo en repostería y panadería, donde las recetas suelen dar las cantidades en gramos para mayor precisión. Si solo tienes una jarra de mililitros, convertir según la densidad evita errores, especialmente con líquidos densos como la miel o ligeros como el aceite. En cocina general la diferencia suele ser menos crítica.' },
+  { question: '¿La leche pesa más que el agua?', answer: 'Sí, un poco: la leche tiene una densidad de alrededor de 1,03 g/ml por su contenido en azúcares, proteínas y minerales, así que un litro pesa unos 1.030 gramos. La diferencia es pequeña y para la mayoría de recetas se puede tratar casi como el agua, pero la herramienta la tiene en cuenta para mayor exactitud.' },
+];
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: [
-    { '@type': 'Question', name: '¿Un mililitro es igual a un gramo?', acceptedAnswer: { '@type': 'Answer', text: 'Solo en el caso del agua, que pesa 1 gramo por mililitro. Otros líquidos pesan distinto: el aceite pesa menos (unos 0,92 g/ml) y la miel mucho más (alrededor de 1,42 g/ml). Por eso, cuando una receta da un líquido en gramos y tú lo mides en mililitros, hay que usar la densidad de ese líquido para convertir bien.' } },
-    { '@type': 'Question', name: '¿Cuánto pesa un litro de aceite?', acceptedAnswer: { '@type': 'Answer', text: 'Un litro de aceite pesa unos 920 gramos, no un kilo, porque su densidad es de aproximadamente 0,92 g/ml, menor que la del agua. Por eso el aceite flota sobre el agua. Esa diferencia importa cuando una receta de repostería da el aceite en gramos y solo tienes una jarra medidora en mililitros.' } },
-    { '@type': 'Question', name: '¿Por qué la miel pesa tanto?', acceptedAnswer: { '@type': 'Answer', text: 'La miel es muy densa, alrededor de 1,42 g/ml, porque es una solución muy concentrada de azúcares con poca agua. Eso significa que 100 ml de miel pesan unos 142 gramos. Lo mismo ocurre con los siropes y la leche condensada: son líquidos pesados, así que conviene medirlos por peso para mayor precisión.' } },
-    { '@type': 'Question', name: '¿Cuándo importa la densidad de un líquido?', acceptedAnswer: { '@type': 'Answer', text: 'Importa sobre todo en repostería y panadería, donde las recetas suelen dar las cantidades en gramos para mayor precisión. Si solo tienes una jarra de mililitros, convertir según la densidad evita errores, especialmente con líquidos densos como la miel o ligeros como el aceite. En cocina general la diferencia suele ser menos crítica.' } },
-    { '@type': 'Question', name: '¿La leche pesa más que el agua?', acceptedAnswer: { '@type': 'Answer', text: 'Sí, un poco: la leche tiene una densidad de alrededor de 1,03 g/ml por su contenido en azúcares, proteínas y minerales, así que un litro pesa unos 1.030 gramos. La diferencia es pequeña y para la mayoría de recetas se puede tratar casi como el agua, pero la herramienta la tiene en cuenta para mayor exactitud.' } },
-  ],
+  mainEntity: PREGUNTAS_FRECUENTES.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: { '@type': 'Answer', text: f.answer },
+  })),
 };
