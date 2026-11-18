@@ -83,11 +83,17 @@ async function irA(page: Page, titulo: string): Promise<void> {
   await expect(page.locator('h2').first()).toContainText(titulo);
 }
 
-/** Ancho de cada bloque de familia relativo al de la indoeuropea, en el orden de la tabla. */
+/**
+ * Ancho de la barra de cada familia relativo al de la indoeuropea, en el orden de la tabla. Desde
+ * el 18/11/2026 la proporción la lleva una barra dentro de cada bloque (los bloques ocupan todo el
+ * ancho, para que el nombre y la cifra quepan también en la familia más pequeña, 4 % del ancho);
+ * antes se medía el bloque entero, que era lo que tenía los suelos (hallazgo 5056).
+ */
 async function anchosRelativosFamilias(page: Page): Promise<number[]> {
   const anchos = await page
-    .locator('[class*="_familiasGrid"] > button')
+    .locator('[class*="_familiasGrid"] > button [class*="_familiaBarra"]')
     .evaluateAll((bs) => bs.map((b) => b.getBoundingClientRect().width));
+  expect(anchos, 'una barra por familia').toHaveLength(8);
   return anchos.map((a) => a / anchos[0]);
 }
 
@@ -184,11 +190,12 @@ test.describe('visualizador-idiomas-mundo — barras, cifras y teclado (escritor
     );
   });
 
-  test.fail('HALLAZGO ABIERTO (18/11/2026) · los bloques de familia no son proporcionales: seis de ocho miden lo mismo', async ({ page }) => {
-    // JSON-LD: «Familias lingüísticas con bloques proporcionales por hablantes». Esperado: ancho ÷
+  test('HALLAZGO REPARADO (18/11/2026) · los bloques de familia no eran proporcionales: seis de ocho medían lo mismo', async ({ page }) => {
+    // JSON-LD: «Familias lingüísticas con … proporcionales por hablantes». Esperado: ancho ÷
     // ancho indoeuropea = hablantes ÷ 3.200 (Japónica 0,040; Austronesia 0,121; Níger-Congo 0,166).
-    // Obtenido a 1280 px: Níger-Congo, Austronesia, Afroasiática, Dravídica, Turca y Japónica a
+    // Era, a 1280 px: Níger-Congo, Austronesia, Afroasiática, Dravídica, Turca y Japónica a
     // 200 px las seis (0,235), por el suelo Math.max(…, 15) y el min-width: 200px del módulo.
+    // Ahora lo mide una barra interior sin suelo.
     const rel = await anchosRelativosFamilias(page);
     const fuera: string[] = [];
     for (const [i, f] of FAMILIAS.entries()) {
@@ -198,9 +205,9 @@ test.describe('visualizador-idiomas-mundo — barras, cifras y teclado (escritor
     expect(fuera).toEqual([]);
   });
 
-  test.fail('HALLAZGO ABIERTO (18/11/2026) · el embudo dibuja 3.000 de 7.000 lenguas al 70 % del ancho', async ({ page }) => {
-    // Esperado: valor ÷ 7.000 → 42,86 %, 21,43 % y 5 %. Obtenido: anchos fijos 70, 45 y 22 %, que
-    // dicen visualmente que el 70 % de las lenguas está en peligro (el texto dice «casi la mitad»).
+  test('HALLAZGO REPARADO (18/11/2026) · el embudo dibujaba 3.000 de 7.000 lenguas al 70 % del ancho', async ({ page }) => {
+    // Esperado: valor ÷ 7.000 → 42,86 %, 21,43 % y 5 %. Eran anchos fijos 70, 45 y 22 %, que
+    // decían visualmente que el 70 % de las lenguas está en peligro (el texto dice «casi la mitad»).
     await irA(page, 'En peligro');
     const niveles = await page.locator('[class*="_embudoNivel"]').evaluateAll((ns) =>
       ns.map((n) => ({
@@ -214,20 +221,23 @@ test.describe('visualizador-idiomas-mundo — barras, cifras y teclado (escritor
     }
   });
 
-  test.fail('HALLAZGO ABIERTO (18/11/2026) · Yagán: «1 hablante» en la tarjeta que dice que la última murió en 2022', async ({ page }) => {
+  test('HALLAZGO REPARADO (18/11/2026) · Yagán: «1 hablante» en la tarjeta que dice que la última murió en 2022', async ({ page }) => {
     // La propia tarjeta: «Cristina Calderón fue la última hablante nativa. Falleció en 2022.»
-    // Esperado: 0 hablantes nativos (o «extinta/sin hablantes nativos») · obtenido: «1 hablante».
+    // Esperado: 0 hablantes nativos · era «1 hablante» con la insignia «Crítico»; ahora «0
+    // hablantes nativos» con «Sin hablantes nativos».
     await irA(page, 'En peligro');
     const tarjeta = page.locator('[class*="_lenguaCard"]').filter({ hasText: 'Yagán' });
     const detalle = (await tarjeta.locator('[class*="_lenguaDetalle"]').textContent()) ?? '';
     const meta = (await tarjeta.locator('[class*="_lenguaMeta"]').textContent()) ?? '';
     expect(detalle).toMatch(/última hablante nativa[^.]*\.\s*Falleció en 2022/);
-    const vivos = Number(/(\d+)\s+hablantes?/.exec(meta)?.[1] ?? 0);
+    const vivos = Number(/(\d+)\s+hablantes?/.exec(meta)?.[1] ?? -1);
     expect(vivos, `meta «${meta}»`).toBe(0);
+    await expect(tarjeta.locator('[class*="_lenguaBadge"]')).toHaveText('Sin hablantes nativos');
   });
 
-  test.fail('HALLAZGO ABIERTO (18/11/2026) · Jemer «74 letras» con un desglose que suma 68', async ({ page }) => {
-    // «33 consonantes, 23 vocales y 12 vocales independientes»: 33 + 23 + 12 = 68 ≠ 74.
+  test('HALLAZGO REPARADO (18/11/2026) · Jemer «74 letras» con un desglose que suma 68', async ({ page }) => {
+    // «33 consonantes, 23 vocales y 12 vocales independientes»: 33 + 23 + 12 = 68 ≠ 74. Ahora el
+    // titular dice 68 y el detalle aclara que hay recuentos de 74 con letras en desuso.
     await irA(page, 'Curiosidades');
     const tarjeta = page.locator('[class*="_curiosidadCard"]').filter({ hasText: 'El alfabeto más largo' });
     const dato = (await tarjeta.locator('[class*="_curiosidadDato"]').textContent()) ?? '';
@@ -274,12 +284,15 @@ test.describe('visualizador-idiomas-mundo — barras, cifras y teclado (escritor
     expect(erroresJs).toEqual([]);
   });
 
-  test.fail('HALLAZGO ABIERTO (18/11/2026) · cifras pintadas por debajo de 4,5:1 en el tema claro', async ({ page }) => {
+  test('HALLAZGO REPARADO (18/11/2026) · cifras pintadas por debajo de 4,5:1 en el tema claro', async ({ page }) => {
     // Texto de 11,2 px (barras), 15,2 px negrita (familias) y 17,6 px negrita (embudo): ninguno es
-    // «texto grande» (18,66 px negrita), así que exige 4,5:1. Medido: blanco sobre #2E86AB 4,11:1 y
+    // «texto grande» (18,66 px negrita), así que exige 4,5:1. Era: blanco sobre #2E86AB 4,11:1 y
     // sobre #48A9A6 2,80:1 (barras), embudo 4,11 · 2,85 · 3,82:1, y siete de las ocho cifras de
-    // familia en su color sobre blanco (Turca #F39C12 2,19:1, Japónica #1ABC9C 2,41:1…).
+    // familia en su color sobre blanco (Turca #F39C12 2,19:1, Japónica #1ABC9C 2,41:1…). Ahora las
+    // cifras van fuera de las barras: --primary-texto y --secondary-texto (barras) y el texto del
+    // tema (familias y embudo), sobre el fondo del contenedor, que se declara opaco.
     const rgb = (s: string): number[] => (s.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+    const opaco = (s: string): boolean => !/rgba\([^)]*,\s*0\)$/.test(s) && s !== 'transparent';
     const bajos: string[] = [];
     const familias = await page.locator('[class*="_familiasGrid"] > button').evaluateAll((bs) =>
       bs.map((b) => ({
@@ -289,6 +302,7 @@ test.describe('visualizador-idiomas-mundo — barras, cifras y teclado (escritor
       })),
     );
     for (const x of familias) {
+      if (!opaco(x.f)) bajos.push(`familia ${x.n}: fondo sin declarar (${x.f})`);
       const r = contraste(rgb(x.c), rgb(x.f));
       if (r < 4.5) bajos.push(`familia ${x.n}: ${r.toFixed(2)}:1`);
     }
@@ -296,7 +310,9 @@ test.describe('visualizador-idiomas-mundo — barras, cifras y teclado (escritor
     const barras = await page.locator('[class*="_barraTexto"]').evaluateAll((ts) =>
       ts.map((t) => ({ t: t.textContent ?? '', c: getComputedStyle(t).color, f: getComputedStyle(t.parentElement as Element).backgroundColor })),
     );
+    expect(barras, 'las 20 cifras del top 10 (nativos y L2), todas escritas').toHaveLength(20);
     for (const x of barras) {
+      if (!opaco(x.f)) bajos.push(`barra «${x.t}»: fondo sin declarar (${x.f})`);
       const r = contraste(rgb(x.c), rgb(x.f));
       if (r < 4.5) bajos.push(`barra «${x.t}»: ${r.toFixed(2)}:1`);
     }
@@ -305,6 +321,7 @@ test.describe('visualizador-idiomas-mundo — barras, cifras y teclado (escritor
       vs.map((v) => ({ t: v.textContent ?? '', c: getComputedStyle(v).color, f: getComputedStyle(v.parentElement as Element).backgroundColor })),
     );
     for (const x of embudo) {
+      if (!opaco(x.f)) bajos.push(`embudo «${x.t}»: fondo sin declarar (${x.f})`);
       const r = contraste(rgb(x.c), rgb(x.f));
       if (r < 4.5) bajos.push(`embudo «${x.t}»: ${r.toFixed(2)}:1`);
     }
@@ -323,10 +340,13 @@ test.describe('visualizador-idiomas-mundo — lo que leen buscadores y asistente
     expect(app?.featureList?.length ?? 0).toBeGreaterThanOrEqual(4);
   });
 
-  test.fail('HALLAZGO ABIERTO (18/11/2026) · la FAQPage da otras cifras que la página', async ({ page }) => {
+  test('HALLAZGO REPARADO (18/11/2026) · la FAQPage daba otras cifras que la página', async ({ page }) => {
     // FAQ: «entre 6.500 y 7.000 idiomas vivos» · página: «Hay más de 7.000 idiomas en el mundo».
     // FAQ: «el español (480 millones de nativos)… el hindi (340 millones)» · barras: 485 M y 345 M.
+    // Ahora el FAQPage dice «más de 7.000», 485 y 345. La cifra de nativos se lee de la primera
+    // cifra bajo la barra (desde el 18/11/2026 ya no va dentro: hallazgo 5057).
     const faq = (await respuestasFaq(page)).join('\n');
+    expect(faq).toContain('más de 7.000 idiomas vivos');
     const discrepancias: string[] = [];
     const contexto = (await page.locator('[class*="_contexto"]').first().textContent()) ?? '';
     const masDe = Number((/más de ([\d.]+) idiomas/.exec(contexto)?.[1] ?? '0').replace(/\./g, ''));
@@ -337,7 +357,7 @@ test.describe('visualizador-idiomas-mundo — lo que leen buscadores y asistente
     await irA(page, 'Los más hablados');
     const nativosPagina = async (nombre: string): Promise<number> =>
       Number(
-        ((await page.locator('[class*="_barraItem"]').filter({ hasText: nombre }).locator('[class*="_barraNativos"]').textContent()) ?? '')
+        ((await page.locator('[class*="_barraItem"]').filter({ hasText: nombre }).locator('[class*="_barraTexto"]').first().textContent()) ?? '')
           .replace(/\D/g, ''),
       );
     for (const [nombre, patron] of [
@@ -351,19 +371,25 @@ test.describe('visualizador-idiomas-mundo — lo que leen buscadores y asistente
     expect(discrepancias).toEqual([]);
   });
 
-  test.fail('HALLAZGO ABIERTO (18/11/2026) · porcentajes pegados al número («95%», «40%»…)', async ({ page }) => {
+  test('HALLAZGO REPARADO (18/11/2026) · porcentajes pegados al número («95%», «40%»…)', async ({ page }) => {
     // Formato español (CLAUDE.md, 25/09/2026): «95 %» con espacio duro U+00A0. Página: 95%, 2%,
-    // 12% y 80% (bloque educativo); FAQPage: 96%, 4% y 40%.
+    // 12% y 80% (bloque educativo); FAQPage: 96%, 4% y 40%. Los de 95, 12 y 80 se retiraron con
+    // el hallazgo de las cifras sin fuente; los demás llevan espacio duro.
     const texto = `${await textoDeLaApp(page)}\n${(await respuestasFaq(page)).join('\n')}`;
+    expect(texto).toContain('2 %');
+    expect(texto).toContain('40 %');
     const pegados = Array.from(texto.matchAll(/\d+(?:%| %)/g)).map((m) => m[0]);
     expect(pegados).toEqual([]);
   });
 
-  test.fail('HALLAZGO ABIERTO (18/11/2026) · afirmaciones discutidas y cifras redondas sin fuente ni atribución', async ({ page }) => {
+  test('HALLAZGO REPARADO (18/11/2026) · afirmaciones discutidas y cifras redondas sin fuente ni atribución', async ({ page }) => {
     // Neutralidad editorial 1 y 3 del CLAUDE.md: cifra popular sin fuente / marco discutido dado por
-    // hecho. La única nota de fuentes (Ethnologue, UNESCO) cubre hablantes y lenguas en peligro, y
-    // está dentro del bloque plegado. Cada frase de abajo debe ir atribuida (autor, organismo o año
-    // en el mismo párrafo) o retirarse.
+    // hecho. Cada frase de abajo debía ir atribuida (autor, organismo o año en el mismo párrafo) o
+    // retirarse. Hopi: Whorf «propuso» y Malotki lo discutió (1983); pirahã: «Según … Everett
+    // (2005)» y «tesis discutida»; euskera: «única lengua preindoeuropea viva de Europa occidental»;
+    // 95 %, 80 %, 12 % y «cada dos semanas» (también en el FAQPage), retirados.
+    const faqTexto = (await respuestasFaq(page)).join('\n');
+    expect(faqTexto).not.toMatch(/cada dos semanas/);
     const frases: readonly RegExp[] = [
       /Los hopi no distinguen pasado y futuro/,
       /una de las lenguas más simples conocidas/,
@@ -407,20 +433,28 @@ test.describe('visualizador-idiomas-mundo — en móvil (Pixel 7)', () => {
     await expect(page.locator('[class*="_barraItem"]')).toHaveCount(10);
   });
 
-  test.fail('HALLAZGO ABIERTO (18/11/2026) · en móvil siete cifras de las barras salen cortadas', async ({ page }) => {
-    // Pista de ~208 px: «+110 M» (árabe) cabe en 16 px, «+105 M» (ruso) en 15, «230 M» (bengalí y
-    // portugués) en 33… Medido en Pixel 7: Mandarín L2, Hindi L2, Árabe L2, Francés L2, Bengalí,
-    // Portugués y Ruso L2 con scrollWidth > clientWidth (text-overflow: ellipsis).
+  test('HALLAZGO REPARADO (18/11/2026) · en móvil siete cifras de las barras salían cortadas', async ({ page }) => {
+    // Pista de ~208 px: «+110 M» (árabe) cabía en 16 px, «+105 M» (ruso) en 15, «230 M» (bengalí y
+    // portugués) en 33… (text-overflow: ellipsis). Además, francés, ruso y japonés no escribían sus
+    // nativos. Ahora las 20 cifras van debajo de la barra, enteras y dentro de la pantalla.
     await page.locator(NAV).getByRole('button', { name: 'Los más hablados' }).tap();
     await expect(page.locator('[class*="_barraItem"]')).toHaveCount(10);
-    const cortadas = await page.locator('[class*="_barraTexto"]').evaluateAll((ts) =>
-      ts.filter((t) => t.scrollWidth > t.clientWidth + 0.5).map((t) => t.textContent ?? ''),
+    await expect(page.locator('[class*="_barraTexto"]')).toHaveCount(20);
+    const anchoPantalla = await page.evaluate(() => document.documentElement.clientWidth);
+    const cortadas = await page.locator('[class*="_barraTexto"]').evaluateAll(
+      (ts, ancho) =>
+        ts
+          .filter((t) => t.scrollWidth > t.clientWidth + 0.5 || t.getBoundingClientRect().right > ancho)
+          .map((t) => t.textContent ?? ''),
+      anchoPantalla,
     );
     expect(cortadas).toEqual([]);
+    const frances = page.locator('[class*="_barraItem"]').filter({ hasText: 'Francés' });
+    await expect(frances.locator('[class*="_barraTexto"]')).toHaveText(['80 M', '+230 M']);
   });
 
-  test.fail('HALLAZGO ABIERTO (18/11/2026) · en móvil las ocho familias miden lo mismo (width: 100% !important)', async ({ page }) => {
-    // Esperado: Japónica 128 ÷ 3.200 = 0,040 del ancho de la indoeuropea · obtenido 1,000 (364 px las ocho).
+  test('HALLAZGO REPARADO (18/11/2026) · en móvil las ocho familias medían lo mismo (width: 100% !important)', async ({ page }) => {
+    // Esperado: Japónica 128 ÷ 3.200 = 0,040 del ancho de la indoeuropea · era 1,000 (364 px las ocho).
     const rel = await anchosRelativosFamilias(page);
     expect(rel[7]).toBeCloseTo(128 / 3200, 1);
     expect(rel[1]).toBeCloseTo(1300 / 3200, 1);

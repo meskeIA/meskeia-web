@@ -66,27 +66,35 @@ function SeccionFamilias() {
         <p>Hay más de <strong>7.000 idiomas</strong> en el mundo, pero casi todos pertenecen a unas pocas grandes familias. La más grande — la indoeuropea — la habla casi la mitad de la humanidad.</p>
       </div>
 
+      {/* Cada bloque ocupa todo el ancho y dentro lleva una barra proporcional a sus hablantes
+          (hablantes ÷ indoeuropea, sin suelo). Hasta el 18/11/2026 el ancho del bloque tenía dos
+          suelos (15 % y min-width 200 px) y en móvil un width 100 % !important: seis de ocho familias
+          medían lo mismo (hallazgo 5056). La cifra va en el texto del tema: en el color de la familia
+          daba de 2,19 a 4,11:1 (hallazgo 5058) */}
       <div className={styles.familiasGrid}>
         {FAMILIAS.map((f, i) => {
-          const ancho = Math.max((f.hablantes / maxHablantes) * 100, 15);
+          const ancho = (f.hablantes / maxHablantes) * 100;
           const activa = familiaActiva === i;
           return (
             <button
               key={f.nombre}
               type="button"
               className={`${styles.familiaBloque} ${activa ? styles.familiaBloqueActiva : ''}`}
-              style={{ width: `${ancho}%`, borderLeftColor: f.color }}
+              style={{ borderLeftColor: f.color }}
               onClick={() => setFamiliaActiva(activa ? null : i)}
               aria-expanded={activa}
               aria-label={`${f.nombre}: ${formatNumber(f.hablantes / 1000000, 0)} millones de hablantes`}
             >
               <div className={styles.familiaHeader}>
                 <span className={styles.familiaNombre}>{f.nombre}</span>
-                <span className={styles.familiaHablantes} style={{ color: f.color }}>
+                <span className={styles.familiaHablantes}>
                   {f.hablantes >= 1000000000
                     ? `${formatNumber(f.hablantes / 1000000000, 1)} mil M`
                     : `${formatNumber(f.hablantes / 1000000, 0)} M`}
                 </span>
+              </div>
+              <div className={styles.familiaPista} aria-hidden="true">
+                <div className={styles.familiaBarra} style={{ width: `${ancho}%`, background: f.color }} />
               </div>
               {activa && (
                 <div className={styles.familiaDetalle}>
@@ -169,12 +177,17 @@ function SeccionHablados() {
                 <span aria-hidden="true">{idioma.bandera}</span>
                 <span className={styles.barraNombre}>{idioma.nombre}</span>
               </div>
-              <div className={styles.barraTrack}>
-                <div className={styles.barraNativos} style={{ width: `${anchoNativos}%` }}>
-                  {idioma.nativos >= 200 && <span className={styles.barraTexto}>{formatNumber(idioma.nativos, 0)} M</span>}
+              {/* Las cifras van debajo de la barra, todas y en el color de su leyenda. Hasta el
+                  18/11/2026 iban dentro, en blanco (2,80-4,11:1), cortadas en móvil, y las menores de
+                  200 M (nativos) o 100 M (L2) no se escribían (hallazgos 5057 y 5058) */}
+              <div className={styles.barraColumna}>
+                <div className={styles.barraTrack} aria-hidden="true">
+                  <div className={styles.barraNativos} style={{ width: `${anchoNativos}%` }} />
+                  <div className={styles.barraL2} style={{ width: `${anchoL2}%` }} />
                 </div>
-                <div className={styles.barraL2} style={{ width: `${anchoL2}%` }}>
-                  {(idioma.total - idioma.nativos) >= 100 && <span className={styles.barraTexto}>+{formatNumber(idioma.total - idioma.nativos, 0)} M</span>}
+                <div className={styles.barraCifras}>
+                  <span className={`${styles.barraTexto} ${styles.barraTextoNativos}`}>{formatNumber(idioma.nativos, 0)} M</span>
+                  <span className={`${styles.barraTexto} ${styles.barraTextoL2}`}>+{formatNumber(idioma.total - idioma.nativos, 0)} M</span>
                 </div>
               </div>
               <span className={styles.barraTotal}>{formatNumber(idioma.total, 0)} M</span>
@@ -208,40 +221,50 @@ interface LenguaPeligro {
   hablantes: string;
   lugar: string;
   detalle: string;
-  estado: 'critico' | 'peligro' | 'salvada';
+  estado: 'durmiente' | 'critico' | 'peligro' | 'salvada';
 }
 
+const ROTULO_ESTADO: Record<LenguaPeligro['estado'], string> = {
+  durmiente: 'Sin hablantes nativos',
+  critico: 'Crítico',
+  peligro: 'En peligro',
+  salvada: 'Recuperada',
+};
+
 const LENGUAS_PELIGRO: LenguaPeligro[] = [
-  { nombre: 'Yagán', hablantes: '1 hablante', lugar: '🇨🇱 Chile', detalle: 'Cristina Calderón fue la última hablante nativa. Falleció en 2022. La lengua se documenta para preservarla.', estado: 'critico' },
+  // «1 hablante» y «Crítico» hasta el 18/11/2026, con la última hablante nativa fallecida en 2022 (hallazgo 5059)
+  { nombre: 'Yagán', hablantes: '0 hablantes nativos', lugar: '🇨🇱 Chile', detalle: 'Cristina Calderón fue la última hablante nativa. Falleció en 2022. La lengua se documenta para preservarla.', estado: 'durmiente' },
   { nombre: 'Ainu', hablantes: '~10 hablantes', lugar: '🇯🇵 Japón', detalle: 'Lengua del pueblo indígena de Hokkaido. Japón la reconoció como lengua indígena en 2019, pero quedan poquísimos hablantes fluidos.', estado: 'critico' },
   { nombre: 'Silbo Gomero', hablantes: '~22.000 conocedores', lugar: '🇪🇸 Canarias', detalle: 'Lenguaje silbado de La Gomera. Se enseña en colegios desde 1999. Patrimonio de la Humanidad (UNESCO, 2009).', estado: 'salvada' },
   { nombre: 'Navajo', hablantes: '~170.000 hablantes', lugar: '🇺🇸 EE.UU.', detalle: 'Lengua de los code talkers de la WWII. Tiene comunidad activa pero los jóvenes prefieren inglés.', estado: 'peligro' },
-  { nombre: 'Euskera', hablantes: '~750.000 hablantes', lugar: '🇪🇸 España', detalle: 'La lengua más antigua de Europa occidental. No está emparentada con ninguna otra. En recuperación gracias a las ikastolas.', estado: 'peligro' },
-  { nombre: 'Gaélico irlandés', hablantes: '~70.000 nativos', lugar: '🇮🇪 Irlanda', detalle: 'Idioma oficial de Irlanda, pero solo el 2% lo usa a diario. Las zonas Gaeltacht luchan por mantenerlo vivo.', estado: 'peligro' },
+  { nombre: 'Euskera', hablantes: '~750.000 hablantes', lugar: '🇪🇸 España', detalle: 'La única lengua preindoeuropea que sigue viva en Europa occidental. No está emparentada con ninguna otra conocida. En recuperación gracias a las ikastolas.', estado: 'peligro' },
+  { nombre: 'Gaélico irlandés', hablantes: '~70.000 nativos', lugar: '🇮🇪 Irlanda', detalle: 'Idioma oficial de Irlanda, pero solo el 2 % lo usa a diario. Las zonas Gaeltacht luchan por mantenerlo vivo.', estado: 'peligro' },
 ];
 
 const EMBUDO = [
-  { label: 'Idiomas en el mundo', valor: 7000, color: '#2E86AB', ancho: 100 },
-  { label: 'En peligro (UNESCO)', valor: 3000, color: '#E67E22', ancho: 70 },
-  { label: 'En peligro crítico', valor: 1500, color: '#E74C3C', ancho: 45 },
-  { label: 'Con menos de 10 hablantes', valor: 350, color: '#922B21', ancho: 22 },
+  { label: 'Idiomas en el mundo', valor: 7000, color: '#2E86AB' },
+  { label: 'En peligro (UNESCO)', valor: 3000, color: '#E67E22' },
+  { label: 'En peligro crítico', valor: 1500, color: '#E74C3C' },
+  { label: 'Con menos de 10 hablantes', valor: 350, color: '#922B21' },
 ];
 
 function SeccionPeligro() {
   return (
     <div className={styles.seccionContent}>
       <div className={styles.contexto}>
-        <p>Cada <strong>dos semanas</strong> muere un idioma en el mundo. De los ~7.000 que existen, casi la mitad está en peligro. Cuando desaparece una lengua, se pierde una forma única de entender el mundo.</p>
+        <p>De los ~7.000 idiomas que existen, casi la mitad está en peligro. Cuando desaparece una lengua, se pierde una forma única de entender el mundo.</p>
       </div>
 
-      {/* Embudo */}
+      {/* Embudo: cada barra mide valor ÷ 7.000 y la cifra va debajo, en el texto del tema. Hasta el
+          18/11/2026 los anchos eran fijos (70, 45 y 22 %: 3.000 de 7.000 dibujadas al 70 %) y la
+          cifra iba en blanco sobre la barra, de 2,85 a 4,11:1 (hallazgos 5063 y 5058) */}
       <div className={styles.embudo}>
         {EMBUDO.map((e) => (
-          <div key={e.label} className={styles.embudoNivel} style={{ width: `${e.ancho}%` }}>
-            <div className={styles.embudoBarra} style={{ background: e.color }}>
-              <span className={styles.embudoValor}>{formatNumber(e.valor, 0)}</span>
-            </div>
-            <span className={styles.embudoLabel}>{e.label}</span>
+          <div key={e.label} className={styles.embudoNivel} style={{ width: `${(e.valor / EMBUDO[0].valor) * 100}%` }}>
+            <div className={styles.embudoBarra} style={{ background: e.color }} aria-hidden="true" />
+            <span className={styles.embudoLabel}>
+              <span className={styles.embudoValor}>{formatNumber(e.valor, 0)}</span> · {e.label}
+            </span>
           </div>
         ))}
       </div>
@@ -253,7 +276,7 @@ function SeccionPeligro() {
             <div className={styles.lenguaHeader}>
               <span className={styles.lenguaNombre}>{l.nombre}</span>
               <span className={`${styles.lenguaBadge} ${styles[`badge_${l.estado}`]}`}>
-                {l.estado === 'critico' ? 'Crítico' : l.estado === 'peligro' ? 'En peligro' : 'Recuperada'}
+                {ROTULO_ESTADO[l.estado]}
               </span>
             </div>
             <div className={styles.lenguaMeta}>
@@ -269,7 +292,7 @@ function SeccionPeligro() {
         <p>
           <strong>No todo son malas noticias.</strong> El silbo gomero, el hebreo (revivido en el siglo XX) y el galés
           demuestran que con voluntad política y educación es posible salvar una lengua. Pero hace falta actuar:
-          <strong> el 95% del contenido de internet está en solo 10 idiomas</strong>.
+          <strong> la mayor parte del contenido de internet se concentra en unas pocas lenguas</strong>.
         </p>
       </div>
     </div>
@@ -291,8 +314,9 @@ const CURIOSIDADES: Curiosidad[] = [
   {
     icono: '🔤',
     titulo: 'El alfabeto más largo',
-    dato: 'Jemer (camboyano): 74 letras',
-    detalle: 'El alfabeto jemer tiene 33 consonantes, 23 vocales y 12 vocales independientes. El más corto es el rotokas (Papúa Nueva Guinea) con solo 12 letras.',
+    // «74 letras» con un desglose que sumaba 68 hasta el 18/11/2026 (hallazgo 5060)
+    dato: 'Jemer (camboyano): 68 letras',
+    detalle: 'El alfabeto jemer tiene 33 consonantes, 23 vocales y 12 vocales independientes. Hay recuentos que llegan a 74 al sumar letras en desuso. El más corto es el rotokas (Papúa Nueva Guinea) con solo 12 letras.',
   },
   {
     icono: '🎵',
@@ -321,14 +345,14 @@ const CURIOSIDADES: Curiosidad[] = [
   {
     icono: '🔢',
     titulo: 'Idiomas sin números',
-    dato: 'Pirahã (Amazonas): solo "pocos" y "muchos"',
-    detalle: 'Los pirahã no tienen palabras para números concretos. Tampoco tienen colores, tiempos verbales pasados ni frases subordinadas. Es una de las lenguas más simples conocidas.',
+    dato: 'Pirahã (Amazonas): sin números exactos, según Everett',
+    detalle: 'Según el lingüista Daniel Everett (2005), el pirahã no tiene palabras para números concretos ni términos básicos de color, y no encadena frases subordinadas. Es una tesis discutida: otros lingüistas rebaten parte de su análisis.',
   },
   {
     icono: '🪞',
     titulo: 'Escritura espejo',
     dato: 'Árabe y hebreo: de derecha a izquierda',
-    detalle: 'El 12% de las lenguas escritas van de derecha a izquierda. El boustrofedon (griego antiguo) alternaba: una línea a la derecha, la siguiente a la izquierda, como un buey arando.',
+    detalle: 'El árabe, el hebreo, el persa y el urdu, entre otras, se escriben de derecha a izquierda. El boustrofedon (griego antiguo) alternaba: una línea a la derecha, la siguiente a la izquierda, como un buey arando.',
   },
   {
     icono: '🌐',
@@ -342,7 +366,7 @@ function SeccionCuriosidades() {
   return (
     <div className={styles.seccionContent}>
       <div className={styles.contexto}>
-        <p>Los idiomas esconden datos fascinantes. Desde alfabetos con 74 letras hasta lenguas sin números, pasando por idiomas que se silban o se chasquean.</p>
+        <p>Los idiomas esconden datos fascinantes. Desde alfabetos con 68 letras hasta lenguas sin números, pasando por idiomas que se silban o se chasquean.</p>
       </div>
 
       <div className={styles.curiosidadesGrid}>
@@ -360,8 +384,9 @@ function SeccionCuriosidades() {
 
       <div className={styles.insight}>
         <p>
-          <strong>Cada idioma es una forma diferente de pensar.</strong> Los hopi no distinguen pasado y futuro.
-          Los guugu yimithirr (Australia) no usan izquierda/derecha, sino puntos cardinales — &quot;la hormiga
+          <strong>Cada idioma organiza el mundo a su manera.</strong> Benjamin Lee Whorf propuso que el hopi no
+          distingue pasado y futuro como el inglés, una tesis que Ekkehart Malotki discutió con cientos de
+          ejemplos (Hopi Time, 1983). Los guugu yimithirr (Australia) no usan izquierda/derecha, sino puntos cardinales — &quot;la hormiga
           está al norte de tu pie&quot;. Perder un idioma es perder una perspectiva única sobre la realidad.
         </p>
       </div>
@@ -439,9 +464,9 @@ export default function VisualizadorIdiomasMundoPage() {
           <h3>¿Qué se pierde cuando muere un idioma?</h3>
           <p>
             Cada lengua codifica conocimiento único: nombres de plantas medicinales, técnicas agrícolas
-            ancestrales, formas de orientarse en el territorio, mitología y cosmovisión. Los lingüistas
-            estiman que el 80% de las plantas medicinales conocidas por pueblos indígenas no están
-            documentadas en ninguna lengua colonial.
+            ancestrales, formas de orientarse en el territorio, mitología y cosmovisión. Buena parte de
+            lo que un pueblo sabe de sus plantas medicinales solo existe en su lengua, y se pierde con ella
+            si nadie lo documenta.
           </p>
 
           <h3>¿El inglés acabará con los demás idiomas?</h3>

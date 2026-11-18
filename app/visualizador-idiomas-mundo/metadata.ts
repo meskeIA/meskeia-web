@@ -37,7 +37,7 @@ export const jsonLd = generateWebAppSchema({
   description: 'Explicador visual interactivo sobre los idiomas del mundo: las grandes familias lingüísticas, los idiomas más hablados por hablantes nativos y totales, las lenguas en peligro de extinción y curiosidades fascinantes sobre la diversidad lingüística.',
   url: 'https://meskeia.com/visualizador-idiomas-mundo/',
   features: [
-    'Familias lingüísticas con bloques proporcionales por hablantes',
+    'Familias lingüísticas con barras proporcionales a sus hablantes',
     'Top 10 idiomas más hablados: nativos vs segunda lengua',
     'Embudo de lenguas en peligro de extinción',
     'Curiosidades lingüísticas: alfabetos, tonos, clics',
@@ -53,7 +53,7 @@ export const faqJsonLd = {
       name: '¿Cuántos idiomas se hablan en el mundo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Se estima que en el mundo existen entre 6.500 y 7.000 idiomas vivos, dependiendo de los criterios usados para distinguir lengua de dialecto. La gran mayoría —más del 96%— son hablados por menos del 4% de la población mundial. Solo 23 idiomas concentran a más de la mitad de todos los hablantes del planeta.',
+        text: 'Se estima que en el mundo existen más de 7.000 idiomas vivos, aunque la cifra depende de los criterios usados para distinguir lengua de dialecto. La gran mayoría —más del 96 %— son hablados por menos del 4 % de la población mundial. Solo 23 idiomas concentran a más de la mitad de todos los hablantes del planeta.',
       },
     },
     {
@@ -61,7 +61,7 @@ export const faqJsonLd = {
       name: '¿Qué idioma tiene más hablantes nativos en el mundo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El mandarín (chino estándar) es el idioma con más hablantes nativos, con aproximadamente 920 millones de personas. Le siguen el español (480 millones de nativos), el inglés (380 millones) y el hindi (340 millones). Si se cuentan también los hablantes de segunda lengua, el inglés pasa al primer puesto con más de 1.400 millones de hablantes totales.',
+        text: 'El mandarín (chino estándar) es el idioma con más hablantes nativos, con aproximadamente 920 millones de personas. Le siguen el español (485 millones de nativos), el inglés (380 millones) y el hindi (345 millones). Si se cuentan también los hablantes de segunda lengua, el inglés pasa al primer puesto con más de 1.400 millones de hablantes totales.',
       },
     },
     {
@@ -77,7 +77,7 @@ export const faqJsonLd = {
       name: '¿Cuántas lenguas están en peligro de extinción?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La UNESCO calcula que alrededor del 40% de los idiomas del mundo están en peligro de extinción, lo que supone unas 2.500-3.000 lenguas. Se considera que una lengua está en peligro cuando deja de transmitirse a los niños. Se extingue aproximadamente una lengua cada dos semanas, con especial concentración de pérdidas en Oceanía, América y África subsahariana.',
+        text: 'La UNESCO calcula que alrededor del 40 % de los idiomas del mundo están en peligro de extinción, lo que supone unas 2.500-3.000 lenguas. Se considera que una lengua está en peligro cuando deja de transmitirse a los niños. Las pérdidas se concentran sobre todo en Oceanía, América y África subsahariana.',
       },
     },
     {
