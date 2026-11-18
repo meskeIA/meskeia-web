@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { FAQ_FACTORES } from './faq';
 
 // ---------------------------------------------------------------------------
 // Tipos
@@ -54,7 +55,7 @@ const BIENES: Bien[] = [
     cantidadBase: 100,
     descripcion:
       'Medicamento de primera necesidad sin sustitutivos. La demanda es casi perfectamente inelástica.',
-    ejemplo: 'Si el precio sube un 50%, la cantidad demandada solo cae un 5%.',
+    ejemplo: 'Si el precio sube un 50 %, la cantidad demandada solo cae un 5 %.',
   },
   {
     id: 'sal',
@@ -76,7 +77,7 @@ const BIENES: Bien[] = [
     cantidadBase: 100,
     descripcion:
       'Inelástica a corto plazo (pocas alternativas inmediatas), más elástica a largo plazo.',
-    ejemplo: 'Subida del 20% → caída del 7% en consumo a corto plazo.',
+    ejemplo: 'Subida del 20 % → caída del 7 % en consumo a corto plazo.',
   },
   {
     id: 'cafe',
@@ -85,8 +86,8 @@ const BIENES: Bien[] = [
     elasticidad: 0.8,
     precioBase: 4.5,
     cantidadBase: 100,
-    descripcion: 'Tiene sustitutivos (otras marcas, té). Elástica pero no unitaria.',
-    ejemplo: 'Subida del 25% → caída del 20% en ventas.',
+    descripcion: 'Tiene sustitutivos (otras marcas, té). Inelástica, aunque cerca de unitaria.',
+    ejemplo: 'Subida del 25 % → caída del 20 % en ventas.',
   },
   {
     id: 'smartphone',
@@ -96,7 +97,7 @@ const BIENES: Bien[] = [
     precioBase: 1000,
     cantidadBase: 100,
     descripcion: 'Bien de lujo con muchos sustitutivos. La demanda es elástica.',
-    ejemplo: 'Subida del 20% → caída del 30% en ventas.',
+    ejemplo: 'Subida del 20 % → caída del 30 % en ventas.',
   },
   {
     id: 'vuelo',
@@ -107,7 +108,7 @@ const BIENES: Bien[] = [
     cantidadBase: 100,
     descripcion:
       'Bien de lujo, muy elástico. Con sustitutivos (tren, coche) y muchas alternativas de destino.',
-    ejemplo: 'Subida del 10% → caída del 24% en reservas.',
+    ejemplo: 'Subida del 10 % → caída del 24 % en reservas.',
   },
 ];
 
@@ -115,10 +116,14 @@ const BIENES: Bien[] = [
 // Funciones puras
 // ---------------------------------------------------------------------------
 
+/** Porcentaje con espacio duro (U+00A0) antes del «%», CLAUDE.md global §2. */
+const PCT = ' %';
+
 function calcular(bien: Bien, deltaP: number, tipo: TipoElasticidad): ResultadoCalculo {
   // Demanda: relación inversa (Ed negativo). Oferta: relación directa (Eo positivo).
   const signo = tipo === 'demanda' ? -1 : 1;
-  const deltaQ = signo * bien.elasticidad * deltaP;
+  // La recta corta Q = 0 (precio de cierre): la cantidad no cae más del 100 % (hallazgo 5149)
+  const deltaQ = Math.max(-100, signo * bien.elasticidad * deltaP);
 
   const P_nuevo = bien.precioBase * (1 + deltaP / 100);
   const Q_nuevo = Math.max(0, bien.cantidadBase * (1 + deltaQ / 100));
@@ -131,25 +136,74 @@ function calcular(bien: Bien, deltaP: number, tipo: TipoElasticidad): ResultadoC
   return { deltaQ, P_nuevo, Q_nuevo, IT_base, IT_nuevo, deltaIT, deltaIT_pct };
 }
 
-function clasificarElasticidad(e: number): string {
-  if (e < 0.05) return 'Perfectamente inelástica';
-  if (e < 1) return 'Inelástica (|Ed| < 1)';
-  if (Math.abs(e - 1) < 0.05) return 'Unitaria (|Ed| ≈ 1)';
-  if (e < 50) return 'Elástica (|Ed| > 1)';
-  return 'Perfectamente elástica';
+/**
+ * Elasticidad ARCO (punto medio) del tramo recorrido. Hallazgo 5147 (18/11/2026): la curva es
+ * lineal y su elasticidad cambia a lo largo de ella, así que el |Ed| del punto de partida no
+ * explica el cambio del ingreso (café +25 %: E arco = −1, el ingreso no varía; café +50 %: −1,25,
+ * el ingreso baja). Con el punto medio, |E arco| < 1 equivale exactamente a que el ingreso se mueva
+ * con el precio (P₁Q₁ = P₀Q₀ ⇔ |E arco| = 1).
+ */
+function elasticidadArco(bien: Bien, r: ResultadoCalculo): number {
+  const dQ = (r.Q_nuevo - bien.cantidadBase) / ((r.Q_nuevo + bien.cantidadBase) / 2);
+  const dP = (r.P_nuevo - bien.precioBase) / ((r.P_nuevo + bien.precioBase) / 2);
+  return dQ / dP;
 }
 
-function interpretacionIT(deltaP: number, deltaIT: number, clasificacion: string): string {
+type ClaseTramo = 'inelastica' | 'unitaria' | 'elastica';
+
+/** Clase del tramo: decide el signo del cambio del ingreso, con tolerancia de redondeo. */
+function claseTramo(r: ResultadoCalculo, eArco: number): ClaseTramo {
+  if (Math.abs(r.deltaIT / r.IT_base) < 1e-9) return 'unitaria';
+  return Math.abs(eArco) < 1 ? 'inelastica' : 'elastica';
+}
+
+function clasificarElasticidad(e: number): string {
+  // La unitaria va ANTES que «< 1» (hallazgo 5153: [0,95; 1) nunca daba «Unitaria»)
+  if (Math.abs(e - 1) < 0.05) return 'Unitaria (|Ed| ≈ 1)';
+  if (e < 1) return 'Inelástica (|Ed| < 1)';
+  return 'Elástica (|Ed| > 1)';
+}
+
+function interpretacionIT(
+  bien: Bien,
+  deltaP: number,
+  r: ResultadoCalculo,
+  tipo: TipoElasticidad
+): string {
   if (deltaP === 0) return 'Introduce una variación de precio para ver el efecto sobre el ingreso total.';
-  const accion = deltaP > 0 ? 'subir' : 'bajar';
-  const efecto = Math.abs(deltaIT) < 0.01 ? 'no varía' : deltaIT > 0 ? 'aumenta' : 'disminuye';
-  const causa =
-    clasificacion.startsWith('Inelástica')
-      ? 'la demanda es inelástica: los compradores apenas reducen la cantidad'
-      : clasificacion.startsWith('Elástica')
-      ? 'la demanda es elástica: los compradores reducen mucho la cantidad'
-      : 'la demanda es unitaria: los efectos precio y cantidad se compensan';
-  return `Al ${accion} el precio un ${formatNumber(Math.abs(deltaP), 0)}%, el ingreso total ${efecto} porque ${causa}.`;
+  const sube = deltaP > 0;
+  const accion = sube ? 'subir' : 'bajar';
+  const efecto = Math.abs(r.deltaIT / r.IT_base) < 1e-9 ? 'no varía' : r.deltaIT > 0 ? 'aumenta' : 'disminuye';
+  const inicio = `Al ${accion} el precio un ${formatNumber(Math.abs(deltaP), 0)}${PCT}, el ingreso total ${efecto}`;
+  const dQ = `${formatNumber(Math.abs(r.deltaQ), 1)}${PCT}`;
+
+  if (tipo === 'oferta') {
+    // Hallazgo 5150: en la oferta precio y cantidad se mueven juntos, así que el ingreso siempre
+    // acompaña al precio, sea cual sea la elasticidad
+    const productores = sube
+      ? `los productores amplían la cantidad ofrecida un ${dQ}`
+      : `los productores reducen la cantidad ofrecida un ${dQ}`;
+    return `${inicio}: en la oferta el precio y la cantidad se mueven en el mismo sentido (${productores}), así que el ingreso siempre acompaña al precio, sea cual sea la elasticidad.`;
+  }
+
+  const eArco = elasticidadArco(bien, r);
+  const clase = claseTramo(r, eArco);
+  const arco = `en este tramo la elasticidad arco es ${formatNumber(eArco, 2)}`;
+  // Hallazgo 5148: al bajar el precio la cantidad AUMENTA
+  const compradores = sube
+    ? `los compradores reducen la cantidad un ${dQ}`
+    : `los compradores aumentan la cantidad un ${dQ}`;
+  const cierre =
+    r.Q_nuevo === 0
+      ? ` A ese precio la cantidad demandada cae a cero: la recta corta el eje en ${formatNumber(bien.precioBase * (1 + 1 / bien.elasticidad), 2)} €.`
+      : '';
+  const porQue =
+    clase === 'unitaria'
+      ? `${arco} (unitaria), así que el cambio de la cantidad compensa exactamente el del precio`
+      : clase === 'inelastica'
+      ? `${arco} (inelástica), así que pesa más el cambio del precio que el de la cantidad`
+      : `${arco} (elástica), así que pesa más el cambio de la cantidad que el del precio`;
+  return `${inicio}: ${compradores}, y ${porQue}.${cierre}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -160,6 +214,7 @@ function dibujarGrafico(
   canvas: HTMLCanvasElement,
   bien: Bien,
   resultado: ResultadoCalculo,
+  tipo: TipoElasticidad,
   isDark: boolean
 ): void {
   const dpr = window.devicePixelRatio || 1;
@@ -200,10 +255,12 @@ function dibujarGrafico(
   const toX = (q: number): number => pad.left + (q / Q_max) * plotW;
   const toY = (p: number): number => pad.top + ((P_max_val - p) / (P_max_val - P_min_val)) * plotH;
 
-  // Curva de demanda (lineal con pendiente derivada de la elasticidad)
-  // Pendiente: ΔP/ΔQ = -(P_base/Q_base)/Ed
+  // Curva lineal con pendiente derivada de la elasticidad en (Q_base, P_base):
+  // demanda ΔP/ΔQ = −(P_base/Q_base)/Ed · oferta ΔP/ΔQ = +(P_base/Q_base)/Eo. Hallazgo 5150: en
+  // oferta dibujaba la recta de demanda y el punto nuevo quedaba fuera de ella
   const Ed = bien.elasticidad;
-  const slope = -(bien.precioBase / (Q_base * Ed)); // dP/dQ — negativo para demanda
+  const signoPendiente = tipo === 'demanda' ? -1 : 1;
+  const slope = signoPendiente * (bien.precioBase / (Q_base * Ed)); // dP/dQ
   // Intersecciones: la curva pasa por (Q_base, P_base)
   // P = P_base + slope * (Q - Q_base)
   const curvaQ = (q: number): number => bien.precioBase + slope * (q - Q_base);
@@ -385,22 +442,26 @@ export default function SimuladorElasticidadPrecio() {
 
   const bien = BIENES.find((b) => b.id === bienId) ?? BIENES[2]!;
   const resultado = calcular(bien, deltaP, tipoElasticidad);
-  const clasificacion = clasificarElasticidad(bien.elasticidad);
-  const interpretacion = interpretacionIT(deltaP, resultado.deltaIT, clasificacion);
+  const esOferta = tipoElasticidad === 'oferta';
+  const clasificacion = esOferta
+    ? clasificarElasticidad(bien.elasticidad).replace('|Ed|', 'Eo')
+    : clasificarElasticidad(bien.elasticidad);
+  const interpretacion = interpretacionIT(bien, deltaP, resultado, tipoElasticidad);
+  const eArco = deltaP === 0 || esOferta ? null : elasticidadArco(bien, resultado);
 
   const badgeClass =
-    bien.elasticidad < 1
-      ? styles.badgeInelastica
-      : Math.abs(bien.elasticidad - 1) < 0.05
+    Math.abs(bien.elasticidad - 1) < 0.05
       ? styles.badgeUnitaria
+      : bien.elasticidad < 1
+      ? styles.badgeInelastica
       : styles.badgeElastica;
 
   const redibujar = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    dibujarGrafico(canvas, bien, resultado, isDark);
-  }, [bien, resultado]);
+    dibujarGrafico(canvas, bien, resultado, tipoElasticidad, isDark);
+  }, [bien, resultado, tipoElasticidad]);
 
   useEffect(() => {
     redibujar();
@@ -495,7 +556,7 @@ export default function SimuladorElasticidadPrecio() {
             aria-valuemax={50}
           />
           <span className={styles.sliderValue}>
-            <span>{deltaP > 0 ? '+' : ''}</span>{deltaP}%
+            <span>{deltaP > 0 ? '+' : ''}</span>{deltaP}{PCT}
           </span>
         </div>
 
@@ -505,7 +566,7 @@ export default function SimuladorElasticidadPrecio() {
             ref={canvasRef}
             className={styles.canvas}
             role="img"
-            aria-label={`Gráfico de elasticidad-precio para ${bien.nombre}. Rectángulo azul: ingreso total base. Rectángulo naranja: ingreso total con el nuevo precio.`}
+            aria-label={`Gráfico de elasticidad-precio para ${bien.nombre}: curva de ${esOferta ? 'oferta' : 'demanda'}. Rectángulo azul: ingreso total base. Rectángulo naranja: ingreso total con el nuevo precio.`}
           />
         </div>
 
@@ -516,9 +577,14 @@ export default function SimuladorElasticidadPrecio() {
               {clasificacion}
             </span>
             <span className={styles.badgeEd}>
-              |Ed| = {formatNumber(bien.elasticidad, 2)}
+              {esOferta ? 'Eo' : '|Ed|'} = {formatNumber(bien.elasticidad, 2)}
             </span>
           </div>
+          <p className={styles.badgeNota}>
+            {esOferta
+              ? 'Elasticidad de oferta: se usa el mismo coeficiente del bien, a modo de ejemplo, con la cantidad moviéndose en el sentido del precio.'
+              : 'Clasificación en el punto de partida: en una recta la elasticidad cambia a lo largo de la curva, y el tramo recorrido tiene la suya (elasticidad arco).'}
+          </p>
 
           <div className={styles.resultRow}>
             <span className={styles.resultLabel}>Precio base</span>
@@ -530,10 +596,16 @@ export default function SimuladorElasticidadPrecio() {
           </div>
           <div className={styles.resultRow}>
             <span className={styles.resultLabel}>
-              ΔP = <span>{deltaP > 0 ? '+' : ''}</span>{deltaP}% → ΔQ
+              ΔP = <span>{deltaP > 0 ? '+' : ''}</span>{deltaP}{PCT} → ΔQ
             </span>
             <span className={`${styles.resultValue} ${resultado.deltaQ < 0 ? styles.valorNegativo : styles.valorPositivo}`}>
-              <span>{resultado.deltaQ > 0 ? '+' : ''}</span>{formatNumber(resultado.deltaQ, 1)}%
+              <span>{resultado.deltaQ > 0 ? '+' : ''}</span>{formatNumber(resultado.deltaQ, 1)}{PCT}
+            </span>
+          </div>
+          <div className={styles.resultRow}>
+            <span className={styles.resultLabel}>Elasticidad arco del tramo</span>
+            <span className={styles.resultValue}>
+              <span>{eArco === null ? '—' : formatNumber(eArco, 2)}</span>
             </span>
           </div>
           <div className={styles.resultRow}>
@@ -556,7 +628,7 @@ export default function SimuladorElasticidadPrecio() {
               }`}
             >
               <span>{resultado.deltaIT >= 0 ? '+' : ''}</span>{formatNumber(resultado.deltaIT, 0)} €
-              {' '}(<span>{resultado.deltaIT_pct >= 0 ? '+' : ''}</span>{formatNumber(resultado.deltaIT_pct, 1)}%)
+              {' '}(<span>{resultado.deltaIT_pct >= 0 ? '+' : ''}</span>{formatNumber(resultado.deltaIT_pct, 1)}{PCT})
             </span>
           </div>
 
@@ -610,7 +682,7 @@ export default function SimuladorElasticidadPrecio() {
                 <tr>
                   <td><span aria-hidden="true">💉</span> Insulina</td>
                   <td>0,10</td>
-                  <td>Perfectamente inelástica</td>
+                  <td>Muy inelástica (casi perfectamente inelástica)</td>
                   <td className={styles.tdPositivo}>IT sube mucho</td>
                   <td>Impuesto recauda sin apenas reducir uso</td>
                   <td>Sin sustitutivos, vital</td>
@@ -618,7 +690,7 @@ export default function SimuladorElasticidadPrecio() {
                 <tr>
                   <td><span aria-hidden="true">🧂</span> Sal</td>
                   <td>0,10</td>
-                  <td>Perfectamente inelástica</td>
+                  <td>Muy inelástica (casi perfectamente inelástica)</td>
                   <td className={styles.tdPositivo}>IT sube mucho</td>
                   <td>Gabela histórica (impuesto sobre la sal)</td>
                   <td>Gasto ínfimo en el presupuesto</td>
@@ -665,8 +737,8 @@ export default function SimuladorElasticidadPrecio() {
             <div className={styles.escenarioCard}>
               <h4><span aria-hidden="true">🚬</span> Impuesto al tabaco</h4>
               <p>
-                El tabaco tiene |Ed| ≈ 0,4. Una subida del 10% en el precio reduce el consumo solo
-                un 4%, pero el ingreso fiscal sube. Políticamente útil para recaudar{' '}
+                El tabaco tiene |Ed| ≈ 0,4. Una subida del 10&nbsp;% en el precio reduce el consumo solo
+                un 4&nbsp;%, pero el ingreso fiscal sube. Políticamente útil para recaudar{' '}
                 <em>y</em> desalentar el hábito sin eliminar la demanda de golpe.
               </p>
             </div>
@@ -700,20 +772,15 @@ export default function SimuladorElasticidadPrecio() {
           <h3>Preguntas frecuentes</h3>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <strong>¿Qué factores determinan la elasticidad?</strong>
-              <p>
-                Los principales son: disponibilidad de sustitutivos (más sustitutivos = más
-                elástico), necesidad vs lujo (los básicos son inelásticos), porcentaje del
-                presupuesto (mayor porcentaje = más elástico) y el horizonte temporal (a largo
-                plazo siempre es más elástico porque los consumidores tienen más opciones de
-                adaptación).
-              </p>
+              <strong>{FAQ_FACTORES.pregunta}</strong>
+              <p>{FAQ_FACTORES.respuesta}</p>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Por qué el tabaco es inelástico pero el lujo es elástico?</strong>
               <p>
-                El tabaco crea dependencia fisiológica y no tiene sustitutivos directos: el
-                adicto paga lo que sea. El smartphone gama alta tiene multitud de sustitutivos
+                El tabaco crea dependencia fisiológica y no tiene sustitutivos directos, así que
+                el consumo responde poco al precio (|Ed| ≈ 0,4 en el escenario de arriba: una
+                subida del 10&nbsp;% lo reduce un 4&nbsp;%), aunque no es nulo. El smartphone gama alta tiene multitud de sustitutivos
                 (otras marcas, gamas, segunda mano, posponer la compra), por lo que el consumidor
                 responde con fuerza ante una subida.
               </p>
@@ -870,8 +937,8 @@ export default function SimuladorElasticidadPrecio() {
               <li>
                 <strong>Confundir &quot;elástico&quot; con &quot;pendiente pronunciada&quot;.</strong>{' '}
                 Una curva casi vertical tiene pendiente grande en valor absoluto, pero puede ser
-                elástica si los valores de P y Q son muy pequeños. La elasticidad y la pendiente
-                no son lo mismo.
+                elástica en un punto donde el precio es alto respecto a la cantidad (cociente P/Q
+                grande). La elasticidad y la pendiente no son lo mismo.
               </li>
               <li>
                 <strong>Creer que elasticidad = pendiente de la curva.</strong> |Ed| = (ΔQ/ΔP) ×

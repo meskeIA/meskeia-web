@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FAQ_FACTORES } from './faq';
 
 export const metadata: Metadata = {
   title: 'Simulador de Elasticidad-Precio de la Demanda | meskeIA',
@@ -46,15 +47,16 @@ export const jsonLd = generateWebAppSchema({
     'Simulador interactivo que visualiza la elasticidad-precio de la demanda para 6 bienes reales (insulina, sal, gasolina, café, smartphone, vuelo). Permite cambiar el precio y observar el efecto sobre la cantidad demandada y el ingreso total mediante rectángulos de ingreso superpuestos.',
   url: 'https://meskeia.com/simulador-elasticidad-precio/',
   category: 'EducationalApplication',
+  // Hallazgo 5153 (18/11/2026): prometía «elasticidades reales» sin fuente y cuatro clases que
+  // ningún bien daba; ahora dice lo que la app hace.
   features: [
-    '6 bienes predefinidos con elasticidades reales (|Ed| de 0,1 a 2,4)',
-    'Slider de variación de precio (−50% a +50%) con respuesta en tiempo real',
-    'Visualización canvas de rectángulos de ingreso total base y nuevo',
-    'Clasificación automática: perfectamente inelástica, inelástica, unitaria, elástica',
-    'Toggle demanda / oferta con lógica diferenciada',
-    'Panel de interpretación: por qué sube o baja el ingreso total',
-    'Bloque educativo v2.0 con tabla comparativa, escenarios, FAQ y errores frecuentes',
-    'Gratuito, sin registro, funciona 100% en el navegador',
+    '6 bienes de ejemplo con elasticidades ilustrativas, de |Ed| 0,1 a 2,4',
+    'Deslizador de variación de precio de −50 % a +50 %, con resultado al instante',
+    'Precio, cantidad e ingreso total antes y después, con su variación en euros y en %',
+    'Gráfico con la curva de demanda (u oferta) y los rectángulos del ingreso total base y nuevo',
+    'Clasificación de la demanda en elástica o inelástica según |Ed|, y elasticidad arco del tramo recorrido',
+    'Interpretación en texto de por qué sube o baja el ingreso total',
+    'Gratuito, sin registro, funciona en el navegador',
   ],
   keywords: [
     'elasticidad precio demanda',
@@ -105,10 +107,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué factores hacen que una demanda sea más elástica?',
+      name: FAQ_FACTORES.pregunta,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Cuatro factores aumentan la elasticidad: 1) Existencia de sustitutos cercanos (si hay alternativas, los consumidores las usan al subir el precio). 2) El bien representa un gasto alto sobre la renta (más incentivo para buscar alternativas). 3) Se trata de un bien de lujo, no de primera necesidad. 4) El horizonte temporal es largo (a largo plazo siempre hay más alternativas disponibles).',
+        text: FAQ_FACTORES.respuesta,
       },
     },
   ],
