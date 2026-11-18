@@ -14,6 +14,8 @@ import { test, expect, Page, devices } from '@playwright/test';
  *
  *   puntos  P1 1 persona +1 · 2 personas 0 · 3-4 −1 · 5 o más −2
  *           P2 Sí +2 · No −1 · No sé 0              P3 mediodía −2 · noche −1 · variable 0
+ *              (P2 desde el 4538, 18/11/2026: «¿El precio de la energía de tu contrato cambia según
+ *              la hora?» — «Sí, por franjas o por horas» +2 · «No, precio único» −1 · «No lo sé» 0)
  *           P4 siempre +3 · a veces +1 · nunca −2   P5 AC mucho −2 · poco 0 · no tengo +1
  *           P6 coche Sí +3 · No 0                   P7 teletrabajo siempre −2 · híbrido −1 · No +1
  *           P8 me da igual +2 · precio fijo −3 · no entiendo −1
@@ -284,7 +286,8 @@ test('ortografía: «España», «Eléctrica» y «recomendación» con sus tild
   expect(await page.title()).toContain('España');
   await expect(page.locator('h1')).toContainText('Eléctrica');
   await expect(page.getByRole('radiogroup', { name: /Cuántas personas/ })).toHaveCount(1);
-  await expect(page.locator('[role="radio"]', { hasText: 'No sé' })).toHaveCount(1);
+  // «No sé» de la pregunta 2 es «No lo sé» desde el 4538 (18/11/2026); la tilde sigue ahí.
+  await expect(page.locator('[role="radio"]', { hasText: 'No lo sé' })).toHaveCount(1);
   await responder(page, AMANTE_VALLE);
   await verResultado(page);
   await expect(page.locator('[class*="resultTitle"]')).toContainText('recomendación');
@@ -312,7 +315,7 @@ test('el nombre de cada grupo de radios es su pregunta, no «Pregunta N» (halla
   // luego «Sí / No / No sé», sin la pregunta. Ahora aria-labelledby apunta al enunciado.
   await abrir(page);
   await expect(page.getByRole('radiogroup', { name: /Cu[aá]ntas personas viven en tu hogar/ })).toHaveCount(1);
-  await expect(page.getByRole('radiogroup', { name: /discriminaci[oó]n horaria/ })).toHaveCount(1);
+  await expect(page.getByRole('radiogroup', { name: /cambia seg[uú]n la hora/ })).toHaveCount(1);
   await expect(page.getByRole('radiogroup', { name: /^Pregunta \d+$/ })).toHaveCount(0);
 });
 
@@ -706,8 +709,12 @@ test('cabo C0204 · 3: los festivos de valle todo el día son los nacionales de 
 });
 
 test('cabo C0204 · 4: la pregunta 2 no ofrece «No» a la 2.0TD, que tiene todo suministro doméstico de hasta 15 kW', async ({ page }) => {
-  test.fail();
-  // ABIERTO (cabo C0204, 11/11/2026): «¿Tienes tarifa con discriminación horaria (2.0TD)?» con
+  // REPARADO el 18/11/2026 (hallazgo 4538, decisión del usuario en /reparar pendientes): la
+  // pregunta es «¿El precio de la energía de tu contrato cambia según la hora?» (Sí, por franjas o
+  // por horas / No, precio único / No lo sé) con la misma puntuación, y el JSON-LD dice que el
+  // peaje 2.0TD se paga en el PVPC y en el mercado libre. Esperado a mano con UMBRAL_4 (4 puntos
+  // con «No lo sé»): «Sí…» +2 → 6 → PVPC; «No, precio único» −1 → 3 → «Ambas».
+  // Era (cabo C0204, 11/11/2026): «¿Tienes tarifa con discriminación horaria (2.0TD)?» con
   // «Sí / No / No sé», y «No» resta 1 punto al PVPC. Por la Circular 3/2020 (art. 6.2.a) todo
   // suministro de baja tensión con 15 kW o menos tiene el peaje 2.0TD desde el 01/06/2021 (y su
   // variante 2.0TDA también tiene tres periodos), así que «No» no es una respuesta posible tal
@@ -715,10 +722,30 @@ test('cabo C0204 · 4: la pregunta 2 no ofrece «No» a la 2.0TD, que tiene todo
   // (3 puntos). El JSON-LD dice también «PVPC regulada (2.0TD con discriminación horaria) o
   // mercado libre con precio fijo», como si la 2.0TD fuera solo del PVPC.
   await abrir(page);
-  const grupo = page.getByRole('radiogroup', { name: /discriminaci[oó]n horaria/ });
-  const enunciado = (await page.locator('#pregunta-2-texto').textContent()) ?? '';
+  const enunciado = ((await page.locator('#pregunta-2-texto').textContent()) ?? '').trim();
+  expect(enunciado).toBe('¿El precio de la energía de tu contrato cambia según la hora?');
+  const grupo = page.getByRole('radiogroup', { name: /cambia seg[uú]n la hora/ });
   const opciones = (await grupo.locator('[role="radio"]').allTextContents()).map((t) => t.trim());
+  expect(opciones).toEqual(['Sí, por franjas o por horas', 'No, precio único', 'No lo sé']);
   expect(enunciado.includes('2.0TD') && opciones.includes('No'), 'ofrece «No» a la 2.0TD').toBe(false);
+
+  // Misma puntuación que la pregunta antigua.
+  for (const [opcion, puntos, recomendacion] of [
+    [0, 6, 'PVPC (tarifa regulada)'],
+    [1, 3, 'Ambas pueden funcionar para ti'],
+  ] as const) {
+    await responder(page, UMBRAL_4.map((v, i) => (i === 1 ? opcion : v)));
+    await verResultado(page);
+    const r = await leerResultado(page);
+    expect(r.recomendacion).toBe(recomendacion);
+    expect(r.barras[0]).toBe(`Puntuación PVPC: ${puntos}`);
+    await repetir(page);
+  }
+
+  // El JSON-LD ya no presenta la 2.0TD como si fuera solo del PVPC.
+  const html = await (await page.request.get('/selector-tarifa-electrica/')).text();
+  expect(html).not.toContain('PVPC regulada (2.0TD con discriminación horaria)');
+  expect(html).toContain('El peaje 2.0TD y sus tres franjas se pagan en los dos');
 });
 
 test('cabo C0204 · 5: el FAQPage no lista comercializadoras de referencia y remite a la lista de la CNMC', async ({ page }) => {

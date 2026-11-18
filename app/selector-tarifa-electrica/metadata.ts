@@ -57,7 +57,7 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Selector de Tarifa Eléctrica',
   description:
-    'Herramienta interactiva con 10 preguntas para analizar tu patrón de consumo eléctrico y recomendarte la mejor tarifa: PVPC regulada (2.0TD con discriminación horaria) o mercado libre con precio fijo. Incluye los factores de tu perfil y consejos personalizados.',
+    'Herramienta interactiva con 10 preguntas para analizar tu patrón de consumo eléctrico y recomendarte la mejor tarifa: el PVPC regulado, con un precio de la energía que cambia cada hora, o el mercado libre con un precio de la energía fijo. El peaje 2.0TD y sus tres franjas se pagan en los dos. Incluye los factores de tu perfil y consejos personalizados.',
   url: 'https://meskeia.com/selector-tarifa-electrica/',
   features: [
     'Test de 10 preguntas sobre hábitos de consumo eléctrico',

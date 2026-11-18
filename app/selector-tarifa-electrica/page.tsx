@@ -70,11 +70,15 @@ const PREGUNTAS: Pregunta[] = [
   },
   {
     id: 2,
-    texto: '¿Tienes tarifa con discriminación horaria (2.0TD)?',
+    // Hasta el 18/11/2026: «¿Tienes tarifa con discriminación horaria (2.0TD)?» con «No», que
+    // ningún hogar puede contestar: todo suministro de hasta 1 kV y 15 kW tiene el peaje 2.0TD
+    // (Circular 3/2020, art. 6.2.a). Lo que sí distingue a los contratos es si el precio de la
+    // ENERGÍA cambia con la hora. Misma puntuación (hallazgo 4538, decisión del usuario).
+    texto: '¿El precio de la energía de tu contrato cambia según la hora?',
     opciones: [
-      { texto: 'Sí', pvpcPuntos: 2 },
-      { texto: 'No', pvpcPuntos: -1 },
-      { texto: 'No sé', pvpcPuntos: 0 },
+      { texto: 'Sí, por franjas o por horas', pvpcPuntos: 2 },
+      { texto: 'No, precio único', pvpcPuntos: -1 },
+      { texto: 'No lo sé', pvpcPuntos: 0 },
     ],
   },
   {
