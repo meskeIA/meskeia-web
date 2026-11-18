@@ -35,7 +35,8 @@
 .simulacionWrapper { margin-bottom: var(--spacing-lg); }
 .simulacionLabel { display: block; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: var(--spacing-sm); }
 .simulacionPista { position: relative; height: 60px; background: var(--hover); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 0.4rem; }
-.simulacionObjeto { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: left 2s ease-out; }
+/* Sin transición: la posición la escribe cada fotograma posicionesInercia() (page.tsx) */
+.simulacionObjeto { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
 .simulacionEtiqueta { font-size: 0.72rem; color: var(--text-muted); text-align: center; }
 .btnSimular { display: inline-flex; align-items: center; gap: 0.5rem; padding: var(--spacing-sm) var(--spacing-lg); background: var(--primary-boton); color: white; border: none; border-radius: var(--radius); cursor: pointer; font-size: 0.88rem; font-weight: 600; margin-top: var(--spacing-sm); transition: background 0.15s; }
 .btnSimular:hover { background: #256a8a; }
@@ -96,8 +97,8 @@
 .arBloqueDer { display: flex; flex-direction: column; align-items: center; font-size: 1.4rem; z-index: 2; transition: transform 0.6s ease; }
 .arBloqueLabel { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); margin-top: 0.2rem; }
 .arFlechas { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; z-index: 1; }
-.arFlechaDer { color: var(--primary-texto); font-size: 1.1rem; font-weight: 700; }
-.arFlechaIzq { color: var(--secondary-texto); font-size: 1.1rem; font-weight: 700; }
+.arFlechaAccion { color: var(--primary-texto); font-size: 1.1rem; font-weight: 700; }
+.arFlechaReaccion { color: var(--secondary-texto); font-size: 1.1rem; font-weight: 700; }
 
 /* Newton en Números */
 .datosGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
@@ -155,7 +156,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .simulacionObjeto { transition-duration: 0.01ms; }
   .vectorFlecha { transition-duration: 0.01ms; }
   .vectorObjeto { transition-duration: 0.01ms; }
   .arBloqueIzq { transition-duration: 0.01ms; }

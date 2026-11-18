@@ -191,11 +191,12 @@ test.describe('visualizador-leyes-newton', () => {
     await expect(panel(page)).toContainText('1687');
   });
 
-  // ABIERTO (18/11/2026, calculo alto) — la caja «Sin fricción (hielo)», rotulada «Sigue
-  // indefinidamente», frena hasta pararse: ease-out en vez de velocidad constante. Medido: recorre
-  // 0,389 / 0,694 / 0,912 de su trayecto a los 25/50/75 % del tiempo, igual que la caja con
-  // fricción (0,397 / 0,699 / 0,916). Esperado: último cuarto / primer cuarto ≈ 1 (obtenido ≈ 0,23).
-  test.fail('1.ª ley: sin rozamiento, la caja recorre lo mismo en cada cuarto del movimiento (velocidad constante)', async ({ page }) => {
+  // REPARADO (18/11/2026, calculo alto) — la caja «Sin fricción (hielo)», rotulada «Sigue
+  // indefinidamente», frenaba hasta pararse: ease-out en vez de velocidad constante (recorría
+  // 0,389 / 0,694 / 0,912 de su trayecto a los 25/50/75 % del tiempo, cociente ≈ 0,23) y salía más
+  // lenta que la del asfalto (529 frente a 684 px/s). Ahora cada fotograma escribe x = x0 + v0·t en
+  // la del hielo y x0 + v0·t − a·t²/2 en la del asfalto, con la misma v0.
+  test('1.ª ley: sin rozamiento, la caja recorre lo mismo en cada cuarto del movimiento (velocidad constante)', async ({ page }) => {
     const m = await muestrearCajas(
       page,
       () => page.getByRole('button', { name: 'Iniciar simulación de inercia' }).click(),
@@ -211,16 +212,21 @@ test.describe('visualizador-leyes-newton', () => {
     const primerCuarto = xEn(m, 1, tIni + dur * 0.25) - x0;
     const ultimoCuarto = xEn(m, 1, tFin) - xEn(m, 1, tIni + dur * 0.75);
     const cociente = ultimoCuarto / primerCuarto;
-    // Uniforme: 1. Ease-out (lo de hoy): 0,247 teórico. Margen holgado para el muestreo por fotograma.
+    // Uniforme: 1. Ease-out (lo de antes): 0,247 teórico. Margen holgado para el muestreo por fotograma.
     expect(cociente).toBeGreaterThan(0.8);
     expect(cociente).toBeLessThan(1.25);
+    // La misma velocidad inicial en las dos: en los primeros 150 ms la del asfalto, que frena con
+    // a = v0²/(2 · 0,45 · W), hace 1 − 0,075/2,25 ≈ 0,97 de lo que hace la del hielo
+    const avance = (col: number): number => xEn(m, col, tIni + 150) - xEn(m, col, tIni);
+    expect(avance(2) / avance(1)).toBeGreaterThan(0.85);
+    expect(avance(2) / avance(1)).toBeLessThan(1.1);
   });
 
-  // ABIERTO (18/11/2026, operativa medio) — «Simular empujón» solo funciona la primera vez: el
-  // segundo clic pone la caja a 10 px CON la transición puesta y dos fotogramas después la vuelve a
-  // mandar al final, así que apenas se mueve. Medido: left mínimo 723,8 px tras el 2.º clic
-  // (esperado: vuelve al inicio, ~11 px desde el borde de la pista, y repite el empujón).
-  test.fail('1.ª ley: un segundo «Simular empujón» devuelve la caja al inicio y repite la simulación', async ({ page }) => {
+  // REPARADO (18/11/2026, operativa medio) — «Simular empujón» solo funcionaba la primera vez: el
+  // segundo clic ponía la caja a 10 px CON la transición puesta y dos fotogramas después la volvía a
+  // mandar al final (left mínimo 723,8 px). Ahora cada clic cancela la animación, devuelve las dos
+  // cajas a 10 px y empieza otra.
+  test('1.ª ley: un segundo «Simular empujón» devuelve la caja al inicio y repite la simulación', async ({ page }) => {
     const boton = page.getByRole('button', { name: 'Iniciar simulación de inercia' });
     await muestrearCajas(page, () => boton.click(), 2600);
     const m = await muestrearCajas(page, () => boton.click(), 1500);
@@ -228,10 +234,10 @@ test.describe('visualizador-leyes-newton', () => {
     expect(minimo).toBeLessThan(60);
   });
 
-  // ABIERTO (18/11/2026, calculo medio) — la flecha rotulada «F = … N» mide 2 · a px (entre 10 y
-  // 200), no la fuerza: con F = 100 N, pasar de 10 a 50 kg la encoge de 20 a 10 px, y F = 1000 N
-  // con 100 kg dibuja la misma flecha de 20 px que F = 100 N con 10 kg.
-  test.fail('2.ª ley: la flecha rotulada «F = 100 N» no cambia de longitud al cambiar solo la masa', async ({ page }) => {
+  // REPARADO (18/11/2026, calculo medio) — la flecha rotulada «F = … N» medía 2 · a px (entre 10 y
+  // 200), no la fuerza: con F = 100 N, pasar de 10 a 50 kg la encogía de 20 a 10 px, y F = 1000 N
+  // con 100 kg dibujaba la misma flecha de 20 px que F = 100 N con 10 kg. Ahora mide F / 1000 · 200 px.
+  test('2.ª ley: la flecha rotulada «F = 100 N» no cambia de longitud al cambiar solo la masa', async ({ page }) => {
     await abrirSegundaLey(page);
     await expect(panel(page)).toContainText('F = 100 N');
     const con10 = await anchoFlecha(page);
@@ -240,13 +246,19 @@ test.describe('visualizador-leyes-newton', () => {
     await expect(panel(page)).toContainText('F = 100 N');
     const con50 = await anchoFlecha(page);
     expect(con50).toBeCloseTo(con10, 0);
+    // F × 10 con m × 10: la misma aceleración, flecha diez veces más larga (20 px → 200 px)
+    await sembrarValor(page, '#masa', 100);
+    await sembrarValor(page, '#fuerza', 1000);
+    await expect(panel(page)).toContainText('F = 1000 N');
+    const con1000 = await anchoFlecha(page);
+    expect(con1000 / con10).toBeCloseTo(10, 1);
   });
 
-  // ABIERTO (18/11/2026, contenido bajo) — en los cuatro pares de la 3.ª ley, la flecha «acción»
-  // apunta al cuerpo que recibe la REACCIÓN. Cohete: «Acción: el motor expulsa gases hacia abajo»
+  // REPARADO (18/11/2026, contenido bajo) — en los cuatro pares de la 3.ª ley, la flecha «acción»
+  // apuntaba al cuerpo que recibe la REACCIÓN. Cohete: «Acción: el motor expulsa gases hacia abajo»
   // es la fuerza sobre los gases (izquierda, «Gases ↓», se van a la izquierda al animar) → «←
-  // acción» y «→ reacción»; la app pinta «→ acción» y «← reacción».
-  test.fail('3.ª ley: la flecha de la acción apunta hacia los gases, que es sobre quien actúa según el texto', async ({ page }) => {
+  // acción» y «→ reacción», que es lo que pinta ahora.
+  test('3.ª ley: la flecha de la acción apunta hacia los gases, que es sobre quien actúa según el texto', async ({ page }) => {
     await pestana(page, /3\.ª Ley/);
     await expect(panel(page)).toContainText('Acción: El motor expulsa gases a gran velocidad hacia abajo');
     const textos = await panel(page).locator('[class*="_arFlecha"]').allInnerTexts();
@@ -254,24 +266,33 @@ test.describe('visualizador-leyes-newton', () => {
     expect(accion.trim()).toMatch(/^←/);
   });
 
-  // ABIERTO (18/11/2026, contenido medio) — el bloque educativo dice que F = dp/dt «funciona
+  // REPARADO (18/11/2026, contenido medio) — el bloque educativo decía que F = dp/dt «funciona
   // incluso cuando la masa cambia (como un cohete…)» y que «es la versión que se usa en …
   // astrodinámica». Cohete en reposo sin fuerza externa, 1000 kg, expulsa 100 kg a 2000 m/s:
-  // Tsiolkovski da 210,7 m/s; d(mv)/dt = 0 da v = 0. Se usa m·dv/dt = F + u·dm/dt (Meshchersky).
-  test.fail('Bloque educativo: no presenta F = dp/dt como válida para un cuerpo que pierde masa', async ({ page }) => {
+  // Tsiolkovski da 210,7 m/s; d(mv)/dt = 0 da v = 0. Ahora dice que dp/dt vale para el sistema
+  // cerrado y da la ecuación del cohete (Meshchersky) con ese mismo ejemplo: «unos 211 m/s».
+  test('Bloque educativo: no presenta F = dp/dt como válida para un cuerpo que pierde masa', async ({ page }) => {
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     await expect(page.locator('[data-guia-educativa]')).toContainText('F = dp/dt');
     await expect(page.locator('[data-guia-educativa]')).not.toContainText(
       'funciona incluso cuando la masa cambia',
       { timeout: 2000 },
     );
+    // 2000 · ln(1000 / 900) = 210,72 m/s
+    expect(2000 * Math.log(1000 / 900)).toBeCloseTo(210.7, 1);
+    await expect(page.locator('[data-guia-educativa]')).toContainText('unos 211 m/s');
   });
 
-  // ABIERTO (18/11/2026, contenido bajo) — el FAQPage dice que las leyes «se superan en dos casos»
+  // REPARADO (18/11/2026, contenido bajo) — el FAQPage decía que las leyes «se superan en dos casos»
   // (cerca de c y escala atómica) y el bloque educativo, que «fallan en tres regímenes» (añade las
   // masas enormes: relatividad general, que es también la mayor corrección del GPS que cita la
-  // propia app). Además el subtítulo dice «todo movimiento en el universo».
-  test.fail('FAQPage: la respuesta sobre la validez de las leyes incluye el régimen de la relatividad general, como la página', async ({ page }) => {
+  // propia app). La tarjeta de Einstein le daba las escalas subatómicas y el subtítulo decía «todo
+  // movimiento en el universo». Ahora los tres regímenes en el FAQPage y la tarjeta, y el subtítulo
+  // habla de los objetos cotidianos.
+  test('FAQPage: la respuesta sobre la validez de las leyes incluye el régimen de la relatividad general, como la página', async ({ page }) => {
+    await expect(page.getByText(/^Inercia, F = m × a y acción-reacción/)).toContainText('el movimiento de los objetos cotidianos');
+    await pestana(page, /Newton en Números/);
+    await expect(panel(page)).not.toContainText('Escalas cósmicas y subatómicas');
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques
       .map((b) => JSON.parse(b) as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] })
@@ -281,31 +302,35 @@ test.describe('visualizador-leyes-newton', () => {
     expect(respuesta).toMatch(/relatividad general/);
   });
 
-  // ABIERTO (18/11/2026, contenido bajo) — nombres de unidad: «1 Newton = …» y «en Newtons» con
+  // REPARADO (18/11/2026, contenido bajo) — nombres de unidad: «1 Newton = …» y «en Newtons» con
   // mayúscula, cuando el RD 2032/2009 (anexo, cap. III, 1.6) manda minúscula aunque venga de un
-  // científico; y el aria-label de los deslizadores dice «1 newtons» y «1 kilogramos».
-  test.fail('Unidades: «newton» con minúscula y en singular con 1', async ({ page }) => {
+  // científico; y el aria-label de los deslizadores decía «1 newtons» y «1 kilogramos».
+  test('Unidades: «newton» con minúscula y en singular con 1', async ({ page }) => {
     await pestana(page, /Newton en Números/);
+    await expect(panel(page)).toContainText('1 newton = fuerza para acelerar 1 kg a');
     await expect(panel(page)).not.toContainText(/\bNewtons\b|1 Newton =/, { timeout: 2000 });
     await abrirSegundaLey(page);
     expect(await sembrarValorAcotado(page, '#fuerza', 1)).toBe('1');
-    await expect(page.locator('#fuerza')).not.toHaveAttribute('aria-label', /1 newtons/, { timeout: 2000 });
+    await expect(page.locator('#fuerza')).toHaveAttribute('aria-label', 'Fuerza: 1 newton');
+    expect(await sembrarValorAcotado(page, '#masa', 1)).toBe('1');
+    await expect(page.locator('#masa')).toHaveAttribute('aria-label', 'Masa: 1 kilogramo');
   });
 
-  // ABIERTO (18/11/2026, contenido bajo) — «Newton formuló las leyes del movimiento con 23 años,
+  // REPARADO (18/11/2026, contenido bajo) — «Newton formuló las leyes del movimiento con 23 años,
   // durante la Gran Plaga (1665-1666)» sin fuente: en esos años avanzó el cálculo, la óptica y la
   // gravitación con notas tempranas sobre el choque; las tres leyes se enuncian en De motu (1684)
-  // y los Principia (1687), como dice la propia línea de tiempo de la app.
-  test.fail('Newton en Números: no atribuye las tres leyes a 1665-1666 sin fuente', async ({ page }) => {
+  // y los Principia (1687), como dice la propia línea de tiempo de la app, y así lo dice ahora.
+  test('Newton en Números: no atribuye las tres leyes a 1665-1666 sin fuente', async ({ page }) => {
     await pestana(page, /Newton en Números/);
     await expect(panel(page)).toContainText('Principia Mathematica: las 3 leyes del movimiento');
     await expect(panel(page)).not.toContainText('formuló las leyes del movimiento con 23 años', { timeout: 2000 });
+    await expect(panel(page)).toContainText('De motu');
   });
 
-  // ABIERTO (18/11/2026, accesibilidad bajo) — el resultado a = F / m no está en ninguna región
-  // viva: quien mueve el deslizador con lector de pantalla oye «Masa: 50 kilogramos» y nunca la
-  // aceleración.
-  test.fail('2.ª ley: la aceleración se anuncia en una región viva al mover un deslizador', async ({ page }) => {
+  // REPARADO (18/11/2026, accesibilidad bajo) — el resultado a = F / m no estaba en ninguna región
+  // viva: quien mueve el deslizador con lector de pantalla oía «Masa: 50 kilogramos» y nunca la
+  // aceleración. Ahora va en un role="status" con «Aceleración:» para el lector.
+  test('2.ª ley: la aceleración se anuncia en una región viva al mover un deslizador', async ({ page }) => {
     await abrirSegundaLey(page);
     await sembrarValor(page, '#masa', 50);
     await expect(
@@ -313,13 +338,23 @@ test.describe('visualizador-leyes-newton', () => {
     ).toContainText('2,00', { timeout: 2000 });
   });
 
-  // ABIERTO (18/11/2026, accesibilidad bajo) — las pestañas tienen role="tab" pero las flechas no
-  // las recorren (patrón de pestañas de la APG) y aria-controls apunta a panel-1…3, que no existen
-  // en el DOM salvo el de la pestaña activa.
-  test.fail('Pestañas: la flecha derecha pasa a la siguiente', async ({ page }) => {
+  // REPARADO (18/11/2026, accesibilidad bajo) — las pestañas tenían role="tab" pero las flechas no
+  // las recorrían (patrón de pestañas de la APG), aria-controls apuntaba a panel-1…3, que no existen
+  // en el DOM salvo el de la pestaña activa, y el tabpanel no tenía nombre.
+  test('Pestañas: la flecha derecha pasa a la siguiente', async ({ page }) => {
     await page.getByRole('tab', { name: /1\.ª Ley/ }).focus();
     await page.keyboard.press('ArrowRight');
-    await expect(page.getByRole('tab', { name: /2\.ª Ley/ })).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
+    const segunda = page.getByRole('tab', { name: /2\.ª Ley/ });
+    await expect(segunda).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
+    await expect(segunda).toBeFocused();
+    await page.keyboard.press('End');
+    await expect(page.getByRole('tab', { name: /Newton en Números/ })).toHaveAttribute('aria-selected', 'true');
+    // Cada aria-controls apunta a un elemento que existe, y el panel se nombra por su pestaña
+    for (const tab of await page.getByRole('tab').all()) {
+      const destino = await tab.getAttribute('aria-controls');
+      if (destino) await expect(page.locator(`#${destino}`)).toHaveCount(1);
+    }
+    await expect(panel(page)).toHaveAccessibleName(/Newton en Números/);
   });
 });
 

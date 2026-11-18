@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Las 3 Leyes de Newton - La Física que Mueve el Mundo',
-    description: 'Inercia, F=ma y acción-reacción: las leyes que gobiernan todo movimiento, explicadas visualmente.',
+    description: 'Inercia, F=ma y acción-reacción: las leyes que describen el movimiento de los objetos cotidianos, explicadas visualmente.',
     url: 'https://meskeia.com/visualizador-leyes-newton/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -86,7 +86,7 @@ export const faqJsonLd = {
       name: '¿Las leyes de Newton siguen siendo válidas hoy o han sido superadas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las leyes de Newton son completamente válidas para objetos cotidianos a velocidades bajas. Se superan en dos casos: a velocidades próximas a la luz (donde entra la relatividad especial de Einstein) y a escala atómica y subatómica (donde rige la mecánica cuántica). Para ingeniería, arquitectura, vehículos, deportes y la mayoría de situaciones prácticas, la mecánica newtoniana sigue siendo el marco correcto.',
+        text: 'Las leyes de Newton son completamente válidas para objetos cotidianos a velocidades bajas. Se superan en tres regímenes: a velocidades próximas a la luz (relatividad especial), con masas enormes como estrellas y galaxias o cuando se necesita mucha precisión en la gravedad, como en el GPS (relatividad general), y a escala atómica y subatómica (mecánica cuántica). Para ingeniería, arquitectura, vehículos, deportes y la mayoría de situaciones prácticas, la mecánica newtoniana sigue siendo el marco correcto.',
       },
     },
   ],
