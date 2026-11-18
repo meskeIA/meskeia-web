@@ -23,8 +23,7 @@
  * Turso o credenciales de GSC, que en un build no hay, y escriben ficheros.
  *
  * Consumidores cubiertos: cuadrante-stem · cuadrante-catalogo · semilla-diaria ·
- * detectar-duplicados · generate-apps-demandadas. NO cubiertos, a propósito: el generador de posts
- * para X (otro repositorio, uso esporádico; sus parsers avisan por consola), `covisita-crosscheck`
+ * detectar-duplicados · generate-apps-demandadas. NO cubiertos, a propósito: `covisita-crosscheck`
  * y `faq-progress`. Un consumidor que copie su propio regex en vez de importarlo de
  * parsers-catalogo.mjs también se queda fuera: por eso no deben copiarlo.
  *

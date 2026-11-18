@@ -13,8 +13,7 @@
  * regex: el candado solo vigila el que está aquí.
  *
  * Consumidores: cuadrante-stem · cuadrante-catalogo · semilla-diaria · detectar-duplicados ·
- * generate-apps-demandadas. Fuera, a propósito: `generador-posts-x/servidor.js` (otro repositorio,
- * herramienta de uso esporádico; sus parsers avisan solos por consola), `covisita-crosscheck` y
+ * generate-apps-demandadas. Fuera, a propósito: `covisita-crosscheck` y
  * `faq-progress`.
  */
 

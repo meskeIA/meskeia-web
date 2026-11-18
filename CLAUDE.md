@@ -643,8 +643,7 @@ Sí la llevan las páginas de su árbol (home, `/datos-fiscales/`, asistente y b
 `npm run check:consumidores` — **rompe** si un parser por regex de `scripts/parsers-catalogo.mjs`
 no saca exactamente lo que contiene el catálogo importado (`STEMUM_APPS`, `COQUINUM_APPS`,
 `applicationsDatabase`…). Los scripts que leen `data/*.ts` como texto **importan su parser de ahí,
-no copian el regex**: la copia queda fuera del candado. ⚠️ Fuera, a propósito: el generador de
-posts para X (otro repo).
+no copian el regex**: la copia queda fuera del candado.
 
 ### Candado de las obligaciones del CLAUDE.md
 

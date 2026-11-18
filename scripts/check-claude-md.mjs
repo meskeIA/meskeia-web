@@ -401,7 +401,6 @@ const OBLIGACIONES = [
   ['Candado de los consumidores de data/', [
     'npm run check:consumidores', 'rompe', 'scripts/parsers-catalogo.mjs',
     'importan su parser de ahí, no copian el regex', 'la copia queda fuera del candado',
-    'el generador de posts para X',
   ]],
   ['Candado de las obligaciones del CLAUDE.md', [
     'npm run check:claude-md', 'rompe', 'desaparece o cambia de sección',
