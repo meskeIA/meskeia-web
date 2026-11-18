@@ -351,19 +351,31 @@ function interpolarPunto(t: number): { x: number; y: number } {
   return { x, y };
 }
 
-// Zonas por fase (rangos en t: 0-1)
-const ZONAS_FASE: Record<FaseId, { inicio: number; fin: number }> = {
-  expansion: { inicio: 0, fin: 0.35 },
-  pico: { inicio: 0.35, fin: 0.5 },
-  recesion: { inicio: 0.5, fin: 0.75 },
-  valle: { inicio: 0.75, fin: 1.0 },
+// Zonas por fase sobre y = 110 − 70·sin(2,5πt), t ∈ [0, 1]: máximo en t = 0,2, mínimo en t = 0,6
+// y vuelta a la tendencia en t = 0,8. Hallazgo 5124 (18/11/2026): los tramos iban desfasados un
+// cuarto de ciclo (el máximo caía en «Expansión», el mínimo en «Recesión», y «Pico» era una bajada
+// que cruzaba la tendencia). Ahora cada fase rodea su tramo de la curva, y `tPunto` es donde se
+// coloca el punto al elegirla: el máximo para el pico y el mínimo para el valle.
+interface ZonaFase {
+  tramos: [number, number][];
+  tPunto: number;
+}
+
+const ZONAS_FASE: Record<FaseId, ZonaFase> = {
+  // La curva acaba (t = 1) en la cima del ciclo siguiente: su último tramo es otra vez pico
+  expansion: { tramos: [[0, 0.15], [0.8, 0.95]], tPunto: 0.1 },
+  pico: { tramos: [[0.15, 0.25], [0.95, 1.0]], tPunto: 0.2 },
+  recesion: { tramos: [[0.25, 0.55]], tPunto: 0.4 },
+  valle: { tramos: [[0.55, 0.8]], tPunto: 0.6 },
 };
 
 function faseDesdeT(t: number): FaseId {
-  if (t < 0.35) return 'expansion';
-  if (t < 0.5) return 'pico';
-  if (t < 0.75) return 'recesion';
-  return 'valle';
+  if (t < 0.15) return 'expansion';
+  if (t < 0.25) return 'pico';
+  if (t < 0.55) return 'recesion';
+  if (t < 0.8) return 'valle';
+  if (t < 0.95) return 'expansion';
+  return 'pico';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -492,11 +504,10 @@ export default function VisualizadorCicloEconomicoPage() {
   const handleFaseClick = useCallback((faseId: FaseId) => {
     setAnimando(false);
     setFaseActiva(faseId);
-    // Posicionar el punto en el centro de la zona
-    const zona = ZONAS_FASE[faseId];
-    const tCentro = (zona.inicio + zona.fin) / 2;
-    tRef.current = tCentro;
-    setTAnim(tCentro);
+    // Colocar el punto en el lugar que representa la fase (el máximo, el mínimo…)
+    const tPunto = ZONAS_FASE[faseId].tPunto;
+    tRef.current = tPunto;
+    setTAnim(tPunto);
   }, []);
 
   const faseData = FASES.find((f) => f.id === faseActiva) ?? FASES[0];
@@ -599,17 +610,20 @@ export default function VisualizadorCicloEconomicoPage() {
               />
 
               {/* Zonas de color */}
-              {(Object.entries(ZONAS_FASE) as [FaseId, { inicio: number; fin: number }][]).map(([faseId, zona]) => {
+              {(Object.entries(ZONAS_FASE) as [FaseId, ZonaFase][]).map(([faseId, zona]) => {
                 const fase = FASES.find((f) => f.id === faseId);
                 if (!fase) return null;
-                const ptsZona = puntosSinusoide.filter(
-                  (_, idx) => idx / puntosSinusoide.length >= zona.inicio && idx / puntosSinusoide.length <= zona.fin
-                );
-                if (ptsZona.length < 2) return null;
-                const pathZona = ptsZona.reduce(
-                  (acc, p, i) => acc + (i === 0 ? `M ${p.x} ${p.y}` : ` L ${p.x} ${p.y}`),
-                  ''
-                );
+                const ultimo = puntosSinusoide.length - 1;
+                const pathZona = zona.tramos
+                  .map(([inicio, fin]) => {
+                    const ptsTramo = puntosSinusoide.filter(
+                      (_, idx) => idx / ultimo >= inicio - 1e-9 && idx / ultimo <= fin + 1e-9
+                    );
+                    return ptsTramo.length < 2 ? '' : puntosAPath(ptsTramo);
+                  })
+                  .filter((d) => d !== '')
+                  .join(' ');
+                if (pathZona === '') return null;
                 return (
                   <path
                     key={faseId}
@@ -639,12 +653,13 @@ export default function VisualizadorCicloEconomicoPage() {
 
               {/* Etiquetas de fase sobre la curva */}
               {/* El color de la fase va en la curva; el rótulo, en su tono de TEXTO por tema (C0297) */}
-              <text x={110} y={60} fontSize="11" className={styles.svgTextoVerde} fontWeight="600" textAnchor="middle">Expansión</text>
-              <text x={265} y={45} fontSize="11" className={styles.svgTextoAmbar} fontWeight="600" textAnchor="middle">Pico</text>
-              {/* Bajo el valle de la curva (y 180): en y 185 el punto de la fase elegida, en (427, 179),
-                  le caía encima (1,73:1) */}
-              <text x={420} y={207} fontSize="11" className={styles.svgTextoRojo} fontWeight="600" textAnchor="middle">Recesión</text>
-              <text x={570} y={90} fontSize="11" className={styles.svgTextoAzul} fontWeight="600" textAnchor="middle">Valle</text>
+              {/* Cada rótulo junto a su tramo (hallazgo 5124): Expansión bajo la subida (t 0-0,15),
+                  Pico sobre el máximo (x 164, y 40), Recesión a la derecha de la bajada (t 0,25-0,55)
+                  y Valle bajo el mínimo (x 412, y 180), por debajo del punto de la fase elegida */}
+              <text x={95} y={102} fontSize="11" className={styles.svgTextoVerde} fontWeight="600" textAnchor="middle">Expansión</text>
+              <text x={164} y={22} fontSize="11" className={styles.svgTextoAmbar} fontWeight="600" textAnchor="middle">Pico</text>
+              <text x={315} y={78} fontSize="11" className={styles.svgTextoRojo} fontWeight="600" textAnchor="middle">Recesión</text>
+              <text x={412} y={207} fontSize="11" className={styles.svgTextoAzul} fontWeight="600" textAnchor="middle">Valle</text>
             </svg>
 
             <button

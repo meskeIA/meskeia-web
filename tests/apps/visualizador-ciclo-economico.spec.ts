@@ -146,15 +146,39 @@ test.describe('Las cuatro fases sobre la curva', () => {
     expect(await punto(page).getAttribute('cx')).toBe(cx);
   });
 
-  test.fail('CASO 2 (límite) — HALLAZGO ABIERTO: «Pico» pone el punto en lo alto de la curva y «Valle / Recuperación» en lo hondo', async ({ page }) => {
-    // Hoy: Pico cy = 123,7 (bajo la tendencia, y = 110) y Valle cy = 71,1 (sobre ella); el máximo
-    // (y 40) está en el tramo «Expansión» y el mínimo (y 180) en el de «Recesión».
+  test('CASO 2 (límite) — REPARADO 5124: «Pico» pone el punto en lo alto de la curva y «Valle / Recuperación» en lo hondo', async ({ page }) => {
+    // Antes: Pico cy = 123,7 (bajo la tendencia, y = 110) y Valle cy = 71,1 (sobre ella); el máximo
+    // (y 40) estaba en el tramo «Expansión» y el mínimo (y 180) en el de «Recesión».
     await page.getByRole('button', { name: 'Pico', exact: true }).click();
     await expect(page.getByRole('region', { name: /Detalle de la fase/ }).locator('h3')).toHaveText('Pico');
     expect(await cyDelPunto(page), 'Pico: en lo alto (cy < 47)').toBeLessThan(47);
     await page.getByRole('button', { name: 'Valle / Recuperación', exact: true }).click();
     await expect(page.getByRole('region', { name: /Detalle de la fase/ }).locator('h3')).toHaveText('Valle / Recuperación');
     expect(await cyDelPunto(page), 'Valle: en lo hondo (cy > 173)').toBeGreaterThan(173);
+    // Expansión, por encima de la tendencia y subiendo; Recesión, en la bajada (cruza la tendencia)
+    await page.getByRole('button', { name: 'Expansión', exact: true }).click();
+    const cyExpansion = await cyDelPunto(page);
+    expect(cyExpansion, 'Expansión: sobre la tendencia, sin llegar a la cima').toBeGreaterThan(47);
+    expect(cyExpansion).toBeLessThan(110);
+    await page.getByRole('button', { name: 'Recesión', exact: true }).click();
+    const cyRecesion = await cyDelPunto(page);
+    expect(cyRecesion, 'Recesión: entre la cima y el fondo').toBeGreaterThan(47);
+    expect(cyRecesion).toBeLessThan(173);
+  });
+
+  test('REPARADO 5124: el máximo de la curva cae en el tramo «Fase: Pico» y el mínimo en «Fase: Valle / Recuperación»', async ({ page }) => {
+    const tramos = await svgCiclo(page).locator('path[role="button"]').evaluateAll((ps) =>
+      ps.map((p) => {
+        const ys = (p.getAttribute('d') ?? '').match(/-?\d+(\.\d+)?/g)!.map(Number).filter((_, i) => i % 2 === 1);
+        return { nombre: p.getAttribute('aria-label'), min: Math.min(...ys), max: Math.max(...ys) };
+      }),
+    );
+    const pico = tramos.find((t) => t.nombre === 'Fase: Pico')!;
+    const valle = tramos.find((t) => t.nombre === 'Fase: Valle / Recuperación')!;
+    expect(pico.min, 'el máximo (y 40) está en el tramo del pico').toBeCloseTo(40, 0);
+    expect(valle.max, 'el mínimo (y 180) está en el tramo del valle').toBeCloseTo(180, 0);
+    for (const t of tramos.filter((t) => t.nombre !== 'Fase: Pico')) expect(t.min, `${t.nombre} no contiene la cima`).toBeGreaterThan(41);
+    for (const t of tramos.filter((t) => t.nombre !== 'Fase: Valle / Recuperación')) expect(t.max, `${t.nombre} no contiene el fondo`).toBeLessThan(179);
   });
 });
 
