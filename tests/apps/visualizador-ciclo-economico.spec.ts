@@ -40,6 +40,19 @@ import { contrasteSobreFondoReal } from './_contraste';
  * el 18/11/2026): operaciones principales de financiación al 4,50 % desde el 20/09/2023, 4,25 %
  * desde el 12/06/2024 (la primera bajada) y 2,65 % desde el 16/09/2026.
  *
+ * CABO C0825 (18/11/2026), los datos de los indicadores cotejados con la red de fuentes oficiales:
+ *   - Afiliados de abril de 2024, Seguridad Social (www.seg-social.es, Estadísticas > Afiliación >
+ *     Afiliación media mensual > Afiliados medios TOTALES, fichero «Serie de afiliación media por
+ *     regímenes (Total Sistema)» 2001-2026, publicado el 04/11/2026): Total Sistema abril 2024
+ *     21.101.504,9 y abril 2023 20.614.988,6 → 21,1 millones y +2,36 % (+2,4 %). A último día del
+ *     mes (EST305 > EST306, «Serie Afiliados Último Día por Regímenes 1985-septiembre 2026»):
+ *     21.082.893 y 20.678.484 → 21,1 millones y +1,96 %. Ninguna da «21,2 millones (+3,1 %)».
+ *   - PMI (S&P Global/HCOB): encuesta privada, sin fuente oficial que lo publique.
+ *   - Diferencial Bund 10a-2a y permisos de vivienda de 2023: su fuente (Bundesbank o el portal de
+ *     datos del BCE; Ministerio de Transportes) no está en la red de la tarea, y el INE no publica
+ *     permisos ni visados. Medias del NBER: nber.org tampoco está. La app no cita fuente para
+ *     ninguna de las tres: se piden retiradas o con su origen (decisión del usuario, C0203).
+ *
  * Los test con test.fail() son HALLAZGOS ABIERTOS (18/11/2026): describen lo que DEBERÍA pasar y
  * hoy no pasa. Al reparar cada uno se quita su test.fail() —comprobando antes que lo que afirma
  * sigue siendo lo correcto— y «ABIERTO» pasa a «REPARADO».
@@ -238,6 +251,51 @@ test.describe('Indicadores', () => {
     const prometeActuales = /datos actuales/i.test(subtitulo);
     const esDeAbril2024 = /abr\. 2024/.test(espana);
     expect(prometeActuales && esDeAbril2024, `«${subtitulo}» frente a «${espana}»`).toBe(false);
+  });
+});
+
+test.describe('Datos de los indicadores frente a su fuente (cabo C0825)', () => {
+  test.beforeEach(async ({ page }) => {
+    await abrir(page);
+  });
+
+  test.fail('HALLAZGO ABIERTO (C0825): los afiliados de abril de 2024 son los de la Seguridad Social, 21,1 millones (+2,4 %)', async ({ page }) => {
+    // www.seg-social.es, serie de afiliación media (Total Sistema): abril 2024 21.101.504,9 frente a
+    // abril 2023 20.614.988,6 → +2,36 %. A último día del mes, 21.082.893 → +1,96 %. Hoy la app
+    // pinta «21,2 millones (+3,1% interanual)». Si la reparación del 5127 cambia la fecha del dato,
+    // este caso se rehace cotejando el nuevo mes en la misma serie.
+    const detalle = await abrirIndicador(page, 'Empleo y Afiliaciones');
+    const espana = (await detalle.locator('div', { hasText: 'España' }).last().locator('strong').innerText()).trim();
+    expect(espana, 'el caso coteja el dato de abril de 2024').toMatch(/abr\. 2024/);
+    expect(espana).toMatch(/21,1\s*millones/);
+    expect(espana).toMatch(/\+2,[04]\s?%/);
+  });
+
+  test.fail('HALLAZGO ABIERTO (C0825): el PMI, encuesta privada de S&P Global/HCOB, dice su origen o no sale como dato', async ({ page }) => {
+    // Hoy: «PMI industria España (abr. 2024): 51,4» y «Eurozona (abr. 2024): 45,7», sin editor, entre
+    // datos del INE, Eurostat y el BCE. Solo la pregunta 5 del simulador nombra a S&P Global.
+    const detalle = await abrirIndicador(page, 'PMI Manufacturero');
+    const texto = await detalle.innerText();
+    if (/\d+,\d/.test(texto)) expect(texto).toMatch(/S&P Global|HCOB/);
+  });
+
+  test.fail('HALLAZGO ABIERTO (C0825): el diferencial del Bund y los permisos de 2023 dicen su fuente o no salen', async ({ page }) => {
+    // Ninguna de las dos fuentes (Bundesbank o el portal de datos del BCE; Ministerio de Transportes)
+    // está en la red de la tarea, y la app no cita ninguna: no se pueden cotejar.
+    const curva = await (await abrirIndicador(page, 'Curva de Rendimientos')).innerText();
+    if (/Bund/.test(curva)) expect(curva, 'Bund 10a-2a').toMatch(/Bundesbank|BCE|fuente/i);
+    const permisos = await (await abrirIndicador(page, 'Permisos de Construcción')).innerText();
+    if (/Permisos vivienda/.test(permisos)) expect(permisos, 'permisos de vivienda').toMatch(/Ministerio|Transportes|visados|licencias|fuente/i);
+  });
+
+  test.fail('HALLAZGO ABIERTO (C0825): las medias del NBER dicen a qué periodo corresponden, o no salen', async ({ page }) => {
+    // Hoy: «Según el NBER, que data los ciclos de EEUU desde 1854: Expansión media ~5 años (60 meses)
+    // · Recesión media ~11 meses», sin el periodo de la media. nber.org no está en la red de la tarea.
+    const lineas = await page.locator('li', { hasText: /^(Expansión|Recesión) media/ }).allTextContents();
+    for (const linea of lineas) {
+      const primeraFrase = linea.split('.')[0];
+      expect(primeraFrase, linea).toMatch(/\b(1[89]\d\d|20\d\d)\b/);
+    }
   });
 });
 
