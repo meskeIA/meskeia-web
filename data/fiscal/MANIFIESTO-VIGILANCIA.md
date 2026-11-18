@@ -469,6 +469,16 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Auditoría de origen (16/11/2026)**: hito `auditoria-motores-lib-calculadoras`. Los dos motores escribían las cifras a mano con sello de enero de 2025, y tres estaban mal: el improcedente con contrato anterior al 12/02/2012 se topaba siempre en 24 mensualidades (30.000 €/año desde 1990: 60.000 € donde la ley da 81.191 €) y solo aplicaba los 45 días si la IA lo marcaba; el cómputo de la reducción de jornada duraba «24 meses» en vez de tres años y dejaba fuera al familiar del párrafo 2.º; y el objetivo eximía solo hasta 20 días. El usuario dio el OK a las tres correcciones con la cita a la vista.
 - **Verificado**: 2026-11-16 · vigencia 2026.
 
+#### `peajes-electricos.ts` — Peaje de acceso 2.0TD: ámbito, franjas horarias y días de valle completo
+- **Contiene**: `PEAJE_2_0TD_AMBITO` (tensión de hasta 1 kV y potencia de hasta 15 kW en todos los periodos), `FRANJAS_2_0TD_PENINSULA` (punta 10-14 h y 18-22 h, llano 8-10 h, 14-18 h y 22-24 h, valle 0-8 h, de lunes a viernes laborables en la península, Illes Balears y Canarias), `DIAS_VALLE_COMPLETO_2_0TD` (sábados, domingos, 6 de enero y festivos nacionales de fecha fija no sustituibles) y `FESTIVOS_FUERA_DEL_VALLE_2_0TD` (Viernes Santo y los festivos sustituidos se facturan como laborables). Regulación energética, no tributaria: está aquí por la regla de `data/fiscal` (dato normativo con fecha de caducidad).
+- **Normativa**: Circular 3/2020 de la CNMC, arts. 6.2.a y 7.3 (BOE-A-2020-1066, consolidada a 05/02/2025).
+- **Vigilar**: circulares de la CNMC que modifiquen la 3/2020 (la estructura de peajes y sus periodos se fija ahí, no en la orden anual de precios de los peajes); un cambio de las franjas o de los días de valle completo, y el horario propio de Ceuta y Melilla si alguna app llega a usarlo.
+- **Cadencia**: baja, por circular de la CNMC. Sin ventana fija; las cuantías de los peajes (€/kW y €/kWh), que sí cambian cada año, no están en este módulo.
+- **Alerta metodológica**: que el peaje 2.0TD deje de tener tres periodos o cambie su ámbito de 15 kW, o que el art. 7.3 deje de excluir del valle completo los festivos sin fecha fija y los sustituibles.
+- **Dependencias internas**: `selector-tarifa-electrica` (tarjeta de franjas, FAQ de verano y de festivos, FAQPage y su `DataReference`).
+- **Auditoría de origen (18/11/2026)** — nace del hallazgo 4537 del Inspector: la app daba valle las 24 horas en cualquier festivo nacional en cuatro textos escritos a mano; el usuario lo decidió en `/reparar pendientes`.
+- **Verificado**: 2026-11-18 · vigencia 2026.
+
 ### 3.5 Catálogos estables (marcos, no cifras)
 
 > Estos cuatro módulos describen **categorías** de ayuda/trámite, no importes. Cambian poco, pero
