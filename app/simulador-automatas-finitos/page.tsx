@@ -16,6 +16,8 @@ import {
   generarPasosValidacion,
   validarRapido,
   alfabetoDeclarado,
+  leerSimbolos,
+  avisoSimbolosLargos,
   conflictosDeterminismo,
   EPSILON,
   type AutomataMotor,
@@ -252,6 +254,8 @@ export default function SimuladorAutomatasFinitos() {
   const [formOrigen, setFormOrigen] = useState<string>('');
   const [formDestino, setFormDestino] = useState<string>('');
   const [formSimbolo, setFormSimbolo] = useState<string>('');
+  // Aviso del editor en texto cuando se escribe un símbolo de varios caracteres (hallazgo 3840)
+  const [avisoSimbolo, setAvisoSimbolo] = useState<string>('');
 
   /*
    * ⚠️ 30/09/2026 (hallazgo 2469) — el arrastre solo escuchaba mousedown/mousemove/mouseup, y un
@@ -300,6 +304,7 @@ export default function SimuladorAutomatasFinitos() {
   // El alfabeto declarado en el campo, ya como lista de símbolos: interviene al validar
   // (una cadena con un símbolo fuera de él no es una entrada) y en el aviso de transiciones.
   const alfabetoLista = useMemo(() => alfabetoDeclarado(alfabeto), [alfabeto]);
+  const avisoAlfabeto = useMemo(() => avisoSimbolosLargos(leerSimbolos(alfabeto).largos), [alfabeto]);
 
   // Resultado de validación de la cadena actual
   const validacion = useMemo(
@@ -429,11 +434,14 @@ export default function SimuladorAutomatasFinitos() {
     return `q${n}`;
   }, [estados]);
 
-  const siguienteIdTransicion = useCallback((): string => {
-    let n = 1;
+  // Los k primeros ids libres: «a,b» crea dos transiciones en el mismo gesto (hallazgo 3840)
+  const idsTransicion = useCallback((k: number): string[] => {
     const usados = new Set(transiciones.map((t) => t.id));
-    while (usados.has(`t${n}`)) n += 1;
-    return `t${n}`;
+    const ids: string[] = [];
+    for (let n = 1; ids.length < k; n += 1) {
+      if (!usados.has(`t${n}`)) ids.push(`t${n}`);
+    }
+    return ids;
   }, [transiciones]);
 
   /**
@@ -527,19 +535,23 @@ export default function SimuladorAutomatasFinitos() {
             'a',
           );
           if (simboloRaw !== null && simboloRaw.trim() !== '') {
-            const simbolo = simboloRaw.trim();
-            const nuevoId = siguienteIdTransicion();
-            setTransiciones((prev) => [
-              ...prev,
-              { id: nuevoId, from: origenTransicion, to: estadoId, simbolo },
-            ]);
+            // «a,b» son dos transiciones; un símbolo de varios caracteres no se crea (3840)
+            const { simbolos, largos } = leerSimbolos(simboloRaw);
+            if (largos.length > 0) {
+              window.alert(avisoSimbolosLargos(largos));
+            } else {
+              const desde = origenTransicion;
+              const ids = idsTransicion(simbolos.length);
+              const nuevas = simbolos.map((simbolo, i) => ({ id: ids[i], from: desde, to: estadoId, simbolo }));
+              setTransiciones((prev) => [...prev, ...nuevas]);
+            }
           }
           setOrigenTransicion(null);
         }
         return;
       }
     },
-    [modo, origenTransicion, siguienteIdTransicion, tipo],
+    [modo, origenTransicion, idsTransicion, tipo],
   );
 
   // Arrastre de un estado, con ratón o con el dedo (eventos de puntero; ver la escucha táctil)
@@ -631,13 +643,20 @@ export default function SimuladorAutomatasFinitos() {
   const origenForm = estados.some((e) => e.id === formOrigen) ? formOrigen : (estados[0]?.id ?? '');
   const destinoForm = estados.some((e) => e.id === formDestino) ? formDestino : (estados[0]?.id ?? '');
 
+  // «a,b» son dos transiciones; un símbolo de varios caracteres no se crea y se avisa (3840)
   const crearTransicionTexto = useCallback(() => {
-    const simbolo = formSimbolo.trim();
-    if (simbolo === '' || origenForm === '' || destinoForm === '') return;
-    const nuevoId = siguienteIdTransicion();
-    setTransiciones((prev) => [...prev, { id: nuevoId, from: origenForm, to: destinoForm, simbolo }]);
+    if (formSimbolo.trim() === '' || origenForm === '' || destinoForm === '') return;
+    const { simbolos, largos } = leerSimbolos(formSimbolo);
+    if (largos.length > 0) {
+      setAvisoSimbolo(avisoSimbolosLargos(largos));
+      return;
+    }
+    setAvisoSimbolo('');
+    const ids = idsTransicion(simbolos.length);
+    const nuevas = simbolos.map((simbolo, i) => ({ id: ids[i], from: origenForm, to: destinoForm, simbolo }));
+    setTransiciones((prev) => [...prev, ...nuevas]);
     setFormSimbolo('');
-  }, [formSimbolo, origenForm, destinoForm, siguienteIdTransicion]);
+  }, [formSimbolo, origenForm, destinoForm, idsTransicion]);
 
   const limpiarLienzo = useCallback(() => {
     setEstados([]);
@@ -741,7 +760,12 @@ export default function SimuladorAutomatasFinitos() {
               onChange={(e) => setAlfabeto(e.target.value)}
               className={styles.alfabetoInput}
               placeholder="a,b"
+              aria-describedby="alfabeto-aviso"
             />
+            {/* Un símbolo del alfabeto es un carácter: «10» no se puede leer nunca (3840) */}
+            <p id="alfabeto-aviso" className={styles.avisoSimbolo} role="status" aria-live="polite">
+              {avisoAlfabeto}
+            </p>
           </div>
         </div>
 
@@ -1225,6 +1249,10 @@ export default function SimuladorAutomatasFinitos() {
                     Crear transición
                   </button>
                 </div>
+                {/* Siempre montado: el texto cambia dentro (hallazgo 3840, página traducida) */}
+                <p className={styles.avisoSimbolo} role="status" aria-live="polite">
+                  {avisoSimbolo}
+                </p>
               </div>
             </div>
           </section>

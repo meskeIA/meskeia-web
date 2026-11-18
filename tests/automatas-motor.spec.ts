@@ -5,6 +5,9 @@ import {
   epsilonClausura,
   alfabetoDe,
   generarPasosValidacion,
+  leerSimbolos,
+  esSimboloValido,
+  avisoSimbolosLargos,
   EPSILON,
   type AutomataMotor,
 } from '../app/simulador-automatas-finitos/motor-conversiones';
@@ -368,6 +371,21 @@ test.describe('auxiliares', () => {
         { from: 'a', to: 'b', simbolo: EPSILON },
       ]),
     ).toEqual(['a', 'b']);
+  });
+
+  // Hallazgo 3840 (18/11/2026): la cadena se lee carácter a carácter, así que un símbolo es UN
+  // carácter o ε. «a,b» son dos símbolos; «10» y «ab» no pueden ser símbolo.
+  test('leerSimbolos parte por comas y separa las piezas de más de un carácter', () => {
+    expect(leerSimbolos('a,b')).toEqual({ simbolos: ['a', 'b'], largos: [] });
+    expect(leerSimbolos(' a , a ,b,')).toEqual({ simbolos: ['a', 'b'], largos: [] });
+    expect(leerSimbolos(EPSILON)).toEqual({ simbolos: [EPSILON], largos: [] });
+    expect(leerSimbolos('10,1')).toEqual({ simbolos: ['1'], largos: ['10'] });
+    expect(leerSimbolos('ab')).toEqual({ simbolos: [], largos: ['ab'] });
+    expect(esSimboloValido('ñ')).toBe(true);
+    expect(esSimboloValido('ab')).toBe(false);
+    expect(avisoSimbolosLargos([])).toBe('');
+    expect(avisoSimbolosLargos(['10'])).toMatch(/^«10» tiene más de un carácter\./);
+    expect(avisoSimbolosLargos(['10', '11'])).toMatch(/^«10», «11» tienen más de un carácter\./);
   });
 });
 

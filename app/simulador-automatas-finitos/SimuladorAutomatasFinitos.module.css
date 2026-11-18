@@ -102,6 +102,7 @@
 /* Alfabeto control */
 .alfabetoControl {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-md);
@@ -787,6 +788,19 @@
 
 .avisoAutomata p {
   margin: 0;
+}
+
+/* Símbolo de varios caracteres en el editor o en el alfabeto (hallazgo 3840). Siempre montado:
+   vacío no ocupa sitio. */
+.avisoSimbolo {
+  flex-basis: 100%;
+  margin: var(--spacing-sm) 0 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.avisoSimbolo:empty {
+  display: none;
 }
 
 [data-theme='dark'] .avisoAutomata {

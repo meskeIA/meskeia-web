@@ -109,6 +109,40 @@ export function alfabetoDeclarado(texto: string): string[] {
   ];
 }
 
+/**
+ * Un símbolo es UN carácter (la cadena de entrada se lee carácter a carácter) o ε.
+ *
+ * ⚠️ 18/11/2026 (hallazgo 3840) — el editor aceptaba «a,b» o «10» como un solo símbolo, que la
+ * lectura de la cadena no puede tomar nunca: «a» y «b» salían «Sin transición» en un autómata
+ * dibujado q0 —a,b→ q1, y Determinizar trataba «a,b» como una letra.
+ */
+export function esSimboloValido(s: string): boolean {
+  return s === EPSILON || Array.from(s).length === 1;
+}
+
+/** Lo que se escribe en «con el símbolo» o en el lienzo: «a,b» son dos símbolos. */
+export interface LecturaSimbolos {
+  /** Los símbolos válidos, sin repetir y en el orden escrito. */
+  simbolos: string[];
+  /** Las piezas de más de un carácter, que no pueden ser símbolo. */
+  largos: string[];
+}
+
+export function leerSimbolos(texto: string): LecturaSimbolos {
+  const piezas = [...new Set(texto.split(',').map((s) => s.trim()).filter((s) => s !== ''))];
+  return {
+    simbolos: piezas.filter(esSimboloValido),
+    largos: piezas.filter((s) => !esSimboloValido(s)),
+  };
+}
+
+/** El aviso de una lectura con piezas largas, o '' si no las hay. */
+export function avisoSimbolosLargos(largos: string[]): string {
+  if (largos.length === 0) return '';
+  const lista = largos.map((s) => `«${s}»`).join(', ');
+  return `${lista} ${largos.length === 1 ? 'tiene' : 'tienen'} más de un carácter. La cadena se lee carácter a carácter, así que cada símbolo es un solo carácter; para varios símbolos, sepáralos con comas (a,b).`;
+}
+
 /** Un motivo por el que el autómata no es determinista. */
 export interface ConflictoDeterminismo {
   /** 'epsilon': transición vacía · 'duplicado': varias transiciones con el mismo origen y símbolo */

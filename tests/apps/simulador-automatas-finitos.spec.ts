@@ -1525,8 +1525,9 @@ test.describe('Inspector 30/10/2026 · casos resueltos a mano (escritorio)', () 
   // TRANSICIÓN, y «Determinizar» la acepta «sobre el alfabeto {a,b}», que se lee como Σ = {a, b},
   // con una sola fila por conjunto. Se exige lo que deja cualquier reparación (partir el rótulo en
   // dos transiciones o negarse a crearlo): que ninguna transición quede con más de un carácter.
+  // REPARADO (3840, 18/11/2026): «a,b» crea q0 -a→ q1 y q0 -b→ q1, así que «a» y «b» salen
+  // ACEPTADAS y «ab» se queda sin camino (desde q1 no hay transición con b: «Sin transición»).
   test('una transición «a,b» no se queda como un único símbolo de tres caracteres', async ({ page }) => {
-    test.fail(); // ABIERTO — hallazgo nuevo del Inspector 30/10/2026
     await page.getByRole('button', { name: 'Limpiar todo' }).click();
     await page.locator('#alfabeto').fill('a,b');
     await esperarValorEnReact(page, '#alfabeto', 'a,b');
@@ -1540,26 +1541,41 @@ test.describe('Inspector 30/10/2026 · casos resueltos a mano (escritorio)', () 
       simbolos.filter((s) => Array.from(s).length !== 1),
       'símbolos de más de un carácter, que ninguna cadena puede leer',
     ).toEqual([]);
+    expect(await transicionesEnTexto(page)).toEqual([
+      ['q0', 'a', 'q1'],
+      ['q0', 'b', 'q1'],
+    ]);
+    await escribirLote(page, 'a\nb\nab');
+    await expect(veredictosDelLote(page)).toHaveText([/Aceptada/, /Aceptada/, /Sin transición/]);
   });
 
-  // El mismo hueco por el alfabeto: Σ = {10, 11} se acepta sin aviso y la transición «10» casa con
-  // él, así que tampoco la avisa «símbolos que no están en el alfabeto». Pero ninguna cadena puede
-  // usarlos: «10» sale FUERA DEL ALFABETO porque se lee «1» (medido: '"1" no pertenece al alfabeto
-  // declarado {10, 11}'). Con símbolos de un carácter eso no puede pasar; aquí se exige un aviso.
+  // El mismo hueco por el alfabeto: Σ = {10, 11} se aceptaba sin aviso y la transición «10» casaba
+  // con él, así que tampoco la avisaba «símbolos que no están en el alfabeto». Pero ninguna cadena
+  // puede usarlos: «10» salía FUERA DEL ALFABETO porque se lee «1» (medido: '"1" no pertenece al
+  // alfabeto declarado {10, 11}'). Con símbolos de un carácter eso no puede pasar; se exige un aviso.
+  // REPARADO (3840, 18/11/2026): el alfabeto avisa de «10» y «11», y la transición «10» no se crea
+  // (0 transiciones) y su campo lo explica. El aviso no va en «avisosAutomata», como suponía el
+  // acta, sino junto a cada campo, que es donde se escribió el símbolo largo.
   test('un alfabeto con símbolos de dos caracteres se avisa, porque la cadena se lee carácter a carácter', async ({
     page,
   }) => {
-    test.fail(); // ABIERTO — el mismo hallazgo que el caso de «a,b», Inspector 30/10/2026
     await page.getByRole('button', { name: 'Limpiar todo' }).click();
     await page.locator('#alfabeto').fill('10,11');
     await esperarValorEnReact(page, '#alfabeto', '10,11');
+    await expect(page.locator('#alfabeto-aviso')).toHaveText(
+      '«10», «11» tienen más de un carácter. La cadena se lee carácter a carácter, así que cada símbolo es un solo carácter; para varios símbolos, sepáralos con comas (a,b).',
+    );
     await page.getByRole('button', { name: 'Nuevo estado' }).click();
     await page.getByRole('button', { name: 'Nuevo estado' }).click();
     await page.getByRole('button', { name: 'Final (q1)' }).click();
     await crearTransicionEnTexto(page, 'q0', '10', 'q1', conRaton);
-    await expect(page.locator('[class*="estadoResumen"]')).toContainText('1 transición');
+    await expect(page.locator('[class*="estadoResumen"]')).toContainText('0 transiciones');
+    await expect(page.getByRole('status').filter({ hasText: '«10» tiene más de un carácter' })).toBeVisible();
 
-    await expect(page.locator('[class*="avisosAutomata"]')).not.toHaveText('', { timeout: 1000 });
+    // Con el alfabeto de un carácter, el aviso desaparece.
+    await page.locator('#alfabeto').fill('0,1');
+    await esperarValorEnReact(page, '#alfabeto', '0,1');
+    await expect(page.locator('#alfabeto-aviso')).toHaveText('');
   });
 
   // HALLAZGO NUEVO (30/10/2026) — «⟲ Reiniciar» se anuncia con su símbolo. Sus hermanos de la fila
