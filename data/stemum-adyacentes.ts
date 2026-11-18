@@ -45,7 +45,6 @@ export const STEMUM_ADYACENTES: Record<string, string> = {
   'simulador-fisica': 'fisica',
   // 'visualizador-leyes-newton' promovido a STEMUM_APPS (31/07/2026): tiene la
   // mecánica slider→gráfica que define el catálogo del portal.
-  'visualizador-electromagnetismo': 'fisica',
   'visualizador-estados-materia': 'fisica',
   'visualizador-termodinamica': 'fisica',
   'visualizador-mecanica-fluidos': 'fisica',

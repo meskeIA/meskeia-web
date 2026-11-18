@@ -254,6 +254,14 @@ const nextConfig: NextConfig = {
       // consulta «tendencias tabla periodica» apenas existe, así que no había demanda que repartir.
       // Nada que absorber antes de retirarlo.
       { source: '/visualizador-tabla-periodica-interactiva', has, destination: '/simulador-tabla-periodica-tendencias/', permanent: true },
+      // Electromagnetismo (18/11/2026, S0281). 22 impresiones en 90 días y sus usos llegaban por
+      // enlace interno: repetía en ilustración lo que tres apps vivas hacen calculando. El campo
+      // eléctrico y el dipolo están en simulador-campo-eléctrico (la estrella del clúster: 80 % de
+      // su uso), Faraday-Lenz en simulador-campo-magnetico (S0057) y el espectro en
+      // visualizador-espectro-electromagnetico. Lo único propio era un imán con semielipses
+      // fijas y un botón de girar 90°: nada que absorber. Va al magnético por la inducción, el
+      // bloque que solo tenía allí equivalente.
+      { source: '/visualizador-electromagnetismo', has, destination: '/simulador-campo-magnetico/', permanent: true },
     ];
   },
 

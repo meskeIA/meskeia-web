@@ -1679,12 +1679,6 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-cerebro-emociones/', icon: '🧠', name: 'Cerebro y Emociones', description: 'El sistema nervioso que regula el corazón' },
     { url: '/visualizador-piel/', icon: '🧬', name: 'La Piel', description: 'Otro órgano vital del cuerpo humano' },
   ],
-  'visualizador-electromagnetismo': [
-    { url: '/simulador-campo-magnetico/', icon: '🧲', name: 'Campo Magnético', description: 'Calcula Lorentz, el campo de un solenoide y la fem inducida' },
-    { url: '/simulador-campo-electrico/', icon: '⚡', name: 'Campo Eléctrico', description: 'Cargas, líneas y equipotenciales' },
-    { url: '/visualizador-mecanica-cuantica/', icon: '🔮', name: 'Mecánica Cuántica', description: 'La física que explica las cargas eléctricas' },
-    { url: '/visualizador-relatividad-especial/', icon: '🌌', name: 'Relatividad Especial', description: 'Einstein y el electromagnetismo' },
-  ],
   'visualizador-computacion-cuantica': [
     { url: '/visualizador-mecanica-cuantica/', icon: '🔮', name: 'Mecánica Cuántica', description: 'Los principios físicos detrás de los qubits' },
     { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'Por qué la computación cuántica amenaza RSA' },
@@ -2015,7 +2009,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-motor-combustion/', icon: '🔥', name: 'Motor de Combustión', description: 'El motor que propulsa los aviones convencionales' },
     { url: '/visualizador-motor-electrico/', icon: '⚡', name: 'Motor Eléctrico', description: 'El motor de los aviones eléctricos del futuro' },
     { url: '/visualizador-efecto-doppler/', icon: '🌊', name: 'Efecto Doppler', description: 'El radar Doppler guía los aviones en tormenta' },
-    { url: '/visualizador-electromagnetismo/', icon: '⚡', name: 'Electromagnetismo', description: 'Las ondas de radio detrás del radar aeronáutico' },
+    { url: '/visualizador-espectro-electromagnetico/', icon: '🌈', name: 'Espectro Electromagnético', description: 'Las ondas de radio detrás del radar aeronáutico' },
   ],
   'visualizador-motor-combustion': [
     { url: '/visualizador-vuelo-avion/', icon: '✈️', name: 'Vuelo de Avión', description: 'El motor a reacción como versión extrema del ciclo Otto' },
@@ -2025,13 +2019,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-motor-electrico': [
     { url: '/visualizador-motor-combustion/', icon: '🔥', name: 'Motor de Combustión', description: 'El contrincante: ciclo Otto y sus pérdidas térmicas' },
-    { url: '/visualizador-electromagnetismo/', icon: '⚡', name: 'Electromagnetismo', description: 'La inducción de Faraday que hace girar el rotor' },
+    { url: '/simulador-campo-magnetico/', icon: '🧲', name: 'Campo Magnético', description: 'La fuerza de Lorentz y la inducción de Faraday que hacen girar el rotor' },
     { url: '/visualizador-vuelo-avion/', icon: '✈️', name: 'Vuelo de Avión', description: 'Propulsión eléctrica en aviación emergente' },
     { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'La electricidad que alimenta los motores eléctricos' },
   ],
   'visualizador-efecto-doppler': [
     { url: '/visualizador-sonido-ondas/', icon: '🔊', name: 'Sonido y Ondas', description: 'Propiedades fundamentales de las ondas sonoras' },
-    { url: '/visualizador-electromagnetismo/', icon: '⚡', name: 'Electromagnetismo', description: 'Doppler también aplica a la luz y el espectro EM' },
+    { url: '/simulador-ondas-interferencia/', icon: '〰️', name: 'Interferencia de Ondas', description: 'Otra propiedad de toda onda: dos frentes que se suman o se anulan' },
     { url: '/visualizador-relatividad-especial/', icon: '🌌', name: 'Relatividad Especial', description: 'El redshift cósmico necesita la fórmula relativista a z alto' },
     { url: '/visualizador-espectro-electromagnetico/', icon: '🌈', name: 'Espectro Electromagnético', description: 'El radar Doppler usa microondas del espectro EM' },
   ],
@@ -3474,7 +3468,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-campo-electrico': [
     { url: '/simulador-campo-magnetico/', icon: '🧲', name: 'Campo Magnético', description: 'El campo hermano: fuerza de Lorentz, solenoides e inducción' },
     { url: '/simulador-circuitos-electricos/', icon: '⚡', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, Ley de Ohm' },
-    { url: '/visualizador-electromagnetismo/', icon: '🧲', name: 'Electromagnetismo', description: 'Campos E y B, inducción' },
+    { url: '/simulador-condensadores/', icon: '🔋', name: 'Condensadores', description: 'El campo uniforme entre dos placas y la energía que guarda' },
     { url: '/simulador-ley-coulomb/', icon: '🧲', name: 'Ley de Coulomb', description: 'La fuerza entre dos cargas, con despejes y casos de clase' },
   ],
   'simulador-ley-coulomb': [
@@ -4875,7 +4869,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-calculo-visual/', icon: '∫', name: 'Cálculo Visual', description: 'El sistema de Lorenz son ecuaciones diferenciales ordinarias integradas numéricamente' },
   ],
   'visualizador-superconductividad': [
-    { url: '/visualizador-electromagnetismo/', icon: '🔌', name: 'Electromagnetismo', description: 'El efecto Meissner expulsa el campo magnético: el diamagnetismo perfecto de los superconductores' },
+    { url: '/simulador-campo-magnetico/', icon: '🧲', name: 'Campo Magnético', description: 'El campo que el efecto Meissner expulsa: Lorentz, solenoides e inducción' },
     { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'ITER usa superconductores de NbTi para los imanes toroidales del reactor de fusión' },
     { url: '/visualizador-computacion-cuantica/', icon: '💻', name: 'Computación Cuántica', description: 'Los qubits superconductores operan cerca del cero absoluto, igual que los superconductores clásicos' },
     { url: '/visualizador-mecanica-cuantica/', icon: '⚛️', name: 'Mecánica Cuántica', description: 'La teoría BCS de superconductividad es un triunfo de la mecánica cuántica aplicada' },
@@ -6362,7 +6356,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-condensadores': [
     { url: '/simulador-campo-electrico/', icon: '⚡', name: 'Campo Eléctrico', description: 'El campo uniforme entre las placas, visto con cargas sueltas' },
     { url: '/simulador-circuitos-electricos/', icon: '🔌', name: 'Circuitos Eléctricos', description: 'Serie, paralelo y Ley de Ohm: el resto del circuito RC' },
-    { url: '/visualizador-electromagnetismo/', icon: '🧲', name: 'Electromagnetismo', description: 'Campos E y B y la energía que almacenan' },
+    { url: '/simulador-campo-magnetico/', icon: '🧲', name: 'Campo Magnético', description: 'El campo B, hermano del E que hay entre las placas' },
     { url: '/calculadora-electricidad/', icon: '💡', name: 'Electricidad', description: 'Ley de Ohm y potencia para la resistencia del circuito' },
   ],
   'simulador-efecto-fotoelectrico': [
@@ -6481,7 +6475,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'simulador-campo-magnetico': [
     { url: '/simulador-campo-electrico/', icon: '⚡', name: 'Campo Eléctrico', description: 'El campo hermano: cargas en reposo frente a cargas en movimiento' },
-    { url: '/visualizador-electromagnetismo/', icon: '🧲', name: 'Electromagnetismo', description: 'La panorámica del tema, de la inducción al espectro electromagnético' },
+    { url: '/visualizador-espectro-electromagnetico/', icon: '🌈', name: 'Espectro Electromagnético', description: 'E y B propagándose juntos: de las ondas de radio a los rayos gamma' },
     { url: '/simulador-circuitos-electricos/', icon: '🔌', name: 'Circuitos Eléctricos', description: 'La corriente que crea el campo, vista desde el circuito' },
     { url: '/simulador-movimiento-circular/', icon: '🔄', name: 'Movimiento Circular', description: 'La fuerza magnética actúa como centrípeta: el MCU de siempre' },
   ],
