@@ -116,6 +116,14 @@ const CASOS = [
     despues: modulo(),
   },
   {
+    // 18/11/2026: retirar el botón de vídeo de los cursos quitó .videoButton de su módulo, y los
+    // capítulos que importan ese módulo —sin tocarlos— rompían por su pasivo de siempre
+    // (.chapterContent, .glossaryExample…), que nunca estuvo declarado y nadie había borrado.
+    n: 17, nombre: 'el módulo pierde una clase que nadie usa: el pasivo del importador no tocado calla', debeFallar: false,
+    antes: { ...modulo('.caja { padding: 1rem; }\n.video { color: red; }\n'), [TSX]: pagina('      <p className={styles.fantasma} />') },
+    despues: modulo(),
+  },
+  {
     n: 15, nombre: 'import citado dentro de una cadena', debeFallar: false,
     despues: { [TSX]: "export const ejemplo = 'import styles from \"./Button.module.css\"; <button className={styles.primary}>';\n" },
   },

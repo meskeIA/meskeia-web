@@ -167,6 +167,7 @@ if (!TODAS) {
     process.exit(0);
   }
 }
+const enElDiff = new Set([...cambiados, ...nuevos]);
 
 /**
  * Clases que ESTABAN declaradas en HEAD y este commit ha quitado de un .module.css ya
@@ -237,7 +238,10 @@ for (const f of objetivos) {
   if (!sf) continue;
   const texto = sf.text;
   const lineas = texto.split('\n');
-  const tocadas = TODAS ? null : lineasTocadas(f);
+  // Un importador que entra solo porque su módulo perdió clases no tiene líneas tocadas: de él
+  // se juzga únicamente lo borrado. `lineasTocadas` daría null («todo es nuevo») y su pasivo de
+  // siempre rompería el build (caso 17 de la prueba, 18/11/2026).
+  const tocadas = TODAS ? null : enElDiff.has(f) ? lineasTocadas(f) : new Set();
 
   // Las ligaduras: declaración del import → módulo que resuelve
   const ligaduras = new Map();
