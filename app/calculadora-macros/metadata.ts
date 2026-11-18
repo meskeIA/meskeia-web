@@ -75,7 +75,9 @@ export const faqJsonLd = {
       name: '¿Qué ratio de macros se recomienda para ganar músculo minimizando la ganancia de grasa?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para un período de volumen limpio, una distribución habitual es: proteínas 30-35% de las calorías totales, carbohidratos 40-50% y grasas 20-25%. En términos prácticos, para alguien de 75 kg con TDEE de 2.700 kcal y un superávit del 10% (2.970 kcal): proteínas ~150 g (660 kcal), carbohidratos ~350 g (1.400 kcal), grasas ~100 g (900 kcal). Los números exactos varían según respuesta individual y tipo de entrenamiento.',
+        // Hasta el 18/11/2026 daba «proteínas 30-35 %… grasas 20-25 %» con un ejemplo que no cuadraba
+        // (150 g = 600 kcal, no 660; un 20 % de proteína y un 30 % de grasa) ni con la app (hallazgo 5035)
+        text: 'Esta calculadora, en volumen, suma 400 kcal a tu gasto diario (TDEE) y reparte las calorías en un 25 % de proteínas, un 50 % de carbohidratos y un 25 % de grasas. Por ejemplo, con un TDEE de 2.700 kcal el objetivo es 3.100 kcal: unos 194 g de proteínas (775 kcal), 388 g de carbohidratos (1.550 kcal) y 86 g de grasas (775 kcal). Otras pautas fijan primero la proteína por kilo de peso corporal (de 1,6 a 2,2 g/kg) y reparten el resto entre carbohidratos y grasas. Los números exactos varían según la respuesta individual y el tipo de entrenamiento.',
       },
     },
   ],
@@ -86,5 +88,12 @@ export const jsonLd = generateWebAppSchema({
   description: "Calcula tus macros diarios según tu objetivo: volumen, definición o mantenimiento. Proteínas, carbohidratos y grasas personalizados para tu peso y actividad.",
   url: "https://meskeia.com/calculadora-macros/",
   category: 'UtilityApplication',
-  features: [],
+  features: [
+    'Metabolismo basal con la fórmula Mifflin-St Jeor según sexo, peso, altura y edad',
+    'Gasto energético diario (TDEE) con cinco niveles de actividad, de 1,2 a 1,9',
+    'Calorías objetivo para definición (−500 kcal), mantenimiento o volumen (+400 kcal)',
+    'Proteínas, carbohidratos y grasas en gramos, kcal y gramos por kg de peso',
+    'Gráfico de anillo con el reparto de macronutrientes',
+    'Fórmula desarrollada con tus datos para comprobar el cálculo',
+  ],
 });

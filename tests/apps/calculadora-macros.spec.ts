@@ -172,10 +172,12 @@ test.describe('Cálculo: Mifflin-St Jeor, factor de actividad y reparto', () => 
   });
 
   test('Caso 2 · límite: mujer 30 kg, 100 cm, 100 años, sedentaria → TMB 264, TDEE 317', async ({ page }) => {
-    await calcular(page, { peso: '30', altura: '100', edad: '100', sexo: 'Mujer', objetivo: 'Definición', actividad: 'Sedentario' });
+    // Con definición el objetivo saldría negativo: desde el 18/11/2026 (hallazgo 5032) se rechaza, y
+    // el rechazo da la TMB y el TDEE. Con mantenimiento se pintan en su sitio.
+    await calcular(page, { peso: '30', altura: '100', edad: '100', sexo: 'Mujer', objetivo: 'Mantenimiento', actividad: 'Sedentario' });
     await expect(panel(page)).toContainText('TMB');
     const t = await texto(page);
-    // 300 + 625 − 500 − 161 = 264; × 1,2 = 316,8 → 317 (el objetivo negativo es el hallazgo de abajo)
+    // 300 + 625 − 500 − 161 = 264; × 1,2 = 316,8 → 317
     expect(t).toContain('TMB (Tasa Metabólica Basal) 264 kcal');
     expect(t).toContain('TDEE (Gasto Total Diario) 317 kcal');
   });
@@ -206,15 +208,14 @@ test.describe('Hallazgos de cálculo (18/11/2026)', () => {
     await abrir(page);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · cambiar objetivo, sexo o peso tras calcular no deja un resultado viejo con el rótulo nuevo', async ({ page }) => {
-    // ABIERTO: el rótulo, la descripción, el «Ajuste por objetivo», la fórmula escrita y los g/kg
-    // leen el estado VIVO (objetivo, sexo, peso), y las kcal y los gramos, el `resultado` del último
-    // clic. Esperado: recalcular o retirar el resultado. Para 70/175/30 moderado:
+  test('HALLAZGO (18/11/2026, REPARADO) · cambiar objetivo, sexo o peso tras calcular no deja un resultado viejo con el rótulo nuevo', async ({ page }) => {
+    // REPARADO: el rótulo, la descripción, el «Ajuste por objetivo», la fórmula escrita y los g/kg
+    // leían el estado VIVO, y las kcal y los gramos, el `resultado` del último clic. Ahora todo se
+    // recalcula con los datos vivos. Para 70/175/30 moderado:
     //   · Definición → 2056 kcal (round(2555,5625 − 500)), no «Objetivo: Definición · 2556 kcal ·
     //     Déficit calórico de 500 kcal»;
-    //   · Mujer → la fórmula «… − 161 =» cuadra en 1483, no en 1649;
-    //   · peso 80 → 2711 kcal (TMB 1748,75 × 1,55 = 2710,56), no «80 kg» con 2556 kcal.
-    test.fail();
+    //   · Mujer → la fórmula «… − 161 =» cuadra en 1483 (1482,75 × 1,55 − 500 = 1798), no en 1649;
+    //   · peso 80 → TMB 1582,75 (mujer), × 1,55 = 2453,26 − 500 → 1953 kcal, no «80 kg» con 2556.
     const fallos: string[] = [];
     await calcular(page, { peso: '70', altura: '175', edad: '30' });
     await expect.poll(() => texto(page)).toContain('Calorías diarias objetivo 2556 kcal');
@@ -224,36 +225,49 @@ test.describe('Hallazgos de cálculo (18/11/2026)', () => {
     if (t.includes('Objetivo: Definición') && t.includes('Calorías diarias objetivo 2556 kcal')) {
       fallos.push('Definición con las 2556 kcal de mantenimiento');
     }
+    expect(t).toContain('Calorías diarias objetivo 2056 kcal');
     await elegir(page, 'Sexo', 'Mujer');
     t = await texto(page);
     if (t.includes('- 161 = 1649 kcal')) fallos.push('fórmula de mujer «− 161 = 1649»');
+    expect(t).toContain('- 161 = 1483 kcal');
+    expect(t).toContain('Calorías diarias objetivo 1798 kcal');
 
     await campo(page, 'Peso').fill('80');
     await esperarValorEnReact(page, campo(page, 'Peso'), '80');
     t = await texto(page);
     if (t.includes('80 kg') && t.includes('Calorías diarias objetivo 2556 kcal')) fallos.push('80 kg con 2556 kcal');
+    expect(t).toContain('80 kg • 175 cm • 30 años');
+    expect(t).toContain('Calorías diarias objetivo 1953 kcal');
     expect(fallos).toEqual([]);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · definición resta 500 kcal sin suelo: mujer 30 kg, 100 cm, 100 años, sedentaria → −183 kcal', async ({ page }) => {
-    // ABIERTO: TDEE 317 − 500 = −183 kcal, y −14 g de proteína (−55 kcal), −18 g de carbohidratos y
-    // −6 g de grasa. Con un perfil corriente (2b: 45 kg, 150 cm, 30 años, sedentaria) el mismo −500
-    // fijo da 792 kcal sin aviso. Esperado: rechazo, suelo o aviso; nunca una ingesta negativa.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · definición resta 500 kcal sin suelo: mujer 30 kg, 100 cm, 100 años, sedentaria → −183 kcal', async ({ page }) => {
+    // REPARADO: TDEE 317 − 500 = −183 kcal salía como objetivo, con −14 g de proteína. Ahora se
+    // rechaza y se dice por qué. Con un perfil corriente (2b: 45 kg, 150 cm, 30 años, sedentaria) el
+    // mismo −500 fijo da 792 kcal, por debajo de la TMB (1077): sale con un aviso.
     await calcular(page, { peso: '30', altura: '100', edad: '100', sexo: 'Mujer', objetivo: 'Definición', actividad: 'Sedentario' });
-    await expect(panel(page)).toContainText('TMB');
+    await expect(panel(page)).toContainText('no se puede proponer un objetivo de definición');
     const t = await texto(page);
+    expect(t).toContain('metabolismo basal estimado es de 264 kcal y el gasto diario de 317 kcal');
     expect(t).not.toMatch(/Calorías diarias objetivo -\d/);
     expect(t).not.toMatch(/(Proteínas|Carbohidratos|Grasas) -\d/);
+
+    await abrir(page);
+    await calcular(page, { peso: '45', altura: '150', edad: '30', sexo: 'Mujer', objetivo: 'Definición', actividad: 'Sedentario' });
+    await expect(panel(page)).toContainText('Calorías diarias objetivo');
+    await expect(panel(page)).toContainText('por debajo de tu metabolismo basal estimado (1077 kcal)');
+    // El mismo perfil en mantenimiento (1292 kcal) no queda por debajo de la TMB: sin aviso
+    await elegir(page, 'Objetivo', 'Mantenimiento');
+    await expect(panel(page)).toContainText('Calorías diarias objetivo');
+    await expect(panel(page)).not.toContainText('por debajo de tu metabolismo basal');
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · entradas fuera de rango o ilegibles se calculan reescritas o como «No definido»', async ({ page }) => {
-    // ABIERTO: NumberInput acota al salir del campo (min/max 30-300 kg, 100-250 cm, 15-100 años) y
-    // `calcular` no valida (NaN <= 0 es false). Esperado: rechazo o aviso; obtenido, un resultado.
-    //   · altura «1,75» (metros) → 100 cm → 1829 kcal en vez de 2556 (−28 %);
-    //   · edad 14 → 15 años; peso −70 → 30 kg → 1936 kcal;
-    //   · peso «70,5,3» → «No definido kcal», «No definidog».
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · entradas fuera de rango o ilegibles se calculan reescritas o como «No definido»', async ({ page }) => {
+    // REPARADO: NumberInput acotaba al salir del campo (min/max 30-300 kg, 100-250 cm, 15-100 años)
+    // y `calcular` no validaba (NaN <= 0 es false). Ahora se rechaza sin resultado, con el motivo:
+    //   · altura «1,75» (metros) → antes 100 cm → 1829 kcal en vez de 2556 (−28 %);
+    //   · edad 14 → antes 15 años; peso −70 → antes 30 kg → 1936 kcal;
+    //   · peso «70,5,3» → antes «No definido kcal», «No definidog».
     const fallos: string[] = [];
     const casos: Array<[Perfil, string]> = [
       [{ peso: '70', altura: '1,75', edad: '30' }, '100 cm'],
@@ -267,8 +281,16 @@ test.describe('Hallazgos de cálculo (18/11/2026)', () => {
       await expect(page.getByRole('button', { name: 'Calcular Macros' })).toBeVisible();
       const t = await texto(page);
       if (t.includes(delator)) fallos.push(`${JSON.stringify(perfil)} → «${delator}» en el resultado`);
+      if (t.includes('Calorías diarias objetivo')) fallos.push(`${JSON.stringify(perfil)} → con resultado`);
     }
     expect(fallos).toEqual([]);
+    // El campo conserva lo escrito y dice por qué no vale (el último caso abierto es «70,5,3»)
+    await expect(campo(page, 'Peso')).toHaveValue('70,5,3');
+    await expect(page.getByText('No se ha podido leer «70,5,3» como número.')).toBeVisible();
+    await abrir(page);
+    await calcular(page, { peso: '70', altura: '1,75', edad: '30' });
+    await expect(campo(page, 'Altura')).toHaveValue('1,75');
+    await expect(page.getByText('La altura va en centímetros: 175, no 1,75.')).toBeVisible();
   });
 
   test('HALLAZGO (18/11/2026, ABIERTO) · la proteína por kg que da la app cae fuera del rango que su propia tabla pide para ese objetivo', async ({ page }) => {
@@ -308,11 +330,12 @@ test.describe('Hallazgos de contenido (18/11/2026)', () => {
     await abrir(page);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · FAQPage de volumen: su ejemplo no cuadra con sus % ni con el reparto de la app', async ({ page }) => {
-    // ABIERTO: dice «proteínas 30-35 %… grasas 20-25 %» y su ejemplo da 150 g (= 600 kcal, no 660),
-    // es decir un 20 % de 2.970 kcal en proteína y 900 / 2.970 = 30 % en grasa. La app, en volumen,
-    // reparte 25 / 50 / 25 con +400 kcal fijas (no +10 %).
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · FAQPage de volumen: su ejemplo no cuadra con sus % ni con el reparto de la app', async ({ page }) => {
+    // REPARADO: decía «proteínas 30-35 %… grasas 20-25 %» y su ejemplo daba 150 g (= 600 kcal, no
+    // 660), es decir un 20 % de 2.970 kcal en proteína y 900 / 2.970 = 30 % en grasa. La app, en
+    // volumen, reparte 25 / 50 / 25 con +400 kcal fijas (no +10 %). Ahora la respuesta describe eso:
+    // TDEE 2.700 + 400 = 3.100 kcal; 775 kcal / 4 = 193,75 → 194 g; 1.550 / 4 = 387,5 → 388 g;
+    // 775 / 9 = 86,1 → 86 g.
     const faq = (await nodosJsonLd(page)).find((n) => n['@type'] === 'FAQPage');
     const r = faq?.mainEntity?.find((q) => /ratio de macros/i.test(q.name))?.acceptedAnswer.text ?? '';
     expect(r, 'la pregunta del ratio para ganar músculo').not.toBe('');
@@ -341,53 +364,60 @@ test.describe('Hallazgos de contenido (18/11/2026)', () => {
       if (cuota < Number(rangoG[1]) || cuota > Number(rangoG[2])) fallos.push(`la grasa del ejemplo es el ${cuota.toFixed(0)} %`);
     }
     expect(fallos).toEqual([]);
+    expect(r).toContain('25 % de proteínas');
+    expect(r).toContain('3.100 kcal: unos 194 g de proteínas (775 kcal), 388 g de carbohidratos (1.550 kcal) y 86 g de grasas (775 kcal)');
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el paso 2 de la guía llama «Muy activo» al × 1,725, que en el selector es «Activo»', async ({ page }) => {
-    // ABIERTO: el selector aplica Activo = 1,725 («Ejercicio intenso 6-7 días/semana») y Muy activo =
-    // 1,9 (2c: 1648,75 × 1,9 = 3133); la guía dice «Muy activo (6-7 días intensos): × 1,725» y omite 1,9.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · el paso 2 de la guía llama «Muy activo» al × 1,725, que en el selector es «Activo»', async ({ page }) => {
+    // REPARADO: el selector aplica Activo = 1,725 («Ejercicio intenso 6-7 días/semana») y Muy activo =
+    // 1,9 (2c: 1648,75 × 1,9 = 3133); la guía decía «Muy activo (6-7 días intensos): × 1,725» y omitía 1,9.
     await abrirGuia(page);
     const paso2 = await page.locator('li', { hasText: 'Multiplica por tu factor de actividad' }).innerText();
     expect(paso2).not.toMatch(/Muy activo[^.]*1,725/);
+    expect(paso2).toContain('Activo (6-7 días intensos): × 1,725');
+    expect(paso2).toContain('Muy activo (atleta o trabajo físico muy intenso): × 1,9');
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el JSON-LD WebApplication no declara características (featureList vacía)', async ({ page }) => {
-    // ABIERTO: metadata.ts pasa `features: []` (CLAUDE.md §1.ter pide 4-8 reales).
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · el JSON-LD WebApplication no declara características (featureList vacía)', async ({ page }) => {
+    // REPARADO: metadata.ts pasaba `features: []` (CLAUDE.md §1.ter pide 4-8 reales).
     const web = (await nodosJsonLd(page)).find((n) => n['@type'] === 'WebApplication');
     expect(web?.featureList?.length ?? 0).toBeGreaterThanOrEqual(4);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el aviso médico pega palabras: «actividad)que NO» y «colegiado.Especialmente»', async ({ page }) => {
-    // ABIERTO: el salto de línea JSX tras </strong> (page.tsx:442-443 y 454-455) se come el espacio.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · el aviso médico pega palabras: «actividad)que NO» y «colegiado.Especialmente»', async ({ page }) => {
+    // REPARADO: el salto de línea JSX tras </strong> se comía el espacio.
     const t = await aviso(page).innerText();
     expect(t).not.toContain(')que NO');
     expect(t).not.toContain('colegiado.Especialmente');
+    expect(t).toContain('actividad) que NO');
+    expect(t).toContain('colegiado. Especialmente');
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el resultado pega el % y la unidad: «Proteínas (25%)», «160g»', async ({ page }) => {
-    // ABIERTO: regla del 25/09/2026 (CLAUDE.md global §2): «25 %» con espacio duro, como hace
+  test('HALLAZGO (18/11/2026, REPARADO) · el resultado pega el % y la unidad: «Proteínas (25%)», «160g»', async ({ page }) => {
+    // REPARADO: regla del 25/09/2026 (CLAUDE.md global §2): «25 %» con espacio duro, como hace
     // formatPercentage; y el símbolo de unidad separado de la cifra («160 g», «2,3 g/kg»).
-    test.fail();
     await calcular(page, { peso: '70', altura: '175', edad: '30' });
     await expect(panel(page)).toContainText('Calorías diarias objetivo');
     const fallos: string[] = [];
     const leyenda = (await panel(page).locator('span', { hasText: /^Proteínas \(/ }).first().textContent()) ?? '';
     if (!/\(25[  ]%\)/.test(leyenda)) fallos.push(`leyenda «${leyenda}»`);
+    const porKg = (await page.locator('[class$="_macroPorKg"]').first().textContent()) ?? '';
+    if (!/^2,3 g\/kg$/.test(porKg.trim())) fallos.push(`g/kg «${porKg.trim()}»`);
     const gramos = (await page.locator('[class$="_macroGramos"]').first().textContent()) ?? '';
     if (!/^160[   ]g$/.test(gramos.trim())) fallos.push(`gramos «${gramos.trim()}»`);
     expect(fallos).toEqual([]);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · «Bebe al menos 2 litros al día» y «pérdida sostenible sin rebote», sin fuente', async ({ page }) => {
-    // ABIERTO: CLAUDE.md §1.quinquies, punto 1 (cifras populares sin fuente) y promesa de resultado.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · «Bebe al menos 2 litros al día» y «pérdida sostenible sin rebote», sin fuente', async ({ page }) => {
+    // REPARADO: CLAUDE.md §1.quinquies, punto 1 (cifras populares sin fuente) y promesa de resultado.
+    // La cifra de agua no se pudo cotejar con la EFSA (fuera de la red de la tarea): se retira, igual
+    // que el «80-90 % produce excelentes resultados» y las tres apps comerciales por su nombre.
     await abrirGuia(page);
     const hidratacion = await page.locator('div', { hasText: 'Hidratación como cuarto macro' }).last().innerText();
     if (/2 litros/.test(hidratacion)) expect(hidratacion).toMatch(/EFSA|OMS|AESAN|\b(19|20)\d{2}\b/);
+    expect(hidratacion).toContain('cambia con el calor, la actividad física y tu tamaño corporal');
     await expect(page.getByText('sin rebote')).toHaveCount(0);
+    await expect(page.getByText(/excelentes resultados|MyFitnessPal|Cronometer|Yazio/)).toHaveCount(0);
   });
 });
 
@@ -396,10 +426,9 @@ test.describe('Hallazgos de accesibilidad (18/11/2026)', () => {
     await abrir(page);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · los gramos de carbohidratos y grasas no llegan a 3:1 en claro', async ({ page }) => {
-    // ABIERTO: color en línea sobre var(--hover) #F5F5F5, 28 px en negrita (texto grande, AA 3:1):
-    // #3498DB 2,89:1 y #F39C12 2,01:1 en claro; en oscuro (#333) 4,01 y 5,76. El #E74C3C, 3,50 y 3,31.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · los gramos de carbohidratos y grasas no llegan a 3:1 en claro', async ({ page }) => {
+    // REPARADO: color en línea sobre var(--hover) #F5F5F5, 28 px en negrita (texto grande, AA 3:1):
+    // #3498DB 2,89:1 y #F39C12 2,01:1 en claro. Ahora por clase de la tarjeta, con variante oscura.
     await calcular(page, { peso: '70', altura: '175', edad: '30' });
     await expect(panel(page)).toContainText('Calorías diarias objetivo');
     await esperarPaginaAsentada(page);
@@ -416,10 +445,9 @@ test.describe('Hallazgos de accesibilidad (18/11/2026)', () => {
     expect(fallos).toEqual([]);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el lector de pantalla lee los emojis del resultado (⚖️, 🥩, 🍚, 🥑) y del hueco vacío (🥗)', async ({ page }) => {
-    // ABIERTO: objetivoIconoBig, macroIcono y placeholderIcon (page.tsx:303, 352, 364, 376, 424) sin
-    // aria-hidden: se leen junto al título y al nombre del macro.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · el lector de pantalla lee los emojis del resultado (⚖️, 🥩, 🍚, 🥑) y del hueco vacío (🥗)', async ({ page }) => {
+    // REPARADO: objetivoIconoBig, macroIcono y placeholderIcon iban sin aria-hidden: se leían junto
+    // al título y al nombre del macro.
     const fallos: string[] = [];
     if ((await panel(page).ariaSnapshot()).includes('🥗')) fallos.push('🥗');
     await calcular(page, { peso: '70', altura: '175', edad: '30' });
@@ -444,6 +472,7 @@ test.describe('Hallazgos de accesibilidad (18/11/2026)', () => {
  *     claro; rgb(229, 229, 229) sobre rgb(13, 38, 68) en oscuro), cuando la pieza de DisclaimerCard que
  *     copia lo pinta en rojo sobre rosa (#b71c1c sobre #ffebee; #ff8a80 sobre #4a1a1a en oscuro).
  * Los localizadores van por rol y texto, no por clase: lo que se mide es justo que falta.
+ * REPARADO el 18/11/2026: el módulo declara las tres, copiadas de DisclaimerCard.module.css.
  */
 test.describe('Cabo C0710 · clases del aviso médico (1280 px)', () => {
   test.beforeEach(async ({ page }) => {
@@ -460,8 +489,7 @@ test.describe('Cabo C0710 · clases del aviso médico (1280 px)', () => {
     expect(new Set(fondos).size).toBe(2);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · C0710 · emergency: «consulta con tu médico inmediatamente» lleva clase y se distingue del resto del aviso, en claro y oscuro', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · C0710 · emergency: «consulta con tu médico inmediatamente» lleva clase y se distingue del resto del aviso, en claro y oscuro', async ({ page }) => {
     const urgencia = aviso(page).locator('p', { hasText: 'consulta con tu médico inmediatamente' });
     const normal = aviso(page).locator('p', { hasText: 'fórmulas generales' });
     await expect(urgencia).toBeVisible();
@@ -489,8 +517,7 @@ test.describe('Cabo C0710 · clases del aviso médico (1280 px)', () => {
     expect(fallos).toEqual([]);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · C0710 · highlight: «NO sustituye la valoración de un dietista-nutricionista» lleva clase y se separa de la lista', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · C0710 · highlight: «NO sustituye la valoración de un dietista-nutricionista» lleva clase y se separa de la lista', async ({ page }) => {
     const lista = aviso(page).locator('ul', { hasText: 'NO reemplaza un plan nutricional personalizado' });
     const destacado = aviso(page).locator('p', { hasText: 'NO sustituye la valoración de un dietista-nutricionista colegiado' });
     await expect(destacado).toBeVisible();
@@ -503,8 +530,7 @@ test.describe('Cabo C0710 · clases del aviso médico (1280 px)', () => {
     expect(fallos).toEqual([]);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · C0710 · disclaimerList: la lista de limitaciones lleva clase y sangría', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · C0710 · disclaimerList: la lista de limitaciones lleva clase y sangría', async ({ page }) => {
     const lista = aviso(page).locator('ul', { hasText: 'NO reemplaza un plan nutricional personalizado' });
     await expect(lista).toBeVisible();
     const fallos: string[] = [];
@@ -535,8 +561,7 @@ test.describe('Móvil 390 px', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · C0710 · a 390 px la lista, el destacado y la urgencia del aviso llevan clase', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · C0710 · a 390 px la lista, el destacado y la urgencia del aviso llevan clase', async ({ page }) => {
     const piezas: Record<string, Locator> = {
       disclaimerList: aviso(page).locator('ul', { hasText: 'NO reemplaza un plan nutricional personalizado' }),
       highlight: aviso(page).locator('p', { hasText: 'NO sustituye la valoración de un dietista-nutricionista colegiado' }),

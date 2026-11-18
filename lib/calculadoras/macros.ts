@@ -57,6 +57,12 @@ export interface ResultadoMacros {
   ratios: { proteinas: number; carbohidratos: number; grasas: number };
   /** IMC aproximado */
   imc: number;
+  /**
+   * El objetivo queda por debajo de la TMB estimada: la energía que el cuerpo gasta en reposo.
+   * Pasa en definición con un TDEE bajo, porque el déficit es fijo (−500 kcal) y no proporcional:
+   * mujer 45 kg, 150 cm, 30 años, sedentaria → TMB 1077, TDEE 1292, objetivo 792 (hallazgo 5032).
+   */
+  bajoTmb: boolean;
 }
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
@@ -103,6 +109,17 @@ export function calcularMacros(p: ParametrosMacros): ResultadoMacros {
   const config = CONFIG_OBJETIVOS[p.objetivo];
   const caloriasObjetivo = ri(tdee + config.ajusteKcal);
 
+  // Una ingesta no puede ser cero ni negativa. Con datos que la app acepta pasa en definición
+  // (mujer 30 kg, 100 cm, 100 años, sedentaria: TDEE 317 − 500 = −183 kcal, hallazgo 5032); hasta
+  // el 18/11/2026 salía «−183 kcal» y gramos negativos como objetivo diario.
+  if (caloriasObjetivo <= 0) {
+    throw new Error(
+      `Con estos datos el metabolismo basal estimado es de ${ri(tmb)} kcal y el gasto diario de ` +
+      `${ri(tdee)} kcal: no alcanza para restar ${Math.abs(config.ajusteKcal)} kcal, así que no se ` +
+      `puede proponer un objetivo de definición.`
+    );
+  }
+
   // Macros
   const kcalProteinas = r(caloriasObjetivo * config.ratios.proteinas / 100);
   const kcalCarbohidratos = r(caloriasObjetivo * config.ratios.carbohidratos / 100);
@@ -130,5 +147,6 @@ export function calcularMacros(p: ParametrosMacros): ResultadoMacros {
     macros,
     ratios: config.ratios,
     imc,
+    bajoTmb: caloriasObjetivo < tmb,
   };
 }

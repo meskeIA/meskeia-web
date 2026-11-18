@@ -404,6 +404,68 @@
   font-weight: 700;
 }
 
+/* Color de cada cifra sobre --hover: los de la marca del gráfico (#E74C3C, #3498DB, #F39C12)
+   daban 3,50, 2,89 y 2,01:1 en claro (hallazgo 5041); estos pasan de 4,5:1 en los dos temas */
+.macroProteinas .macroGramos { color: #B03A2E; }
+.macroCarbohidratos .macroGramos { color: #1F6FA8; }
+.macroGrasas .macroGramos { color: #9A6206; }
+
+[data-theme='dark'] .macroProteinas .macroGramos { color: #FF8A80; }
+[data-theme='dark'] .macroCarbohidratos .macroGramos { color: #7FBCE8; }
+[data-theme='dark'] .macroGrasas .macroGramos { color: #F5B041; }
+
+/* Objetivo por debajo de la TMB (hallazgo 5032) */
+.avisoBajoTmb {
+  margin: calc(-1 * var(--spacing-md)) 0 var(--spacing-xl);
+  padding: var(--spacing-md);
+  border-left: 4px solid #B9770E;
+  border-radius: var(--radius);
+  background: #FFF4E0;
+  color: #1A1A1A;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .avisoBajoTmb {
+  background: #3A2A10;
+  color: #F2E6D0;
+}
+
+/* Piezas del aviso médico que la página ya ponía y el módulo no declaraba (cabo C0710,
+   hallazgos 5038-5040): copian las de DisclaimerCard.module.css */
+.disclaimerList {
+  margin: var(--spacing-md) 0;
+  padding-left: var(--spacing-lg);
+  line-height: 1.7;
+}
+
+.disclaimerList li {
+  margin-bottom: var(--spacing-sm);
+}
+
+.disclaimerList li:last-child {
+  margin-bottom: 0;
+}
+
+.highlight {
+  font-weight: 600;
+  margin-top: var(--spacing-lg);
+}
+
+.emergency {
+  font-weight: 700;
+  color: #b71c1c;
+  padding: var(--spacing-md);
+  background: #ffebee;
+  border-radius: var(--radius);
+  margin-top: var(--spacing-lg);
+}
+
+[data-theme='dark'] .emergency {
+  color: #ff8a80;
+  background: #4a1a1a;
+}
+
 .macroCalorias {
   font-size: 0.8rem;
   color: var(--text-muted);

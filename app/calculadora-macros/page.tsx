@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import Chart from 'chart.js/auto';
 import styles from './CalculadoraMacros.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { formatNumber, parseSpanishNumber } from '@/lib';
+import { formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
 import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
+import { calcularMacros } from '@/lib/calculadoras/macros';
 
 // Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
 Chart.register(PLUGIN_REDIMENSION_APLAZADA);
@@ -21,7 +22,88 @@ interface ResultadoMacros {
   grasas: { gramos: number; porcentaje: number; calorias: number };
   tmb: number;
   tdee: number;
+  bajoTmb: boolean;
+  /** Ajuste por objetivo sobre el TDEE (kcal): −500, 0 o +400, del motor */
+  ajuste: number;
+  /** Los datos con los que se calculó: la cabecera, la fórmula escrita y los g/kg leen ESTOS. */
+  peso: number;
+  altura: number;
+  edad: number;
 }
+
+interface ErroresCampos {
+  peso?: string;
+  altura?: string;
+  edad?: string;
+}
+
+type Salida =
+  | { tipo: 'resultado'; resultado: ResultadoMacros }
+  | { tipo: 'error'; errores: ErroresCampos; general?: string };
+
+const ESPACIO_DURO = ' ';
+
+/**
+ * Lee y valida un campo. Hasta el 18/11/2026 NumberInput reescribía al límite al salir del campo
+ * (altura «1,75» → 100 cm → un objetivo un 28 % más bajo) y lo ilegible llegaba al resultado como
+ * «No definido kcal» (hallazgo 5033). Ahora lo fuera de rango o ilegible se rechaza con su motivo.
+ */
+function leerCampo(texto: string, nombre: string, unidad: string, min: number, max: number): { valor: number } | { error: string } {
+  const valor = parseSpanishNumber(texto);
+  if (texto.trim() === '') return { error: `Introduce ${nombre}.` };
+  if (isNaN(valor)) return { error: `No se ha podido leer «${texto}» como número.` };
+  if (valor < min || valor > max) {
+    return { error: `Debe estar entre ${min} y ${max} ${unidad}.` };
+  }
+  return { valor };
+}
+
+/**
+ * El cálculo, con los datos VIVOS. Hasta el 18/11/2026 el resultado se congelaba en el último clic
+ * y, al cambiar el objetivo, el sexo o el peso, la cabecera y la fórmula cambiaban pero las kcal no:
+ * «Objetivo: Definición» con las 2556 kcal de mantenimiento (hallazgo 5031).
+ */
+function evaluar(peso: string, altura: string, edad: string, sexo: Sexo, objetivo: Objetivo, actividad: NivelActividad): Salida {
+  const p = leerCampo(peso, 'el peso', 'kg', 30, 300);
+  const a = leerCampo(altura, 'la altura', 'cm', 100, 250);
+  const e = leerCampo(edad, 'la edad', 'años', 15, 100);
+  const errores: ErroresCampos = {};
+  if ('error' in p) errores.peso = p.error;
+  if ('error' in a) {
+    const valor = parseSpanishNumber(altura);
+    errores.altura = valor > 0 && valor < 3
+      ? `La altura va en centímetros: ${formatNumber(valor * 100, 0)}, no ${altura}.`
+      : a.error;
+  }
+  if ('error' in e) errores.edad = e.error;
+  if ('error' in p || 'error' in a || 'error' in e) return { tipo: 'error', errores };
+
+  try {
+    const r = calcularMacros({ peso: p.valor, altura: a.valor, edad: e.valor, sexo, nivelActividad: actividad, objetivo });
+    // Los gramos, sin redondear (kcal / 4 y / 9): se redondean al pintarlos
+    return {
+      tipo: 'resultado',
+      resultado: {
+        calorias: r.caloriasObjetivo,
+        proteinas: { gramos: r.macros.caloriasProteinas / 4, porcentaje: r.ratios.proteinas, calorias: r.macros.caloriasProteinas },
+        carbohidratos: { gramos: r.macros.caloriasCarbohidratos / 4, porcentaje: r.ratios.carbohidratos, calorias: r.macros.caloriasCarbohidratos },
+        grasas: { gramos: r.macros.caloriasGrasas / 9, porcentaje: r.ratios.grasas, calorias: r.macros.caloriasGrasas },
+        tmb: Math.round(r.tmb),
+        tdee: Math.round(r.tdee),
+        bajoTmb: r.bajoTmb,
+        ajuste: r.ajusteKcal,
+        peso: p.valor,
+        altura: a.valor,
+        edad: e.valor,
+      },
+    };
+  } catch (err) {
+    return { tipo: 'error', errores: {}, general: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+const gramos = (g: number) => `${formatNumber(g, 0)}${ESPACIO_DURO}g`;
+const porcentaje = (p: number) => formatPercentage(p / 100, 0);
 
 const objetivos: { id: Objetivo; nombre: string; icono: string; descripcion: string }[] = [
   { id: 'definicion', nombre: 'Definición', icono: '🔥', descripcion: 'Pérdida de grasa manteniendo músculo' },
@@ -37,13 +119,6 @@ const nivelesActividad: { id: NivelActividad; nombre: string; factor: number; de
   { id: 'muy_activo', nombre: 'Muy activo', factor: 1.9, descripcion: 'Atleta o trabajo físico muy intenso' },
 ];
 
-// Ratios de macros según objetivo (proteína / carbos / grasa)
-const ratiosMacros: Record<Objetivo, { proteina: number; carbos: number; grasa: number; ajusteCalorias: number }> = {
-  definicion: { proteina: 0.30, carbos: 0.40, grasa: 0.30, ajusteCalorias: -500 },
-  mantenimiento: { proteina: 0.25, carbos: 0.50, grasa: 0.25, ajusteCalorias: 0 },
-  volumen: { proteina: 0.25, carbos: 0.50, grasa: 0.25, ajusteCalorias: 400 },
-};
-
 export default function CalculadoraMacrosPage() {
   const [peso, setPeso] = useState('');
   const [altura, setAltura] = useState('');
@@ -51,61 +126,29 @@ export default function CalculadoraMacrosPage() {
   const [sexo, setSexo] = useState<Sexo>('hombre');
   const [objetivo, setObjetivo] = useState<Objetivo>('mantenimiento');
   const [actividad, setActividad] = useState<NivelActividad>('moderado');
-  const [resultado, setResultado] = useState<ResultadoMacros | null>(null);
+  // Tras el primer «Calcular», el resultado sigue a los datos vivos (hallazgo 5031)
+  const [calculado, setCalculado] = useState(false);
 
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
 
+  const salida = useMemo(
+    () => (calculado ? evaluar(peso, altura, edad, sexo, objetivo, actividad) : null),
+    [calculado, peso, altura, edad, sexo, objetivo, actividad]
+  );
+  const resultado = salida?.tipo === 'resultado' ? salida.resultado : null;
+  const errores: ErroresCampos = salida?.tipo === 'error' ? salida.errores : {};
+  const errorGeneral = salida?.tipo === 'error' ? salida.general : undefined;
+
   const calcular = () => {
-    const pesoNum = parseSpanishNumber(peso);
-    const alturaNum = parseSpanishNumber(altura);
-    const edadNum = parseSpanishNumber(edad);
-
-    if (pesoNum <= 0 || alturaNum <= 0 || edadNum <= 0) {
-      return;
-    }
-
-    // Fórmula Mifflin-St Jeor para TMB
-    let tmb: number;
-    if (sexo === 'hombre') {
-      tmb = 10 * pesoNum + 6.25 * alturaNum - 5 * edadNum + 5;
-    } else {
-      tmb = 10 * pesoNum + 6.25 * alturaNum - 5 * edadNum - 161;
-    }
-
-    // TDEE = TMB × Factor de actividad
-    const factorActividad = nivelesActividad.find(n => n.id === actividad)?.factor || 1.55;
-    const tdee = tmb * factorActividad;
-
-    // Calorías objetivo según objetivo
-    const ratio = ratiosMacros[objetivo];
-    const calorias = Math.round(tdee + ratio.ajusteCalorias);
-
-    // Calcular macros
-    const caloriasProteinas = calorias * ratio.proteina;
-    const caloriasCarbos = calorias * ratio.carbos;
-    const caloriasGrasas = calorias * ratio.grasa;
-
-    // Conversión: Proteínas y carbos = 4 kcal/g, Grasas = 9 kcal/g
-    const gramosProteinas = caloriasProteinas / 4;
-    const gramosCarbos = caloriasCarbos / 4;
-    const gramosGrasas = caloriasGrasas / 9;
-
-    setResultado({
-      calorias,
-      proteinas: { gramos: gramosProteinas, porcentaje: ratio.proteina * 100, calorias: caloriasProteinas },
-      carbohidratos: { gramos: gramosCarbos, porcentaje: ratio.carbos * 100, calorias: caloriasCarbos },
-      grasas: { gramos: gramosGrasas, porcentaje: ratio.grasa * 100, calorias: caloriasGrasas },
-      tmb: Math.round(tmb),
-      tdee: Math.round(tdee),
-    });
+    setCalculado(true);
   };
 
   const limpiar = () => {
     setPeso('');
     setAltura('');
     setEdad('');
-    setResultado(null);
+    setCalculado(false);
   };
 
   // Effect para Chart.js
@@ -157,7 +200,7 @@ export default function CalculadoraMacrosPage() {
               label: (context) => {
                 const label = context.label || '';
                 const value = context.raw as number;
-                return `${label}: ${formatNumber(value, 0)}g`;
+                return `${label}: ${gramos(value)}`;
               }
             }
           }
@@ -196,9 +239,11 @@ export default function CalculadoraMacrosPage() {
               onChange={setPeso}
               label="Peso"
               placeholder="70"
-              helperText="Tu peso en kilogramos"
+              helperText="Tu peso en kilogramos (30-300)"
               min={30}
               max={300}
+              acotarAlSalir={false}
+              error={errores.peso}
             />
 
             <NumberInput
@@ -206,9 +251,11 @@ export default function CalculadoraMacrosPage() {
               onChange={setAltura}
               label="Altura"
               placeholder="175"
-              helperText="Tu altura en centímetros"
+              helperText="Tu altura en centímetros (100-250)"
               min={100}
               max={250}
+              acotarAlSalir={false}
+              error={errores.altura}
             />
 
             <NumberInput
@@ -216,9 +263,11 @@ export default function CalculadoraMacrosPage() {
               onChange={setEdad}
               label="Edad"
               placeholder="30"
-              helperText="Tu edad en años"
+              helperText="Tu edad en años (15-100)"
               min={15}
               max={100}
+              acotarAlSalir={false}
+              error={errores.edad}
             />
 
             <div className={styles.sexoSelector}>
@@ -300,12 +349,12 @@ export default function CalculadoraMacrosPage() {
           {resultado ? (
             <>
               <div className={styles.objetivoHeader}>
-                <span className={styles.objetivoIconoBig}>
+                <span className={styles.objetivoIconoBig} aria-hidden="true">
                   {objetivos.find(o => o.id === objetivo)?.icono}
                 </span>
                 <div>
                   <h3>Objetivo: {objetivos.find(o => o.id === objetivo)?.nombre}</h3>
-                  <p>{formatNumber(parseSpanishNumber(peso), 0)} kg • {formatNumber(parseSpanishNumber(altura), 0)} cm • {formatNumber(parseSpanishNumber(edad), 0)} años</p>
+                  <p>{formatNumber(resultado.peso, Number.isInteger(resultado.peso) ? 0 : 1)} kg • {formatNumber(resultado.altura, 0)} cm • {formatNumber(resultado.edad, 0)} años</p>
                 </div>
               </div>
 
@@ -316,9 +365,18 @@ export default function CalculadoraMacrosPage() {
                   unit="kcal"
                   variant="highlight"
                   icon="🎯"
-                  description={objetivo === 'definicion' ? 'Déficit calórico de 500 kcal' : objetivo === 'volumen' ? 'Superávit calórico de 400 kcal' : 'Calorías de mantenimiento'}
+                  description={resultado.ajuste < 0 ? `Déficit calórico de ${formatNumber(-resultado.ajuste, 0)} kcal` : resultado.ajuste > 0 ? `Superávit calórico de ${formatNumber(resultado.ajuste, 0)} kcal` : 'Calorías de mantenimiento'}
                 />
               </div>
+
+              {resultado.bajoTmb && (
+                <p className={styles.avisoBajoTmb}>
+                  <span aria-hidden="true">⚠️</span> Este objetivo queda por debajo de tu metabolismo basal
+                  estimado ({formatNumber(resultado.tmb, 0)} kcal), lo que tu cuerpo gasta en reposo: el
+                  déficit fijo de {formatNumber(-resultado.ajuste, 0)} kcal es grande para tu gasto diario.
+                  Un déficit así debe pautarlo y vigilarlo un profesional sanitario.
+                </p>
+              )}
 
               <div className={styles.chartSection}>
                 <h3 className={styles.seccionTitulo}><span aria-hidden="true">📊</span> Distribución de Macros</h3>
@@ -333,54 +391,56 @@ export default function CalculadoraMacrosPage() {
                   <div className={styles.chartLegend}>
                     <div className={styles.legendItem}>
                       <span className={styles.legendColor} style={{ background: '#E74C3C' }}></span>
-                      <span className={styles.legendText}>Proteínas ({formatNumber(resultado.proteinas.porcentaje, 0)}%)</span>
+                      <span className={styles.legendText}>Proteínas ({porcentaje(resultado.proteinas.porcentaje)})</span>
                     </div>
                     <div className={styles.legendItem}>
                       <span className={styles.legendColor} style={{ background: '#3498DB' }}></span>
-                      <span className={styles.legendText}>Carbohidratos ({formatNumber(resultado.carbohidratos.porcentaje, 0)}%)</span>
+                      <span className={styles.legendText}>Carbohidratos ({porcentaje(resultado.carbohidratos.porcentaje)})</span>
                     </div>
                     <div className={styles.legendItem}>
                       <span className={styles.legendColor} style={{ background: '#F39C12' }}></span>
-                      <span className={styles.legendText}>Grasas ({formatNumber(resultado.grasas.porcentaje, 0)}%)</span>
+                      <span className={styles.legendText}>Grasas ({porcentaje(resultado.grasas.porcentaje)})</span>
                     </div>
                   </div>
                 </div>
               </div>
 
+              {/* El color de la cifra va por clase de la tarjeta, con su variante oscura: en línea,
+                  #3498DB y #F39C12 sobre --hover daban 2,89:1 y 2,01:1 en claro (hallazgo 5041) */}
               <div className={styles.macrosGrid}>
-                <div className={styles.macroCard} style={{ borderColor: '#E74C3C' }}>
-                  <div className={styles.macroIcono}>🥩</div>
+                <div className={`${styles.macroCard} ${styles.macroProteinas}`} style={{ borderColor: '#E74C3C' }}>
+                  <div className={styles.macroIcono} aria-hidden="true">🥩</div>
                   <div className={styles.macroNombre}>Proteínas</div>
-                  <div className={styles.macroGramos} style={{ color: '#E74C3C' }}>
-                    {formatNumber(resultado.proteinas.gramos, 0)}g
+                  <div className={styles.macroGramos}>
+                    {gramos(resultado.proteinas.gramos)}
                   </div>
                   <div className={styles.macroCalorias}>{formatNumber(resultado.proteinas.calorias, 0)} kcal</div>
                   <div className={styles.macroPorKg}>
-                    {formatNumber(resultado.proteinas.gramos / parseSpanishNumber(peso), 1)}g/kg
+                    {formatNumber(resultado.proteinas.gramos / resultado.peso, 1)}{ESPACIO_DURO}g/kg
                   </div>
                 </div>
 
-                <div className={styles.macroCard} style={{ borderColor: '#3498DB' }}>
-                  <div className={styles.macroIcono}>🍚</div>
+                <div className={`${styles.macroCard} ${styles.macroCarbohidratos}`} style={{ borderColor: '#3498DB' }}>
+                  <div className={styles.macroIcono} aria-hidden="true">🍚</div>
                   <div className={styles.macroNombre}>Carbohidratos</div>
-                  <div className={styles.macroGramos} style={{ color: '#3498DB' }}>
-                    {formatNumber(resultado.carbohidratos.gramos, 0)}g
+                  <div className={styles.macroGramos}>
+                    {gramos(resultado.carbohidratos.gramos)}
                   </div>
                   <div className={styles.macroCalorias}>{formatNumber(resultado.carbohidratos.calorias, 0)} kcal</div>
                   <div className={styles.macroPorKg}>
-                    {formatNumber(resultado.carbohidratos.gramos / parseSpanishNumber(peso), 1)}g/kg
+                    {formatNumber(resultado.carbohidratos.gramos / resultado.peso, 1)}{ESPACIO_DURO}g/kg
                   </div>
                 </div>
 
-                <div className={styles.macroCard} style={{ borderColor: '#F39C12' }}>
-                  <div className={styles.macroIcono}>🥑</div>
+                <div className={`${styles.macroCard} ${styles.macroGrasas}`} style={{ borderColor: '#F39C12' }}>
+                  <div className={styles.macroIcono} aria-hidden="true">🥑</div>
                   <div className={styles.macroNombre}>Grasas</div>
-                  <div className={styles.macroGramos} style={{ color: '#F39C12' }}>
-                    {formatNumber(resultado.grasas.gramos, 0)}g
+                  <div className={styles.macroGramos}>
+                    {gramos(resultado.grasas.gramos)}
                   </div>
                   <div className={styles.macroCalorias}>{formatNumber(resultado.grasas.calorias, 0)} kcal</div>
                   <div className={styles.macroPorKg}>
-                    {formatNumber(resultado.grasas.gramos / parseSpanishNumber(peso), 1)}g/kg
+                    {formatNumber(resultado.grasas.gramos / resultado.peso, 1)}{ESPACIO_DURO}g/kg
                   </div>
                 </div>
               </div>
@@ -399,8 +459,8 @@ export default function CalculadoraMacrosPage() {
                   <div className={styles.detalleItem}>
                     <span className={styles.detalleLabel}>Ajuste por objetivo</span>
                     <span className={styles.detalleValor}>
-                      <span>{ratiosMacros[objetivo].ajusteCalorias > 0 ? '+' : ''}</span>
-                      {formatNumber(ratiosMacros[objetivo].ajusteCalorias, 0)} kcal
+                      <span>{resultado.ajuste > 0 ? '+' : ''}</span>
+                      {formatNumber(resultado.ajuste, 0)} kcal
                     </span>
                   </div>
                 </div>
@@ -415,14 +475,22 @@ export default function CalculadoraMacrosPage() {
                   }
                 </p>
                 <p className={styles.formulaDetalle}>
-                  TMB = 10 × {peso} + 6,25 × {altura} - 5 × {edad} {sexo === 'hombre' ? '+ 5' : '- 161'} = {formatNumber(resultado.tmb, 0)} kcal
+                  TMB = 10 × {formatNumber(resultado.peso, Number.isInteger(resultado.peso) ? 0 : 1)} + 6,25 × {formatNumber(resultado.altura, Number.isInteger(resultado.altura) ? 0 : 1)} - 5 × {formatNumber(resultado.edad, Number.isInteger(resultado.edad) ? 0 : 1)} {sexo === 'hombre' ? '+ 5' : '- 161'} = {formatNumber(resultado.tmb, 0)} kcal
                 </p>
               </div>
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🥗</span>
-              <p>Introduce tus datos y selecciona tu objetivo para calcular tus macronutrientes diarios</p>
+              <span className={styles.placeholderIcon} aria-hidden="true">🥗</span>
+              {/* Región viva: el motivo por el que no hay resultado se anuncia al cambiar (5031, 5033) */}
+              <p role="status" aria-live="polite">
+                <span>
+                  {errorGeneral
+                    ?? (salida?.tipo === 'error'
+                      ? 'Revisa los datos marcados: con ellos no se puede calcular.'
+                      : 'Introduce tus datos y selecciona tu objetivo para calcular tus macronutrientes diarios')}
+                </span>
+              </p>
             </div>
           )}
         </div>
@@ -439,19 +507,19 @@ export default function CalculadoraMacrosPage() {
         context="calculadora-macros"
       >
         <p>
-          Esta calculadora utiliza <strong>fórmulas generales (Mifflin-St Jeor + factores de actividad)</strong>
+          Esta calculadora utiliza <strong>fórmulas generales (Mifflin-St Jeor + factores de actividad)</strong>{' '}
           que NO tienen en cuenta tu situación individual. Limitaciones importantes:
         </p>
 
         <ul className={styles.disclaimerList}>
           <li><strong>NO reemplaza un plan nutricional personalizado</strong>: Un nutricionista colegiado debe evaluar tu composición corporal (bioimpedancia, pliegues cutáneos), analíticas, patologías previas y objetivos reales</li>
-          <li><strong>Los valores son estimaciones promedio</strong>: Tu metabolismo basal puede variar ±15% según genética, masa muscular, tiroides y otros factores hormonales</li>
+          <li><strong>Los valores son estimaciones promedio</strong>: Tu metabolismo basal puede variar ±15{ESPACIO_DURO}% según genética, masa muscular, tiroides y otros factores hormonales</li>
           <li><strong>No considera contraindicaciones médicas</strong>: Dietas altas en proteínas pueden ser peligrosas con enfermedad renal. Déficits calóricos extremos pueden causar trastornos hormonales</li>
           <li><strong>El "objetivo" no es garantía de resultado</strong>: Perder/ganar peso depende de adherencia, calidad de alimentos, descanso, estrés y genética individual</li>
         </ul>
 
         <p className={styles.highlight}>
-          <strong><span aria-hidden="true">⚕️</span> Esta herramienta NO sustituye la valoración de un dietista-nutricionista colegiado.</strong>
+          <strong><span aria-hidden="true">⚕️</span> Esta herramienta NO sustituye la valoración de un dietista-nutricionista colegiado.</strong>{' '}
           Especialmente si tienes diabetes, enfermedad renal, trastornos alimentarios, embarazo o lactancia,
           es OBLIGATORIO consultar con un profesional sanitario antes de modificar tu dieta.
         </p>
@@ -508,14 +576,14 @@ export default function CalculadoraMacrosPage() {
                   <td>TDEE + 200/300 kcal</td>
                   <td>1,6 – 2,0 g/kg</td>
                   <td>Muy altos (5-8 g/kg)</td>
-                  <td>20-25% kcal totales</td>
+                  <td>20-25{ESPACIO_DURO}% de las kcal</td>
                 </tr>
                 <tr>
                   <td><span aria-hidden="true">🧘</span> Sedentario/salud general</td>
                   <td>= TDEE o − 200 kcal</td>
                   <td>0,8 – 1,2 g/kg</td>
                   <td>Moderados</td>
-                  <td>25-35% kcal totales</td>
+                  <td>25-35{ESPACIO_DURO}% de las kcal</td>
                 </tr>
               </tbody>
             </table>
@@ -552,7 +620,7 @@ export default function CalculadoraMacrosPage() {
                 <span className={styles.casoTag}>Corredora de fondo</span>
               </div>
               <p>Laura, 55 kg, corre 60 km/semana preparando un maratón. Sus necesidades de carbohidratos
-              son muy altas (6-8 g/kg = 330-440 g/día). La grasa no debe bajar del 20% de las calorías
+              son muy altas (6-8 g/kg = 330-440 g/día). La grasa no debe bajar del 20{ESPACIO_DURO}% de las calorías
               totales para mantener el correcto funcionamiento hormonal.</p>
               <div className={styles.casoResultado}>Prioridad: carbohidratos suficientes para el rendimiento en carrera</div>
             </div>
@@ -564,7 +632,7 @@ export default function CalculadoraMacrosPage() {
               <p>Tomás, 90 kg, trabajo de oficina, sin deporte. TDEE: ~2.200 kcal. Con un déficit moderado de
               300 kcal (1.900 kcal/día) y aumentando proteína a 1,2 g/kg (108 g/día) puede perder grasa
               sin perder masa muscular y sin hambre excesiva.</p>
-              <div className={styles.casoResultado}>Déficit moderado + proteína alta = pérdida sostenible sin rebote</div>
+              <div className={styles.casoResultado}>Déficit moderado y proteína suficiente: una pérdida más gradual</div>
             </div>
           </div>
         </section>
@@ -576,7 +644,7 @@ export default function CalculadoraMacrosPage() {
               <h4><span aria-hidden="true">🥩</span> Proteínas</h4>
               <p>
                 Esenciales para la construcción y reparación muscular. Cada gramo aporta 4 kcal.
-                Recomendación general: 1,6-2,2g/kg de peso corporal para personas activas.
+                Recomendación general: 1,6-2,2 g/kg de peso corporal para personas activas.
                 Fuentes: carne, pescado, huevos, lácteos, legumbres, tofu.
               </p>
             </div>
@@ -592,7 +660,7 @@ export default function CalculadoraMacrosPage() {
               <h4><span aria-hidden="true">🥑</span> Grasas</h4>
               <p>
                 Esenciales para hormonas, absorción de vitaminas y salud celular. Cada gramo aporta 9 kcal.
-                Nunca bajes de 0,5g/kg de peso. Prioriza grasas insaturadas (aceite de oliva, aguacate,
+                Nunca bajes de 0,5 g/kg de peso. Prioriza grasas insaturadas (aceite de oliva, aguacate,
                 frutos secos) y omega-3 (pescado azul).
               </p>
             </div>
@@ -613,7 +681,7 @@ export default function CalculadoraMacrosPage() {
             <div className={styles.contentCard}>
               <h4><span aria-hidden="true">🔥</span> Definición</h4>
               <p>
-                • Proteína alta (2-2,2g/kg) para preservar músculo<br/>
+                • Proteína alta (2-2,2 g/kg) para preservar músculo<br/>
                 • Déficit moderado (300-500 kcal/día)<br/>
                 • Prioriza alimentos saciantes y bajos en calorías<br/>
                 • Mantén el entrenamiento de fuerza
@@ -624,7 +692,7 @@ export default function CalculadoraMacrosPage() {
               <p>
                 • Superávit controlado (300-500 kcal/día)<br/>
                 • Carbohidratos suficientes para rendir en el gimnasio<br/>
-                • Proteína moderada-alta (1,6-2g/kg)<br/>
+                • Proteína moderada-alta (1,6-2 g/kg)<br/>
                 • Entrena progresivamente más pesado
               </p>
             </div>
@@ -637,9 +705,9 @@ export default function CalculadoraMacrosPage() {
             <details className={styles.faqItem}>
               <summary>¿Cuánta proteína necesito realmente?</summary>
               <p>
-                Para personas sedentarias: 0,8g/kg. Para personas activas o que entrenan: 1,6-2,2g/kg.
-                En definición, se recomienda el rango alto (2-2,2g/kg) para minimizar pérdida muscular.
-                Más de 2,2g/kg no ha demostrado beneficios adicionales en la mayoría de estudios.
+                Para personas sedentarias: 0,8 g/kg. Para personas activas o que entrenan: 1,6-2,2 g/kg.
+                En definición, se recomienda el rango alto (2-2,2 g/kg) para minimizar pérdida muscular.
+                Más de 2,2 g/kg no ha demostrado beneficios adicionales en la mayoría de estudios.
               </p>
             </details>
             <details className={styles.faqItem}>
@@ -686,7 +754,8 @@ export default function CalculadoraMacrosPage() {
               <div className={styles.stepContent}>
                 <strong>Multiplica por tu factor de actividad (TDEE)</strong>
                 <p>Sedentario: TMB × 1,2. Ligero (1-3 días/semana): × 1,375. Moderado (3-5 días): × 1,55.
-                Muy activo (6-7 días intensos): × 1,725. Este es tu gasto total diario de energía.</p>
+                Activo (6-7 días intensos): × 1,725. Muy activo (atleta o trabajo físico muy intenso): × 1,9.
+                Este es tu gasto total diario de energía.</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -709,9 +778,9 @@ export default function CalculadoraMacrosPage() {
             <li className={styles.step}>
               <span className={styles.stepNumber}>5</span>
               <div className={styles.stepContent}>
-                <strong>Fija la grasa mínima (no bajar del 20% del total calórico)</strong>
+                <strong>Fija la grasa mínima (no bajar del 20{ESPACIO_DURO}% del total calórico)</strong>
                 <p>Las grasas son esenciales para las hormonas y la absorción de vitaminas. Nunca bajes de 0,5-0,6 g/kg.
-                Cada gramo de grasa aporta 9 kcal. En definición suelen representar el 20-25% de las calorías totales.</p>
+                Cada gramo de grasa aporta 9 kcal. En definición suelen representar el 20-25{ESPACIO_DURO}% de las calorías totales.</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -732,8 +801,9 @@ export default function CalculadoraMacrosPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📱</span>
               <strong>Usa una app de seguimiento</strong>
-              <p>MyFitnessPal, Cronometer o Yazio permiten registrar alimentos con detalle. La constancia
-              en el registro (incluso parcial) es más efectiva que el perfeccionismo esporádico.</p>
+              <p>Una app de registro de alimentos o una simple libreta te permiten anotar lo que comes con
+              detalle. Registrar con constancia, aunque sea de forma parcial, suele servir más que hacerlo
+              perfecto de vez en cuando.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🥣</span>
@@ -750,8 +820,9 @@ export default function CalculadoraMacrosPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">💧</span>
               <strong>Hidratación como cuarto macro</strong>
-              <p>El agua no tiene calorías pero afecta al rendimiento y al apetito. Bebe al menos 2 litros
-              al día. Confundir sed con hambre es muy común durante las primeras semanas de dieta.</p>
+              <p>El agua no tiene calorías pero afecta al rendimiento y al apetito. Lo que necesitas beber
+              cambia con el calor, la actividad física y tu tamaño corporal: ten agua a mano a lo largo del
+              día y bebe más cuando entrenas o hace calor.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📅</span>
@@ -761,9 +832,10 @@ export default function CalculadoraMacrosPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🍽️</span>
-              <strong>Flexibilidad: el 80/20 funciona</strong>
-              <p>Seguir los macros el 80-90% del tiempo produce excelentes resultados. La rigidez total
-              lleva al abandono. Un 10-20% de comidas más libres no arruina el progreso a largo plazo.</p>
+              <strong>Flexibilidad antes que rigidez</strong>
+              <p>No hace falta clavar los macros todos los días: lo que cuenta es la media de semanas y
+              meses. Una pauta demasiado rígida es más difícil de mantener, y algunas comidas más libres
+              no deshacen el progreso.</p>
             </div>
           </div>
         </section>
@@ -778,7 +850,7 @@ export default function CalculadoraMacrosPage() {
             <li><strong>Usar el peso como única métrica:</strong> El peso fluctúa diariamente por el agua, el glucógeno y la digestión. Mide también perímetros (cintura, cadera) y fotos mensuales para evaluar el progreso real.</li>
             <li><strong>Subestimar las calorías de las grasas:</strong> La grasa tiene 9 kcal/g, más del doble que proteínas y carbohidratos (4 kcal/g). Pequeñas cantidades de aceite, mantequilla o frutos secos suman muchas calorías.</li>
             <li><strong>Priorizar los carbohidratos sobre la proteína:</strong> En definición, reducir proteína para comer más carbohidratos es un error frecuente. La proteína debe establecerse primero, especialmente cuando se pierde peso.</li>
-            <li><strong>Bajar demasiado las grasas:</strong> Bajar las grasas por debajo del 20% del total calórico puede afectar a las hormonas, la absorción de vitaminas liposolubles (A, D, E, K) y el sistema inmune.</li>
+            <li><strong>Bajar demasiado las grasas:</strong> Bajar las grasas por debajo del 20{ESPACIO_DURO}% del total calórico puede afectar a las hormonas, la absorción de vitaminas liposolubles (A, D, E, K) y el sistema inmune.</li>
             <li><strong>No recalcular tras perder o ganar peso:</strong> El TDEE disminuye al perder peso. Si no ajustas las calorías, el déficit se vuelve insuficiente y el progreso se estanca. Recalcula cada 4-6 semanas.</li>
             <li><strong>Seguir macros de otra persona:</strong> Los macros son individuales. No uses los de un influencer o amigo como punto de partida sin calcular los tuyos propios según tu peso, altura, edad y nivel de actividad.</li>
           </ul>

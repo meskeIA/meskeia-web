@@ -825,6 +825,9 @@ function crearServidorMCP(): McpServer {
         `📊 TMB (Mifflin-St Jeor): **${r.tmb} kcal/día**`,
         `🏃 ${actLabel[nivelActividad]} → TDEE: **${r.tdee} kcal/día**`,
         `🎯 Calorías objetivo: **${r.caloriasObjetivo} kcal/día** (${r.ajusteKcal >= 0 ? '+' : ''}${r.ajusteKcal} kcal)`,
+        ...(r.bajoTmb
+          ? [`⚠️ El objetivo queda por debajo de la TMB estimada (${Math.round(r.tmb)} kcal), lo que el cuerpo gasta en reposo: un déficit así debe pautarlo y vigilarlo un profesional sanitario.`]
+          : []),
         '',
         `🍗 Proteínas (${r.ratios.proteinas}%): **${r.macros.proteinas} g/día** (${r.macros.caloriasProteinas} kcal)`,
         `🍞 Carbohidratos (${r.ratios.carbohidratos}%): **${r.macros.carbohidratos} g/día** (${r.macros.caloriasCarbohidratos} kcal)`,
