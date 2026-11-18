@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Mitosis y Meiosis - División Celular Interactiva | meskeIA',
   description:
-    'Simulador visual animado de mitosis (6 fases) y meiosis (9 fases). Observa cómo se dividen las células con cromosomas, huso acromático y crossing-over. Ideal para Bachillerato (España), preparatoria y secundaria (Latinoamérica) y biología universitaria.',
+    'Simulador visual animado de mitosis (6 etapas) y meiosis (9 etapas). Observa cómo se dividen las células con cromosomas, huso acromático y crossing-over. Ideal para Bachillerato (España), preparatoria y secundaria (Latinoamérica) y biología universitaria.',
   keywords:
     'mitosis, meiosis, división celular, cromosomas, crossing-over, gametos, célula, fases mitosis, fases meiosis, EBAU, Bachillerato, preparatoria, secundaria, biología, haploide, diploide',
   authors: [{ name: 'meskeIA' }],

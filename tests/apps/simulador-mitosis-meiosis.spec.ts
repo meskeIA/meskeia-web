@@ -1029,11 +1029,11 @@ test.describe('reinspección 25/09/2026 — hallazgos reparados el 26/09/2026', 
     // fase de la meiosis, y la FAQPage de la propia app dice que la interfase no forma parte de la
     // división. Que pasen no lo hace correcto. Lo que este test protege es que la cifra salga del
     // motor (FASES_MEIOSIS.length) y no a mano; al reparar, cambiar aquí la redacción esperada
-    // («9 etapas» o la que se elija), no borrar el test.
-    await expect(page.locator('td', { hasText: 'meiosis I + meiosis II' })).toContainText('9 fases');
+    // («9 etapas» o la que se elija), no borrar el test. REPARADO (3845, 18/11/2026): «etapas».
+    await expect(page.locator('td', { hasText: 'meiosis I + meiosis II' })).toContainText('9 etapas');
     await expect(page.locator('meta[name="description"]')).toHaveAttribute(
       'content',
-      /meiosis \(9 fases\)/
+      /meiosis \(9 etapas\)/
     );
   });
 
@@ -1303,9 +1303,9 @@ test.describe('Inspector 30/09/2026 — casos a mano', () => {
     // «6/9 fases» del bloque de abajo da por incorrecto. «1 (6 fases)» cuenta la interfase y la
     // citocinesis como fases de la mitosis, y la FAQPage de metadata.ts (reparada en el 2503)
     // dice «La mitosis, o división del núcleo, tiene cuatro fases». Que pasen no lo hace correcto:
-    // al reparar, cambiar aquí la redacción esperada, no borrar el test.
-    await expect(fila).toContainText('1 (6 fases)');
-    await expect(fila).toContainText('2 (meiosis I + meiosis II, 9 fases)');
+    // al reparar, cambiar aquí la redacción esperada, no borrar el test. REPARADO (3845, 18/11/2026).
+    await expect(fila).toContainText('1 (6 etapas)');
+    await expect(fila).toContainText('2 (meiosis I + meiosis II, 9 etapas)');
   });
 
   test('CASO B · práctica en los extremos de la baraja: 2n = 4 y 2n = 16', async ({ page }) => {
@@ -1856,11 +1856,12 @@ test.describe('Inspector 30/10/2026 — hallazgos', () => {
     await esperarHidratacion(page, [ENTRADA_CASOS]);
   });
 
-  test('HALLAZGO (C0087 a) · la tabla y la meta description cuentan interfase y citocinesis como fases', async ({
+  test('3845 (C0087 a) · la tabla y la meta description cuentan interfase y citocinesis como fases', async ({
     page,
   }) => {
-    test.fail();
-    // ABIERTO (inspector 30/10/2026). La propia app, tras el 2503:
+    // REPARADO el 18/11/2026: «6 etapas» y «9 etapas» en la tabla, la meta description, el
+    // catálogo y la etiqueta de las pestañas («Etapas de la división»).
+    // Hallazgo del inspector 30/10/2026. La propia app, tras el 2503:
     //   FAQPage (metadata.ts): «La mitosis, o división del núcleo, tiene cuatro fases: profase (…),
     //   metafase (…), anafase (…) y telofase (…)» y «La interfase … no forma parte de la mitosis».
     //   Truco visible: «la mitosis propiamente dicha es PMAT».
@@ -1877,13 +1878,17 @@ test.describe('Inspector 30/10/2026 — hallazgos', () => {
     expect(celdas[2], 'celda de la meiosis').not.toMatch(/\b9 fases\b/);
     expect(meta).not.toMatch(/mitosis \(6 fases\)/);
     expect(meta).not.toMatch(/meiosis \(9 fases\)/);
+    expect(celdas[1]).toBe('1 (6 etapas)');
+    expect(meta).toMatch(/mitosis \(6 etapas\) y meiosis \(9 etapas\)/);
+    await expect(page.getByRole('tablist', { name: 'Etapas de la división' })).toHaveCount(1);
   });
 
-  test('HALLAZGO (C0087 b) · la membrana plasmática no desaparece: lo que se disuelve es la envoltura nuclear', async ({
+  test('3846 (C0087 b) · la membrana plasmática no desaparece: lo que se disuelve es la envoltura nuclear', async ({
     page,
   }) => {
-    test.fail();
-    // ABIERTO (inspector 30/10/2026). `dibujarCelula` gobierna el CONTORNO DE LA CÉLULA con
+    // REPARADO el 18/11/2026: el contorno de la célula va siempre continuo a 3 px y `fase.membrana`
+    // gobierna solo la envoltura nuclear (discontinua en profase y en telofase).
+    // Hallazgo del inspector 30/10/2026. `dibujarCelula` gobierna el CONTORNO DE LA CÉLULA con
     // `fase.membrana`, que en el motor es el estado de la membrana NUCLEAR («La membrana nuclear
     // comienza a desintegrarse»). A mano: la membrana plasmática está en todas las fases (≥ 85 %
     // del anillo, con margen para un surco de citocinesis); en la profase la que se desintegra es
@@ -1926,11 +1931,11 @@ test.describe('Inspector 30/10/2026 — hallazgos', () => {
     expect({ sinContorno, nucleoContinuoEnProfase }).toEqual({ sinContorno: [], nucleoContinuoEnProfase: [] });
   });
 
-  test('HALLAZGO · con la página traducida, el rótulo de resultado se queda en el de la interfase', async ({
+  test('3847 · con la página traducida, el rótulo de resultado se queda en el de la interfase', async ({
     page,
   }) => {
-    test.fail();
-    // ABIERTO (inspector 30/10/2026). Es la forma del 3297 que 4fc83bcd reparó en los botones de
+    // REPARADO el 18/11/2026: el texto en su propio <span>.
+    // Hallazgo del inspector 30/10/2026. Es la forma del 3297 que 4fc83bcd reparó en los botones de
     // pista y solución: `<span aria-hidden>🔬</span> {resultadoTexto}` deja el texto como nodo
     // suelto junto a su hermano, el traductor lo cambia por <font> y React sigue escribiendo en el
     // nodo retirado. A mano: en la citocinesis de la mitosis el rótulo es «Resultado: 2 células
@@ -1939,6 +1944,11 @@ test.describe('Inspector 30/10/2026 — hallazgos', () => {
     await traducirPagina(page);
     await irAFase(page, 'Citocinesis');
     await expect(rotuloResultado(page)).toContainText('Resultado: 2 células (2n=4)', { timeout: 3000 });
+    // Y en la meiosis terminada, el de 4 células.
+    await traducirPagina(page);
+    await elegirModo(page, 'Meiosis');
+    await irAFase(page, 'Telofase II / Citocinesis II');
+    await expect(rotuloResultado(page)).toContainText('Resultado: 4 células (n=2)', { timeout: 3000 });
   });
 
   test('HALLAZGO · la pregunta del crossing-over está en las dos FAQ con respuestas distintas', async ({

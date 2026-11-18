@@ -177,16 +177,15 @@ function dibujarCelula(
   ctx.arc(cx, cy, radioCell, 0, Math.PI * 2);
   ctx.fillStyle = isDark ? 'rgba(30,40,55,0.85)' : 'rgba(250,252,255,0.92)';
   ctx.fill();
+  // El contorno de la CÉLULA es la membrana plasmática, que no desaparece en ninguna fase: va
+  // siempre continuo y a 3 px. Hasta el 18/11/2026 seguía `fase.membrana`, que en el motor es el
+  // estado de la envoltura NUCLEAR: la célula se quedaba sin contorno en metafase y anafase,
+  // salía discontinua en profase y a 1 px en telofase (lineWidth 0 no vale en canvas). Ahora
+  // `fase.membrana` solo se aplica a la envoltura nuclear, abajo (hallazgo 3846).
   ctx.strokeStyle = COLOR_MEMBRANA;
-  ctx.lineWidth = fase.membrana === 'completa' ? 3 : fase.membrana === 'disolviendose' ? 1.5 : 0;
-  if (fase.membrana === 'disolviendose') {
-    ctx.setLineDash([8, 5]);
-  } else {
-    ctx.setLineDash([]);
-  }
-  if (fase.membrana !== 'ausente') {
-    ctx.stroke();
-  }
+  ctx.lineWidth = 3;
+  ctx.setLineDash([]);
+  ctx.stroke();
   ctx.restore();
 
   // Núcleo central: solo cuando la célula tiene UNO. Con `nucleos: 2` (telofase de la mitosis)
@@ -200,8 +199,10 @@ function dibujarCelula(
     ctx.fillStyle = COLOR_NUCLEO_FILL;
     ctx.fill();
     ctx.strokeStyle = COLOR_MEMBRANA;
-    ctx.lineWidth = fase.membrana === 'formandose' ? 1.5 : 2;
-    if (fase.membrana === 'formandose') ctx.setLineDash([6, 4]);
+    // La envoltura nuclear: discontinua mientras se desintegra (profase) o se forma (3846)
+    const enCambio = fase.membrana === 'formandose' || fase.membrana === 'disolviendose';
+    ctx.lineWidth = enCambio ? 1.5 : 2;
+    if (enCambio) ctx.setLineDash([6, 4]);
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.restore();
@@ -591,7 +592,7 @@ export default function SimuladorMitosisMeiosis() {
         </div>
 
         {/* Barra de fases */}
-        <div className={styles.fasesBar} role="tablist" aria-label="Fases de la división">
+        <div className={styles.fasesBar} role="tablist" aria-label="Etapas de la división">
           {fases.map((f, i) => (
             <button
               key={f.id}
@@ -675,7 +676,9 @@ export default function SimuladorMitosisMeiosis() {
 
         {/* Badge de resultado */}
         <div className={styles.resultadoCell} aria-live="polite" aria-atomic="true">
-          <span aria-hidden="true">🔬</span> {resultadoTexto}
+          {/* El texto, hijo único de su <span>: suelto junto al emoji, con la página traducida se
+              quedaba congelado en el del momento de traducir (hallazgo 3847). */}
+          <span aria-hidden="true">🔬</span> <span>{resultadoTexto}</span>
         </div>
       </main>
 
@@ -729,8 +732,10 @@ export default function SimuladorMitosisMeiosis() {
                 <td>Número de divisiones</td>
                 {/* Del motor, no a mano: al añadir la Profase II la meiosis pasó a 9 pestañas y
                     la tabla siguió diciendo 8 (hallazgo 2154). */}
-                <td>1 ({FASES_MITOSIS.length} fases)</td>
-                <td>2 (meiosis I + meiosis II, {FASES_MEIOSIS.length} fases)</td>
+                {/* «etapas», no «fases»: las 6 y las 9 cuentan la interfase (y la citocinesis), que
+                    la FAQPage y el truco PMAT dejan fuera de la mitosis (hallazgo 3845). */}
+                <td>{`1 (${FASES_MITOSIS.length} etapas)`}</td>
+                <td>{`2 (meiosis I + meiosis II, ${FASES_MEIOSIS.length} etapas)`}</td>
               </tr>
               <tr>
                 <td>Crossing-over</td>
