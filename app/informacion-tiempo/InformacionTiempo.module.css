@@ -352,6 +352,145 @@
   text-transform: capitalize;
 }
 
+/* Cada día es un botón que despliega sus franjas */
+.forecastHint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: -8px 0 12px;
+}
+
+button.forecastDay {
+  font: inherit;
+  color: inherit;
+  width: 100%;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+button.forecastDay:hover {
+  border-color: var(--accent);
+}
+
+button.forecastDay:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.forecastDayActivo {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.forecastChevron {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+.franjasPanel {
+  margin-top: 15px;
+  padding: 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.franjasTitulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+/* Solo la primera letra: «capitalize» daba «18 De Noviembre» */
+.franjasTitulo::first-letter,
+.franjaDesc::first-letter {
+  text-transform: uppercase;
+}
+
+.franjasNota {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+}
+
+.franjasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.franja {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.franjaCabecera {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.franjaNombre {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.franjaHoras {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.franjaEmoji {
+  font-size: 1.8rem;
+}
+
+.franjaTemp {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-texto);
+}
+
+.franjaDesc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.franjaDatos {
+  width: 100%;
+  margin: 6px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.franjaDatos div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.franjaDatos dt {
+  color: var(--text-secondary);
+}
+
+.franjaDatos dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 /* Info Panel */
 .infoPanel {
   background: var(--bg-card);

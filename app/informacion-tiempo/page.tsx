@@ -1,11 +1,18 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import styles from './InformacionTiempo.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { formatNumber, formatPercentage } from '@/lib';
+import {
+  agruparPronostico,
+  type DiaPronostico,
+  type FranjaPronostico,
+  type TramoPronostico,
+} from '@/lib/calculadoras/franjasTiempo';
 
 // API Key de OpenWeatherMap (límite gratuito: 1000 calls/día)
 const OPENWEATHER_API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
@@ -44,33 +51,28 @@ interface WeatherData {
   timezone: number;
 }
 
-interface ForecastItem {
-  dt: number;
-  main: {
-    temp: number;
-    temp_min: number;
-    temp_max: number;
-    humidity: number;
-  };
-  weather: Array<{
-    id: number;
-    main: string;
-    description: string;
-    icon: string;
-  }>;
-  wind: {
-    speed: number;
-  };
-  dt_txt: string;
-}
-
+// Respuesta de /forecast: 40 tramos de 3 h. `city.timezone` es el desfase de la ciudad
+// respecto a UTC, en segundos; `dt_txt` va en UTC y por eso no se usa para agrupar
 interface ForecastData {
-  list: ForecastItem[];
+  list: TramoPronostico[];
   city: {
     name: string;
     country: string;
+    timezone: number;
   };
 }
+
+const ID_PANEL_FRANJAS = 'franjas-dia';
+
+// Fecha de un día local de la ciudad (no del navegador): se construye en UTC y se formatea en UTC
+const fechaDelDia = (dia: DiaPronostico, opciones: Intl.DateTimeFormatOptions): string =>
+  new Date(Date.UTC(dia.anio, dia.mes - 1, dia.dia, 12)).toLocaleDateString('es-ES', {
+    ...opciones,
+    timeZone: 'UTC',
+  });
+
+const rangoTemperatura = (f: FranjaPronostico): string =>
+  f.tempMin === f.tempMax ? `${f.tempMax}°` : `${f.tempMin}° – ${f.tempMax}°`;
 
 // Ciudades populares para acceso rápido
 const CIUDADES_POPULARES = [
@@ -117,16 +119,6 @@ const formatTime = (timestamp: number, timezone: number): string => {
   });
 };
 
-// Formatear fecha
-const formatDate = (timestamp: number): string => {
-  const date = new Date(timestamp * 1000);
-  return date.toLocaleDateString('es-ES', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short'
-  });
-};
-
 export default function InformacionTiempoPage() {
   const [ciudad, setCiudad] = useState('');
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -134,6 +126,7 @@ export default function InformacionTiempoPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [historial, setHistorial] = useState<string[]>([]);
+  const [diaAbierto, setDiaAbierto] = useState<string | null>(null);
 
   // Cargar historial al inicio
   useEffect(() => {
@@ -201,6 +194,7 @@ export default function InformacionTiempoPage() {
       if (forecastRes.ok) {
         const forecastData = await forecastRes.json();
         setForecast(forecastData);
+        setDiaAbierto(null);
       }
 
       guardarHistorial(weatherData.name);
@@ -237,6 +231,7 @@ export default function InformacionTiempoPage() {
       if (forecastRes.ok) {
         const forecastData = await forecastRes.json();
         setForecast(forecastData);
+        setDiaAbierto(null);
       }
 
       guardarHistorial(weatherData.name);
@@ -248,38 +243,17 @@ export default function InformacionTiempoPage() {
     }
   };
 
-  // Obtener pronóstico diario (agrupar por día)
-  const getPronosticoDiario = (): { fecha: string; tempMin: number; tempMax: number; icon: string; desc: string }[] => {
-    if (!forecast) return [];
-
-    const dias: { [key: string]: ForecastItem[] } = {};
-
-    forecast.list.forEach(item => {
-      const fecha = item.dt_txt.split(' ')[0];
-      if (!dias[fecha]) dias[fecha] = [];
-      dias[fecha].push(item);
-    });
-
-    return Object.entries(dias).slice(0, 5).map(([fecha, items]) => {
-      const temps = items.map(i => i.main.temp);
-      const midday = items.find(i => i.dt_txt.includes('12:00')) || items[0];
-
-      return {
-        fecha: formatDate(items[0].dt),
-        tempMin: Math.round(Math.min(...temps)),
-        tempMax: Math.round(Math.max(...temps)),
-        icon: midday.weather[0].icon,
-        desc: midday.weather[0].description,
-      };
-    });
-  };
+  // Pronóstico por días y franjas, en la hora local de la ciudad consultada
+  const pronosticoDiario = useMemo(
+    () => (forecast ? agruparPronostico(forecast.list, forecast.city.timezone ?? 0) : []),
+    [forecast]
+  );
+  const diaSeleccionado = pronosticoDiario.find(d => d.clave === diaAbierto) ?? null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     buscarCiudad(ciudad);
   };
-
-  const pronosticoDiario = getPronosticoDiario();
 
   return (
     <div className={styles.container}>
@@ -456,20 +430,82 @@ export default function InformacionTiempoPage() {
             {pronosticoDiario.length > 0 && (
               <div className={styles.forecastPanel}>
                 <h3 className={styles.forecastTitle}>Pronóstico 5 días</h3>
+                <p className={styles.forecastHint}>
+                  Toca un día para verlo por franjas: mañana, tarde y noche.
+                </p>
                 <div className={styles.forecastGrid}>
-                  {pronosticoDiario.map((dia, index) => (
-                    <div key={index} className={styles.forecastDay}>
-                      <span className={styles.forecastDate}>{dia.fecha}</span>
-                      <span className={styles.forecastEmoji}>
-                        {getWeatherEmoji(dia.icon)}
-                      </span>
-                      <span className={styles.forecastTemp}>
-                        {dia.tempMax}° / {dia.tempMin}°
-                      </span>
-                      <span className={styles.forecastDesc}>{dia.desc}</span>
-                    </div>
-                  ))}
+                  {pronosticoDiario.map((dia) => {
+                    const abierto = dia.clave === diaAbierto;
+                    return (
+                      <button
+                        type="button"
+                        key={dia.clave}
+                        className={`${styles.forecastDay} ${abierto ? styles.forecastDayActivo : ''}`}
+                        aria-expanded={abierto}
+                        aria-controls={abierto ? ID_PANEL_FRANJAS : undefined}
+                        onClick={() => setDiaAbierto(abierto ? null : dia.clave)}
+                      >
+                        <span className={styles.forecastDate}>
+                          {fechaDelDia(dia, { weekday: 'short', day: 'numeric', month: 'short' })}
+                        </span>
+                        <span className={styles.forecastEmoji} aria-hidden="true">
+                          {getWeatherEmoji(dia.icon)}
+                        </span>
+                        <span className={styles.forecastTemp}>
+                          {dia.tempMax}° / {dia.tempMin}°
+                        </span>
+                        <span className={styles.forecastDesc}>{dia.desc}</span>
+                        <span className={styles.forecastChevron} aria-hidden="true">
+                          {abierto ? '▴' : '▾'}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
+
+                {diaSeleccionado && (
+                  <section
+                    id={ID_PANEL_FRANJAS}
+                    className={styles.franjasPanel}
+                    aria-label={`Franjas del ${fechaDelDia(diaSeleccionado, { weekday: 'long', day: 'numeric', month: 'long' })}`}
+                  >
+                    <h4 className={styles.franjasTitulo}>
+                      {fechaDelDia(diaSeleccionado, { weekday: 'long', day: 'numeric', month: 'long' })}
+                    </h4>
+                    <p className={styles.franjasNota}>
+                      Horas locales de {forecast?.city.name}. Solo aparecen las franjas con previsión disponible.
+                    </p>
+                    <div className={styles.franjasGrid}>
+                      {diaSeleccionado.franjas.map((f) => (
+                        <div key={f.clave} className={styles.franja}>
+                          <div className={styles.franjaCabecera}>
+                            <span className={styles.franjaNombre}>{f.nombre}</span>
+                            <span className={styles.franjaHoras}>{f.horas}</span>
+                          </div>
+                          <span className={styles.franjaEmoji} aria-hidden="true">
+                            {getWeatherEmoji(f.icon)}
+                          </span>
+                          <span className={styles.franjaTemp}>{rangoTemperatura(f)}</span>
+                          <span className={styles.franjaDesc}>{f.desc}</span>
+                          <dl className={styles.franjaDatos}>
+                            <div>
+                              <dt>Prob. de lluvia</dt>
+                              <dd>{formatPercentage(f.probLluvia, 0)}</dd>
+                            </div>
+                            <div>
+                              <dt>Precipitación</dt>
+                              <dd>{formatNumber(f.precipitacionMm, 1)} mm</dd>
+                            </div>
+                            <div>
+                              <dt>Viento máx.</dt>
+                              <dd>{f.vientoMaxKmh} km/h</dd>
+                            </div>
+                          </dl>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
               </div>
             )}
           </>
