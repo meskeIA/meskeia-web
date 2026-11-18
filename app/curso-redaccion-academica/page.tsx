@@ -61,15 +61,6 @@ export default function CursoRedaccionAcademicaPage() {
           Guía práctica para escribir textos académicos de calidad.
           Aprende a estructurar tu TFG, TFM, tesis o artículo científico con pautas aplicables desde el primer día.
         </p>
-        <a
-          href="/videos/curso-redaccion-academica.mp4"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.videoButton}
-        >
-          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
-          Ver introducción en video
-        </a>
       </header>
 
       <LegalNotice />

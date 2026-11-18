@@ -36,15 +36,6 @@ export default function CursoTeoriaPoliticaPage() {
           las teorías contemporáneas de la justicia. Los grandes pensadores que
           moldearon nuestra forma de entender el poder, el Estado y la sociedad.
         </p>
-        <a
-          href="/videos/curso-teoria-politica.mp4"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.videoButton}
-        >
-          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
-          Ver introducción en video
-        </a>
       </header>
 
       <LegalNotice />

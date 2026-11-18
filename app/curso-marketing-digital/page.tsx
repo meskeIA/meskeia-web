@@ -51,15 +51,6 @@ export default function CursoMarketingDigitalPage() {
           Domina el marketing digital en 2025: desde fundamentos de branding hasta IA y automatización.
           Estrategias prácticas para emprendedores, marketers y profesionales que quieren resultados reales.
         </p>
-        <a
-          href="/videos/curso-marketing-digital.mp4"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.videoButton}
-        >
-          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
-          Ver introducción en video
-        </a>
       </header>
 
       <LegalNotice />

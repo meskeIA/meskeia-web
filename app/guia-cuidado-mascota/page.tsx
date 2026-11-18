@@ -21,15 +21,6 @@ function GuideContent() {
           Todo lo que necesitas saber para cuidar a tu perro o gato.
           Consejos prácticos, fáciles y cercanos para dueños de todos los niveles.
         </p>
-        <a
-          href="/videos/guia-cuidado-mascota.mp4"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.videoButton}
-        >
-          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
-          Ver introducción en video
-        </a>
       </header>
 
       <LegalNotice lastUpdated="2026-02-02" />

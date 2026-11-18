@@ -47,15 +47,6 @@ export default function CursoPensamientoCientificoPage() {
           Aprende a pensar como un científico: método científico, pensamiento crítico,
           falacias lógicas y cómo aplicar la ciencia en tu vida cotidiana
         </p>
-        <a
-          href="/videos/curso-pensamiento-cientifico.mp4"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.videoButton}
-        >
-          <span className={styles.videoIcon} aria-hidden="true">▶️</span>
-          Ver introducción en video
-        </a>
       </header>
 
       <LegalNotice />
