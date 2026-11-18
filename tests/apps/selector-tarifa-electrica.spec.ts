@@ -681,8 +681,10 @@ test('cabo C0204 · 3: ya no dice «14 festivos nacionales al año»', async ({ 
 });
 
 test('cabo C0204 · 3: los festivos de valle todo el día son los nacionales de fecha fija no sustituibles, no todos', async ({ page }) => {
-  test.fail();
-  // ABIERTO (cabo C0204, 11/11/2026): la tarjeta «Tres franjas horarias (2.0TD)», la FAQ «¿Las
+  // REPARADO el 18/11/2026 (hallazgo 4537, decisión del usuario en /reparar pendientes): las
+  // cuatro bocas leen DIAS_VALLE_COMPLETO_2_0TD de data/fiscal/peajes-electricos.ts, y la FAQ de
+  // los festivos dice que Viernes Santo y los sustituidos se facturan como laborables.
+  // Era (cabo C0204, 11/11/2026): la tarjeta «Tres franjas horarias (2.0TD)», la FAQ «¿Las
   // franjas horarias cambian en verano?», la FAQ «¿Los festivos locales cuentan como valle?»
   // («Solo los festivos nacionales tienen tarifa valle las 24 horas») y el FAQPage de la 2.0TD dan
   // valle todo el día en cualquier festivo nacional. La Circular 3/2020 (art. 7.3) excluye los
@@ -697,6 +699,10 @@ test('cabo C0204 · 3: los festivos de valle todo el día son los nacionales de 
   expect(frases.length).toBeGreaterThan(0);
   const sinAcotar = frases.filter((f) => !/fecha fija/i.test(f));
   expect(sinAcotar, 'frases que dan valle todo el día en cualquier festivo nacional').toEqual([]);
+  // Las cuatro bocas: tarjeta, FAQ de verano, FAQ de festivos y FAQPage.
+  expect(frases.filter((f) => /festivos nacionales de fecha fija no sustituibles/.test(f)).length).toBeGreaterThanOrEqual(4);
+  expect(texto).toContain('como Viernes Santo');
+  expect(texto).toContain('se facturan como laborables');
 });
 
 test('cabo C0204 · 4: la pregunta 2 no ofrece «No» a la 2.0TD, que tiene todo suministro doméstico de hasta 15 kW', async ({ page }) => {

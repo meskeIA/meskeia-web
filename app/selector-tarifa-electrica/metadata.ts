@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { DIAS_VALLE_COMPLETO_2_0TD } from '@/data/fiscal/peajes-electricos';
 
 /**
  * «¿Cómo se cambia de tarifa?», en UN solo sitio (hallazgo 3173, 20/10/2026).
@@ -84,7 +85,7 @@ export const faqJsonLd = {
       name: '¿Cómo funciona la discriminación horaria en la tarifa 2.0TD?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La tarifa 2.0TD divide el día en tres franjas horarias con precios distintos: punta (de 10 a 14 h y de 18 a 22 h en días laborables), llano (de 8 a 10 h, de 14 a 18 h y de 22 a 24 h en días laborables) y valle (de 0 a 8 h todos los días y las 24 horas en fines de semana y festivos nacionales). Consumir en horas valle puede costar hasta tres veces menos que en hora punta, por lo que hogares con flexibilidad horaria se benefician significativamente de esta tarifa.',
+        text: `La tarifa 2.0TD divide el día en tres franjas horarias con precios distintos: punta (de 10 a 14 h y de 18 a 22 h en días laborables), llano (de 8 a 10 h, de 14 a 18 h y de 22 a 24 h en días laborables) y valle (de 0 a 8 h en días laborables y las 24 horas en ${DIAS_VALLE_COMPLETO_2_0TD}). Consumir en horas valle puede costar hasta tres veces menos que en hora punta, por lo que hogares con flexibilidad horaria se benefician significativamente de esta tarifa.`,
       },
     },
     {

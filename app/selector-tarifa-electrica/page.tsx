@@ -13,6 +13,13 @@ import {
   RegionBadge,
 } from '@/components';
 import { CATEGORIAS_AYUDAS_PERSONAS } from '@/data/fiscal/ayudas-personas';
+import DataReference from '@/components/DataReference';
+import {
+  FISCAL_PEAJES_ELECTRICOS_META,
+  DIAS_VALLE_COMPLETO_2_0TD,
+  FESTIVOS_FUERA_DEL_VALLE_2_0TD,
+  FRANJAS_2_0TD_PENINSULA as FRANJAS,
+} from '@/data/fiscal/peajes-electricos';
 import { PREGUNTA_CAMBIO_TARIFA, RESPUESTA_CAMBIO_TARIFA } from './metadata';
 
 // ─── Tipos ─────────────────────────────────────────────────────────────────────
@@ -367,6 +374,12 @@ export default function SelectorTarifaElectricaPage() {
           comercializadora. Para una comparativa exacta, consulta tu factura actual y las
           ofertas disponibles en el <strong>comparador de la CNMC</strong>.
         </DisclaimerCard>
+        <DataReference
+          normativa="Peaje 2.0TD: franjas horarias y días de valle"
+          fuente={FISCAL_PEAJES_ELECTRICOS_META.fuente}
+          verificado={FISCAL_PEAJES_ELECTRICOS_META.verificado}
+          urlOficial={FISCAL_PEAJES_ELECTRICOS_META.urlOficial}
+        />
 
         {/* ─── RESULTADO ─── */}
         {mostrarResultado && resultado && (
@@ -558,10 +571,12 @@ export default function SelectorTarifaElectricaPage() {
               <div className={styles.contentCard}>
                 <h4>Tres franjas horarias (2.0TD)</h4>
                 <p>
-                  <strong>Punta</strong> (la más cara): 10-14 h y 18-22 h entre semana.{' '}
-                  <strong>Llano</strong>: 8-10 h, 14-18 h y 22-24 h entre semana.{' '}
-                  <strong>Valle</strong> (la más barata): 0-8 h entre semana y todo el
-                  fin de semana y festivos nacionales.
+                  {/* Franjas y días de valle desde data/fiscal (Circular 3/2020, art. 7.3, hallazgo 4537) */}
+                  <strong>Punta</strong> (la más cara): {FRANJAS.punta} entre semana.{' '}
+                  <strong>Llano</strong>: {FRANJAS.llano} entre semana.{' '}
+                  <strong>Valle</strong> (la más barata): {FRANJAS.valle} entre semana y todo el
+                  día los {DIAS_VALLE_COMPLETO_2_0TD}. Son las franjas de la península, Baleares y
+                  Canarias.
                 </p>
               </div>
               <div className={styles.contentCard}>
@@ -762,18 +777,18 @@ export default function SelectorTarifaElectricaPage() {
               <details className={styles.faqItem}>
                 <summary>¿Las franjas horarias cambian en verano?</summary>
                 <p>
-                  No. Las franjas horarias de la 2.0TD son fijas todo el año: punta (10-14 h y
-                  18-22 h de lunes a viernes), llano (8-10 h, 14-18 h y 22-24 h de lunes a
-                  viernes) y valle (0-8 h de lunes a viernes y todo el sábado, domingo y festivo
-                  nacional). No hay cambio estacional.
+                  No. Las franjas horarias de la 2.0TD son fijas todo el año: punta ({FRANJAS.punta}{' '}
+                  de lunes a viernes laborables), llano ({FRANJAS.llano} de lunes a viernes
+                  laborables) y valle ({FRANJAS.valle} de lunes a viernes laborables y todo el día
+                  los {DIAS_VALLE_COMPLETO_2_0TD}). No hay cambio estacional.
                 </p>
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Los festivos locales cuentan como valle?</summary>
                 <p>
-                  No. Solo los festivos nacionales tienen tarifa valle las 24 horas. Los festivos
-                  autonómicos y locales se tarifican como día laborable normal. Consulta el
-                  calendario oficial de Red Eléctrica para las fechas exactas.
+                  No. Son valle las 24 horas los {DIAS_VALLE_COMPLETO_2_0TD}.{' '}
+                  {FESTIVOS_FUERA_DEL_VALLE_2_0TD}. Consulta el calendario oficial de Red
+                  Eléctrica para las fechas exactas.
                 </p>
               </details>
               <details className={styles.faqItem}>
