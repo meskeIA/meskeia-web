@@ -839,7 +839,8 @@ test.describe('Inspección 24/09/2026 — casos para clase contra el modelo, lí
     // Cifra y delta de la barra de herbívoros (antes 2,38:1 y 1,98:1): pradera + contaminación 70 % → «30 (-10)».
     await ponerEscenario(page, 'Pradera', 'Contaminación del agua', '0.7');
     expect(await contrasteDe(page, 'span[style*="color"]:has-text("30")')).toBeGreaterThanOrEqual(4.5);
-    expect(await page.locator('span[style*="color"]:has-text("30") > span').evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+    // Desde el 3906 (18/11/2026) la cifra también va en su <span>: el delta es el último.
+    expect(await page.locator('span[style*="color"]:has-text("30") > span:last-child').evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
     // Título del panel (antes 4,11:1 con var(--primary) como texto).
     expect(await contrasteDe(page, 'h2:text-is("¿Qué está pasando?")')).toBeGreaterThanOrEqual(4.5);
   });
@@ -1249,6 +1250,7 @@ test.describe('Inspector 30/09/2026 — móvil 390×844', () => {
  *   · accesibilidad, bajo — el deslizador anuncia «0.4», no «40 %».
  *   · operativa, medio — página traducida: pirámide, barras y etiqueta con la cifra vieja.
  *   · operativa, medio — página traducida: ficha, situación de partida y veredicto de los casos.
+ * REPARADOS el 18/11/2026 los cuatro medios: 3902 (con otro esperado), 3904, 3906 y 3907.
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 import { type Locator } from '@playwright/test';
@@ -1286,7 +1288,8 @@ test.describe('Inspector 01/11/2026 — escritorio', () => {
     // tiene que verse pegado a la cifra, «(+8)».
     expect(await cifrasVisibles(page)).toEqual(['86 (-14)', '50 (+8)', '12 (-4)', '5 (-1)']);
     expect(await piramideVisible(page)).toEqual(['5 ind. rel.', '12 ind. rel.', '50 ind. rel.', '86 ind. rel.']);
-    await expect(enEscalon(page, 0)).toContainText('Leones, cocodrilos');
+    // Era «Leones, cocodrilos» hasta el 3902 (18/11/2026)
+    await expect(enEscalon(page, 0)).toContainText('Águilas marciales, serpentarios');
     await expect(page.locator('[role="status"]')).toContainText(
       'La caza ilegal reduce la población de carnívoros. Los productores se han reducido un 14 %, los herbívoros han aumentado un 20 %, los carnívoros se han reducido un 28 % y los superdepredadores un 20 %.'
     );
@@ -1315,20 +1318,35 @@ test.describe('Inspector 01/11/2026 — escritorio', () => {
     );
   });
 
-  test('ABIERTO (contenido, medio) · en el bosque, los superdepredadores no comen a los lobos: la tabla los pone en la cima', async ({ page }) => {
-    test.fail();
-    // Hallazgo del 01/11/2026. Caso: Bosque Templado → la pirámide pone «Osos, águilas reales» como
-    // superdepredadores encima de «Lobos, linces, búhos», y el caso 5 lo explica así: «Los
+  test('3902 · en el bosque y la sabana, los superdepredadores comen a los carnívoros de abajo y son la cima de la tabla', async ({ page }) => {
+    // Hallazgo del 01/11/2026. Caso: Bosque Templado → la pirámide ponía «Osos, águilas reales»
+    // como superdepredadores encima de «Lobos, linces, búhos», y el caso 5 lo explica así: «Los
     // superdepredadores se alimentan de los carnívoros: con menos alimento, bajan de 4 a 3». La
-    // tabla comparativa de la misma página da el «Lobo gris» como depredador tope del bosque
-    // templado. Esperado: la cima de la pirámide del bosque es la de la tabla (el lobo) y nadie
-    // pone a los osos a comer lobos.
+    // tabla comparativa daba el «Lobo gris» como depredador tope del bosque templado. La sabana
+    // tenía la misma forma (leones y cocodrilos sobre guepardos, leopardos e hienas).
+    // REPARADO el 18/11/2026 con OTRO esperado que el del acta: el acta pedía al lobo en la cima de
+    // la pirámide, pero el lobo vive de ciervos, no de los carnívoros del escalón de abajo, y el
+    // modelo hace que la cima coma de ese escalón. Ahora cada escalón come del de abajo (erizos,
+    // comadrejas y petirrojos de orugas y ratones; búhos reales y azores de ellos; en la sabana,
+    // mangostas, serpientes y lagartos de roedores y saltamontes, y águilas marciales y serpentarios
+    // de ellos), la tabla pone esa misma cima y una nota explica dónde irían el lobo y el león.
     await page.getByRole('group', { name: 'Seleccionar ecosistema' }).getByRole('button', { name: 'Bosque Templado', exact: true }).click();
-    const tope = (await page.locator('table tr', { hasText: 'Bosque Templado' }).locator('td').nth(3).textContent()) ?? '';
-    expect(tope.trim()).toBe('Lobo gris');
-    const cima = (await enEscalon(page, 0).locator('[class*="nivelEjemplos"]').textContent()) ?? '';
-    expect(cima, 'superdepredadores del bosque').toContain('Lobo');
-    expect(cima, 'superdepredadores del bosque').not.toContain('Osos');
+    await expect(enEscalon(page, 0).locator('[class*="nivelEjemplos"]')).toHaveText('Búhos reales, azores');
+    await expect(enEscalon(page, 1).locator('[class*="nivelEjemplos"]')).toHaveText('Erizos, comadrejas, petirrojos');
+    await expect(enEscalon(page, 2).locator('[class*="nivelEjemplos"]')).toHaveText('Ciervos, ratones de campo, orugas');
+    const tope = async (ecosistema: string) =>
+      ((await page.locator('table tr', { hasText: ecosistema }).locator('td').nth(3).textContent()) ?? '').trim();
+    expect(await tope('Bosque Templado')).toBe('Búho real, azor');
+
+    await page.getByRole('group', { name: 'Seleccionar ecosistema' }).getByRole('button', { name: 'Sabana', exact: true }).click();
+    await expect(enEscalon(page, 0).locator('[class*="nivelEjemplos"]')).toHaveText('Águilas marciales, serpentarios');
+    await expect(enEscalon(page, 1).locator('[class*="nivelEjemplos"]')).toHaveText('Mangostas, serpientes, lagartos');
+    expect(await tope('Sabana')).toBe('Águila marcial');
+    expect(await laPaginaDice(page, 'el lobo, el lince o el león, no tienen quien los cace')).toBe(true);
+    // Ninguna pirámide pone osos ni leones encima de lobos o guepardos.
+    for (const nombre of ['Osos', 'Leones', 'Lobos, linces', 'Guepardos']) {
+      expect(await laPaginaDice(page, nombre), nombre).toBe(false);
+    }
   });
 
   test('ABIERTO (contenido, bajo) · los descomponedores no son «el nivel trófico oculto» si no ocupan un escalón', async ({ page }) => {
@@ -1345,8 +1363,9 @@ test.describe('Inspector 01/11/2026 — escritorio', () => {
     expect(await laPaginaDice(page, 'son el «nivel trófico oculto»'), 'son el «nivel trófico oculto»').toBe(false);
   });
 
-  test('ABIERTO (contenido, medio) · las preguntas del FAQPage que están en la FAQ visible dicen lo mismo', async ({ page }) => {
-    test.fail();
+  test('3904 · las preguntas del FAQPage que están en la FAQ visible dicen lo mismo', async ({ page }) => {
+    // REPARADO el 18/11/2026: las dos bocas leen faq.ts (FAQ_CASCADA_TROFICA y FAQ_ESPECIE_CLAVE),
+    // con la definición de los niveles no adyacentes y los ejemplos de las dos versiones.
     // Hallazgo del 01/11/2026. «¿Qué es una cascada trófica?» y «¿Qué es una especie clave?» están en
     // la FAQ visible y en el FAQPage con respuestas distintas; la de la cascada, con otra definición
     // («en los niveles no adyacentes» frente a «sobre los demás niveles»). Reparación: UNA constante
@@ -1532,8 +1551,10 @@ test.describe('Inspector 01/11/2026 — página traducida', () => {
     expect(errores).toEqual([]);
   });
 
-  test('ABIERTO (operativa, medio) · traducida, la pirámide, las barras y la etiqueta del deslizador siguen a la perturbación', async ({ page }) => {
-    test.fail();
+  test('3906 · traducida, la pirámide, las barras y la etiqueta del deslizador siguen a la perturbación', async ({ page }) => {
+    // REPARADO el 18/11/2026: cada cifra, hija única de su elemento (la pirámide en una sola
+    // cadena con «ind. rel.», la cifra de la barra y el delta entero en su <span>, la etiqueta en
+    // una sola cadena con el %).
     // Hallazgo del 01/11/2026 (forma del cabo C0243). page.tsx pinta la cifra junto a otro texto
     // en el mismo elemento: «{cifra} ind. rel.» en la pirámide, «{cifra}<span delta>» en la barra,
     // «({signo}{delta})» y «{n}&nbsp;%» en la etiqueta. React escribe en el nodo que el traductor
@@ -1558,8 +1579,9 @@ test.describe('Inspector 01/11/2026 — página traducida', () => {
     );
   });
 
-  test('ABIERTO (operativa, medio) · traducida, la ficha, la situación de partida y el veredicto siguen al caso', async ({ page }) => {
-    test.fail();
+  test('3907 · traducida, la ficha, la situación de partida y el veredicto siguen al caso', async ({ page }) => {
+    // REPARADO el 18/11/2026: el nombre del ecosistema, «Intensidad: …», la partida y el texto
+    // del veredicto, cada uno hijo único de su elemento en CasosAula.tsx.
     // Hallazgo del 01/11/2026 (forma del cabo C0243, en CasosAula.tsx; 4fc83bcd solo arregló los
     // rótulos de ayuda). Caso 1 acertado («Baja»), caso 10 fallado («Los productores»), traducir y
     // volver al caso 1. Esperado: lo de la página sin traducir, «🌅 Sabana · Sequía · Intensidad:

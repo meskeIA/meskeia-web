@@ -68,9 +68,15 @@ export const ECOSISTEMAS: Ecosistema[] = [
     emoji: '🌲',
     niveles: [
       { nombre: 'Productores', emoji: '🌳', ejemplos: 'Robles, hayas, arbustos', poblacion: 100, energiaPorcentaje: 100 },
-      { nombre: 'Herbívoros', emoji: '🦌', ejemplos: 'Ciervos, jabatos, orugas', poblacion: 35, energiaPorcentaje: 10 },
-      { nombre: 'Carnívoros', emoji: '🐺', ejemplos: 'Lobos, linces, búhos', poblacion: 12, energiaPorcentaje: 1 },
-      { nombre: 'Superdepredadores', emoji: '🐻', ejemplos: 'Osos, águilas reales', poblacion: 4, energiaPorcentaje: 0.1 },
+      // Hasta el 18/11/2026 los superdepredadores eran «Osos, águilas reales» sobre «Lobos, linces,
+      // búhos»: el oso no come lobos, y el modelo (y el caso 5) hacen que los superdepredadores
+      // vivan de los carnívoros del escalón de abajo (hallazgo 3902). Ahora cada escalón come del
+      // de abajo: el erizo y el petirrojo comen orugas, la comadreja ratones, y el búho real y el
+      // azor cazan erizos, comadrejas y aves pequeñas. El lobo y el lince viven de herbívoros: en
+      // esta pirámide irían con los carnívoros (lo explica la nota de la tabla comparativa).
+      { nombre: 'Herbívoros', emoji: '🦌', ejemplos: 'Ciervos, ratones de campo, orugas', poblacion: 35, energiaPorcentaje: 10 },
+      { nombre: 'Carnívoros', emoji: '🦔', ejemplos: 'Erizos, comadrejas, petirrojos', poblacion: 12, energiaPorcentaje: 1 },
+      { nombre: 'Superdepredadores', emoji: '🦉', ejemplos: 'Búhos reales, azores', poblacion: 4, energiaPorcentaje: 0.1 },
     ],
   },
   {
@@ -97,9 +103,13 @@ export const ECOSISTEMAS: Ecosistema[] = [
     emoji: '🌅',
     niveles: [
       { nombre: 'Productores', emoji: '🌾', ejemplos: 'Acacia, gramíneas tropicales', poblacion: 100, energiaPorcentaje: 100 },
-      { nombre: 'Herbívoros', emoji: '🦓', ejemplos: 'Cebras, ñus, jirafas', poblacion: 42, energiaPorcentaje: 10 },
-      { nombre: 'Carnívoros', emoji: '🐆', ejemplos: 'Guepardos, leopardos, hienas', poblacion: 16, energiaPorcentaje: 1 },
-      { nombre: 'Superdepredadores', emoji: '🦁', ejemplos: 'Leones, cocodrilos', poblacion: 6, energiaPorcentaje: 0.1 },
+      // Hasta el 18/11/2026, «Leones, cocodrilos» sobre «Guepardos, leopardos, hienas», que no son
+      // su alimento (la misma forma que el bosque, hallazgo 3902). Ahora la mangosta, la serpiente y
+      // el lagarto comen roedores y saltamontes, y el águila marcial y el serpentario los cazan a
+      // ellos. El león vive de cebras y ñus: en esta pirámide iría con los carnívoros.
+      { nombre: 'Herbívoros', emoji: '🦓', ejemplos: 'Cebras, ñus, roedores, saltamontes', poblacion: 42, energiaPorcentaje: 10 },
+      { nombre: 'Carnívoros', emoji: '🐍', ejemplos: 'Mangostas, serpientes, lagartos', poblacion: 16, energiaPorcentaje: 1 },
+      { nombre: 'Superdepredadores', emoji: '🦅', ejemplos: 'Águilas marciales, serpentarios', poblacion: 6, energiaPorcentaje: 0.1 },
     ],
   },
 ];

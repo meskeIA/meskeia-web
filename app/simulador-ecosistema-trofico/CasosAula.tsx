@@ -212,12 +212,15 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
           {practica ? 'Ejercicio de práctica' : `Caso ${caso.id} · ${caso.titulo}`}
         </h3>
 
+        {/* Cada texto variable, hijo único de su elemento: con la página traducida, el nombre
+            suelto junto al emoji, «Intensidad: {…}», la partida y el veredicto se quedaban con el
+            texto del caso anterior (hallazgo 3907). */}
         <p className={styles.aulaFicha}>
           <span className={styles.aulaFichaDato}>
-            <span aria-hidden="true">{ecosistema.emoji}</span> {ecosistema.nombre}
+            <span aria-hidden="true">{ecosistema.emoji}</span> <span>{ecosistema.nombre}</span>
           </span>
           <span className={styles.aulaFichaDato}>{evento.nombre}</span>
-          <span className={styles.aulaFichaDato}>Intensidad: {porcentaje(datos.intensidad)}</span>
+          <span className={styles.aulaFichaDato}>{`Intensidad: ${porcentaje(datos.intensidad)}`}</span>
         </p>
 
         {/* `aria-live` y NO `role="status"`: un enunciado no es un mensaje de estado, y el panel
@@ -227,8 +230,7 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
         </p>
 
         <p className={styles.aulaPartida}>
-          Situación de partida:{' '}
-          {ecosistema.niveles.map(n => `${n.nombre.toLowerCase()} ${formatNumber(n.poblacion, 0)}`).join(' · ')}
+          {`Situación de partida: ${ecosistema.niveles.map(n => `${n.nombre.toLowerCase()} ${formatNumber(n.poblacion, 0)}`).join(' · ')}`}
         </p>
 
         <fieldset className={styles.aulaOpciones} disabled={bloqueada}>
@@ -301,13 +303,15 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
             <span aria-hidden="true">
               {veredicto.correcto ? '✅' : veredicto.motivo === 'vacia' ? '✏️' : '❌'}
             </span>{' '}
-            {veredicto.correcto
-              ? `¡Correcto! La respuesta es «${pregunta.respuestaTexto}».`
-              : veredicto.motivo === 'vacia'
-                ? 'Elige una de las tres opciones antes de comprobar.'
-                : veredicto.motivo === 'no-disponible'
-                  ? 'Este caso no está disponible.'
-                  : `No. Predijiste «${textoElegido}» y la respuesta es «${pregunta.respuestaTexto}». Cárgalo en el simulador y mira por qué.`}
+            <span>
+              {veredicto.correcto
+                ? `¡Correcto! La respuesta es «${pregunta.respuestaTexto}».`
+                : veredicto.motivo === 'vacia'
+                  ? 'Elige una de las tres opciones antes de comprobar.'
+                  : veredicto.motivo === 'no-disponible'
+                    ? 'Este caso no está disponible.'
+                    : `No. Predijiste «${textoElegido}» y la respuesta es «${pregunta.respuestaTexto}». Cárgalo en el simulador y mira por qué.`}
+            </span>
           </p>
         )}
 

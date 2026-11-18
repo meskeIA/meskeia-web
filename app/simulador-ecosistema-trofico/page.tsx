@@ -19,6 +19,7 @@ import {
   type TipoEvento,
 } from './motor';
 import CasosAula from './CasosAula';
+import { FAQ_CASCADA_TROFICA, FAQ_ESPECIE_CLAVE } from './faq';
 
 // ============================================
 // TEXTO DINÁMICO DE EXPLICACIÓN
@@ -246,7 +247,9 @@ export default function SimuladorEcosistemaTroficoPage() {
         {evento.id !== 'ninguno' && (
           <div className={styles.intensidadRow}>
             <label htmlFor="slider-intensidad" className={styles.intensidadLabel}>
-              Intensidad de la perturbación: <strong>{Math.round(intensidad * 100)}&nbsp;%</strong>
+              {/* La cifra y el % en UNA cadena, hija única de su elemento: con la página traducida,
+                  una cifra suelta junto a «&nbsp;%» se quedaba con el valor viejo (hallazgo 3906). */}
+              Intensidad de la perturbación: <strong>{`${Math.round(intensidad * 100)} %`}</strong>
             </label>
             <input
               id="slider-intensidad"
@@ -298,8 +301,10 @@ export default function SimuladorEcosistemaTroficoPage() {
                     <div className={styles.nivelInfo}>
                       <span className={styles.nivelNombre}>{nivel.nombre}</span>
                       <span className={styles.nivelEjemplos}>{ecosistema.niveles[idxOriginal].ejemplos}</span>
+                      {/* Una sola cadena: la cifra suelta junto a « ind. rel.» no cambiaba con la
+                          página traducida (hallazgo 3906). */}
                       <span className={styles.nivelPob}>
-                        {formatNumber(cifra.valor, cifra.decimales)} ind. rel.
+                        {`${formatNumber(cifra.valor, cifra.decimales)} ind. rel.`}
                       </span>
                     </div>
                   </div>
@@ -327,16 +332,17 @@ export default function SimuladorEcosistemaTroficoPage() {
                       <span aria-hidden="true">{nivel.emoji}</span> {nivel.nombre}
                     </span>
                     <span className={styles.barraValor} style={{ color: COLORES_TEXTO_NIVEL[idx] }}>
-                      {textoCifra}
+                      {/* La cifra y el delta, cada uno hijo único de su <span> y siempre montados:
+                          con la página traducida, la cifra suelta y el «(+…)» por piezas se
+                          quedaban con el valor viejo y llegaban a pintar «(+-6)» (hallazgo 3906). */}
+                      <span>{textoCifra}</span>
                       {/* El delta se decide sobre la cifra IMPRESA. Comparando los valores sin
                           redondear, una sequía al 1 % pintaba «40 (0)» —un cambio de cero
                           anunciado como si fuera un cambio— porque la diferencia real era
                           0,168 (hallazgo 328). */}
-                      {delta !== 0 && (
-                        <span className={styles.barraDelta}>
-                          {' '}(<span>{delta > 0 ? '+' : ''}</span>{formatNumber(delta, cifra.decimales)})
-                        </span>
-                      )}
+                      <span className={styles.barraDelta}>
+                        {delta !== 0 ? ` (${delta > 0 ? '+' : ''}${formatNumber(delta, cifra.decimales)})` : ''}
+                      </span>
                     </span>
                   </div>
                   <div className={styles.barraTrack}>
@@ -465,7 +471,9 @@ export default function SimuladorEcosistemaTroficoPage() {
                     <td><span aria-hidden="true">🌲</span> Bosque Templado</td>
                     <td>Robles y hayas</td>
                     <td>Ciervos (Cervus elaphus)</td>
-                    <td>Lobo gris</td>
+                    {/* Decía «Lobo gris», y la pirámide del simulador ponía a los osos encima de
+                        los lobos (hallazgo 3902): la cima de la tabla es ahora la de la pirámide. */}
+                    <td>Búho real, azor</td>
                     <td>Deforestación</td>
                   </tr>
                   <tr>
@@ -479,7 +487,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                     <td><span aria-hidden="true">🌅</span> Sabana</td>
                     <td>Gramíneas tropicales</td>
                     <td>Cebras y ñus</td>
-                    <td>León africano</td>
+                    <td>Águila marcial</td>
                     <td>Sequía + fragmentación</td>
                   </tr>
                   <tr>
@@ -501,6 +509,13 @@ export default function SimuladorEcosistemaTroficoPage() {
                 </tbody>
               </table>
             </div>
+            <p>
+              En los cuatro ecosistemas del simulador, el depredador tope es la cima de su pirámide:
+              el que caza a los carnívoros. Los grandes depredadores que viven de herbívoros, como el
+              lobo, el lince o el león, no tienen quien los cace, pero comen un escalón más abajo: en
+              la pirámide de cuatro niveles irían con los carnívoros. En la tundra, donde la cadena es
+              más corta, el lobo es a la vez cazador de herbívoros y cima.
+            </p>
           </section>
 
           <section>
@@ -566,15 +581,9 @@ export default function SimuladorEcosistemaTroficoPage() {
             <h3>Preguntas frecuentes sobre ecología trófica</h3>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
-                <h4>¿Qué es una especie clave (keystone species)?</h4>
-                <p>
-                  Una <strong>especie clave</strong> es aquella cuyo impacto en el ecosistema es
-                  desproporcionadamente grande en relación con su biomasa. Su desaparición provoca
-                  cambios radicales en la estructura de toda la comunidad biológica. Ejemplos:
-                  el lobo en los bosques boreales, la nutria marina en los kelps del Pacífico,
-                  los elefantes en la sabana africana y las estrellas de mar Pisaster en la costa
-                  noroeste de EE. UU. (el caso original descrito por Paine, 1969).
-                </p>
+                {/* Pregunta y respuesta de faq.ts, las mismas que el FAQPage (hallazgo 3904) */}
+                <h4>{FAQ_ESPECIE_CLAVE.pregunta}</h4>
+                <p>{FAQ_ESPECIE_CLAVE.respuesta}</p>
                 {/* Prometía «la eliminación de un nivel», y el suelo del modelo la hace
                     imposible en cualquier ecosistema y a cualquier intensidad: el peor
                     impacto es −0,7 y la menor población de carnívoros es 12, así que nunca se
@@ -609,15 +618,8 @@ export default function SimuladorEcosistemaTroficoPage() {
               </div>
 
               <div className={styles.faqItem}>
-                <h4>¿Qué es una cascada trófica?</h4>
-                <p>
-                  Una <strong>cascada trófica</strong> es el efecto indirecto que la alteración de
-                  un nivel trófico produce en los niveles no adyacentes. Puede ser descendente
-                  (<em>top-down</em>): cuando los depredadores controlan a los herbívoros y
-                  esto beneficia a las plantas; o ascendente (<em>bottom-up</em>): cuando la
-                  disponibilidad de recursos (plantas, nutrientes) determina la abundancia de todos
-                  los niveles superiores.
-                </p>
+                <h4>{FAQ_CASCADA_TROFICA.pregunta}</h4>
+                <p>{FAQ_CASCADA_TROFICA.respuesta}</p>
                 <p className={styles.faqTip}>
                   <span aria-hidden="true">💡</span> La mayoría de ecosistemas funcionan con ambas direcciones al mismo tiempo,
                   aunque generalmente domina una según el contexto.

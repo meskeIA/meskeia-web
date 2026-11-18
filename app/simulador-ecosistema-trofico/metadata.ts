@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FAQ_CASCADA_TROFICA, FAQ_ESPECIE_CLAVE } from './faq';
 
 export const metadata: Metadata = {
   title: 'Simulador de Ecosistema: Cadena Trófica | meskeIA',
@@ -83,22 +84,15 @@ export const faqJsonLd = {
         text: 'Es una aproximación, no una ley exacta: de media, en torno al 10\u00A0% de la energía de un nivel trófico pasa a formar parte del nivel superior; el resto se pierde como calor en la respiración o queda en heces y biomasa no consumida. Se suele atribuir al trabajo de Raymond Lindeman (1942), que no la llamó ley y citó eficiencias desde el 0,1\u00A0% hasta el 37,5\u00A0%: la cifra real varía mucho entre ecosistemas. Ayuda a entender por qué las cadenas tróficas son cortas (lo habitual es que no pasen de cinco niveles) y por qué hay mucha más energía en los productores que en los depredadores.',
       },
     },
-    {
+    // La cascada y la especie clave están también en la FAQ visible: salen de faq.ts (3904).
+    ...[FAQ_CASCADA_TROFICA, FAQ_ESPECIE_CLAVE].map((p) => ({
       '@type': 'Question',
-      name: '¿Qué es una cascada trófica y cómo afecta al ecosistema?',
+      name: p.pregunta,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una cascada trófica es el efecto en cadena que provoca el aumento o la disminución drástica de una especie sobre los demás niveles del ecosistema. Por ejemplo, la eliminación de un depredador tope puede disparar la población de herbívoros, que a su vez reducen la vegetación. Un caso clásico es el de las nutrias marinas, los erizos y los bosques de kelp del Pacífico (Estes y Palmisano, 1974). La reintroducción del lobo en Yellowstone (1995) se propuso como otro ejemplo, pero es un caso debatido: estudios de campo de hasta 20 años (Marshall, Hobbs y Cooper, 2013; Hobbs et al., 2024) encuentran que la recuperación de los sauces es limitada y depende también de la pérdida de los castores.',
+        text: p.respuesta,
       },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Qué es una especie clave y por qué su pérdida es tan grave?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Una especie clave es aquella cuya influencia en el ecosistema es desproporcionadamente grande respecto a su biomasa. Su eliminación provoca una reestructuración profunda del ecosistema, a veces su colapso. Las nutrias marinas son un ejemplo clásico: al comer erizos de mar evitan que estos devoren los bosques de kelp, que dan cobijo a cientos de especies. El concepto fue introducido por el ecólogo Robert Paine en 1969.',
-      },
-    },
+    })),
     {
       '@type': 'Question',
       name: '¿En qué se diferencia una pirámide trófica de energía de la de biomasa?',
