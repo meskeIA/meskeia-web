@@ -14,7 +14,9 @@ import { esperarPaginaAsentada } from './_hidratacion';
  * · Modo Rápido (20 preguntas al azar), Modo Completo (las 40) y «Practicar por grupo» (6 botones,
  *   uno por grupo, con las plantas de ese grupo: 6 algas, 6 briófitos, 7 pteridófitos, 7
  *   gimnospermas, 8 monocotiledóneas contando la posidonia y 6 dicotiledóneas; hasta el 3724 la
- *   posidonia contaba entre las dicotiledóneas).
+ *   posidonia contaba entre las dicotiledóneas). Desde el 3726 (18/11/2026) cada práctica las
+ *   mezcla con OTRAS TANTAS de los demás grupos, sus trampas primero (`TRAMPAS_POR_GRUPO`): 12, 12,
+ *   14, 14, 16 y 12 preguntas.
  * · Cada pregunta: el nombre común y el científico de una planta, una pista y cuatro grupos (el
  *   correcto y tres de los otros cinco al azar). Tras responder, la explicación y «Siguiente».
  * · Resultado: «Resultado: c/t», porcentaje, emoji por tramo, aciertos por grupo y lista de fallos.
@@ -208,40 +210,48 @@ test.describe('Quiz Tipos de Plantas · partida', () => {
   /**
    * CASO LÍMITE — pleno en «Practicar Gimnosperma» y cero en «Practicar Briófito», con «Volver a
    * jugar» entre medias y sin recargar.
-   * Esperado a mano: 7/7 = 100 % → 🏆, sin lista de fallos, «Gimnosperma 7/7»; 0/6 = 0 % → 😅,
-   * «Repasa estos 6 errores:» con 6 fichas, «Briófito 0/6». La última pregunta dice «Ver resultados →».
+   * Esperado a mano (desde el 3726, cada práctica son las plantas del grupo y otras tantas de los
+   * demás): 14/14 = 100 % → 🏆, sin lista de fallos, «Gimnosperma 7/7» y la palmera y el helecho
+   * árbol entre las ajenas; 0/12 = 0 % → 😅, «Repasa estos 12 errores:» con 12 fichas, «Briófito
+   * 0/6» y la selaginela entre las ajenas. La última pregunta dice «Ver resultados →».
    */
-  test('caso límite: 7 de 7 da 100 % y 🏆; 0 de 6 da 0 % y 😅; «Volver a jugar» no recarga', async ({ page }) => {
+  test('caso límite: 14 de 14 da 100 % y 🏆; 0 de 12 da 0 % y 😅; «Volver a jugar» no recarga', async ({ page }) => {
     test.setTimeout(90_000);
     await abrir(page);
     await page.evaluate(() => { (window as unknown as { __marca: string }).__marca = 'sin-recarga'; });
-    await empezar(page, /^Practicar Gimnosperma: 7 preguntas/);
-    await expect(contador(page)).toHaveText('Pregunta 1 / 7');
+    await empezar(page, /^Practicar Gimnosperma: 14 preguntas, 7 del grupo/);
+    await expect(contador(page)).toHaveText('Pregunta 1 / 14');
     const pleno = await jugar(page, 99);
-    expect(pleno).toHaveLength(7);
+    expect(pleno).toHaveLength(14);
+    expect(new Set(pleno.map((h) => h.nombre)).size, 'planta repetida en la práctica').toBe(14);
+    expect(pleno.filter((h) => h.correcta === 'Gimnosperma')).toHaveLength(7);
+    expect(pleno.map((h) => h.nombre)).toEqual(expect.arrayContaining(['Palmera datilera', 'Helecho árbol']));
     let r = await resultado(page);
-    expect(r.titulo).toBe('Resultado: 7/7');
+    expect(r.titulo).toBe('Resultado: 14/14');
     expect(r.emoji).toBe('🏆');
     expect(r.porcentaje).toMatch(pct(100));
     expect(r.errores).toBe(0);
     await expect(page.locator('[class*="errorList"]')).toHaveCount(0);
-    expect(r.porGrupo).toEqual({ Gimnosperma: '7/7' });
+    expect(r.porGrupo).toEqual(porGrupoEsperado(pleno));
+    expect(r.porGrupo.Gimnosperma).toBe('7/7');
 
     await page.getByRole('button', { name: /Volver a jugar/ }).click();
     await expect(page.getByRole('button', { name: /^Modo rápido/ })).toBeVisible();
     expect(await page.evaluate(() => (window as unknown as { __marca?: string }).__marca)).toBe('sin-recarga');
 
-    await empezar(page, /^Practicar Briófito: 6 preguntas/);
+    await empezar(page, /^Practicar Briófito: 12 preguntas, 6 del grupo/);
     await expect(marcador(page)).toHaveText(/0 correctas$/);
     const cero = await jugar(page, 0);
-    expect(cero).toHaveLength(6);
+    expect(cero).toHaveLength(12);
+    expect(cero.map((h) => h.nombre)).toContain('Selaginella');
     r = await resultado(page);
-    expect(r.titulo).toBe('Resultado: 0/6');
+    expect(r.titulo).toBe('Resultado: 0/12');
     expect(r.emoji).toBe('😅');
     expect(r.porcentaje).toMatch(pct(0));
-    expect(r.tituloErrores).toBe('Repasa estos 6 errores:');
-    expect(r.errores).toBe(6);
-    expect(r.porGrupo).toEqual({ 'Briófito': '0/6' });
+    expect(r.tituloErrores).toBe('Repasa estos 12 errores:');
+    expect(r.errores).toBe(12);
+    expect(r.porGrupo).toEqual(porGrupoEsperado(cero));
+    expect(r.porGrupo['Briófito']).toBe('0/6');
   });
 
   /**
@@ -326,15 +336,15 @@ async function recorridoConRafagas(page: Page): Promise<void> {
   expect(await tema(), 'Salir: la ráfaga no cambia el tema').toBe(tema0);
   const guia0 = await guia();
 
-  // «Practicar Alga» (6 preguntas): ráfaga en cada opción y en cada «Siguiente»
+  // «Practicar Alga» (12 preguntas desde el 3726): ráfaga en cada opción y en cada «Siguiente»
   await rafaga(page, page.getByRole('button', { name: /^Practicar Alga/ }), async () => (await habilitadas(page)) > 0, 'Practicar Alga');
   expect(await habilitadas(page), 'Practicar Alga: la ráfaga no contesta la pregunta 1').toBe(4);
-  for (let n = 1; n <= 6; n++) {
+  for (let n = 1; n <= 12; n++) {
     await page.waitForTimeout(600);
     const nombre = norm(await enunciado(page).innerText());
     const i = (await rotulos(page)).indexOf(CLAVE[nombre]);
     await rafaga(page, opciones(page).nth(i), async () => (await feedback(page).count()) > 0, `opción ${n}`);
-    await expect(contador(page), `opción ${n}: la ráfaga no se salta la explicación`).toHaveText(`Pregunta ${n} / 6`);
+    await expect(contador(page), `opción ${n}: la ráfaga no se salta la explicación`).toHaveText(`Pregunta ${n} / 12`);
     await expect(feedback(page)).toBeVisible();
 
     const sig = page.locator('[class*="btnSiguiente"]');
@@ -346,11 +356,11 @@ async function recorridoConRafagas(page: Page): Promise<void> {
       ultima ? 'Ver resultados' : `Siguiente ${n}`,
     );
     if (ultima) break;
-    await expect(contador(page)).toHaveText(`Pregunta ${n + 1} / 6`);
+    await expect(contador(page)).toHaveText(`Pregunta ${n + 1} / 12`);
     expect(await habilitadas(page), `Siguiente ${n}: la ráfaga no contesta la pregunta nueva`).toBe(4);
   }
   await expect(panelResultado(page), 'Ver resultados: la ráfaga no se come la nota').toBeVisible();
-  await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Resultado: 6/6');
+  await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Resultado: 12/12');
   expect(await guia(), 'Ver resultados: la ráfaga no abre la guía').toBe(guia0);
 
   // «Volver a jugar»: el 2.º toque cae sobre un botón de modo o de grupo
@@ -424,31 +434,41 @@ test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
     expect(fallos, 'preguntas en que las opciones cambian al responder').toEqual([]);
   });
 
-  test('hallazgo · «Practicar por grupo» no se acierta entero pulsando siempre el grupo elegido', async ({ page }) => {
-    // page.tsx:156-158 — el modo por grupo filtra las plantas de ESE grupo y pregunta «¿A qué grupo
-    // pertenece?»: la respuesta es siempre el botón que se acaba de pulsar. Esperado a mano con
-    // «Practicar Pteridófito» (7 plantas) pulsando siempre «Pteridófito» sin leer: no debería dar
-    // pleno; obtenido «Resultado: 7/7», 100 % y 🏆.
-    test.fail();
+  test('3726 · «Practicar por grupo» no se acierta entero pulsando siempre el grupo elegido', async ({ page }) => {
+    // page.tsx:156-158 — el modo por grupo filtraba las plantas de ESE grupo y preguntaba «¿A qué
+    // grupo pertenece?»: la respuesta era siempre el botón que se acababa de pulsar. «Practicar
+    // Pteridófito» pulsando siempre «Pteridófito» sin leer daba «Resultado: 7/7», 100 % y 🏆.
+    // REPARADO el 18/11/2026: la práctica son las 7 y otras 7 de los demás grupos (la cica, su
+    // trampa, siempre). Esperado a mano pulsando siempre «Pteridófito» (o, si no se ofrece, otra
+    // opción, que también es fallo): 7/14 = 50 % → 👍, nunca pleno.
     test.setTimeout(60_000);
     await abrir(page);
-    await empezar(page, /^Practicar Pteridófito: 7 preguntas/);
-    await jugar(page, 0, 'Pteridófito');
+    await empezar(page, /^Practicar Pteridófito: 14 preguntas, 7 del grupo/);
+    const hechas: Respuesta[] = [];
+    for (let n = 1; n <= 20; n++) {
+      const ofrecidas = await rotulos(page);
+      hechas.push(await responder(page, ofrecidas.includes('Pteridófito') ? 'Pteridófito' : 'mal'));
+      if (/resultados/.test(await avanzar(page))) break;
+    }
+    expect(hechas).toHaveLength(14);
+    expect(hechas.map((h) => h.nombre)).toContain('Cica');
     const r = await resultado(page);
-    expect(r.titulo, 'pulsar siempre «Pteridófito» sin leer la planta da pleno').not.toBe('Resultado: 7/7');
+    expect(r.titulo, 'pulsar siempre «Pteridófito» sin leer la planta da pleno').toBe('Resultado: 7/14');
+    expect(r.porcentaje).toMatch(pct(50));
+    expect(r.emoji).toBe('👍');
   });
 
   test('hallazgo · el marcador y la lista de fallos concuerdan en número («1 correcta», «este error»)', async ({ page }) => {
     // page.tsx:309 `{n} correctas` y :431 `Repasa estos {n} errores:` sin singular. Practicar Alga:
-    // la 1.ª bien → esperado «✅ 1 correcta»; 5 bien y la 6.ª mal → esperado sin «estos 1 errores».
-    // Obtenido el 28/10/2026: «✅ 1 correctas» y «Repasa estos 1 errores:».
+    // la 1.ª bien → esperado «✅ 1 correcta»; 11 bien y la 12.ª mal (12 preguntas desde el 3726) →
+    // esperado sin «estos 1 errores». Obtenido el 28/10/2026: «✅ 1 correctas» y «Repasa estos 1 errores:».
     test.fail();
     test.setTimeout(60_000);
     await abrir(page);
     await empezar(page, /^Practicar Alga/);
     const textos: string[] = [];
-    for (let n = 1; n <= 6; n++) {
-      await responder(page, n <= 5 ? 'bien' : 'mal');
+    for (let n = 1; n <= 12; n++) {
+      await responder(page, n <= 11 ? 'bien' : 'mal');
       if (n === 1) textos.push(norm(await marcador(page).innerText()));
       await avanzar(page);
     }
@@ -458,24 +478,24 @@ test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
   });
 
   test('hallazgo · el porcentaje va separado del «%» con espacio duro («83 % de acierto»)', async ({ page }) => {
-    // page.tsx:409 `{porcentaje}% de acierto`. Practicar Alga 5 bien + 1 mal: 5/6 = 83,3 → 83.
-    // Obtenido el 28/10/2026: «83% de acierto», pegado.
+    // page.tsx:409 `{porcentaje}% de acierto`. Practicar Alga (12 preguntas desde el 3726) 10 bien
+    // + 2 mal: 10/12 = 83,3 → 83. Obtenido el 28/10/2026: «83% de acierto», pegado.
     test.fail();
     test.setTimeout(60_000);
     await abrir(page);
     await empezar(page, /^Practicar Alga/);
-    await jugar(page, 5);
+    await jugar(page, 10);
     const r = await resultado(page);
-    expect(r.titulo).toBe('Resultado: 5/6');
+    expect(r.titulo).toBe('Resultado: 10/12');
     expect(r.porcentaje).toBe(`83${DURO}% de acierto`);
   });
 
-  test('hallazgo · tras «Volver a jugar» y «✕ Salir» el foco no cae a <body> y el selector de modo se ve', async ({ page }) => {
-    // page.tsx:274-282 — el efecto de foco solo atiende 'jugando', 'feedback' y 'resultados': al
-    // volver a 'inicio' el botón pulsado se desmonta y el foco cae a <body> (el primer Tab va al
-    // logo). Tras un resultado largo (7 fallos) la portada se pinta con el scroll que tenía el
+  test('3727 · tras «Volver a jugar» y «✕ Salir» el foco no cae a <body> y el selector de modo se ve', async ({ page }) => {
+    // page.tsx:274-282 — el efecto de foco solo atendía 'jugando', 'feedback' y 'resultados': al
+    // volver a 'inicio' el botón pulsado se desmontaba y el foco caía a <body> (el primer Tab iba
+    // al logo). Tras un resultado largo (7 fallos) la portada se pintaba con el scroll que tenía el
     // resultado: medido scrollY 1408 a 1280×800 y «Elige tu modo de juego» en y = −943.
-    test.fail();
+    // REPARADO el 18/11/2026: el foco va al título del selector (h2 tabindex -1), a la vista.
     test.setTimeout(90_000);
     await page.setViewportSize({ width: 1280, height: 800 });
     await abrir(page);
@@ -487,13 +507,18 @@ test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
     await expect(page.getByRole('button', { name: /^Modo rápido/ })).toBeVisible();
     await page.waitForTimeout(300);
     if (await enBody()) fallos.push('Volver a jugar: foco en <body>');
+    await expect(page.locator('#titulo-modo')).toBeFocused();
     const caja = await page.locator('#titulo-modo').boundingBox();
     if (!caja || caja.y < 0 || caja.y > 800) fallos.push(`Volver a jugar: «Elige tu modo de juego» fuera de la vista (y = ${caja ? Math.round(caja.y) : 'sin caja'})`);
+    // El primer Tab lleva al primer modo, no al logo.
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('button', { name: /^Modo rápido/ })).toBeFocused();
     await empezar(page, /^Modo completo/);
     await page.getByRole('button', { name: 'Salir del quiz' }).click();
     await expect(page.getByRole('button', { name: /^Modo rápido/ })).toBeVisible();
     await page.waitForTimeout(300);
     if (await enBody()) fallos.push('Salir: foco en <body>');
+    await expect(page.locator('#titulo-modo')).toBeFocused();
     expect(fallos).toEqual([]);
   });
 });
@@ -518,13 +543,14 @@ test.describe('Inspector 28/10/2026 · hallazgos del banco y los textos', () => 
     // (page.tsx:76), lo repetía la explicación y la FAQ visible («angiosperma dicotiledónea»).
     // Caso: llega la posidonia, se pulsa «Monocotiledónea» → esperado «¡Correcto!» · obtenido
     // «❌ Era: Dicotiledónea». REPARADO el 28/10/2026: ahora es del grupo monocotiledónea, así que
-    // llega en «Practicar Monocotiledónea» (8 preguntas), donde esa opción sale siempre.
+    // llega en «Practicar Monocotiledónea» (16 preguntas desde el 3726, las 8 del grupo siempre),
+    // donde esa opción sale siempre.
     test.setTimeout(120_000);
     await abrir(page);
     let titulo = '';
     for (let intento = 0; intento < 2 && !titulo; intento++) {
       await empezar(page, /^Practicar Monocotiledónea/);
-      for (let n = 1; n <= 8; n++) {
+      for (let n = 1; n <= 16; n++) {
         const nombre = norm(await enunciado(page).innerText());
         if (nombre === 'Posidonia') {
           if (!(await rotulos(page)).includes('Monocotiledónea')) break;
@@ -617,7 +643,8 @@ test.describe('Inspector 28/10/2026 · hallazgos del banco y los textos', () => 
 /**
  * INSPECTOR 29/10/2026 — 2.ª pasada como app, tras la reparación de la familia (c5b619bb,
  * d9e710f8) y la propia (2b3df054: la posidonia en monocotiledónea y las opciones que se
- * rebarajaban al contestar). Siguen abiertos 3726-3733 (sus `test.fail` de arriba).
+ * rebarajaban al contestar). Siguen abiertos 3728-3733 (sus `test.fail` de arriba); 3726 y 3727,
+ * REPARADOS el 18/11/2026.
  *
  * Sin <input>: además de la página asentada, se espera a que React cuelgue sus props del botón
  * «Modo Rápido» (`__reactProps$`), como `esperarHidratado` del testigo de la familia.
@@ -682,34 +709,36 @@ test.describe('Inspector 29/10/2026 · escritorio 1280 × 800', () => {
   /**
    * CASO LÍMITE — los bordes de los tramos y del redondeo, sin recargar entre partidas.
    * Esperado a mano (`Math.round(c / t * 100)`; ≥ 80 🏆 · ≥ 50 👍 · resto 😅):
-   *   · Practicar Alga, 3 bien + 3 mal → 3/6 = 50 % → 👍 (borde inferior de 👍), «Alga 3/6».
-   *   · Practicar Monocotiledónea, 5 bien + 3 mal → 5/8 = 62,5 → Math.round 63 → 👍, la 8.ª
-   *     pregunta dice «Ver resultados →».
+   *   · Practicar Alga (12 preguntas desde el 3726), 6 bien + 6 mal → 6/12 = 50 % → 👍 (borde
+   *     inferior de 👍); los «c/t» por grupo, de lo jugado.
+   *   · Practicar Monocotiledónea (16), 10 bien + 6 mal → 10/16 = 62,5 → Math.round 63 → 👍, la
+   *     16.ª pregunta dice «Ver resultados →».
    *   · Modo Rápido, 16 bien + 4 mal → 16/20 = 80 % → 🏆 (borde inferior de 🏆).
    */
   test('caso límite: 50 % da 👍, 62,5 % redondea a 63 % y 80 % da 🏆', async ({ page }) => {
     test.setTimeout(150_000);
     await abrir29(page);
 
-    await empezar(page, /^Practicar Alga: 6 preguntas/);
-    expect(await jugar(page, 3)).toHaveLength(6);
+    await empezar(page, /^Practicar Alga: 12 preguntas, 6 del grupo/);
+    const algas = await jugar(page, 6);
+    expect(algas).toHaveLength(12);
     let r = await resultado(page);
-    expect(r.titulo).toBe('Resultado: 3/6');
+    expect(r.titulo).toBe('Resultado: 6/12');
     expect(r.emoji).toBe('👍');
     expect(r.porcentaje).toMatch(pct(50));
-    expect(r.tituloErrores).toBe('Repasa estos 3 errores:');
-    expect(r.porGrupo).toEqual({ Alga: '3/6' });
+    expect(r.tituloErrores).toBe('Repasa estos 6 errores:');
+    expect(r.porGrupo).toEqual(porGrupoEsperado(algas));
 
     await page.getByRole('button', { name: /Volver a jugar/ }).click();
-    await empezar(page, /^Practicar Monocotiledónea: 8 preguntas/);
-    await expect(contador(page)).toHaveText('Pregunta 1 / 8');
-    const mono = await jugar(page, 5);
-    expect(mono).toHaveLength(8);
+    await empezar(page, /^Practicar Monocotiledónea: 16 preguntas, 8 del grupo/);
+    await expect(contador(page)).toHaveText('Pregunta 1 / 16');
+    const mono = await jugar(page, 10);
+    expect(mono).toHaveLength(16);
     r = await resultado(page);
-    expect(r.titulo).toBe('Resultado: 5/8');
+    expect(r.titulo).toBe('Resultado: 10/16');
     expect(r.emoji).toBe('👍');
     expect(r.porcentaje).toMatch(pct(63));
-    expect(r.porGrupo).toEqual({ 'Monocotiledónea': '5/8' });
+    expect(r.porGrupo).toEqual(porGrupoEsperado(mono));
 
     await page.getByRole('button', { name: /Volver a jugar/ }).click();
     await empezar(page, /^Modo rápido: 20 preguntas/);
@@ -725,15 +754,15 @@ test.describe('Inspector 29/10/2026 · escritorio 1280 × 800', () => {
    * CASO DE RECHAZO — «Siguiente» sin contestar y el recorrido solo con teclado.
    * Esperado a mano: antes de responder no hay «Siguiente» (el panel de la explicación solo se
    * pinta en 'feedback'); Intro y Espacio sobre el enunciado enfocado no contestan ni avanzan
-   * («Pregunta 1 / 7», 4 opciones activas, 0 correctas). Tab lleva a la 1.ª opción e Intro la
+   * («Pregunta 1 / 14», 4 opciones activas, 0 correctas). Tab lleva a la 1.ª opción e Intro la
    * elige: el marcador suma 1 solo si esa era la correcta según la clave; el foco pasa a
-   * «Siguiente», e Intro lleva a «Pregunta 2 / 7» con el foco en el enunciado nuevo (h2,
+   * «Siguiente», e Intro lleva a «Pregunta 2 / 14» con el foco en el enunciado nuevo (h2,
    * tabindex -1), nunca en <body>, y sin contestarla.
    */
   test('caso de rechazo: sin contestar no hay «Siguiente» y el teclado no salta preguntas', async ({ page }) => {
     test.setTimeout(60_000);
     await abrir29(page);
-    await empezar(page, /^Practicar Gimnosperma: 7 preguntas/);
+    await empezar(page, /^Practicar Gimnosperma: 14 preguntas/);
     await page.waitForTimeout(600);
     const foco = () => page.evaluate(() => {
       const a = document.activeElement as HTMLElement | null;
@@ -746,7 +775,7 @@ test.describe('Inspector 29/10/2026 · escritorio 1280 × 800', () => {
     await page.keyboard.press('Enter');
     await page.keyboard.press('Space');
     await page.waitForTimeout(200);
-    await expect(contador(page)).toHaveText('Pregunta 1 / 7');
+    await expect(contador(page)).toHaveText('Pregunta 1 / 14');
     await expect(feedback(page)).toHaveCount(0);
     expect(await habilitadas(page)).toBe(4);
     await expect(marcador(page)).toHaveText(/^✅ 0 correctas$/);
@@ -761,7 +790,7 @@ test.describe('Inspector 29/10/2026 · escritorio 1280 × 800', () => {
     await expect(marcador(page)).toHaveText(new RegExp(`^✅ ${suma} correctas$`));
 
     await page.keyboard.press('Enter');
-    await expect(contador(page)).toHaveText('Pregunta 2 / 7');
+    await expect(contador(page)).toHaveText('Pregunta 2 / 14');
     const nombre2 = norm(await enunciado(page).innerText());
     expect(await foco()).toBe(`H2:-1:${nombre2}`);
     await expect(feedback(page)).toHaveCount(0);

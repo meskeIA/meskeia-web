@@ -172,6 +172,14 @@
   margin-top: 0.2rem;
 }
 
+/* Nota de «Practicar por grupo»: la práctica mezcla plantas de otros grupos (hallazgo 3726) */
+.practicaNota {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #555);
+  margin: -0.5rem 0 1rem;
+  text-align: center;
+}
+
 /* --------------------------------------------------------------------------
    VISTA PREVIA DE GRUPOS (INICIO)
    -------------------------------------------------------------------------- */

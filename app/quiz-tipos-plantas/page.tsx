@@ -147,6 +147,36 @@ function generarOpciones(planta: PlantaQuiz): GrupoPlanta[] {
   return mezclar([planta.grupo, ...distractores]);
 }
 
+/**
+ * Plantas de OTRO grupo que más se parecen a cada uno, según las propias fichas y la guía: la
+ * posidonia «parece un alga», la selaginela «parece un musgo», la cica parece un helecho
+ * arborescente, la palmera es el error común de «gimnosperma», el aguacate tiene flor de base 3
+ * y el ginkgo hojas anchas. Entran siempre en la práctica de ese grupo.
+ */
+const TRAMPAS_POR_GRUPO: Record<GrupoPlanta, number[]> = {
+  alga: [7], // Posidonia
+  briofito: [19], // Selaginella
+  pteridofito: [23], // Cica
+  gimnosperma: [29, 17], // Palmera datilera, Helecho árbol
+  monocotiledonea: [40], // Aguacate
+  dicotiledonea: [24], // Ginkgo
+};
+
+/**
+ * Preguntas de «Practicar por grupo»: todas las plantas del grupo y OTRAS TANTAS de los demás
+ * (sus trampas primero). Antes eran solo las del grupo y la pregunta «¿A qué grupo pertenece?»
+ * se acertaba entera pulsando siempre el grupo elegido, sin leer la planta (hallazgo 3726).
+ */
+function preguntasDePractica(grupo: GrupoPlanta): PlantaQuiz[] {
+  const delGrupo = PLANTAS.filter((p) => p.grupo === grupo);
+  const trampas = TRAMPAS_POR_GRUPO[grupo]
+    .map((id) => PLANTAS.find((p) => p.id === id))
+    .filter((p): p is PlantaQuiz => p !== undefined && p.grupo !== grupo);
+  const resto = mezclar(PLANTAS.filter((p) => p.grupo !== grupo && !trampas.includes(p)));
+  const ajenas = [...trampas, ...resto].slice(0, delGrupo.length);
+  return mezclar([...delGrupo, ...ajenas]);
+}
+
 /** Selecciona las preguntas según el modo */
 function seleccionarPreguntas(modo: ModoJuego): PlantaQuiz[] {
   if (modo === 'rapido') {
@@ -155,9 +185,7 @@ function seleccionarPreguntas(modo: ModoJuego): PlantaQuiz[] {
   if (modo === 'completo') {
     return mezclar(PLANTAS);
   }
-  // Modo por grupo
-  const porGrupo = PLANTAS.filter((p) => p.grupo === modo);
-  return mezclar(porGrupo);
+  return preguntasDePractica(modo);
 }
 
 // ============================================================================
@@ -278,6 +306,10 @@ function QuizPorFases() {
   const enunciadoRef = useRef<HTMLHeadingElement>(null);
   const siguienteRef = useRef<HTMLButtonElement>(null);
   const resultadoRef = useRef<HTMLDivElement>(null);
+  // Al volver al inicio («Volver a jugar» o «✕ Salir») el botón pulsado se desmonta: el foco caía
+  // a <body> y la portada se pintaba con el scroll del resultado (hallazgo 3727). Ahora va al
+  // título del selector de modo, a la vista, como en quiz-complejidad-algoritmos.
+  const inicioRef = useRef<HTMLHeadingElement>(null);
   const vistaRef = useRef<string | null>(null);
   useEffect(() => {
     const vista = `${juego.estado}-${juego.indiceActual}`;
@@ -287,6 +319,7 @@ function QuizPorFases() {
     if (juego.estado === 'jugando') enfocarALaVista(enunciadoRef.current);
     else if (juego.estado === 'feedback') enfocarSinCentrar(siguienteRef.current); // sin centrarlo (3770)
     else if (juego.estado === 'resultados') enfocarALaVista(resultadoRef.current);
+    else if (juego.estado === 'inicio') enfocarALaVista(inicioRef.current);
   }, [juego.estado, juego.indiceActual]);
 
   // ============================================================================
@@ -615,7 +648,7 @@ function QuizPorFases() {
       <main className={styles.main}>
         {/* Selector de modo */}
         <section className={styles.selectorModo} aria-labelledby="titulo-modo">
-          <h2 id="titulo-modo" className={styles.selectorTitulo}>Elige tu modo de juego</h2>
+          <h2 id="titulo-modo" className={styles.selectorTitulo} ref={inicioRef} tabIndex={-1}>Elige tu modo de juego</h2>
 
           <div className={styles.modosPrincipales}>
             <button
@@ -642,6 +675,10 @@ function QuizPorFases() {
           </div>
 
           <h3 className={styles.selectorSubtitulo}>Practicar por grupo</h3>
+          <p className={styles.practicaNota}>
+            Cada práctica mezcla las plantas del grupo con otras tantas de los demás, entre ellas
+            las que más se le parecen.
+          </p>
           <div className={styles.gruposGrid}>
             {TODOS_LOS_GRUPOS.map((grupo) => {
               const info = GRUPOS[grupo];
@@ -653,12 +690,12 @@ function QuizPorFases() {
                   className={styles.btnGrupo}
                   onClick={() => iniciarQuiz(grupo)}
                   style={{ '--grupo-color': info.color } as React.CSSProperties}
-                  aria-label={`Practicar ${info.label}: ${cuenta} preguntas`}
+                  aria-label={`Practicar ${info.label}: ${cuenta * 2} preguntas, ${cuenta} del grupo`}
                 >
                   <span className={styles.grupoEmoji} aria-hidden="true">{info.emoji}</span>
                   <strong className={styles.grupoNombre}>{info.label}</strong>
                   <span className={styles.grupoDescripcion}>{info.descripcion}</span>
-                  <span className={styles.grupoConteo}>{cuenta} plantas</span>
+                  <span className={styles.grupoConteo}>{cuenta * 2} preguntas · {cuenta} del grupo</span>
                 </button>
               );
             })}

@@ -84,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Cómo funciona el modo de práctica por grupo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El modo de práctica por grupo permite seleccionar una categoría concreta (por ejemplo, solo pteridófitos o solo gimnospermas) y recibir únicamente preguntas de ese grupo. Es útil para reforzar los grupos en los que se cometen más errores antes de intentar el modo completo de 40 organismos.',
+        text: 'El modo de práctica por grupo permite elegir una categoría concreta (por ejemplo, pteridófitos o gimnospermas) y recibir todas sus plantas mezcladas con otras tantas de los demás grupos, entre ellas las que más se le parecen, como la posidonia en las algas o la palmera en las gimnospermas. Así no basta con pulsar siempre el mismo grupo: hay que reconocer cuáles pertenecen a él. Es útil para reforzar los grupos en los que se cometen más errores antes de intentar el modo completo de 40 organismos.',
       },
     },
     {
