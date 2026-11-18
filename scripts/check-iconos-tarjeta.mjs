@@ -26,6 +26,8 @@
  *    había 11. Los otros 10 llevaban las mismas clases SIN el prefijo `edu` (`escenarioIcon`,
  *    `tipIcono`), que el detector del turno no veía: 618 nodos en 76 ficheros. La campaña del
  *    13/11/2026 los ocultó todos y dejó este candado, que vigila las ocho a la vez.
+ * 3. Hallazgo 5010 (huesos-cuerpo-humano, 18/11/2026): `typeIcon` y `factIcon`, 11 nodos allí y 4
+ *    en minerales-del-mundo, ocultos en /reparar del mismo día. Son diez clases.
  *
  * El detector del tema C de `Vigilancia/ActasNocturnas/turno-a11y.mjs` IMPORTA este fichero
  * (`iconosSinOcultar`, `CLASES_ICONO`): la lista de clases vive aquí y solo aquí. Una copia en el
@@ -64,6 +66,9 @@ export const CLASES_ICONO = [
   'eduEscenarioIcon', 'eduTipIcon', 'eduTipIcono', 'warningIcon', 'warningIcono',
   // Las mismas sin el prefijo `edu` (C0723, 13/11/2026)
   'escenarioIcon', 'tipIcon', 'tipIcono',
+  // Tarjetas de tipo de hueso y de dato curioso (hallazgo 5010, huesos-cuerpo-humano, 18/11/2026):
+  // 11 nodos sin ocultar allí y 4 `factIcon` en minerales-del-mundo, la única otra app que las usa
+  'typeIcon', 'factIcon',
 ];
 
 // Exportadas: la comparación mecánica del turno (`normalizarParIconos`) las usa tal cual

@@ -12,6 +12,7 @@ import {
   TIPO_EMOJI,
   searchBones,
   getTotalBones,
+  rotuloCantidad,
   type Bone,
   type BoneRegion,
   type BoneType,
@@ -81,10 +82,13 @@ export default function HuesosCuerpoHumanoPage() {
 
       <LegalNotice />
 
+      {/* Suite salud (nivel 2 ALTO, nunca plegable) además de cultura: manda el nivel más alto, y la
+          guía trae datos clínicos (calcio, consolidación de fracturas). Hasta el 18/11/2026 iba
+          severity="medium" y plegable (hallazgo 5004) */}
       <DisclaimerCard
         variant="educational"
-        severity="medium"
-        collapsible={true}
+        severity="high"
+        collapsible={false}
         context="huesos-cuerpo-humano-disclaimer"
       />
 
@@ -168,7 +172,7 @@ export default function HuesosCuerpoHumanoPage() {
       <div className={styles.resultsCount} role="status" aria-live="polite" aria-atomic="true">
         {huesosFiltrados.length === BONES.length
           ? `Mostrando ${BONES.length} entradas (${totalHuesos} huesos en total)`
-          : `${huesosFiltrados.length} entrada${huesosFiltrados.length !== 1 ? 's' : ''} (${totalHuesosFiltrados} huesos)`
+          : `${huesosFiltrados.length} entrada${huesosFiltrados.length !== 1 ? 's' : ''} (${totalHuesosFiltrados} hueso${totalHuesosFiltrados !== 1 ? 's' : ''})`
         }
       </div>
 
@@ -184,7 +188,19 @@ export default function HuesosCuerpoHumanoPage() {
               <div className={styles.cardHeaderLeft}>
                 <span className={styles.regionEmoji} aria-hidden="true">{REGION_EMOJI[hueso.region]}</span>
                 <div>
-                  <h3 className={styles.boneName}>{hueso.nombre}</h3>
+                  {/* El botón abre la ficha con el teclado: antes solo el <article onClick> la
+                      abría, sin foco ni tecla (hallazgo 5003). stopPropagation: si no, el clic
+                      subiría al article y la ficha se abriría y cerraría a la vez. */}
+                  <h3 className={styles.boneName}>
+                    <button
+                      type="button"
+                      className={styles.boneNameButton}
+                      aria-expanded={huesoSeleccionado?.id === hueso.id}
+                      onClick={(e) => { e.stopPropagation(); handleHuesoClick(hueso); }}
+                    >
+                      {hueso.nombre}
+                    </button>
+                  </h3>
                   <span className={styles.latinName}>{hueso.nombreLatin}</span>
                 </div>
               </div>
@@ -233,7 +249,7 @@ export default function HuesosCuerpoHumanoPage() {
                     <div className={styles.propertyItem}>
                       <span className={styles.propertyLabel}>Cantidad</span>
                       <span className={styles.propertyValue}>
-                        {hueso.cantidad === 1 ? 'Impar (1)' : `Par (${hueso.cantidad})`}
+                        {rotuloCantidad(hueso)}
                       </span>
                     </div>
                   </div>
@@ -295,31 +311,31 @@ export default function HuesosCuerpoHumanoPage() {
           </p>
           <div className={styles.typesGrid}>
             <div className={styles.typeCard}>
-              <span className={styles.typeIcon}>📏</span>
+              <span className={styles.typeIcon} aria-hidden="true">📏</span>
               <h4>Largos</h4>
               <p>Más largos que anchos. Tienen diáfisis (cuerpo) y epífisis (extremos). Actúan como palancas.</p>
               <span className={styles.examples}>Ejemplos: Fémur, húmero, tibia, radio</span>
             </div>
             <div className={styles.typeCard}>
-              <span className={styles.typeIcon}>🔲</span>
+              <span className={styles.typeIcon} aria-hidden="true">🔲</span>
               <h4>Cortos</h4>
               <p>Forma aproximadamente cúbica. Permiten movimientos finos y absorben impactos.</p>
               <span className={styles.examples}>Ejemplos: Carpos (muñeca), tarsos (tobillo)</span>
             </div>
             <div className={styles.typeCard}>
-              <span className={styles.typeIcon}>📄</span>
+              <span className={styles.typeIcon} aria-hidden="true">📄</span>
               <h4>Planos</h4>
               <p>Delgados y curvados. Protegen órganos internos y proporcionan superficie para músculos.</p>
               <span className={styles.examples}>Ejemplos: Cráneo, escápula, esternón, costillas</span>
             </div>
             <div className={styles.typeCard}>
-              <span className={styles.typeIcon}>🔶</span>
+              <span className={styles.typeIcon} aria-hidden="true">🔶</span>
               <h4>Irregulares</h4>
               <p>Formas complejas que no encajan en otras categorías. Funciones especializadas.</p>
               <span className={styles.examples}>Ejemplos: Vértebras, coxal, esfenoides</span>
             </div>
             <div className={styles.typeCard}>
-              <span className={styles.typeIcon}>⚫</span>
+              <span className={styles.typeIcon} aria-hidden="true">⚫</span>
               <h4>Sesamoideos</h4>
               <p>Pequeños, redondeados, incrustados en tendones. Protegen y mejoran la mecánica.</p>
               <span className={styles.examples}>Ejemplos: Rótula (el más grande)</span>
@@ -361,27 +377,27 @@ export default function HuesosCuerpoHumanoPage() {
           <h2><span aria-hidden="true">💡</span> Datos curiosos sobre los huesos</h2>
           <div className={styles.funFacts}>
             <div className={styles.funFact}>
-              <span className={styles.factIcon}>👶</span>
+              <span className={styles.factIcon} aria-hidden="true">👶</span>
               <p>Los bebés nacen con aproximadamente <strong>270 huesos</strong>, que se van fusionando hasta llegar a 206 en la edad adulta.</p>
             </div>
             <div className={styles.funFact}>
-              <span className={styles.factIcon}>💪</span>
-              <p>El <strong>fémur</strong> es el hueso más largo y fuerte del cuerpo, mientras que el <strong>estribo</strong> del oído es el más pequeño (2,5 mm).</p>
+              <span className={styles.factIcon} aria-hidden="true">💪</span>
+              <p>El <strong>fémur</strong> es el hueso más largo y fuerte del cuerpo, mientras que el <strong>estribo</strong> del oído es el más pequeño (unos 3 mm).</p>
             </div>
             <div className={styles.funFact}>
-              <span className={styles.factIcon}>🔄</span>
+              <span className={styles.factIcon} aria-hidden="true">🔄</span>
               <p>Los huesos están en constante renovación. El esqueleto completo se reemplaza aproximadamente cada <strong>10 años</strong>.</p>
             </div>
             <div className={styles.funFact}>
-              <span className={styles.factIcon}>🩸</span>
+              <span className={styles.factIcon} aria-hidden="true">🩸</span>
               <p>La médula ósea roja produce alrededor de <strong>200 mil millones</strong> de glóbulos rojos cada día.</p>
             </div>
             <div className={styles.funFact}>
-              <span className={styles.factIcon}>🤚</span>
+              <span className={styles.factIcon} aria-hidden="true">🤚</span>
               <p>Más de <strong>la mitad de los huesos</strong> del cuerpo (106) están en las manos y los pies.</p>
             </div>
             <div className={styles.funFact}>
-              <span className={styles.factIcon}>🦴</span>
+              <span className={styles.factIcon} aria-hidden="true">🦴</span>
               <p>El <strong>hioides</strong> es el único hueso del cuerpo que no se articula con ningún otro hueso.</p>
             </div>
           </div>
@@ -412,7 +428,7 @@ export default function HuesosCuerpoHumanoPage() {
             </div>
             <div className={styles.summaryRow}>
               <span className={styles.summaryLabel}>Hueso más pequeño</span>
-              <span className={styles.summaryValue}>Estribo (~2,5 mm)</span>
+              <span className={styles.summaryValue}>Estribo (~3 mm)</span>
             </div>
           </div>
         </section>
@@ -526,7 +542,7 @@ export default function HuesosCuerpoHumanoPage() {
               </div>
               <div className={styles.escenarioExample}>
                 <p><strong>Uso típico:</strong></p>
-                <code>Proyectar en clase el atlas filtrado por "Cráneo" → mostrar los 22 huesos con función y curiosidades → debate sobre el hioides</code>
+                <code>Proyectar en clase el atlas filtrado por "Cráneo" → mostrar los 8 huesos del neurocráneo → filtrar "Cara" para los 14 restantes del esqueleto craneal → debate sobre el hioides</code>
               </div>
               <p className={styles.escenarioTip}>
                 <strong>Por qué funciona:</strong> La interfaz visual y los datos curiosos hacen que la clase sea más dinámica que un libro de texto. Los estudiantes pueden explorar en sus móviles durante la clase.
@@ -618,7 +634,7 @@ export default function HuesosCuerpoHumanoPage() {
         <section className={styles.guideSection}>
           <h2><span aria-hidden="true">📋</span> Cómo estudiar el esqueleto para un examen</h2>
           <p className={styles.introParagraph}>
-            Estrategia probada para memorizar los 206 huesos con sus nombres, regiones y funciones en el menor tiempo posible.
+            Una forma ordenada de estudiar los 206 huesos con sus nombres, regiones y funciones.
           </p>
           <div className={styles.stepGuide}>
             <div className={styles.step}>
@@ -626,7 +642,7 @@ export default function HuesosCuerpoHumanoPage() {
               <div className={styles.stepContent}>
                 <h4>Aprende primero los 5 tipos de huesos</h4>
                 <p>
-                  Antes de memorizar huesos individuales, interioriza la clasificación: Largo (palancas), Corto (absorción), Plano (protección), Irregular (función especializada), Sesamoideo (mejora mecánica). Cuando sepas el tipo, la función se deduce automáticamente. Esto reduce a la mitad el esfuerzo de memorización.
+                  Antes de memorizar huesos individuales, interioriza la clasificación: Largo (palancas), Corto (absorción), Plano (protección), Irregular (función especializada), Sesamoideo (mejora mecánica). Cuando sepas el tipo, buena parte de la función se deduce sin tener que memorizarla.
                 </p>
               </div>
             </div>
@@ -644,7 +660,7 @@ export default function HuesosCuerpoHumanoPage() {
               <div className={styles.stepContent}>
                 <h4>Aprende los huesos grandes primero, luego los pequeños</h4>
                 <p>
-                  Orden recomendado: Fémur → Tibia/Peroné → Húmero → Radio/Cúbito → Vértebras → Cráneo → Costillas → Manos/Pies. Los 8 huesos del carpo (muñeca) y los 7 del tarso (tobillo) son los más difíciles: déjalos para el final y usa reglas mnemotécnicas (El Escafoides Pide Grandes, Trapecios, Trapezoides y Capitanes).
+                  Orden recomendado: Fémur → Tibia/Peroné → Húmero → Radio/Cúbito → Vértebras → Cráneo → Costillas → Manos/Pies. Los 8 huesos del carpo (muñeca) y los 7 del tarso (tobillo) son los más difíciles: déjalos para el final y apréndelos por filas: en el carpo, la fila proximal (escafoides, semilunar, piramidal y pisiforme) y la distal (trapecio, trapezoide, grande y ganchoso).
                 </p>
               </div>
             </div>
@@ -671,7 +687,7 @@ export default function HuesosCuerpoHumanoPage() {
               <div className={styles.stepContent}>
                 <h4>Repasa usando los filtros de región y tipo</h4>
                 <p>
-                  Usa los filtros de esta app como tests de repaso: filtra "Cráneo" e intenta nombrar cada hueso antes de leerlo. Después filtra "Planos" y comprueba si recuerdas que el cráneo, la escápula, el esternón y las costillas son planos. Este repaso activo retiene 3 veces más que releer apuntes pasivamente.
+                  Usa los filtros de esta app como tests de repaso: filtra "Cráneo" e intenta nombrar cada hueso antes de leerlo. Después filtra "Planos" y comprueba si recuerdas que el cráneo, la escápula, el esternón y las costillas son planos. Intentar recordar antes de mirar es un repaso más activo que releer los apuntes.
                 </p>
               </div>
             </div>
@@ -719,7 +735,7 @@ export default function HuesosCuerpoHumanoPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📱</span>
               <h4>Repaso activo con los filtros de la app</h4>
-              <p>Filtra por región, tapa los nombres con el dedo y recítalos de memoria. El repaso activo retiene 3 veces más que la relectura pasiva según estudios de aprendizaje.</p>
+              <p>Filtra por región, tapa los nombres con el dedo y recítalos de memoria: obliga a recordar en vez de solo reconocer lo que lees.</p>
             </div>
           </div>
         </section>

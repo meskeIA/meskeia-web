@@ -79,11 +79,13 @@ function catalogo(ficheros) {
 }
 const NOTAS = 'app/calculadora-notas/page.tsx';
 const LIMPIADOR = 'app/limpiador-texto/page.tsx';
+const HUESOS = 'app/huesos-cuerpo-humano/page.tsx';
 const casosB = [
   ['CASO DE ORIGEN C0723 · calculadora-notas antes de 0521446c7', true, { [NOTAS]: deGit('0521446c7~1', NOTAS) }, /calculadora-notas\/page\.tsx:\d+ «📚»/],
   ['CASO DE ORIGEN C0723 REPARADO · calculadora-notas en 0521446c7', false, { [NOTAS]: deGit('0521446c7', NOTAS) }],
   ['CASO DE ORIGEN C0661 · limpiador-texto antes de 9b86f89d', true, { [LIMPIADOR]: deGit('9b86f89df~1', LIMPIADOR) }],
   ['CASO DE ORIGEN C0661 REPARADO · limpiador-texto en 9b86f89d', false, { [LIMPIADOR]: deGit('9b86f89df', LIMPIADOR) }],
+  ['CASO DE ORIGEN 5010 · huesos-cuerpo-humano antes de /reparar del 18/11/2026', true, { [HUESOS]: deGit('a4d4f0618', HUESOS) }, /huesos-cuerpo-humano\/page\.tsx:\d+ «📏»/],
   ['escape con razón', false, { [W]: '// iconos-tarjeta-ok: el icono es el resultado del dado, no decoración\n<span className={styles.tipIcon}>🎲</span>' }],
   ['escape SIN razón', true, { [W]: '// iconos-tarjeta-ok:\n<span className={styles.tipIcon}>🎲</span>' }, /SIN razón/],
   ['en components/ también', true, { 'components/Tarjeta.tsx': '<span className={styles.escenarioIcon}>📚</span>' }],
@@ -98,6 +100,7 @@ for (const [nombre, debeFallar, ficheros, salida] of casosB) {
 
 // ─── C. la lista ─────────────────────────────────────────────────────────────
 for (const c of ['escenarioIcon', 'tipIcon', 'tipIcono']) marca(CLASES_ICONO.includes(c), `C · la lista incluye «${c}» (C0723)`);
+for (const c of ['typeIcon', 'factIcon']) marca(CLASES_ICONO.includes(c), `C · la lista incluye «${c}» (hallazgo 5010)`);
 
 console.log(fallos ? `\n${fallos} comprobación(es) mal: check:iconos-tarjeta NO es fiable` : '\ncheck:iconos-tarjeta distingue los casos y falla con los de origen.');
 process.exit(fallos ? 1 : 0);

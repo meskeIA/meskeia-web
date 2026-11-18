@@ -377,19 +377,19 @@ export default function MineralesDelMundoPage() {
           <h2><span aria-hidden="true">💡</span> Datos curiosos</h2>
           <div className={styles.funFacts}>
             <div className={styles.funFact}>
-              <span className={styles.factIcon}>🌍</span>
+              <span className={styles.factIcon} aria-hidden="true">🌍</span>
               <p>Los feldespatos son el grupo de minerales más abundante de la Tierra, formando aproximadamente el 60% de la corteza terrestre.</p>
             </div>
             <div className={styles.funFact}>
-              <span className={styles.factIcon}>💰</span>
+              <span className={styles.factIcon} aria-hidden="true">💰</span>
               <p>El rubí y el zafiro son exactamente el mismo mineral (corindón). Solo se diferencian por las impurezas que les dan color.</p>
             </div>
             <div className={styles.funFact}>
-              <span className={styles.factIcon}>🔬</span>
+              <span className={styles.factIcon} aria-hidden="true">🔬</span>
               <p>El diamante y el grafito tienen la misma composición (carbono puro), pero el diamante es el material más duro y el grafito uno de los más blandos.</p>
             </div>
             <div className={styles.funFact}>
-              <span className={styles.factIcon}>🚀</span>
+              <span className={styles.factIcon} aria-hidden="true">🚀</span>
               <p>El color rojo de Marte se debe a la hematites (óxido de hierro) en su superficie. Por eso se le llama "el planeta rojo".</p>
             </div>
           </div>

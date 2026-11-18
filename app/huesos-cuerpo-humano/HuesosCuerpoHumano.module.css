@@ -215,6 +215,20 @@
   margin: 0 0 4px;
 }
 
+/* El nombre es el botón que abre la ficha con el teclado (hallazgo 5003): se ve como el título */
+.boneNameButton {
+  all: unset;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  border-radius: 4px;
+}
+
+.boneNameButton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .latinName {
   font-size: 0.9rem;
   color: var(--text-secondary);

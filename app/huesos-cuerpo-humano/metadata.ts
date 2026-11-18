@@ -39,13 +39,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Explora los 206 huesos del esqueleto humano: nombre, función, articulaciones y curiosidades. Guía interactiva para estudiantes de medicina, enfermería y anatomía.",
   url: "https://meskeia.com/huesos-cuerpo-humano/",
   category: 'EducationalApplication',
+  // Lo que la app hace (hallazgo 5002): 47 fichas, no 206, porque carpo, tarso, vértebras,
+  // costillas y falanges van agrupados
   features: [
-    'Catálogo de los 206 huesos del esqueleto adulto con nombre en latín',
-    'Filtros por región anatómica: cráneo, columna vertebral, tórax, extremidades superiores e inferiores',
-    'Filtros por tipo de hueso: largo, corto, plano, irregular y sesamoideo',
-    'Articulaciones, función biomecánica y datos curiosos por hueso',
-    'Buscador por nombre, función o articulación entre los 206 huesos',
-    'Contador de resultados dinámico con combinación de filtros',
+    '47 fichas que agrupan los 206 huesos del esqueleto adulto, con nombre latino, tipo, región y cantidad',
+    'Filtros por región: cráneo, cara, oído medio, cuello, columna, tórax, cinturas y extremidades',
+    'Filtro por tipo de hueso: largo, corto, plano, irregular y sesamoideo',
+    'Buscador por nombre, nombre latino, función o articulación, también sin tildes',
+    'Ficha desplegable con articulaciones, función y curiosidad',
+    'Contador de entradas y de huesos que cambia con los filtros',
   ],
 });
 
@@ -72,7 +74,7 @@ export const faqJsonLd = {
       name: '¿Cuál es el hueso más largo del cuerpo humano?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El fémur, el hueso del muslo, es el más largo del cuerpo humano. En un adulto de estatura media mide aproximadamente 45-50 cm y representa alrededor del 27% de la altura total de la persona. También es el hueso más resistente: puede soportar fuerzas de compresión de hasta 1.700 kg.',
+        text: 'El fémur, el hueso del muslo, es el más largo del cuerpo humano. En un adulto de estatura media mide aproximadamente 45-50 cm y representa alrededor del 27% de la altura total de la persona. También es el hueso más resistente del cuerpo: al caminar, correr o saltar soporta cargas de varias veces el peso corporal.',
       },
     },
     {

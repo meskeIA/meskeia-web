@@ -1,5 +1,5 @@
 // Base de datos de huesos del cuerpo humano - meskeIA
-// ~80 huesos principales del esqueleto humano adulto
+// 47 entradas que suman los 206 huesos del esqueleto humano adulto (getTotalBones)
 
 export interface Bone {
   id: string;
@@ -7,15 +7,30 @@ export interface Bone {
   nombreLatin: string;
   region: BoneRegion;
   tipo: BoneType;
-  cantidad: number; // 1 = impar, 2 = par
+  cantidad: number; // huesos que agrupa la entrada (1, 2, 14…)
+  /**
+   * Hueso de la línea media que se repite en serie (las vértebras): impar aunque la entrada cuente
+   * varios. Hasta el 18/11/2026 la ficha ponía «Par» a todo lo que tuviera cantidad > 1, así que
+   * C3-C7 salía «Par (5)» (hallazgo 5000).
+   */
+  lineaMedia?: true;
+  /** Huesos que una entrada agrupada enumera, para que el buscador los encuentre (hallazgo 5002) */
+  incluye?: string[];
   articulaciones: string[];
   funcion: string;
   curiosidad: string;
 }
 
+/**
+ * Las regiones siguen la cuenta de la guía (cráneo 8 + cara 14, oído 6 y hioides 1 aparte): hasta
+ * el 18/11/2026 «Cráneo» metía los huesecillos del oído (14) y «Cara» el hioides (15), y el
+ * escenario de aula prometía otra cifra al filtrar (hallazgo 5005).
+ */
 export type BoneRegion =
   | 'Cráneo'
   | 'Cara'
+  | 'Oído medio'
+  | 'Cuello'
   | 'Columna vertebral'
   | 'Tórax'
   | 'Cintura escapular'
@@ -33,6 +48,8 @@ export type BoneType =
 export const REGIONES: BoneRegion[] = [
   'Cráneo',
   'Cara',
+  'Oído medio',
+  'Cuello',
   'Columna vertebral',
   'Tórax',
   'Cintura escapular',
@@ -53,6 +70,8 @@ export const TIPOS: BoneType[] = [
 export const REGION_EMOJI: Record<BoneRegion, string> = {
   'Cráneo': '🧠',
   'Cara': '👤',
+  'Oído medio': '👂',
+  'Cuello': '🗣️',
   'Columna vertebral': '🦴',
   'Tórax': '🫁',
   'Cintura escapular': '💪',
@@ -125,7 +144,8 @@ export const BONES: Bone[] = [
     region: 'Cráneo',
     tipo: 'Irregular',
     cantidad: 1,
-    articulaciones: ['Todos los huesos del cráneo', 'Vómer', 'Palatinos'],
+    // Cigomáticos: la ficha del cigomático ya lista al esfenoides, y está en «Cara» (hallazgo 5006)
+    articulaciones: ['Todos los huesos del cráneo', 'Vómer', 'Palatinos', 'Cigomáticos'],
     funcion: 'Une todos los huesos del cráneo y aloja la glándula pituitaria en la silla turca',
     curiosidad: 'Su forma recuerda a una mariposa o murciélago con las alas extendidas.',
   },
@@ -240,7 +260,7 @@ export const BONES: Bone[] = [
     id: 'martillo',
     nombre: 'Martillo',
     nombreLatin: 'Malleus',
-    region: 'Cráneo',
+    region: 'Oído medio',
     tipo: 'Irregular',
     cantidad: 2,
     articulaciones: ['Yunque', 'Membrana timpánica'],
@@ -251,7 +271,7 @@ export const BONES: Bone[] = [
     id: 'yunque',
     nombre: 'Yunque',
     nombreLatin: 'Incus',
-    region: 'Cráneo',
+    region: 'Oído medio',
     tipo: 'Irregular',
     cantidad: 2,
     articulaciones: ['Martillo', 'Estribo'],
@@ -262,12 +282,13 @@ export const BONES: Bone[] = [
     id: 'estribo',
     nombre: 'Estribo',
     nombreLatin: 'Stapes',
-    region: 'Cráneo',
+    region: 'Oído medio',
     tipo: 'Irregular',
     cantidad: 2,
     articulaciones: ['Yunque', 'Ventana oval (cóclea)'],
     funcion: 'Transmite las vibraciones al oído interno a través de la ventana oval',
-    curiosidad: 'Es el hueso más pequeño del cuerpo humano, mide solo 2.5-3 mm.',
+    // La misma medida que el resumen de la guía y el FAQPage (hallazgo 5007: aquí decía «2.5-3 mm»)
+    curiosidad: 'Es el hueso más pequeño del cuerpo humano: mide unos 3 mm.',
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -302,6 +323,7 @@ export const BONES: Bone[] = [
     region: 'Columna vertebral',
     tipo: 'Irregular',
     cantidad: 5,
+    lineaMedia: true,
     articulaciones: ['Vértebras adyacentes', 'Discos intervertebrales'],
     funcion: 'Soportan el peso de la cabeza y permiten movimiento del cuello',
     curiosidad: 'Las jirafas también tienen solo 7 vértebras cervicales, pero mucho más largas.',
@@ -313,6 +335,7 @@ export const BONES: Bone[] = [
     region: 'Columna vertebral',
     tipo: 'Irregular',
     cantidad: 12,
+    lineaMedia: true,
     articulaciones: ['Vértebras adyacentes', 'Costillas', 'Discos intervertebrales'],
     funcion: 'Articulan con las costillas y protegen los órganos torácicos',
     curiosidad: 'Son las únicas vértebras que se articulan con las costillas.',
@@ -324,6 +347,7 @@ export const BONES: Bone[] = [
     region: 'Columna vertebral',
     tipo: 'Irregular',
     cantidad: 5,
+    lineaMedia: true,
     articulaciones: ['Vértebras adyacentes', 'Sacro', 'Discos intervertebrales'],
     funcion: 'Soportan la mayor parte del peso corporal y permiten flexión del tronco',
     curiosidad: 'Son las vértebras más grandes porque soportan más peso. El dolor lumbar es muy común.',
@@ -468,6 +492,7 @@ export const BONES: Bone[] = [
     region: 'Extremidad superior',
     tipo: 'Corto',
     cantidad: 16,
+    incluye: ['Escafoides', 'Semilunar', 'Piramidal', 'Pisiforme', 'Trapecio', 'Trapezoide', 'Grande', 'Ganchoso'],
     articulaciones: ['Radio', 'Cúbito', 'Metacarpianos', 'Entre sí'],
     funcion: 'Permiten movimientos finos de la muñeca',
     curiosidad: '8 huesos por mano: escafoides, semilunar, piramidal, pisiforme, trapecio, trapezoide, grande y ganchoso.',
@@ -522,7 +547,9 @@ export const BONES: Bone[] = [
     cantidad: 2,
     articulaciones: ['Coxal (cadera)', 'Tibia', 'Rótula'],
     funcion: 'Soporta el peso corporal y permite la locomoción',
-    curiosidad: 'Es el hueso más largo, fuerte y pesado del cuerpo. Puede soportar 30 veces el peso corporal.',
+    // Sin la cifra: «30 veces el peso corporal» no llevaba fuente y no cuadraba con los «1.700 kg» del
+    // FAQPage (hallazgo 5009)
+    curiosidad: 'Es el hueso más largo, fuerte y pesado del cuerpo. Al caminar, correr o saltar soporta cargas de varias veces el peso corporal.',
   },
   {
     id: 'rotula',
@@ -558,15 +585,18 @@ export const BONES: Bone[] = [
     curiosidad: 'No soporta peso significativo. Se usa para injertos óseos por su forma y accesibilidad.',
   },
   {
+    // 5 por pie, no 7: el astrágalo y el calcáneo tienen ficha propia. Hasta el 18/11/2026 esta
+    // entrada contaba 14 y ellos 2 + 2 más, y el esqueleto sumaba 210 (hallazgo 4999)
     id: 'tarsos',
     nombre: 'Huesos del tarso',
     nombreLatin: 'Ossa tarsi',
     region: 'Extremidad inferior',
     tipo: 'Corto',
-    cantidad: 14,
-    articulaciones: ['Tibia', 'Peroné', 'Metatarsianos', 'Entre sí'],
+    cantidad: 10,
+    incluye: ['Navicular', 'Escafoides del pie', 'Cuboides', 'Cuneiformes'],
+    articulaciones: ['Astrágalo', 'Calcáneo', 'Metatarsianos', 'Entre sí'],
     funcion: 'Forman el tobillo y parte posterior del pie, absorben impactos',
-    curiosidad: '7 por pie: astrágalo, calcáneo, navicular, cuboides, y 3 cuneiformes.',
+    curiosidad: 'El tarso tiene 7 huesos por pie: el astrágalo y el calcáneo (con ficha propia) y estos 5, navicular, cuboides y 3 cuneiformes.',
   },
   {
     id: 'calcaneo',
@@ -620,7 +650,7 @@ export const BONES: Bone[] = [
     id: 'hioides',
     nombre: 'Hioides',
     nombreLatin: 'Os hyoideum',
-    region: 'Cara',
+    region: 'Cuello',
     tipo: 'Irregular',
     cantidad: 1,
     articulaciones: ['Ninguna (suspendido por ligamentos y músculos)'],
@@ -639,15 +669,27 @@ export function getBonesByType(tipo: BoneType): Bone[] {
   return BONES.filter(b => b.tipo === tipo);
 }
 
-// Función auxiliar para buscar huesos
+/** Minúsculas y sin tildes: «rotula» encuentra «Rótula», como se teclea en el móvil (hallazgo 5001) */
+function normalizar(texto: string): string {
+  return texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+}
+
+// Función auxiliar para buscar huesos (también los que una entrada agrupada enumera en `incluye`)
 export function searchBones(query: string): Bone[] {
-  const q = query.toLowerCase();
+  const q = normalizar(query);
   return BONES.filter(b =>
-    b.nombre.toLowerCase().includes(q) ||
-    b.nombreLatin.toLowerCase().includes(q) ||
-    b.funcion.toLowerCase().includes(q) ||
-    b.articulaciones.some(a => a.toLowerCase().includes(q))
+    normalizar(b.nombre).includes(q) ||
+    normalizar(b.nombreLatin).includes(q) ||
+    normalizar(b.funcion).includes(q) ||
+    b.articulaciones.some(a => normalizar(a).includes(q)) ||
+    (b.incluye ?? []).some(h => normalizar(h).includes(q))
   );
+}
+
+/** El rótulo de «Cantidad» en la ficha: las vértebras son impares aunque la entrada cuente varias */
+export function rotuloCantidad(b: Bone): string {
+  if (b.lineaMedia) return `Impar (${b.cantidad} vértebras)`;
+  return b.cantidad === 1 ? 'Impar (1)' : `Par (${b.cantidad})`;
 }
 
 // Calcular total de huesos (sumando cantidades)
