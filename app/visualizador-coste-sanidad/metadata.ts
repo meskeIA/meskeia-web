@@ -61,7 +61,9 @@ export const faqJsonLd = {
       name: '¿Cómo se financia la sanidad pública en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La sanidad pública española se financia principalmente a través de los impuestos generales del Estado (IRPF, IVA, cotizaciones sociales) que se transfieren a las comunidades autónomas, que son las responsables de gestionar los servicios sanitarios. El gasto público sanitario en España representa aproximadamente el 6-7 % del PIB, por debajo de la media europea del 8 %. El copago farmacéutico es la única aportación directa del usuario.',
+        // LGSS art. 109.2 y 109.3.b (hallazgo 5017): las cotizaciones no financian la asistencia
+        // sanitaria general, solo la derivada de accidente de trabajo y enfermedad profesional
+        text: 'La sanidad pública española se financia con impuestos: la Ley General de la Seguridad Social (art. 109) la define como no contributiva, salvo la asistencia por accidentes de trabajo y enfermedades profesionales, que cubren las cotizaciones. Las comunidades autónomas, responsables de gestionar los servicios sanitarios, la pagan con el sistema de financiación autonómica, que se nutre de impuestos como el IRPF o el IVA y de transferencias del Estado. El gasto público sanitario en España representa aproximadamente el 6-7 % del PIB, por debajo de la media europea del 8 %. El copago farmacéutico es la única aportación directa del usuario.',
       },
     },
     {

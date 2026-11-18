@@ -185,11 +185,14 @@ test.describe('Cifras derivadas que la app sí cuadra', () => {
     await expect(page.locator('[class*="_insight"]')).toContainText('más de 4 veces');
   });
 
-  test('las cinco fuentes de financiación suman el 100 %', async ({ page }) => {
+  test('las fuentes de financiación no dan porcentajes sin fuente y citan la LGSS', async ({ page }) => {
+    // Hasta el 18/11/2026 este caso comprobaba que cinco porcentajes (38/32/20/7/3) sumaban 100,
+    // pero ninguno tenía fuente y el primero contradecía la LGSS (hallazgo 5017): sumar 100 no los
+    // hacía ciertos. Ahora las cuatro fuentes van sin porcentaje y con el artículo que las fija.
     await seccion(page, 'Sistema español');
-    const pcts = await page.locator('[class*="_financiacionPct"]').allTextContents();
-    expect(pcts).toHaveLength(5);
-    expect(pcts.map((p) => Number(p.replace(/\D/g, ''))).reduce((a, b) => a + b, 0)).toBe(100);
+    await expect(page.locator('[class*="_financiacionCard"]')).toHaveCount(4);
+    await expect(page.locator('[class*="_financiacionPct"]')).toHaveCount(0);
+    await expect(page.locator('[class*="_financiacionGrid"]')).toContainText('Real Decreto Legislativo 8/2015), artículo 109');
   });
 
   test('las cuatro pestañas se marcan con aria-pressed y cambian el encabezado', async ({ page }) => {
@@ -228,12 +231,12 @@ test.describe('Hallazgos de cálculo (18/11/2026)', () => {
 });
 
 test.describe('Hallazgos de datos (18/11/2026)', () => {
-  test('HALLAZGO (18/11/2026, ABIERTO) · «¿De dónde sale el dinero?» da las cotizaciones sociales como primera fuente (38 %)', async ({ page }) => {
-    // ABIERTO: LGSS art. 109.3.b (BOE-A-2015-11724): la asistencia sanitaria es de naturaleza NO
-    // contributiva (salvo accidente de trabajo y enfermedad profesional) y, art. 109.2, se financia con
-    // aportaciones del Estado / el sistema de financiación autonómica. El FAQPage dice lo mismo que la
-    // tarjeta: «impuestos generales del Estado (IRPF, IVA, cotizaciones sociales)».
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · «¿De dónde sale el dinero?» da las cotizaciones sociales como primera fuente (38 %)', async ({ page }) => {
+    // REPARADO: LGSS art. 109.3.b (BOE-A-2015-11724, consultado el 18/11/2026): la asistencia
+    // sanitaria es de naturaleza NO contributiva «salvo que se deriven de accidentes de trabajo y
+    // enfermedades profesionales» y, art. 109.2, se financia con aportaciones del Estado o el sistema
+    // de financiación autonómica. El FAQPage decía lo mismo que la tarjeta: «impuestos generales del
+    // Estado (IRPF, IVA, cotizaciones sociales)».
     await seccion(page, 'Sistema español');
     const tarjetas = await page.locator('[class*="_financiacionCard"]').evaluateAll((cs) =>
       cs.map((c) => ({
@@ -243,8 +246,12 @@ test.describe('Hallazgos de datos (18/11/2026)', () => {
     );
     const cotizaciones = tarjetas.find((t) => /cotizaciones/i.test(t.fuente));
     expect(cotizaciones?.pct ?? 0).toBeLessThan(10);
+    // Las cotizaciones siguen como fuente, pero solo de la asistencia por contingencias profesionales
+    expect(cotizaciones?.fuente).toBe('Cotizaciones sociales, solo en lo profesional');
+    expect(tarjetas[0].fuente).toBe('Impuestos, vía la financiación autonómica');
     const faq = await respuestaFaqPage(page, /¿Cómo se financia la sanidad pública/);
     expect(faq).not.toMatch(/impuestos generales del Estado \([^)]*cotizaciones sociales/);
+    expect(faq).toContain('no contributiva, salvo la asistencia por accidentes de trabajo y enfermedades profesionales');
   });
 
   test('HALLAZGO (18/11/2026, ABIERTO) · copago: «pensionistas entre el 0% y el 10% (con topes mensuales de 8-18 €)»', async ({ page }) => {

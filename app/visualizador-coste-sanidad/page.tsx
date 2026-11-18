@@ -106,7 +106,7 @@ function SeccionConsulta() {
 
       <div className={styles.insight}>
         <p>
-          <strong>En España, cada consulta de atención primaria cuesta al sistema unos 40-60 €.</strong> Tú no lo pagas directamente, pero se financia con tus impuestos y cotizaciones sociales. En EE.UU., sin seguro, la misma consulta puede suponer una factura de más de 200 $.
+          <strong>En España, cada consulta de atención primaria cuesta al sistema unos 40-60 €.</strong> Tú no lo pagas directamente, pero se financia con tus impuestos. En EE.UU., sin seguro, la misma consulta puede suponer una factura de más de 200 $.
         </p>
       </div>
 
@@ -325,12 +325,17 @@ function SeccionSistema() {
     { nombre: 'EE.UU.', pib: 17.8, perCapita: 12500 },
   ];
 
+  // De dónde sale el dinero según la LGSS (RDL 8/2015, BOE-A-2015-11724), art. 109, consultado el
+  // 18/11/2026: 109.3.b clasifica la asistencia sanitaria como NO contributiva «salvo que se deriven
+  // de accidentes de trabajo y enfermedades profesionales»; 109.2 la financia con aportaciones del
+  // Estado o, si está transferida, con el sistema de financiación autonómica. Hasta esa fecha la
+  // pestaña daba «Cotizaciones sociales 38 %» como primera fuente, y los demás porcentajes
+  // (32/20/7/3) no citaban fuente: se retiran (hallazgo 5017).
   const financiacion = [
-    { fuente: 'Cotizaciones sociales', porcentaje: 38, icono: '💼', detalle: 'Lo que empresa y trabajador pagan a la Seguridad Social cada mes.' },
-    { fuente: 'IRPF y otros impuestos', porcentaje: 32, icono: '📋', detalle: 'Parte de tu declaración de la renta financia directamente la sanidad.' },
-    { fuente: 'IVA y tasas', porcentaje: 20, icono: '🛒', detalle: 'Parte del IVA de cada compra se destina al sistema sanitario autonómico.' },
-    { fuente: 'Copagos farmacéuticos', porcentaje: 7, icono: '💊', detalle: 'Lo que pagas en la farmacia (0-60% según renta). Los pensionistas pagan menos.' },
-    { fuente: 'Otros ingresos', porcentaje: 3, icono: '📊', detalle: 'Transferencias europeas, loterías, y otros ingresos menores.' },
+    { fuente: 'Impuestos, vía la financiación autonómica', icono: '📋', detalle: 'Las comunidades autónomas gestionan la sanidad y la pagan con el sistema de financiación autonómica, que se nutre de impuestos como el IRPF o el IVA y de transferencias del Estado.' },
+    { fuente: 'Aportaciones del Estado', icono: '🏛️', detalle: 'Donde la asistencia sanitaria no está transferida, el Estado la financia con aportaciones al presupuesto de la Seguridad Social.' },
+    { fuente: 'Cotizaciones sociales, solo en lo profesional', icono: '💼', detalle: 'Las cotizaciones solo cubren la asistencia que se deriva de un accidente de trabajo o una enfermedad profesional: el resto de la sanidad pública no es contributiva.' },
+    { fuente: 'Copagos del usuario', icono: '💊', detalle: 'El usuario paga una parte de algunas prestaciones, como los medicamentos con receta.' },
   ];
 
   const costePerCapita = pibSlider * 30; // Aproximación simplificada
@@ -349,14 +354,14 @@ function SeccionSistema() {
             <div className={styles.financiacionHeader}>
               <span aria-hidden="true">{f.icono}</span>
               <span className={styles.financiacionFuente}>{f.fuente}</span>
-              <span className={styles.financiacionPct}>{f.porcentaje}%</span>
-            </div>
-            <div className={styles.financiacionBarra}>
-              <div className={styles.financiacionProgreso} style={{ width: `${f.porcentaje * 2}%` }} />
             </div>
             <p className={styles.financiacionDetalle}>{f.detalle}</p>
           </div>
         ))}
+        <p className={styles.financiacionDetalle}>
+          Fuente: Ley General de la Seguridad Social (Real Decreto Legislativo 8/2015), artículo 109. La
+          ley dice de dónde sale el dinero, no un reparto fijo en porcentajes.
+        </p>
       </div>
 
       {/* Slider PIB */}
@@ -485,8 +490,9 @@ export default function VisualizadorCosteSanidadPage() {
         >
           <h3>¿Es realmente &quot;gratis&quot; la sanidad pública?</h3>
           <p>
-            No, pero funciona como un seguro colectivo. Cada trabajador aporta a través de impuestos
-            y cotizaciones sociales. Un asalariado con sueldo medio contribuye unos {formatCurrency(2000)}-{formatCurrency(3000)} anuales
+            No, pero funciona como un seguro colectivo que se paga sobre todo con impuestos: la ley
+            la define como no contributiva, salvo la asistencia por accidente de trabajo o enfermedad
+            profesional, que cubren las cotizaciones. Un asalariado con sueldo medio contribuye unos {formatCurrency(2000)}-{formatCurrency(3000)} anuales
             al sistema sanitario. A cambio, tiene acceso ilimitado a consultas, urgencias, operaciones y medicamentos
             subvencionados, sin importar cuánto use el sistema.
           </p>
