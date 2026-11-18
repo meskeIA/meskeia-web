@@ -1,7 +1,6 @@
 'use client';
-// @disclaimer: exempt
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './VisualizadorCerebro.module.css';
 import {
   MeskeiaLogo,
@@ -10,6 +9,7 @@ import {
   RelatedApps,
   LegalNotice,
   ShareCard,
+  DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
 
@@ -27,7 +27,7 @@ interface SeccionInfo {
 }
 
 const SECCIONES: SeccionInfo[] = [
-  { id: 'maquina', titulo: 'La máquina', icono: '🧠', subtitulo: 'La máquina más compleja del universo' },
+  { id: 'maquina', titulo: 'La máquina', icono: '🧠', subtitulo: 'Neuronas, lóbulos y energía' },
   { id: 'recuerdo', titulo: 'Recuerdos', icono: '💾', subtitulo: 'Cómo se forma un recuerdo' },
   { id: 'plasticidad', titulo: 'Neuroplasticidad', icono: '🔄', subtitulo: 'Tu cerebro se recablea' },
   { id: 'ilusiones', titulo: 'Ilusiones', icono: '👁️', subtitulo: 'Trucos que te engañan' },
@@ -40,28 +40,38 @@ const SECCIONES: SeccionInfo[] = [
 interface LobuloInfo {
   id: string;
   nombre: string;
+  /** Borde y tinte del botón (decorativo, sin texto encima a pleno color) */
   color: string;
-  colorDark: string;
+  /** Fondo del botón pulsado con texto blanco, y título sobre la tarjeta clara: ≥ 4,5:1 */
+  colorTexto: string;
+  /** Título sobre la tarjeta oscura (#2A2A2A): ≥ 4,5:1 */
+  colorTextoOscuro: string;
   funciones: string[];
   dato: string;
   posicion: string;
 }
 
+// Hasta el 18/11/2026 el nombre iba en blanco sobre el tinte (1,31-1,42:1) o sobre el color pleno
+// (2,87-3,82:1), y el título del detalle en el color pleno (hallazgos 5069 y 5070). colorTexto da
+// con blanco: frontal 5,44, parietal 6,45, temporal 5,83, occipital 7,0; colorTextoOscuro sobre
+// #2A2A2A: 6,4, 7,4, 7,6 y 6,1.
 const LOBULOS: LobuloInfo[] = [
   {
     id: 'frontal',
     nombre: 'Lóbulo frontal',
     color: '#E74C3C',
-    colorDark: '#C0392B',
+    colorTexto: '#C0392B',
+    colorTextoOscuro: '#F1948A',
     funciones: ['Planificación', 'Toma de decisiones', 'Personalidad', 'Control de impulsos', 'Habla (área de Broca)'],
-    dato: 'Es el más grande. Se desarrolla completamente hacia los 25 años.',
+    dato: 'Es el más grande y el último en terminar de madurar: su desarrollo se prolonga más allá de la adolescencia.',
     posicion: 'top: 10%; left: 18%; width: 42%; height: 35%;',
   },
   {
     id: 'parietal',
     nombre: 'Lóbulo parietal',
     color: '#3498DB',
-    colorDark: '#2980B9',
+    colorTexto: '#1F6391',
+    colorTextoOscuro: '#85C1E9',
     funciones: ['Tacto y dolor', 'Orientación espacial', 'Cálculo matemático', 'Integración sensorial'],
     dato: 'Crea tu mapa corporal: sabe dónde está cada parte de tu cuerpo.',
     posicion: 'top: 8%; left: 55%; width: 30%; height: 30%;',
@@ -70,7 +80,8 @@ const LOBULOS: LobuloInfo[] = [
     id: 'temporal',
     nombre: 'Lóbulo temporal',
     color: '#27AE60',
-    colorDark: '#1E8449',
+    colorTexto: '#1A7340',
+    colorTextoOscuro: '#7DCEA0',
     funciones: ['Audición', 'Comprensión del lenguaje (Wernicke)', 'Memoria a largo plazo', 'Reconocimiento facial'],
     dato: 'Contiene el hipocampo, esencial para formar nuevos recuerdos.',
     posicion: 'top: 50%; left: 12%; width: 35%; height: 30%;',
@@ -79,7 +90,8 @@ const LOBULOS: LobuloInfo[] = [
     id: 'occipital',
     nombre: 'Lóbulo occipital',
     color: '#9B59B6',
-    colorDark: '#7D3C98',
+    colorTexto: '#7D3C98',
+    colorTextoOscuro: '#C39BD3',
     funciones: ['Visión', 'Procesamiento de color', 'Reconocimiento de formas', 'Percepción de movimiento'],
     dato: 'Aunque está atrás, procesa todo lo que ves. Un golpe aquí puede causar ceguera.',
     posicion: 'top: 42%; left: 68%; width: 22%; height: 28%;',
@@ -93,14 +105,14 @@ function SeccionMaquina() {
   const cifras = [
     { valor: formatNumber(86000, 0), unidad: 'millones', label: 'Neuronas', icono: '⚡' },
     { valor: formatNumber(150, 0), unidad: 'billones', label: 'Sinapsis (conexiones)', icono: '🔗' },
-    { valor: '2%', unidad: 'del peso corporal', label: 'Solo ~1,4 kg', icono: '⚖️' },
-    { valor: '20%', unidad: 'de la energía', label: 'Consumo energético', icono: '🔋' },
+    { valor: '2 %', unidad: 'del peso corporal', label: 'Solo ~1,4 kg', icono: '⚖️' },
+    { valor: '20 %', unidad: 'de la energía', label: 'Consumo energético', icono: '🔋' },
   ];
 
   return (
     <div className={styles.seccionContent}>
       <div className={styles.contexto}>
-        <p>Tu cerebro tiene <strong>{formatNumber(86000, 0)} millones de neuronas</strong> conectadas por <strong>150 billones de sinapsis</strong>. Pesa solo el 2% de tu cuerpo, pero consume el 20% de tu energía.</p>
+        <p>Tu cerebro tiene <strong>{formatNumber(86000, 0)} millones de neuronas</strong> conectadas por <strong>150 billones de sinapsis</strong>. Pesa solo el 2&nbsp;% de tu cuerpo, pero consume el 20&nbsp;% de tu energía.</p>
       </div>
 
       {/* Cifras clave */}
@@ -134,7 +146,7 @@ function SeccionMaquina() {
                   className={`${styles.lobuloBtn} ${lobuloActivo === l.id ? styles.lobuloActivo : ''}`}
                   style={{
                     ...posObj,
-                    backgroundColor: lobuloActivo === l.id ? l.color : `${l.color}44`,
+                    backgroundColor: lobuloActivo === l.id ? l.colorTexto : `${l.color}44`,
                     borderColor: l.color,
                   } as React.CSSProperties}
                   onClick={() => setLobuloActivo(lobuloActivo === l.id ? null : l.id)}
@@ -151,7 +163,13 @@ function SeccionMaquina() {
         {/* Detalle del lóbulo seleccionado */}
         {lobuloSeleccionado && (
           <div className={styles.lobuloDetalle} style={{ borderLeftColor: lobuloSeleccionado.color }}>
-            <h4 className={styles.lobuloDetalleTitulo} style={{ color: lobuloSeleccionado.color }}>
+            <h4
+              className={styles.lobuloDetalleTitulo}
+              style={{
+                '--lobulo-texto': lobuloSeleccionado.colorTexto,
+                '--lobulo-texto-oscuro': lobuloSeleccionado.colorTextoOscuro,
+              } as React.CSSProperties}
+            >
               {lobuloSeleccionado.nombre}
             </h4>
             <ul className={styles.lobuloFunciones}>
@@ -185,7 +203,7 @@ function SeccionMaquina() {
           <div className={styles.comparacionItem}>
             <span className={styles.comparacionCategoria}>Almacenamiento</span>
             <div className={styles.comparacionDual}>
-              <span className={styles.comparacionCerebro}><span aria-hidden="true">🧠</span> ~2,5 petabytes estimados</span>
+              <span className={styles.comparacionCerebro}><span aria-hidden="true">🧠</span> ~2,5 petabytes (estimación divulgativa de Paul Reber, 2010)</span>
               <span className={styles.comparacionPC}><span aria-hidden="true">💻</span> ~1-4 TB (disco duro típico)</span>
             </div>
           </div>
@@ -215,6 +233,8 @@ function SeccionRecuerdo() {
       descripcion: 'Tus sentidos captan información y la convierten en señales eléctricas. El hipocampo decide qué merece recordarse.',
       detalle: 'Factores que mejoran la codificación: atención (sin móvil), emoción (recuerdos emocionales se fijan mejor), repetición y conexión con conocimientos previos.',
       color: '#E74C3C',
+      fondo: '#C0392B',
+      colorTexto: 'var(--rojo-texto, #C0392B)',
     },
     {
       icono: '🗄️',
@@ -222,6 +242,8 @@ function SeccionRecuerdo() {
       descripcion: 'Las sinapsis se fortalecen por repetición (potenciación a largo plazo). El recuerdo pasa de corto a largo plazo, principalmente durante el sueño.',
       detalle: 'Durante el sueño profundo (ondas lentas), el hipocampo "reproduce" los eventos del día y los transfiere a la corteza cerebral. Por eso dormir después de estudiar funciona.',
       color: '#2E86AB',
+      fondo: 'var(--primary-boton)',
+      colorTexto: 'var(--primary-texto)',
     },
     {
       icono: '🔍',
@@ -229,8 +251,12 @@ function SeccionRecuerdo() {
       descripcion: 'Reactivar el patrón de sinapsis original. Cada vez que recuerdas algo, lo reconstruyes (no lo reproduces como un vídeo).',
       detalle: 'Por eso los recuerdos cambian con el tiempo: cada recuperación los modifica ligeramente. Los testigos oculares son menos fiables de lo que crees.',
       color: '#48A9A6',
+      fondo: 'var(--secondary-boton)',
+      colorTexto: 'var(--secondary-texto)',
     },
   ];
+  // color pinta solo el borde: con blanco encima daba 2,80-4,11:1 (hallazgo 5070, 18/11/2026).
+  // fondo lleva el blanco de la fase activa (≥ 5,15:1) y colorTexto el <h3>, con su tono en oscuro.
 
   const tiposMemoria = [
     {
@@ -264,7 +290,7 @@ function SeccionRecuerdo() {
   ];
 
   const razonesOlvido = [
-    { titulo: 'Decaimiento', desc: 'Las conexiones sinápticas se debilitan sin uso. Curva de Ebbinghaus: olvidas el 70% en 24 horas sin repaso.', icono: '📉' },
+    { titulo: 'Decaimiento', desc: 'Las conexiones sinápticas se debilitan sin uso. La curva del olvido de Ebbinghaus (1885): la mayor parte de lo aprendido se pierde en las primeras horas sin repaso, y después el olvido se frena.', icono: '📉' },
     { titulo: 'Interferencia', desc: 'Nuevos recuerdos compiten con los antiguos (proactiva) o los nuevos borran los viejos (retroactiva).', icono: '🔀' },
     { titulo: 'Fallo de recuperación', desc: 'El recuerdo está ahí, pero no encuentras la "pista" para acceder. Como un archivo sin nombre en tu ordenador.', icono: '🔐' },
   ];
@@ -282,7 +308,7 @@ function SeccionRecuerdo() {
             <button
               type="button"
               className={`${styles.faseBtn} ${faseActiva === i ? styles.faseActiva : ''}`}
-              style={{ borderColor: f.color, ...(faseActiva === i ? { backgroundColor: f.color, color: 'white' } : {}) }}
+              style={{ borderColor: f.color, ...(faseActiva === i ? { backgroundColor: f.fondo, color: 'white' } : {}) }}
               onClick={() => setFaseActiva(i)}
               aria-pressed={faseActiva === i}
             >
@@ -296,7 +322,7 @@ function SeccionRecuerdo() {
 
       {/* Detalle de la fase seleccionada */}
       <div className={styles.faseDetalle} style={{ borderLeftColor: fases[faseActiva].color }}>
-        <h3 style={{ color: fases[faseActiva].color }}>{fases[faseActiva].titulo}</h3>
+        <h3 style={{ color: fases[faseActiva].colorTexto }}>{fases[faseActiva].titulo}</h3>
         <p className={styles.faseDesc}>{fases[faseActiva].descripcion}</p>
         <p className={styles.faseDetalleTexto}>{fases[faseActiva].detalle}</p>
       </div>
@@ -366,7 +392,7 @@ function SeccionPlasticidad() {
       icono: '🎹',
       antes: 'Cuerpo calloso de grosor estándar',
       despues: 'Cuerpo calloso más grueso y más conexiones interhemisféricas',
-      explicacion: 'Los músicos que empiezan antes de los 7 años tienen un cuerpo calloso (puente entre hemisferios) hasta un 15% más grueso. Ambas manos trabajan coordinadamente, forzando más conexiones.',
+      explicacion: 'Schlaug y colaboradores (1995) observaron que los músicos que empezaron antes de los 7 años tenían más grande la parte anterior del cuerpo calloso (el puente entre hemisferios). Ambas manos trabajan coordinadas, lo que exige más conexiones entre los dos lados.',
       tipo: 'Coordinación motora',
       colorTipo: '#2E86AB',
     },
@@ -449,6 +475,56 @@ function SeccionPlasticidad() {
 // Sección 4: Ilusiones y trucos
 // ─────────────────────────────────────────────
 
+/**
+ * Ceguera al cambio con parpadeo (paradigma de Rensink, O'Regan y Clark, 1997): la escena alterna
+ * con otra casi igual y entre las dos hay un instante en gris. El parpadeo es la interrupción que
+ * esconde el cambio. Hasta el 18/11/2026 el cambio se anunciaba y ocurría al pulsar «Revelar», sin
+ * ninguna interrupción, así que no se podía dejar de ver (hallazgo 5067).
+ */
+const FASES_PARPADEO = [
+  { escena: 'a', ms: 900 },
+  { escena: 'gris', ms: 250 },
+  { escena: 'b', ms: 900 },
+  { escena: 'gris', ms: 250 },
+] as const;
+
+function DemoCegueraCambio({ revelado }: { revelado: boolean }) {
+  const [paso, setPaso] = useState(0);
+
+  useEffect(() => {
+    if (revelado) return;
+    const t = setTimeout(() => setPaso((p) => (p + 1) % FASES_PARPADEO.length), FASES_PARPADEO[paso].ms);
+    return () => clearTimeout(t);
+  }, [paso, revelado]);
+
+  const escena = revelado ? 'b' : FASES_PARPADEO[paso].escena;
+
+  return (
+    <div className={styles.changeDemo}>
+      <div className={styles.changeEscena} aria-hidden="true">
+        {escena !== 'gris' && (
+          <>
+            <div className={styles.changeObjeto} style={{ background: '#2E86AB', left: '10%', top: '20%' }} />
+            <div className={styles.changeObjeto} style={{ background: '#E74C3C', left: '60%', top: '15%' }} />
+            <div className={styles.changeObjeto} style={{ background: '#27AE60', left: '35%', top: '55%' }} />
+            <div
+              className={`${styles.changeObjeto} ${revelado ? styles.changeObjetoMarcado : ''}`}
+              style={{ background: escena === 'a' ? '#F39C12' : '#9B59B6', left: '75%', top: '60%' }}
+            />
+          </>
+        )}
+      </div>
+      <p className={styles.changePista}>
+        <span>
+          {revelado
+            ? 'El círculo de abajo a la derecha pasaba de naranja a morado en cada parpadeo gris. ¿Lo habías visto?'
+            : 'La escena parpadea y, entre una imagen y la siguiente, algo cambia. ¿Qué es?'}
+        </span>
+      </p>
+    </div>
+  );
+}
+
 function SeccionIlusiones() {
   const [ilusion, setIlusion] = useState(0);
   const [revelado, setRevelado] = useState(false);
@@ -466,7 +542,7 @@ function SeccionIlusiones() {
       titulo: 'Sombra del tablero de ajedrez',
       categoria: 'Ilusión de brillo',
       pregunta: '¿Qué cuadrado es más oscuro, A o B?',
-      respuesta: 'Son exactamente del mismo color. Tu cerebro "corrige" la sombra automáticamente, haciendo que B parezca más claro.',
+      respuesta: 'Son exactamente del mismo color. Al revelar se apagan las demás casillas y A y B se quedan como estaban: tu cerebro "corrige" la sombra y hace que B parezca más clara.',
       explicacion: 'Ilusión de Adelson (1995). Tu sistema visual compensa automáticamente las sombras para entender el "verdadero" color de los objetos. Normalmente es útil, pero aquí te engaña.',
       demo: 'checker-shadow',
     },
@@ -482,7 +558,7 @@ function SeccionIlusiones() {
       titulo: 'Miembro fantasma',
       categoria: 'Ilusión somatosensorial',
       pregunta: '¿Puedes sentir una parte del cuerpo que ya no existe?',
-      respuesta: 'Sí. Hasta el 80% de personas que pierden una extremidad siguen sintiéndola — incluyendo dolor, picor o movimiento.',
+      respuesta: 'Sí. Es frecuente que quien pierde una extremidad la siga sintiendo, incluido dolor, picor o movimiento.',
       explicacion: 'El mapa corporal del cerebro (corteza somatosensorial) sigue "esperando" señales de la extremidad amputada. Las neuronas vecinas invaden esa zona, creando sensaciones cruzadas.',
       demo: 'phantom',
     },
@@ -491,7 +567,7 @@ function SeccionIlusiones() {
       categoria: 'Ilusión atencional',
       pregunta: '¿Puedes detectar cambios obvios en tu entorno?',
       respuesta: 'No siempre. Si un cambio ocurre durante una interrupción (parpadeo, movimiento de cámara), tu cerebro puede no detectarlo — incluso si es enorme.',
-      explicacion: 'Simons y Chabris (1999) demostraron que un gorila puede cruzar una escena sin que el 50% de los observadores lo vean, si están concentrados en otra tarea. Tu atención tiene un "ancho de banda" limitado.',
+      explicacion: 'Simons y Levin (1998) lo probaron en la calle: un desconocido preguntaba una dirección y, mientras dos operarios pasaban con una puerta entre los dos, lo sustituía otra persona; cerca de la mitad de los participantes no notó el cambio. Es distinto de la ceguera por falta de atención, en la que no se ve algo que aparece mientras se atiende a otra tarea.',
       demo: 'change-blindness',
     },
   ];
@@ -513,6 +589,7 @@ function SeccionIlusiones() {
             className={`${styles.ilusionTab} ${ilusion === i ? styles.ilusionTabActiva : ''}`}
             onClick={() => { setIlusion(i); setRevelado(false); }}
             aria-pressed={ilusion === i}
+            aria-label={`${i + 1}. ${il.titulo}`}
           >
             {i + 1}
           </button>
@@ -531,41 +608,41 @@ function SeccionIlusiones() {
           {actual.demo === 'muller-lyer' && (
             <div className={styles.mullerLyer}>
               <div className={styles.mullerLinea}>
-                <span className={styles.mullerFlecha}>{'<'}</span>
+                <span className={styles.mullerFlecha} aria-hidden="true">{'<'}</span>
                 <div className={styles.mullerBarra} />
-                <span className={styles.mullerFlecha}>{'>'}</span>
-                {revelado && <span className={styles.mullerMedida}>100%</span>}
+                <span className={styles.mullerFlecha} aria-hidden="true">{'>'}</span>
+                {revelado && <span className={styles.mullerMedida}>100&nbsp;%</span>}
               </div>
               <div className={styles.mullerLinea}>
-                <span className={styles.mullerFlechaInversa}>{'>'}</span>
+                <span className={styles.mullerFlechaInversa} aria-hidden="true">{'>'}</span>
                 <div className={styles.mullerBarra} />
-                <span className={styles.mullerFlechaInversa}>{'<'}</span>
-                {revelado && <span className={styles.mullerMedida}>100%</span>}
+                <span className={styles.mullerFlechaInversa} aria-hidden="true">{'<'}</span>
+                {revelado && <span className={styles.mullerMedida}>100&nbsp;%</span>}
               </div>
             </div>
           )}
 
           {actual.demo === 'checker-shadow' && (
+            // Como en la ilusión de Adelson: A es una casilla OSCURA a la luz y B una CLARA en la sombra
+            // del cilindro, y las dos se pintan con el mismo gris (#787878). La sombra va en el color de
+            // cada casilla, no en una capa encima, para que ningún píxel de B cambie. Revelar apaga las
+            // demás casillas y no toca A ni B. Hasta el 18/11/2026 A era una casilla clara a la luz
+            // (#c8c8c8) y B una clara en sombra (#969696), y revelar las repintaba (hallazgo 5065).
             <div className={styles.checkerBoard}>
               <div className={styles.checkerGrid}>
                 {Array.from({ length: 16 }, (_, i) => {
                   const row = Math.floor(i / 4);
                   const col = i % 4;
                   const isLight = (row + col) % 2 === 0;
-                  const isA = row === 1 && col === 1;
+                  const isA = row === 1 && col === 2;
                   const isB = row === 2 && col === 2;
-                  const inShadow = row >= 2;
-                  let bg: string;
-                  if (revelado) {
-                    bg = (isA || isB) ? '#787878' : isLight ? (inShadow ? '#969696' : '#c8c8c8') : (inShadow ? '#505050' : '#787878');
-                  } else {
-                    bg = isLight ? (inShadow ? '#969696' : '#c8c8c8') : (inShadow ? '#505050' : '#787878');
-                  }
+                  const inShadow = (row === 2 && col >= 1) || row === 3;
+                  const bg = isLight ? (inShadow ? '#787878' : '#c8c8c8') : (inShadow ? '#3c3c3c' : '#787878');
                   return (
                     <div
                       key={i}
                       className={`${styles.checkerCell} ${(isA || isB) ? styles.checkerHighlight : ''}`}
-                      style={{ backgroundColor: bg }}
+                      style={{ backgroundColor: bg, opacity: revelado && !isA && !isB ? 0.12 : 1 }}
                     >
                       {isA && <span className={styles.checkerLabel}>A</span>}
                       {isB && <span className={styles.checkerLabel}>B</span>}
@@ -573,7 +650,7 @@ function SeccionIlusiones() {
                   );
                 })}
               </div>
-              {!revelado && <div className={styles.checkerShadow} />}
+              {!revelado && <div className={styles.checkerCilindro} aria-hidden="true" />}
             </div>
           )}
 
@@ -628,20 +705,7 @@ function SeccionIlusiones() {
             </div>
           )}
 
-          {actual.demo === 'change-blindness' && (
-            <div className={styles.changeDemo}>
-              <div className={styles.changeEscena}>
-                <div className={styles.changeObjeto} style={{ background: '#2E86AB', left: '10%', top: '20%' }} />
-                <div className={styles.changeObjeto} style={{ background: '#E74C3C', left: '60%', top: '15%' }} />
-                <div className={styles.changeObjeto} style={{ background: '#27AE60', left: '35%', top: '55%' }} />
-                {!revelado && <div className={styles.changeObjeto} style={{ background: '#F39C12', left: '75%', top: '60%' }} />}
-                {revelado && <div className={styles.changeObjeto} style={{ background: '#9B59B6', left: '75%', top: '60%' }} />}
-              </div>
-              <p className={styles.changePista}>
-                {revelado ? 'El objeto naranja (abajo derecha) cambió a morado. ¿Lo viste?' : '¿Puedes ver qué cambiará cuando pulses "Revelar"?'}
-              </p>
-            </div>
-          )}
+          {actual.demo === 'change-blindness' && <DemoCegueraCambio revelado={revelado} />}
         </div>
 
         {/* Pregunta */}
@@ -667,7 +731,7 @@ function SeccionIlusiones() {
 
       <div className={styles.insight}>
         <p>
-          Las ilusiones no son &quot;fallos&quot; del cerebro — son <strong>atajos evolutivos</strong> que normalmente funcionan perfectamente. Tu cerebro procesa millones de datos por segundo y necesita simplificar. Estas simplificaciones son correctas el 99% del tiempo.
+          Las ilusiones no son &quot;fallos&quot; del cerebro — son <strong>atajos evolutivos</strong> que normalmente funcionan perfectamente. Tu cerebro procesa millones de datos por segundo y necesita simplificar. En la vida cotidiana, estas simplificaciones aciertan casi siempre.
         </p>
       </div>
     </div>
@@ -696,10 +760,20 @@ export default function VisualizadorCerebroPage() {
 
         <header className={styles.hero}>
           <h1 className={styles.title}>Cómo Piensa tu Cerebro</h1>
-          <p className={styles.subtitle}>Neuronas, memoria, neuroplasticidad e ilusiones — la máquina más compleja del universo</p>
+          <p className={styles.subtitle}>Neuronas, memoria, neuroplasticidad e ilusiones</p>
         </header>
 
         <LegalNotice />
+
+        {/* Suite salud (nivel 2 ALTO, nunca plegable) además de cultura y estudiantes: manda el nivel
+            más alto. Hasta el 18/11/2026 iba con «@disclaimer: exempt» y su única nota quedaba en la
+            guía plegada (hallazgo 5072) */}
+        <DisclaimerCard
+          variant="educational"
+          severity="high"
+          collapsible={false}
+          context="visualizador-cerebro-disclaimer"
+        />
 
         {/* Navegación */}
         <nav className={styles.navSecciones} aria-label="Secciones del explicador">
@@ -733,7 +807,7 @@ export default function VisualizadorCerebroPage() {
           subtitle="Preguntas frecuentes sobre neurociencia"
           defaultOpen={false}
         >
-          <h3>¿Usamos solo el 10% del cerebro?</h3>
+          <h3>¿Usamos solo el 10&nbsp;% del cerebro?</h3>
           <p>
             <strong>No.</strong> Este es uno de los mitos más extendidos. Las imágenes de resonancia magnética
             funcional (fMRI) muestran que prácticamente todas las áreas del cerebro están activas a lo largo
@@ -742,9 +816,10 @@ export default function VisualizadorCerebroPage() {
 
           <h3>¿Cuántas decisiones toma el cerebro al día?</h3>
           <p>
-            Se estima que unas <strong>{formatNumber(35000, 0)} decisiones</strong> al día, la mayoría
-            inconscientes. Desde la postura de tu cuerpo hasta qué palabra usar a continuación.
-            Solo unas pocas (las difíciles) llegan a tu consciencia.
+            No hay un recuento científico: la cifra redonda que circula por internet no sale de ningún
+            estudio. Lo que sí se sabe es que <strong>la mayoría son inconscientes</strong>, desde la
+            postura de tu cuerpo hasta qué palabra usar a continuación, y solo unas pocas (las
+            difíciles) llegan a tu consciencia.
           </p>
 
           <h3>¿Puede el cerebro adulto generar nuevas neuronas?</h3>
@@ -764,7 +839,7 @@ export default function VisualizadorCerebroPage() {
           <div className={styles.warningBox}>
             <strong>Nota:</strong> este explicador simplifica conceptos de neurociencia con fines educativos.
             El cerebro humano es extraordinariamente complejo y muchos de sus mecanismos siguen siendo
-            objeto de investigación activa. Los datos presentados reflejan el consenso científico actual.
+            objeto de investigación activa.
           </div>
         </EducationalSection>
 

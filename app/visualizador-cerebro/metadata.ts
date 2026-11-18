@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Cómo Piensa tu Cerebro - Explicador Visual',
-    description: '86.000 millones de neuronas, 150 billones de sinapsis. Así funciona la máquina más compleja del universo.',
+    description: '86.000 millones de neuronas y billones de sinapsis: así se forman los recuerdos, así se recablea el cerebro y así te engañan las ilusiones.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Cerebro meskeIA' },
@@ -54,7 +54,7 @@ export const faqJsonLd = {
       name: '¿Cuántas neuronas tiene el cerebro humano?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El cerebro humano contiene aproximadamente 86.000 millones de neuronas, según estudios de recuento directo realizados por el neurocientífico Suzana Herculano-Houzel. Cada neurona puede conectarse con otras 10.000, lo que genera unos 150 billones de sinapsis en total. Esta red es responsable de todas las funciones cognitivas, emocionales y motoras del organismo.',
+        text: 'El cerebro humano contiene aproximadamente 86.000 millones de neuronas, según el recuento directo del equipo de la neurocientífica Suzana Herculano-Houzel (Azevedo y colaboradores, 2009). Cada neurona se conecta con miles de otras, y el total de sinapsis se estima en el orden de cien billones o más; las cifras varían según el método y la región contada. Esta red es responsable de todas las funciones cognitivas, emocionales y motoras del organismo.',
       },
     },
     {

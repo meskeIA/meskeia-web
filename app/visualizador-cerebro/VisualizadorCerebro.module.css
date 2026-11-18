@@ -50,10 +50,14 @@
 .lobuloBtn:hover { opacity: 0.9; transform: scale(1.03); }
 .lobuloBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .lobuloActivo { opacity: 1; }
-.lobuloNombre { font-size: 0.7rem; font-weight: 700; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); text-align: center; }
+/* Sin pulsar, texto del tema sobre el tinte al 27 % (≥ 7,7:1 en los dos temas); pulsado, blanco sobre
+   el colorTexto del lóbulo (≥ 5,44:1). Hasta el 18/11/2026, blanco siempre: 1,31-3,82:1 (hallazgo 5069) */
+.lobuloNombre { font-size: 0.7rem; font-weight: 700; color: var(--text-primary); text-align: center; }
+.lobuloActivo .lobuloNombre { color: white; }
 
 .lobuloDetalle { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid; border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-md); }
-.lobuloDetalleTitulo { font-size: 1rem; font-weight: 700; margin: 0 0 var(--spacing-sm) 0; }
+.lobuloDetalleTitulo { font-size: 1rem; font-weight: 700; margin: 0 0 var(--spacing-sm) 0; color: var(--lobulo-texto, var(--text-primary)); }
+[data-theme='dark'] .lobuloDetalleTitulo { color: var(--lobulo-texto-oscuro, var(--text-primary)); }
 .lobuloFunciones { margin: 0 0 var(--spacing-sm) 0; padding-left: 1.2rem; }
 .lobuloFunciones li { font-size: 0.88rem; color: var(--text-primary); line-height: 1.6; }
 .lobuloDato { font-size: 0.82rem; color: var(--text-muted); font-style: italic; margin: 0; }
@@ -161,7 +165,8 @@
 .checkerCell { display: flex; align-items: center; justify-content: center; transition: background-color 0.3s; }
 .checkerHighlight { outline: 3px solid var(--primary); outline-offset: -3px; z-index: 1; }
 .checkerLabel { font-size: 1rem; font-weight: 800; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-.checkerShadow { position: absolute; top: 50%; left: 0; right: 0; bottom: 0; background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%); pointer-events: none; border-radius: 0 0 4px 4px; }
+/* El cilindro que proyecta la sombra: ocupa solo la columna 4, lejos de A y B (columna 3) */
+.checkerCilindro { position: absolute; top: 40px; left: 158px; width: 38px; height: 92px; border-radius: 19px / 8px; background: linear-gradient(90deg, #2f7d4f 0%, #6fcf97 45%, #1e5a37 100%); box-shadow: -6px 6px 10px rgba(0,0,0,0.35); pointer-events: none; z-index: 2; }
 
 /* McGurk */
 .mcgurkDemo { width: 100%; }
@@ -189,7 +194,8 @@
 /* Change blindness */
 .changeDemo { width: 100%; text-align: center; }
 .changeEscena { position: relative; width: 280px; height: 160px; margin: 0 auto var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); }
-.changeObjeto { position: absolute; width: 30px; height: 30px; border-radius: 50%; transition: background 0.3s; }
+.changeObjeto { position: absolute; width: 30px; height: 30px; border-radius: 50%; }
+.changeObjetoMarcado { outline: 3px dashed var(--text-primary); outline-offset: 4px; }
 .changePista { font-size: 0.82rem; color: var(--text-secondary); margin: 0; font-style: italic; }
 
 .ilusionPregunta { font-size: 1rem; font-weight: 600; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-md); }

@@ -199,14 +199,15 @@ test.describe('CASO 2 — Ilusiones: lo que cada demo dice que muestra', () => {
     await seccion(page, 'Ilusiones');
   });
 
-  test('Müller-Lyer: las dos barras miden lo mismo (200 px) y al revelar las dos dicen «100%»', async ({ page }) => {
+  test('Müller-Lyer: las dos barras miden lo mismo (200 px) y al revelar las dos dicen «100 %»', async ({ page }) => {
     const barras = page.locator('[class*="_mullerBarra"]');
     await expect(barras).toHaveCount(2);
     const [a, b] = await Promise.all([barras.nth(0).boundingBox(), barras.nth(1).boundingBox()]);
     expect(a?.width).toBe(200);
     expect(b?.width).toBe(200);
     await revelar(page).click();
-    await expect(page.locator('[class*="_mullerMedida"]')).toHaveText(['100%', '100%']);
+    // Con espacio duro desde el 18/11/2026 (hallazgo 5071)
+    await expect(page.locator('[class*="_mullerMedida"]')).toHaveText(['100 %', '100 %']);
   });
 
   test('tablero de Adelson: la respuesta afirma «Son exactamente del mismo color» (premisa del caso siguiente)', async ({ page }) => {
@@ -218,15 +219,12 @@ test.describe('CASO 2 — Ilusiones: lo que cada demo dice que muestra', () => {
     await expect(page.locator('[class*="_ilusionRespuesta"]')).toContainText('Son exactamente del mismo color');
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · tablero de Adelson: A se pinta a 200 y B a 150, y «Revelar» repinta las dos a 120', async ({ page }) => {
-    // ABIERTO: la demo no reproduce la ilusión, la contradice. A (fila 1, col 1) es casilla CLARA
-    // fuera de la sombra (#c8c8c8) y B (fila 2, col 2) casilla clara en sombra (#969696): B es de
-    // verdad más oscura y quien lo dice acierta, pero la app le contesta que son iguales. «Revelar»
-    // no muestra que lo eran: las repinta a #787878. En la ilusión de Adelson, A es casilla OSCURA a
-    // la luz y B clara en sombra, con el mismo gris. Además A y B llevan z-index: 1 (checkerHighlight)
-    // y la capa de sombra no pasa por encima de B. Pasa a verde cuando A y B salen con el mismo
-    // píxel antes de revelar y revelar no lo cambia.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · tablero de Adelson: A y B, el mismo píxel, y «Revelar» no las repinta', async ({ page }) => {
+    // REPARADO (18/11/2026): A (fila 1, col 1) era casilla CLARA fuera de la sombra (#c8c8c8) y B
+    // (fila 2, col 2) clara en sombra (#969696), y «Revelar» las repintaba a #787878. Ahora, como en
+    // la ilusión de Adelson, A es una casilla OSCURA a la luz (fila 1, col 2) y B una clara en la
+    // sombra del cilindro, las dos #787878; la sombra va en el color de cada casilla y revelar solo
+    // apaga las demás.
     await ilusion(page, 2);
     const tablero = page.locator('[class*="_checkerBoard"]');
     const [a, b] = await pixeles(page, tablero, [celda(page, 'A'), celda(page, 'B')]);
@@ -237,21 +235,22 @@ test.describe('CASO 2 — Ilusiones: lo que cada demo dice que muestra', () => {
     expect(a2, 'revelar no repinta A').toEqual(a);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · «Ceguera al cambio» se ilustra con el gorila de Simons y Chabris, que es otra cosa', async ({ page }) => {
-    // ABIERTO: la respuesta define la ceguera al cambio como no ver un cambio que ocurre «durante
-    // una interrupción (parpadeo, movimiento de cámara)»; la explicación pone de ejemplo el gorila
-    // que cruza la escena mientras se atiende a otra tarea, sin interrupción ni cambio: el estudio
-    // que cita (Simons y Chabris, 1999, «Gorillas in our midst: sustained inattentional blindness
-    // for dynamic events») trata de la ceguera por falta de atención. Y la demo anuncia el cambio
-    // («¿Puedes ver qué cambiará cuando pulses "Revelar"?») y lo hace sin interrupción: no se puede
-    // dejar de verlo.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · «Ceguera al cambio»: ejemplo de cambio con interrupción y demo con parpadeo', async ({ page }) => {
+    // REPARADO (18/11/2026): la explicación ponía el gorila de Simons y Chabris (1999), que es
+    // ceguera por falta de atención, y la demo anunciaba el cambio y lo hacía sin interrupción. Ahora
+    // el ejemplo es el de la puerta de Simons y Levin (1998) y la escena alterna con otra a través
+    // de un instante en gris (el parpadeo que esconde el cambio).
     await ilusion(page, 5);
+    const escena = page.locator('[class*="_changeEscena"]');
+    // El parpadeo: en algún momento la escena se queda sin objetos (el gris entre las dos imágenes)
+    await expect.poll(() => escena.locator('[class*="_changeObjeto"]').count(), { intervals: [50] }).toBe(0);
+    await expect.poll(() => escena.locator('[class*="_changeObjeto"]').count(), { intervals: [50] }).toBe(4);
     await revelar(page).click();
     const titulo = (await page.locator('[class*="_ilusionTitulo"]').textContent()) ?? '';
     const explicacion = (await page.locator('[class*="_explicacionTexto"]').textContent()) ?? '';
     expect(titulo).toBe('Ceguera al cambio');
     expect(/gorila/i.test(explicacion), `la explicación de «${titulo}» es: ${explicacion}`).toBe(false);
+    expect(explicacion).toContain('Simons y Levin (1998)');
   });
 
   test('las cinco ilusiones abren su respuesta y «Revelar» alterna con «Ocultar respuesta»', async ({ page }) => {
@@ -293,12 +292,12 @@ test.describe('CASO 3 — Operativa con teclado', () => {
 });
 
 test.describe('Hallazgos de contenido (18/11/2026)', () => {
-  test('HALLAZGO (18/11/2026, ABIERTO) · FAQPage: «86.000 millones» × «otras 10.000» no da «unos 150 billones» de sinapsis', async ({ page }) => {
-    // ABIERTO: 86.000 millones × 10.000 = 8,6 × 10^14 = 860 billones (430 aunque cada sinapsis se
-    // contara dos veces); el «lo que genera unos 150 billones» no sale de sus propios números. La
-    // misma respuesta dice «el neurocientífico Suzana Herculano-Houzel» (la neurocientífica).
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · FAQPage: «86.000 millones» × «otras 10.000» no daba «unos 150 billones» de sinapsis', async ({ page }) => {
+    // REPARADO (18/11/2026): 86.000 millones × 10.000 = 8,6 × 10^14 = 860 billones, no los «unos 150
+    // billones» que deducía. Ahora no deduce: «miles de otras» y un total «del orden de cien billones
+    // o más», que varía según el método; y «la neurocientífica Suzana Herculano-Houzel».
     const faq = await respuestaFaqPage(page, /¿Cuántas neuronas tiene el cerebro humano/);
+    expect(faq).toContain('la neurocientífica Suzana Herculano-Houzel');
     const m = faq.match(/otras ([\d.]+), lo que genera unos ([\d.]+) billones/);
     if (m) {
       const derivadas = 86000e6 * Number(m[1].replace(/\./g, ''));
@@ -308,11 +307,12 @@ test.describe('Hallazgos de contenido (18/11/2026)', () => {
     expect(faq).not.toContain('el neurocientífico Suzana');
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · cifras populares sin fuente ni año (35.000 decisiones, 70 % en 24 h, 2,5 PB…)', async ({ page }) => {
-    // ABIERTO: §1.quinquies, regla 1 («atribuye fuente y año»). La nota de la guía dice que «los
-    // datos presentados reflejan el consenso científico actual», pero ninguna de estas frases dice
-    // de dónde sale su cifra. Pasa a verde cuando cada una desaparece o lleva su año.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · cifras populares sin fuente ni año (35.000 decisiones, 70 % en 24 h, 2,5 PB…)', async ({ page }) => {
+    // REPARADO (18/11/2026): §1.quinquies, regla 1 («atribuye fuente y año»). Se retiran las cifras
+    // sin estudio detrás (35.000 decisiones, 99 %, 25 años, 80 %) o se atribuyen: Ebbinghaus (1885),
+    // Reber (2010), Schlaug y colaboradores (1995). La nota de la guía ya no dice que «los datos
+    // presentados reflejan el consenso científico actual».
+    await expect(page.getByText('reflejan el consenso científico actual')).toHaveCount(0);
     const textos: string[] = [];
     await botonLobulo(page, 'frontal').click();
     textos.push(await page.locator('[class*="_seccionContent"]').innerText());
@@ -333,21 +333,20 @@ test.describe('Hallazgos de contenido (18/11/2026)', () => {
     expect(sinFuente).toEqual([]);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · formato: el «%» va pegado a la cifra («2%», «20%», «99%»)', async ({ page }) => {
-    // ABIERTO: CLAUDE.md global §2 (decidido el 25/09/2026): «15 %» con espacio duro. También
-    // «70%», «15%», «80%», «50%» y las medidas «100%» del Müller-Lyer.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · formato: el «%» iba pegado a la cifra («2%», «20%», «99%»)', async ({ page }) => {
+    // REPARADO (18/11/2026): CLAUDE.md global §2 (decidido el 25/09/2026): «15 %» con espacio duro.
     const visibles = [await page.locator('[class*="_seccionContent"]').innerText()];
+    expect(visibles[0]).toContain('2 %');
     await seccion(page, 'Ilusiones');
+    await revelar(page).click();
     visibles.push(await page.locator('[class*="_seccionContent"]').innerText());
     expect(visibles.join('\n').match(/.{0,12}\d%.{0,8}/g) ?? []).toEqual([]);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · suite salud con «@disclaimer: exempt»: su única nota va en la guía plegada', async ({ page }) => {
-    // ABIERTO: suites ['salud', 'cultura', 'estudiantes']; la regla multi-suite de la política de
-    // disclaimers aplica el nivel de salud (1 o 2, no plegable). La nota «este explicador simplifica
-    // conceptos de neurociencia…» está dentro de <EducationalSection>, que nace colapsada.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · suite salud con «@disclaimer: exempt»: su única nota iba en la guía plegada', async ({ page }) => {
+    // REPARADO (18/11/2026): suites ['salud', 'cultura', 'estudiantes']; la regla multi-suite de la
+    // política de disclaimers aplica el nivel de salud (2, no plegable). Ahora monta DisclaimerCard
+    // severity="high" fijo, como huesos-cuerpo-humano (f33e02980); la nota sigue en la guía.
     await expect(page.getByText('este explicador simplifica conceptos')).toBeHidden();
     const aviso = page.locator('[role="note"]');
     const hayAviso = (await aviso.count()) > 0 && (await aviso.first().isVisible());
@@ -356,12 +355,10 @@ test.describe('Hallazgos de contenido (18/11/2026)', () => {
 });
 
 test.describe('Hallazgos de accesibilidad (18/11/2026)', () => {
-  test('HALLAZGO (18/11/2026, ABIERTO) · los nombres del mapa de lóbulos: blanco sobre su tinte, de 1,31:1 a 1,42:1 (pulsados, de 2,87 a 3,82)', async ({ page }) => {
-    // ABIERTO: el botón sin pulsar lleva de fondo `${color}44` (27 % de opacidad) sobre la tarjeta
-    // blanca y el nombre en blanco de 11,2 px: frontal 1,42, parietal 1,33, temporal 1,31,
-    // occipital 1,42. Pulsado, el color pleno: frontal 3,82, parietal 3,15, temporal 2,87 (solo el
-    // occipital, 4,67, llega a 4,5:1). El text-shadow no cuenta para WCAG.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · los nombres del mapa de lóbulos: blanco sobre su tinte, de 1,31:1 a 1,42:1 (pulsados, de 2,87 a 3,82)', async ({ page }) => {
+    // REPARADO (18/11/2026): el nombre iba en blanco sobre `${color}44` (1,31-1,42:1) o sobre el
+    // color pleno (2,87-3,82:1). Ahora va en el texto del tema sobre el tinte y, pulsado, en blanco
+    // sobre el colorTexto del lóbulo (≥ 5,44:1).
     const fondoMapa = rgb(await estilo(page, page.locator('[class$="_cerebroMapa"]'), 'backgroundColor'));
     const fallos: string[] = [];
     for (const n of LOBULOS) {
@@ -381,13 +378,11 @@ test.describe('Hallazgos de accesibilidad (18/11/2026)', () => {
     expect(fallos).toEqual([]);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · títulos y fases pintados con el color de su dato, por debajo de 4,5:1', async ({ page }) => {
-    // ABIERTO: el título del lóbulo (16 px negrita) va en el color del lóbulo: frontal 3,82, parietal
-    // 3,15, temporal 2,87 sobre blanco; en oscuro, frontal 3,76 y occipital 3,07 sobre #2A2A2A. La
-    // fase activa pone blanco sobre su color (13,1 px negrita): Codificación 3,82, Almacenamiento
-    // 4,11, Recuperación 2,80, y su <h3> (16,8 px negrita) los mismos valores sobre blanco.
-    // check:contraste-marca no lo ve: el hexadecimal va en el array de datos, no en el style={{…}}.
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO) · títulos y fases pintados con el color de su dato, por debajo de 4,5:1', async ({ page }) => {
+    // REPARADO (18/11/2026): el título del lóbulo iba en el color del lóbulo (2,87-3,82:1) y la fase
+    // activa ponía blanco sobre su color (2,80-4,11:1). Ahora el título usa colorTexto (claro) y
+    // colorTextoOscuro (oscuro), la fase activa #C0392B, --primary-boton y --secondary-boton, y su
+    // <h3> --rojo-texto, --primary-texto y --secondary-texto. El caso en oscuro, en el test siguiente.
     const fallos: string[] = [];
     for (const n of LOBULOS) {
       await botonLobulo(page, n).click();
@@ -409,10 +404,33 @@ test.describe('Hallazgos de accesibilidad (18/11/2026)', () => {
     expect(fallos).toEqual([]);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · las pestañas de ilusiones se llaman «1»…«5» y el Müller-Lyer se lee «<» «>»', async ({ page }) => {
-    // ABIERTO: el lector anuncia «1, botón, presionado» sin decir qué ilusión es, y los extremos de
-    // las líneas son caracteres sin aria-hidden.
-    test.fail();
+  test('títulos del lóbulo y de la fase en tema oscuro: ≥ 4,5:1 sobre la tarjeta (hallazgo 5070)', async ({ page }) => {
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    const fallos: string[] = [];
+    for (const n of LOBULOS) {
+      await botonLobulo(page, n).click();
+      const h4 = detalle(page).locator('h4');
+      const fondo = rgb(await estilo(page, detalle(page), 'backgroundColor'));
+      expect(fondo, 'la tarjeta está en oscuro').toEqual([42, 42, 42]);
+      const r = contraste(rgb(await estilo(page, h4, 'color')), fondo);
+      if (r < 4.5) fallos.push(`título ${n}: ${r.toFixed(2)}:1`);
+    }
+    await seccion(page, 'Recuerdos');
+    for (const fase of ['Codificación', 'Almacenamiento', 'Recuperación']) {
+      const b = page.getByRole('button', { name: fase });
+      await b.click();
+      await expect(b).toHaveAttribute('aria-pressed', 'true');
+      const h3 = faseDetalle(page).locator('h3');
+      const rh = contraste(rgb(await estilo(page, h3, 'color')), rgb(await estilo(page, faseDetalle(page), 'backgroundColor')));
+      if (rh < 4.5) fallos.push(`h3 ${fase}: ${rh.toFixed(2)}:1`);
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  test('HALLAZGO (18/11/2026, REPARADO) · las pestañas de ilusiones se llamaban «1»…«5» y el Müller-Lyer se leía «<» «>»', async ({ page }) => {
+    // REPARADO (18/11/2026): cada pestaña lleva aria-label «N. <título>» (con el número visible
+    // dentro, WCAG 2.5.3) y los extremos de las líneas van con aria-hidden.
     await seccion(page, 'Ilusiones');
     await expect(pestanasIlusion(page).first()).toHaveAccessibleName(/Müller-Lyer/, { timeout: 1000 });
     const arbol = await page.locator('[class*="_demoArea"]').ariaSnapshot();
