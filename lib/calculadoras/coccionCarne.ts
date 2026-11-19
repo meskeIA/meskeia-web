@@ -101,7 +101,7 @@ export const ALIMENTOS_COCCION: AlimentoCoccion[] = [
     minSeguroC: 63,
     minSeguroF: 145,
     reposoMin: 0,
-    avisoCrudo: 'El punto jugoso (típico en salmón o atún) queda por debajo del mínimo seguro. Para crudo o poco hecho, usa pescado muy fresco y previamente congelado (anisakis).',
+    avisoCrudo: 'El punto jugoso (típico en salmón o atún) queda por debajo del mínimo seguro. Para crudo o poco hecho, usa pescado muy fresco y previamente congelado contra el anisakis: en casa, a −15 °C o menos durante al menos 4 días (la AESAN recomienda contar 5 desde que entra en el congelador); el congelado industrial, a −20 °C 24 horas o a −35 °C 15 horas.',
     puntos: [
       { nombre: 'Jugoso', tempC: 52, tempF: 126, descripcion: 'Centro translúcido (salmón, atún).', seguro: false },
       { nombre: 'Al punto', tempC: 58, tempF: 136, descripcion: 'Opaco pero jugoso, se desmiga apenas.', seguro: false },

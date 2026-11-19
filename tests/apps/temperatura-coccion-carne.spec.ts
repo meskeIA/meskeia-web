@@ -247,16 +247,17 @@ test.describe('Contenido de seguridad alimentaria', () => {
     expect(aLaVista).toMatch(/70\s?°C/);
   });
 
-  // HALLAZGO [medio] (16/11/2026, ABIERTO): «usa pescado muy fresco y previamente congelado
-  // (anisakis)» sin decir cómo. La AESAN (página del anisakis): en casa, «congelar el pescado a
-  // -15 °C o temperatura inferior durante al menos 4 días» (recomienda contar 5); en la industria,
-  // «–20 °C durante 24 horas o a -35 °C durante 15 horas como mínimo».
-  test('HALLAZGO (16/11/2026, ABIERTO) · el aviso del pescado dice a qué temperatura y cuánto tiempo congelarlo', async ({ page }) => {
-    test.fail();
+  // REPARADO el 19/11/2026 (hallazgo 4854): «usa pescado muy fresco y previamente congelado
+  // (anisakis)» sin decir cómo. La AESAN (página del anisakis, consultada el 19/11/2026): en casa,
+  // «congelar el pescado a -15 °C o temperatura inferior durante al menos 4 días» (recomienda contar
+  // 5); en la industria, «–20 °C durante 24 horas o a -35 °C durante 15 horas como mínimo».
+  test('HALLAZGO 4854 (16/11/2026, REPARADO) · el aviso del pescado dice a qué temperatura y cuánto tiempo congelarlo', async ({ page }) => {
     await elegir(page, 'Pescado y marisco');
     const aviso = regionPuntos(page).locator('p');
     await expect(aviso).toContainText(/[-−–]\s?(15|20)\s?°C/);
     await expect(aviso).toContainText(/\d+\s?(días|horas)/);
+    await expect(aviso).toContainText('a −15 °C o menos durante al menos 4 días');
+    await expect(aviso).toContainText('a −20 °C 24 horas o a −35 °C 15 horas');
   });
 
   // HALLAZGO [bajo] (16/11/2026, ABIERTO): la FAQ del JSON-LD da 3 min de reposo también al

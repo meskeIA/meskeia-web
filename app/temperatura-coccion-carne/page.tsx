@@ -182,7 +182,10 @@ export default function TemperaturaCoccionCarnePage() {
                   </div>
                   <p className={styles.escenarioExample}>
                     Hecho a 63 °C, se desmiga con facilidad. Para crudo o jugoso (sushi, tataki), usa
-                    pescado muy fresco y previamente congelado para prevenir el anisakis.
+                    pescado muy fresco y previamente congelado para prevenir el anisakis: según la
+                    AESAN, en casa a −15 °C o menos durante al menos 4 días (mejor contar 5 desde que
+                    entra en el congelador); el congelado industrial, a −20 °C 24 horas o a −35 °C 15
+                    horas.
                   </p>
                 </div>
               </div>
