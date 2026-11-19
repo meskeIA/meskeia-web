@@ -74,6 +74,40 @@ import { MASA_ELECTRON, METALES } from '../../app/simulador-efecto-fotoelectrico
  *   6) RelatedApps pinta 4 tarjetas.
  *   7) el rótulo de las constantes dice CODATA 2022 y la mₑ de 2022, la misma que usa el motor
  *      (cabo C0726: el de 2018 seguía en pantalla).
+ *
+ * INSPECCIÓN DEL 19/11/2026 (Inspector, primera entera) — casos 8 a 14
+ *   Esperados recalculados APARTE del motor (script del inspector, constantes del SI: h, c y e
+ *   exactas del BIPM; mₑ = 9,109 383 7139·10⁻³¹ kg leída en physics.nist.gov/cgi-bin/cuu/Value?me,
+ *   CODATA 2022), antes de abrir el navegador:
+ *
+ *   Zinc (φ = 4,31 eV) a 250 nm, el problema resuelto de la guía:
+ *     E = 1.239,8419843/250 = 4,9593679 eV → «4,959 eV» · E en J = 7,945783·10⁻¹⁹ → «7,946 × 10⁻¹⁹ J»
+ *     f = 299.792.458/2,5·10⁻⁷ = 1,1991698·10¹⁵ → «1,199 × 10¹⁵ Hz»
+ *     f₀ = 4,31 · 1,602176634·10⁻¹⁹/6,62607015·10⁻³⁴ = 1,0421534·10¹⁵ → «1,042 × 10¹⁵ Hz»
+ *     λ₀ = 1.239,8419843/4,31 = 287,66635 nm → «287,7 nm», ultravioleta
+ *     E_c = 0,6493679 eV → «0,649 eV» · 1,040402·10⁻¹⁹ J → «1,040 × 10⁻¹⁹ J» · V₀ → «0,649 V»
+ *     v = √(2 · 1,040402·10⁻¹⁹/9,1093837139·10⁻³¹) = 4,779375·10⁵ → «4,779 × 10⁵ m/s»
+ *     (la guía, con constantes de 4 cifras: 4,96 eV, 0,65 eV, 4,78 × 10⁵ m/s, 287,7 nm y 1,04 × 10¹⁵ Hz)
+ *
+ *   Platino (φ = 6,35 eV) a 100 nm, el extremo del deslizador:
+ *     E = 12,398420 eV → «12,398 eV» · 1,986446·10⁻¹⁸ J → «1,986 × 10⁻¹⁸ J» · f → «2,998 × 10¹⁵ Hz»
+ *     f₀ = 1,535444·10¹⁵ → «1,535 × 10¹⁵ Hz» · E_c = 6,048420 eV → «6,048 eV» y «6,048 V»
+ *     E_c en J = 9,690636·10⁻¹⁹ → «9,691 × 10⁻¹⁹ J» · v = 1,458635·10⁶ → «1,459 × 10⁶ m/s»
+ *
+ *   El umbral del sodio (λ₀ = 504,0008 nm):
+ *     503 nm → E = 2,4648946 eV, E_c = 0,0048946 → «0,005 eV», «0,005 V», v = 4,149391·10⁴ → «4,149 × 10⁴ m/s»
+ *     505 nm → E = 2,4551326 eV < 2,46: sin emisión, le faltan 0,0048674 → «0,005 eV», corriente 0 %
+ *   El umbral EXACTO: «Otro φ» = 3,09960496083 eV a 400 nm (E = 3,09960496083 eV): E − φ ≈ 7·10⁻¹⁵,
+ *     λ₀ = 400,0000 nm → «400,0 nm». E_c = 0: sin emisión neta, V₀ = 0, corriente 0, ningún electrón.
+ *   Rechazo: φ = 0 o negativa no es una función de trabajo → ninguna tarjeta y el aviso.
+ *
+ *   El color de Bruton (color.ts), recalculado aparte: 445 nm → rgb(0, 40, 255), tono 231° ·
+ *     590 nm → rgb(255, 223, 0), 52° · 620 nm → rgb(255, 119, 0), 28°. Controles en el centro de
+ *     cada nombre: 400 → 283° (violeta) · 470 → 200° (azul) · 530 → 98° (verde) · 575 → 64°
+ *     (amarillo) · 650 → 0° (rojo).
+ *
+ *   Los test con test.fail() son HALLAZGOS ABIERTOS: el día que se reparen, fallarán por pasar y
+ *   habrá que quitarles el test.fail() (y cambiar ABIERTO por REPARADO). Cada uno afirma lo CORRECTO.
  */
 
 const SLIDERS = ['#slider-lambda', '#slider-intensidad'] as const;
@@ -246,6 +280,225 @@ test('Caso 7 — el rótulo de las constantes es el de CODATA 2022, igual que el
   await expect(rotulo).toContainText('Constantes CODATA 2022');
   await expect(rotulo).toContainText('mₑ = 9,1093837139 × 10⁻³¹ kg');
   await expect(rotulo).not.toContainText('2018');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test('Caso 8 — zinc a 250 nm, el problema resuelto de la guía: las nueve tarjetas', async ({ page }) => {
+  await page.getByRole('button', { name: /^Zinc/ }).click();
+  await sembrarValor(page, '#slider-lambda', 250);
+
+  const tarjetaEnergia = page.locator('[class*="valueCard"]').filter({ hasText: 'Energía del fotón' });
+  const tarjetaEc = page.locator('[class*="valueCard"]').filter({ hasText: 'Energía cinética máxima' });
+  await expect(valorTarjeta(page, 'Energía del fotón')).toHaveText('4,959 eV');
+  await expect(tarjetaEnergia.locator(':scope > span').nth(2)).toHaveText('7,946 × 10⁻¹⁹ J');
+  await expect(valorTarjeta(page, 'Frecuencia f')).toHaveText('1,199 × 10¹⁵ Hz');
+  await expect(valorTarjeta(page, 'Función de trabajo')).toHaveText('4,31 eV');
+  await expect(valorTarjeta(page, 'Frecuencia umbral')).toHaveText('1,042 × 10¹⁵ Hz');
+  await expect(valorTarjeta(page, 'Longitud de onda umbral')).toHaveText('287,7 nm');
+  await expect(valorTarjeta(page, 'Energía cinética máxima')).toHaveText('0,649 eV');
+  await expect(tarjetaEc.locator(':scope > span').nth(2)).toHaveText('1,040 × 10⁻¹⁹ J');
+  await expect(valorTarjeta(page, 'Velocidad máxima')).toHaveText('4,779 × 10⁵ m/s');
+  await expect(valorTarjeta(page, 'Potencial de frenado')).toHaveText('0,649 V');
+  await expect(page.getByText(/a cada fotón le sobran 0,649 eV/)).toBeVisible();
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test('Caso 9 — platino a 100 nm, el extremo ultravioleta del deslizador', async ({ page }) => {
+  await page.getByRole('button', { name: /^Platino/ }).click();
+  await sembrarValor(page, '#slider-lambda', 100);
+
+  const tarjetaEnergia = page.locator('[class*="valueCard"]').filter({ hasText: 'Energía del fotón' });
+  const tarjetaEc = page.locator('[class*="valueCard"]').filter({ hasText: 'Energía cinética máxima' });
+  await expect(valorTarjeta(page, 'Energía del fotón')).toHaveText('12,398 eV');
+  await expect(tarjetaEnergia.locator(':scope > span').nth(2)).toHaveText('1,986 × 10⁻¹⁸ J');
+  await expect(valorTarjeta(page, 'Frecuencia f')).toHaveText('2,998 × 10¹⁵ Hz');
+  await expect(valorTarjeta(page, 'Frecuencia umbral')).toHaveText('1,535 × 10¹⁵ Hz');
+  await expect(valorTarjeta(page, 'Longitud de onda umbral')).toHaveText('195,3 nm');
+  await expect(valorTarjeta(page, 'Energía cinética máxima')).toHaveText('6,048 eV');
+  await expect(tarjetaEc.locator(':scope > span').nth(2)).toHaveText('9,691 × 10⁻¹⁹ J');
+  await expect(valorTarjeta(page, 'Velocidad máxima')).toHaveText('1,459 × 10⁶ m/s');
+  await expect(valorTarjeta(page, 'Potencial de frenado')).toHaveText('6,048 V');
+  await expect(electrones(page)).toHaveCount(6);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test('Caso 10 — el umbral: sodio a 503 y 505 nm, y «Otro φ» justo en λ₀ = 400 nm', async ({ page }) => {
+  // Un nanómetro por debajo de λ₀ = 504,0008 nm: emite, con 0,0049 eV.
+  await sembrarValor(page, '#slider-lambda', 503);
+  await expect(valorTarjeta(page, 'Energía cinética máxima')).toHaveText('0,005 eV');
+  await expect(valorTarjeta(page, 'Potencial de frenado')).toHaveText('0,005 V');
+  await expect(valorTarjeta(page, 'Velocidad máxima')).toHaveText('4,149 × 10⁴ m/s');
+  await expect(valorTarjeta(page, 'Corriente relativa')).toHaveText(`60${NBSP}%`);
+
+  // Uno por encima: ya no emite, y le faltan 0,0049 eV.
+  await sembrarValor(page, '#slider-lambda', 505);
+  await expect(page.getByText(/no se emiten electrones aunque aumentes la intensidad\. A cada fotón le faltan 0,005 eV/)).toBeVisible();
+  await expect(valorTarjeta(page, 'Energía cinética máxima')).toHaveText('sin emisión');
+  await expect(valorTarjeta(page, 'Corriente relativa')).toHaveText(`0${NBSP}%`);
+  await expect(electrones(page)).toHaveCount(0);
+
+  // Justo en el umbral: φ = h·c/(400 nm) con once cifras. E_c = 0 → sin emisión neta.
+  await sembrarValor(page, '#slider-lambda', 400);
+  await page.getByRole('button', { name: /^Otro φ/ }).click();
+  const entradaPhi = page.getByLabel('Función de trabajo φ (eV)');
+  await entradaPhi.fill('3,09960496083');
+  await esperarValorEnReact(page, entradaPhi, '3,09960496083');
+  await expect(valorTarjeta(page, 'Longitud de onda umbral')).toHaveText('400,0 nm');
+  await expect(page.getByText(/^Justo en el umbral/)).toBeVisible();
+  await expect(valorTarjeta(page, 'Energía cinética máxima')).toHaveText('sin emisión');
+  await expect(valorTarjeta(page, 'Potencial de frenado')).toHaveText(/^0 V/);
+  await expect(valorTarjeta(page, 'Corriente relativa')).toHaveText(`0${NBSP}%`);
+  await expect(electrones(page)).toHaveCount(0);
+  await expect(page.locator('svg text', { hasText: /^En el umbral: sin emisión neta$/ })).toBeVisible();
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test('Caso 11 — una función de trabajo de 0 o negativa se rechaza: ninguna tarjeta y el aviso', async ({ page }) => {
+  await page.getByRole('button', { name: /^Otro φ/ }).click();
+  const entradaPhi = page.getByLabel('Función de trabajo φ (eV)');
+  const aviso = page.locator('[role="status"]').getByText('Escribe una función de trabajo mayor que 0 eV para calcular.');
+  for (const valor of ['0', '-2']) {
+    await entradaPhi.fill(valor);
+    await esperarValorEnReact(page, entradaPhi, valor);
+    await expect(aviso).toBeVisible();
+    await expect(page.locator('[class*="valueCard"]')).toHaveCount(0);
+    await expect(electrones(page)).toHaveCount(0);
+    await expect(page.locator('svg text', { hasText: /^Corriente relativa: —$/ })).toBeVisible();
+  }
+});
+
+/** Tono (0-360°) de un «rgb(r, g, b)». */
+function tonoDe(rgb: string): number {
+  const m = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+  if (!m) return NaN;
+  const [r, g, b] = [Number(m[1]) / 255, Number(m[2]) / 255, Number(m[3]) / 255];
+  const max = Math.max(r, g, b);
+  const d = max - Math.min(r, g, b);
+  if (d === 0) return 0;
+  const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return (h * 60 + 360) % 360;
+}
+
+/** El nombre que corresponde a un tono, con bandas anchas y los controles lejos de sus bordes. */
+function nombreDelTono(h: number): string {
+  if (h >= 250 && h < 330) return 'violeta';
+  if (h >= 170 && h < 250) return 'azul';
+  if (h >= 80 && h < 170) return 'verde';
+  if (h >= 48 && h < 80) return 'amarillo';
+  if (h >= 15 && h < 48) return 'naranja';
+  return 'rojo';
+}
+
+/** El color de la muestra (atributo style: globals anima el fondo 0,3 s) y el nombre rotulado. */
+async function muestraDeColor(page: Page, lambda: number): Promise<{ rgb: string; nombre: string }> {
+  await sembrarValor(page, '#slider-lambda', lambda);
+  await expect(page.locator('label[for="slider-lambda"]')).toContainText(`${lambda} nm`);
+  const muestra = page.locator('[class*="muestraColor"]');
+  const estilo = (await muestra.getAttribute('style')) ?? '';
+  const rotulo = (await muestra.locator('xpath=following-sibling::span[1]').innerText()).trim();
+  return { rgb: estilo.replace(/^background:\s*/, '').replace(/;$/, ''), nombre: rotulo.split(' · ')[1] ?? '' };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+test('Caso 12 — en el centro de cada nombre, la muestra de color y el rótulo coinciden', async ({ page }) => {
+  const controles: ReadonlyArray<readonly [number, string, string]> = [
+    [400, 'rgb(131, 0, 181)', 'violeta'],
+    [470, 'rgb(0, 169, 255)', 'azul'],
+    [530, 'rgb(94, 255, 0)', 'verde'],
+    [575, 'rgb(240, 255, 0)', 'amarillo'],
+    [650, 'rgb(255, 0, 0)', 'rojo'],
+  ];
+  for (const [lambda, rgb, nombre] of controles) {
+    const m = await muestraDeColor(page, lambda);
+    expect(m.rgb, `${lambda} nm`).toBe(rgb);
+    expect(m.nombre, `${lambda} nm`).toBe(nombre);
+    expect(nombreDelTono(tonoDe(m.rgb)), `${lambda} nm: tono ${tonoDe(m.rgb)}°`).toBe(nombre);
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test.fail('HALLAZGO (19/11/2026, ABIERTO) · en tres fronteras la muestra dice un color y el rótulo otro', async ({ page }) => {
+  // 445 nm: rgb(0, 40, 255), tono 231° (azul), rotulado «violeta» (pasa de 434 a 449 nm).
+  // 590 nm: rgb(255, 223, 0), tono 52° (amarillo), rotulado «naranja» (de 590 a 597 nm).
+  // 620 nm: rgb(255, 119, 0), tono 28° (naranja), rotulado «rojo» (de 620 a 633 nm).
+  // color.ts pinta con Bruton (azul puro en 440, rojo puro desde 645) y nombra con otra tabla
+  // (violeta < 450, rojo ≥ 620). La reparación mueve una de las dos; este caso mide que casen.
+  for (const lambda of [445, 590, 620]) {
+    const m = await muestraDeColor(page, lambda);
+    expect(m.nombre, `${lambda} nm: ${m.rgb}, tono ${Math.round(tonoDe(m.rgb))}°`).toBe(nombreDelTono(tonoDe(m.rgb)));
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test.fail('HALLAZGO (19/11/2026, ABIERTO) · la pregunta de la intensidad está en las dos FAQ con dos respuestas', async ({ page }) => {
+  // FAQPage: «¿Por qué aumentar la intensidad de la luz no aumenta la energía de los electrones?»
+  // FAQ visible: «¿Por qué más intensidad no da electrones más rápidos?». La misma pregunta, escrita
+  // dos veces con respuestas distintas; la del FAQPage añade el caso por debajo del umbral. Una
+  // sola constante para las dos (PREGUNTAS_FRECUENTES, §1.ter) deja este caso en verde.
+  const delFaqPage = await page.evaluate(() => {
+    for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+      const j = JSON.parse(s.textContent ?? '{}') as {
+        '@type'?: string;
+        mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
+      };
+      if (j['@type'] === 'FAQPage' && j.mainEntity) {
+        return j.mainEntity.map((q) => ({ p: q.name.trim(), r: q.acceptedAnswer.text.replace(/\s+/g, ' ').trim() }));
+      }
+    }
+    return [];
+  });
+  const visibles = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('[class*="faqItem"]')).map((it) => ({
+      p: (it.querySelector('strong')?.textContent ?? '').trim(),
+      r: (it.querySelector('p')?.textContent ?? '').replace(/\s+/g, ' ').trim(),
+    })),
+  );
+  expect(delFaqPage.length).toBeGreaterThan(0);
+  expect(visibles.length).toBeGreaterThan(0);
+  const a = delFaqPage.filter((q) => /intensidad/i.test(q.p));
+  const b = visibles.filter((q) => /intensidad/i.test(q.p));
+  if (a.length > 0 && b.length > 0) {
+    expect(b[0].p).toBe(a[0].p);
+    expect(b[0].r).toBe(a[0].r);
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test.fail('HALLAZGO (19/11/2026, ABIERTO) · h·c sale como «1239,84» y «1240» y también como «1.239,84» y «1.240»', async ({ page }) => {
+  // CLAUDE.md global §2 (Ortografía de la RAE, 2010): con cuatro cifras enteras no se agrupa.
+  // La caja de fórmulas (formatNumber) escribe «1239,84 eV·nm» y los casos «1240 eV·nm», pero la
+  // guía paso a paso y el FAQPage escriben «1.239,84», los consejos y los errores típicos
+  // «1.240 eV·nm» y la tarjeta de paneles solares «~1.100 nm».
+  await expect(page.locator('[class*="formulaBox"]')).toContainText('h·c = 1239,84 eV·nm');
+  const cuatroAgrupadas = /(?<![\d.,])\d\.\d{3}(?:,\d+)?(?![\d.])/g;
+  // El texto de la app: <main> sin scripts ni las tarjetas de otras apps (RelatedApps).
+  const texto = await page.evaluate(() => {
+    const copia = document.querySelector('main')?.cloneNode(true) as HTMLElement | undefined;
+    if (!copia) return '';
+    copia.querySelectorAll('script, section[aria-label="Aplicaciones relacionadas"]').forEach((n) => n.remove());
+    return copia.textContent ?? '';
+  });
+  const ld = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+      .map((s) => s.textContent ?? '')
+      .join(' '),
+  );
+  expect([...texto.matchAll(cuatroAgrupadas)].map((m) => m[0])).toEqual([]);
+  expect([...ld.matchAll(cuatroAgrupadas)].map((m) => m[0])).toEqual([]);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test.fail('HALLAZGO (19/11/2026, ABIERTO) · «Otro φ» por debajo de 0,5 se reescribe al salir como «0.5», con punto', async ({ page }) => {
+  // NumberInput acota al salir con `min.toString()`: el campo pasa de «0,2» a «0.5». El cálculo
+  // es el de 0,5 eV (tarjeta «0,50 eV»), pero el campo enseña el formato inglés.
+  await page.getByRole('button', { name: /^Otro φ/ }).click();
+  const entradaPhi = page.getByLabel('Función de trabajo φ (eV)');
+  await entradaPhi.fill('0,2');
+  await esperarValorEnReact(page, entradaPhi, '0,2');
+  await expect(valorTarjeta(page, 'Función de trabajo')).toHaveText('0,20 eV');
+  await page.locator('#slider-intensidad').focus();
+  await expect(valorTarjeta(page, 'Función de trabajo')).toHaveText('0,50 eV');
+  await expect(entradaPhi).toHaveValue('0,5');
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════════
@@ -546,6 +799,19 @@ test.describe('simulador-efecto-fotoelectrico · la sección de casos en el nave
     await expect(solucion).toHaveAttribute('aria-expanded', 'false');
     await solucion.click();
     await expect(page.locator('#casos-resultado')).toContainText('0,92 eV');
+  });
+
+  test('el punto decimal de «7.262» y «247.968» se lee como decimal y «4.01» (h·c = 1243,1) se rechaza (19/11/2026)', async ({ page }) => {
+    // Caso 7: v = 7,262 × 10⁵ m/s con CODATA, la clave 7,26 ± 0,005 → «7.262» es 7,262, no 7262.
+    expect(await corregirAula(page, 7, '7.262')).toBe(true);
+    // Caso 12: λ = 1.239,8419843/5,00 = 247,968 nm, la clave 248 ± 0,5 → «247.968» es 247,968.
+    expect(await corregirAula(page, 12, '247.968')).toBe(true);
+    expect(await corregirAula(page, 12, '249')).toBe(false);
+    // Caso 1: 4,01 eV es la cuenta con h·c = 1243,1, que el enunciado descarta al fijar 1240.
+    expect(await corregirAula(page, 1, '4.01')).toBe(false);
+    expect(await corregirAula(page, 1, '3,999')).toBe(true);
+    // Caso 8: lo que le falta al fotón es positivo; «−1,21» es E − φ con signo.
+    expect(await corregirAula(page, 8, '-1,21')).toBe(false);
   });
 
   test('la sección no añade electrones, deslizadores ni tarjetas al acta', async ({ page }) => {
