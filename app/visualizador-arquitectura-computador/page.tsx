@@ -534,11 +534,22 @@ export default function VisualizadorArquitecturaComputadorPage() {
 
               {/* Bloques */}
               {BLOQUES_VN.map((b) => (
+                // Hallazgo 4835 (19/11/2026): sin tabIndex ni teclado, los 8 bloques solo se abrían con
+                // el ratón (WCAG 2.1.1). Ahora entran en el orden de tabulación y Enter o Espacio
+                // los abren y cierran como el clic.
                 <g
                   key={b.id}
                   onClick={() => setBloqueSeleccionado(bloqueSeleccionado?.id === b.id ? null : b)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setBloqueSeleccionado(bloqueSeleccionado?.id === b.id ? null : b);
+                    }
+                  }}
                   className={styles.svgBloque}
                   role="button"
+                  tabIndex={0}
+                  aria-pressed={bloqueSeleccionado?.id === b.id}
                   aria-label={b.nombre}
                 >
                   <rect
@@ -567,7 +578,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
             </svg>
 
             {/* Panel de detalle */}
-            <div className={styles.detallePanel}>
+            <div className={styles.detallePanel} aria-live="polite">
               {bloqueSeleccionado ? (
                 <>
                   <h2 className={styles.detalleTitulo} style={{ color: tonoDe(bloqueSeleccionado.color) }}>
@@ -770,7 +781,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
             <h3>¿Por qué existe la jerarquía de memoria?</h3>
             <p>
               La CPU puede ejecutar miles de millones de operaciones por segundo, pero acceder a la RAM
-              tarda ~100 ns — miles de ciclos de espera. La caché almacena copias de los datos más usados
+              tarda ~100 ns — cientos de ciclos de espera (a 3,5 GHz, unos 350). La caché almacena copias de los datos más usados
               cerca de la CPU para reducir esas esperas. El principio de <strong>localidad temporal</strong>
               (si accediste a X, probablemente volverás a acceder a X) y <strong>localidad espacial</strong>
               (si accediste a X, probablemente accederás a X+1) hacen que la caché sea muy eficiente.

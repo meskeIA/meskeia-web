@@ -111,6 +111,16 @@
 .svgBloque:hover rect {
   opacity: 0.85;
 }
+.svgBloque:focus {
+  outline: none;
+}
+.svgBloque:focus-visible rect {
+  stroke: var(--primary);
+  stroke-width: 3.5px;
+}
+[data-theme='dark'] .svgBloque:focus-visible rect {
+  stroke: var(--accent);
+}
 .detallePanel {
   flex: 1;
   min-height: 200px;

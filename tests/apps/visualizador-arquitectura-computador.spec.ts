@@ -189,8 +189,8 @@ test.describe('CASO 2 (límite)', () => {
 
 // ─── CASO 3 ────────────────────────────────────────────────────────────────────────────────
 
-test('HALLAZGO ABIERTO [contenido/medio]: la RAM a ~100 ns son CIENTOS de ciclos, no «miles»', async ({ page }) => {
-  test.fail(); // HALLAZGO ABIERTO (inspector 16/11/2026) [contenido/medio]
+test('HALLAZGO 4836 REPARADO 19/11/2026 [contenido/medio]: la RAM a ~100 ns son CIENTOS de ciclos, no «miles»', async ({ page }) => {
+  // REPARADO: la caja dice ahora «cientos de ciclos de espera (a 3,5 GHz, unos 350)»
   // ENTRADA  pestaña «Jerarquía Memoria», caja «¿Por qué existe la jerarquía de memoria?»
   // ESPERADO 100 ns × 3,5 GHz (la frecuencia de ejemplo de la tarjeta CLK de la propia app) = 350
   //          ciclos; la FAQ de la app dice «200+ ciclos». Para «miles» harían falta ≥ 20 GHz
@@ -202,12 +202,14 @@ test('HALLAZGO ABIERTO [contenido/medio]: la RAM a ~100 ns son CIENTOS de ciclos
   expect(ciclos).toBe(350);
   expect(caja).toContain('~100 ns');
   expect(caja).not.toContain('miles de ciclos');
+  expect(caja).toContain('cientos de ciclos de espera (a 3,5 GHz, unos 350)');
 });
 
 // ─── CABO C0673: el diagrama Von Neumann con el teclado ─────────────────────────────────────
 
-test('CABO C0673 · HALLAZGO ABIERTO [accesibilidad/medio]: los bloques del diagrama se alcanzan con Tab y se abren con Enter o Espacio', async ({ page }) => {
-  test.fail(); // HALLAZGO ABIERTO (inspector 16/11/2026) [accesibilidad/medio], cabo C0673
+test('CABO C0673 · HALLAZGO 4835 REPARADO 19/11/2026 [accesibilidad/medio]: los bloques del diagrama se alcanzan con Tab y se abren con Enter o Espacio', async ({ page }) => {
+  // REPARADO: los <g role="button"> llevan tabIndex={0}, onKeyDown (Enter y Espacio) y aria-pressed,
+  // y el panel de detalle es aria-live
   // ENTRADA  foco en la pestaña «Von Neumann» y 15 pulsaciones de Tab; Enter sobre «Memoria RAM» y
   //          Espacio sobre «E/S»
   // ESPERADO los 8 bloques (role="button") en el orden de tabulación, y Enter/Espacio abren su
@@ -233,6 +235,10 @@ test('CABO C0673 · HALLAZGO ABIERTO [accesibilidad/medio]: los bloques del diag
   await page.getByRole('button', { name: 'E/S', exact: true }).focus();
   await page.keyboard.press(' ');
   await expect(page.getByRole('heading', { level: 2, name: 'E/S', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'E/S', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  // Espacio otra vez lo cierra, como el segundo clic
+  await page.keyboard.press(' ');
+  await expect(page.getByText('Selecciona un bloque del diagrama para ver su descripción')).toBeVisible();
 });
 
 // ─── Otros hallazgos abiertos ───────────────────────────────────────────────────────────────
