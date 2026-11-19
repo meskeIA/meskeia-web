@@ -309,7 +309,7 @@ test.describe('simulador-irpf-tramos', () => {
     await expect(page.getByRole('tab').first()).toHaveAttribute('aria-controls', /.+/, { timeout: 2000 });
   });
 
-  test('ABIERTO (cabo C0831, 19/11/2026) · «Mejores prácticas» no pone las donaciones entre lo que reduce la base liquidable', async ({ page }) => {
+  test('REPARADO (hallazgo 5261, cabo C0831) · «Mejores prácticas» no pone las donaciones entre lo que reduce la base liquidable', async ({ page }) => {
     // La tarjeta «Planifica antes de fin de año» dice: «Aportaciones a planes de pensiones (hasta
     // 1.500 €/año), donaciones, gastos deducibles… reducen tu base liquidable.» Los planes de
     // pensiones sí reducen la base (arts. 51-52 LIRPF; tope de 1.500 € en data/fiscal/pensiones.ts),
@@ -321,7 +321,9 @@ test.describe('simulador-irpf-tramos', () => {
     // paso 4 de la guía de la propia app: «Cada deducción reduce directamente la cuota, no la base».
     // Se mira cada párrafo de las tarjetas: ninguno puede poner donaciones o donativos delante de
     // «reduce(n) tu/la base liquidable/imponible».
-    test.fail();
+    // REPARADO: la tarjeta separa los planes de pensiones (base) de los donativos (cuota íntegra),
+    // contrastado el 19/11/2026 con el art. 19.1 en el BOE. Sin porcentajes: no hay módulo de
+    // mecenazgo en data/fiscal.
     const tarjetas = page.locator('h3', { hasText: 'Mejores Prácticas' }).locator('xpath=following-sibling::div[1]');
     const parrafos = (await tarjetas.locator('p').allTextContents()).map(normalizar);
     expect(parrafos.length).toBeGreaterThan(0);
@@ -329,5 +331,6 @@ test.describe('simulador-irpf-tramos', () => {
       /(donaci|donativ)[^.]*reduc\w*\s+(tu|la)\s+base\s+(liquidable|imponible)/i.test(p),
     );
     expect(queMezclan).toEqual([]);
+    expect(parrafos.join(' ')).toContain('dan una deducción en la cuota íntegra');
   });
 });

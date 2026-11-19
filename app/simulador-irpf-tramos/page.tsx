@@ -818,7 +818,9 @@ export default function SimuladorIrpfTramosPage() {
             <span className={styles.tipIcon} aria-hidden="true">📅</span>
             <div>
               <strong>Planifica antes de fin de año</strong>
-              <p>Aportaciones a planes de pensiones (hasta 1.500 €/año), donaciones, gastos deducibles… reducen tu base liquidable.</p>
+              {/* Los donativos de la Ley 49/2002 se deducen de la cuota íntegra (art. 19.1, BOE-A-2002-25039),
+                  no de la base: hallazgo 5261 */}
+              <p>Las aportaciones a planes de pensiones (hasta 1.500 €/año) reducen tu base liquidable. Los donativos a entidades de la Ley 49/2002 van aparte: no reducen la base, sino que dan una deducción en la cuota íntegra.</p>
             </div>
           </div>
           <div className={styles.tipCard}>
