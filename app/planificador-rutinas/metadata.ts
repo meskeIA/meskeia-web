@@ -38,7 +38,7 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [
     'Crea rutinas paso a paso con pictogramas emoji personalizables',
-    'Modo seguimiento en pantalla completa con tono de éxito al completar cada tarea',
+    'Modo seguimiento paso a paso, con la tarea actual en grande y un tono de éxito al completar cada una',
     'Barra de progreso visual y contador de posición en la secuencia',
     'Diseñado para personas con TEA, TDAH y discapacidad cognitiva',
     'Datos guardados localmente: funciona sin internet y sin cuenta',
@@ -46,6 +46,17 @@ export const jsonLd = generateWebAppSchema({
     'Reordenación de tareas con duración orientativa por paso',
   ],
 });
+
+/**
+ * Pregunta que va en las dos bocas: la FAQ visible de page.tsx (que la importa) y el FAQPage de
+ * abajo. Antes cada una daba su respuesta, con cifras de tareas por edad distintas y sin fuente
+ * (hallazgo 5290, CLAUDE.md §1.quinquies punto 1): ahora una sola, sin cifras.
+ */
+export const PREGUNTA_CUANTAS_TAREAS = {
+  question: '¿Cuántas tareas debo incluir en una rutina?',
+  answer:
+    'Depende de la persona y de la rutina: no hay una cifra que sirva para todos. Lo habitual es empezar con pocas tareas, cada una un paso claro y concreto, y añadir más cuando la rutina corta esté consolidada. Quien conoce a la persona (la familia, el educador o el terapeuta) es quien mejor puede ajustar la longitud.',
+};
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -61,10 +72,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cuántas actividades debe tener una rutina visual?',
+      name: PREGUNTA_CUANTAS_TAREAS.question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El número óptimo depende de la edad y capacidad de la persona. Para niños pequeños o personas con mayor nivel de apoyo: 4-6 actividades por rutina. Para niños en edad escolar: 6-10 actividades. Para adolescentes y adultos: pueden manejar rutinas más largas de 10-15 pasos. La clave es que sea manejable y no abrumadora. Es mejor empezar con menos pasos e ir ampliando progresivamente conforme la persona domina la rutina. Cada actividad debe corresponder a un paso claro y concreto.',
+        text: PREGUNTA_CUANTAS_TAREAS.answer,
       },
     },
     {
@@ -88,7 +99,7 @@ export const faqJsonLd = {
       name: '¿Qué son los pictogramas y dónde se pueden encontrar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los pictogramas son imágenes simples y esquemáticas que representan acciones, objetos o conceptos de forma unívoca. En el campo de la comunicación aumentativa, los más usados son los de ARASAAC (Centro Aragonés de Comunicación Aumentativa y Alternativa), disponibles gratuitamente en arasaac.org bajo licencia Creative Commons. Representan más de 30.000 conceptos en decenas de idiomas. El planificador visual de meskeIA usa emojis como pictogramas accesibles, combinables con texto descriptivo.',
+        text: 'Los pictogramas son imágenes simples y esquemáticas que representan acciones, objetos o conceptos de forma unívoca. En el campo de la comunicación aumentativa, los más usados son los de ARASAAC (Centro Aragonés de Comunicación Aumentativa y Alternativa), disponibles gratuitamente en arasaac.org bajo licencia Creative Commons. Representan más de 30.000 conceptos en decenas de idiomas. Este planificador visual usa emojis como pictogramas accesibles, combinables con texto descriptivo.',
       },
     },
   ],

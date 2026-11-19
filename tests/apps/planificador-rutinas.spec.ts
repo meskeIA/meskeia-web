@@ -23,6 +23,9 @@ import { esperarValorEnReact, esperarPaginaAsentada } from './_hidratacion';
  * Los test con test.fail() son HALLAZGOS ABIERTOS (19/11/2026): describen lo que DEBERÍA pasar y
  * hoy no pasa. Al reparar cada uno se quita su test.fail() —comprobando antes que lo que afirma
  * sigue siendo lo correcto— y «ABIERTO» pasa a «REPARADO».
+ *
+ * REPARADOS (/reparar, 19/11/2026): todos menos el borrado sin confirmar (5294), que decide el
+ * usuario. El botón ¡HECHO! ya no lleva aria-label: su nombre accesible es «¡HECHO!», lo que enseña.
  */
 
 test.use({ locale: 'es-ES', reducedMotion: 'reduce' });
@@ -54,7 +57,7 @@ const progreso = (page: Page): Locator => page.locator('[class$="_rutinaHeaderPr
 const tareaActual = (page: Page): Locator => page.locator('[class$="_tareaActualNombre"]');
 const duracionActual = (page: Page): Locator => page.locator('[class$="_tareaActualDuracion"]');
 const proxima = (page: Page): Locator => page.locator('[class$="_proximaTarea"]');
-const botonHecho = (page: Page): Locator => page.getByRole('button', { name: 'Marcar tarea como completada' });
+const botonHecho = (page: Page): Locator => page.getByRole('button', { name: '¡HECHO!', exact: true });
 
 async function leerGuardado(page: Page): Promise<RutinaGuardada[]> {
   const bruto = await page.evaluate((clave) => localStorage.getItem(clave), CLAVE);
@@ -155,10 +158,9 @@ test.describe('Casos resueltos a mano', () => {
     await expect(duracionActual(page)).toContainText('120 min');
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · límite: borrar la única rutina no se guarda y vuelve al recargar', async ({ page }) => {
-    // El efecto que guarda solo escribe con rutinas.length > 0: con la lista vacía localStorage
-    // se queda con la última rutina, y al recargar reaparece «Mañana».
-    test.fail();
+  test('HALLAZGO (19/11/2026, REPARADO) · límite: borrar la única rutina se guarda y no vuelve al recargar', async ({ page }) => {
+    // Antes el efecto que guarda solo escribía con rutinas.length > 0: con la lista vacía
+    // localStorage se quedaba con la última rutina, y al recargar reaparecía «Mañana».
     await abrir(page);
     await page.getByRole('button', { name: 'Eliminar rutina Mañana' }).click();
     await expect(page.getByText('Aún no tienes rutinas. ¡Crea la primera!')).toBeVisible();
@@ -190,10 +192,9 @@ test.describe('Casos resueltos a mano', () => {
     await expect(guardar).toBeDisabled();
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · rechazo: la duración admite −5, 500 y 1e3 pese a min=0 y max=120, y pinta «2.5 min»', async ({ page }) => {
-    // Hoy: −5 se guarda como −5 (y no se pinta), 500 sale «500 min», «1e3» sale «1000 min» y
-    // «2,5» tecleado en es-ES sale «2.5 min».
-    test.fail();
+  test('HALLAZGO (19/11/2026, REPARADO) · rechazo: la duración se acota a 0-120 min enteros (−5, 500, 2,5)', async ({ page }) => {
+    // Antes: −5 se guardaba como −5 (y no se pintaba), 500 salía «500 min», «1e3» salía «1000 min» y
+    // «2,5» tecleado en es-ES salía «2.5 min». Ahora: minutos enteros entre 0 y 120, los del campo.
     await abrir(page);
     await crearRutina(page, 'Pruebas', [['Base', 10]]);
     await anadirTarea(page, 'Negativa', -5);
@@ -213,13 +214,16 @@ test.describe('Casos resueltos a mano', () => {
     for (const t of pruebas?.tareas ?? []) {
       expect(t.duracion, `duración guardada de «${t.nombre}»`).toBeGreaterThanOrEqual(0);
       expect(t.duracion, `duración guardada de «${t.nombre}»`).toBeLessThanOrEqual(120);
+      expect(Number.isInteger(t.duracion), `duración entera de «${t.nombre}»`).toBe(true);
     }
+    // −5 → 0 (sin tiempo) y 500 → 120, el máximo que declara el campo
+    expect(pruebas?.tareas.find((t) => t.nombre === 'Negativa')?.duracion).toBe(0);
+    expect(pruebas?.tareas.find((t) => t.nombre === 'Larguísima')?.duracion).toBe(120);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · doble toque en ¡HECHO! marca dos tareas y no hay vuelta atrás', async ({ page }) => {
-    // Hoy: en 1/3 un doble clic deja «3 / 3» (Jugar marcada sin hacer) y la vista no tiene
-    // «Anterior» ni «Deshacer». La receta del repositorio para la ráfaga es useGuardaRafaga.
-    test.fail();
+  test('HALLAZGO (19/11/2026, REPARADO) · doble toque en ¡HECHO! marca una sola tarea', async ({ page }) => {
+    // Antes: en 1/3 un doble clic dejaba «3 / 3» (Jugar marcada sin hacer) y la vista no tiene
+    // «Anterior» ni «Deshacer». Ahora lo frena useGuardaRafaga.
     await abrir(page);
     await crearRutina(page, 'Tarde', [['Merendar', 15], ['Jugar'], ['Deberes', 30]]);
     await page.getByRole('button', { name: /Guardar rutina/ }).click();
@@ -232,10 +236,10 @@ test.describe('Casos resueltos a mano', () => {
 });
 
 test.describe('Foco, anuncios y selector', () => {
-  test('HALLAZGO (19/11/2026, ABIERTO) · el foco cae a <body> al cambiar de vista y en el editor', async ({ page }) => {
-    // Hoy: BODY tras Iniciar, tras el último ¡HECHO!, tras Guardar rutina, tras elegir un emoji y
-    // tras «+ Añadir tarea» (el botón se deshabilita con el foco dentro).
-    test.fail();
+  test('HALLAZGO (19/11/2026, REPARADO) · el foco no cae a <body> al cambiar de vista ni en el editor', async ({ page }) => {
+    // Antes: BODY tras Iniciar, tras el último ¡HECHO!, tras Guardar rutina, tras elegir un emoji,
+    // tras «+ Añadir tarea» (el botón se deshabilita con el foco dentro), con ▲ al llegar arriba y
+    // tras Eliminar rutina.
     const enBody = (): Promise<boolean> => page.evaluate(() => !document.activeElement || document.activeElement === document.body);
     await abrir(page);
 
@@ -253,26 +257,44 @@ test.describe('Foco, anuncios y selector', () => {
     await expect(itemsEditor(page)).toHaveCount(1);
     expect(await enBody(), 'tras «+ Añadir tarea»').toBe(false);
 
+    // ▲ en la 2.ª tarea la sube a la primera posición y su ▲ se deshabilita
+    await anadirTarea(page, 'Pijama');
+    await itemsEditor(page).nth(1).getByRole('button', { name: 'Mover arriba' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(itemsEditor(page).nth(0)).toContainText('Pijama');
+    expect(await enBody(), 'tras ▲ hasta la primera posición').toBe(false);
+
     await page.getByRole('button', { name: /Guardar rutina/ }).focus();
     await page.keyboard.press('Enter');
     await expect(page.getByRole('button', { name: 'Iniciar rutina Noche' })).toBeVisible();
     expect(await enBody(), 'tras Guardar rutina').toBe(false);
+    // El foco va al nombre de la tarjeta recién guardada
+    await expect(page.locator(':focus')).toHaveText('Noche');
 
     await page.getByRole('button', { name: 'Iniciar rutina Noche' }).focus();
     await page.keyboard.press('Enter');
-    await expect(progreso(page)).toHaveText('1 / 1');
+    await expect(progreso(page)).toHaveText('1 / 2');
     expect(await enBody(), 'tras Iniciar').toBe(false);
 
     await botonHecho(page).focus();
     await page.keyboard.press('Enter');
+    await expect(progreso(page)).toHaveText('2 / 2');
+    await botonHecho(page).focus();
+    await page.keyboard.press('Enter');
     await expect(page.getByRole('heading', { name: '¡Rutina completada!' })).toBeVisible();
     expect(await enBody(), 'tras el último ¡HECHO!').toBe(false);
+
+    await page.getByRole('button', { name: /Volver al inicio/ }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByRole('button', { name: 'Eliminar rutina Noche' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('button', { name: 'Iniciar rutina Noche' })).toHaveCount(0);
+    expect(await enBody(), 'tras Eliminar rutina').toBe(false);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · al pulsar ¡HECHO! nada anuncia la tarea nueva', async ({ page }) => {
-    // Hoy: la vista no tiene ninguna región viva, el botón se llama «Marcar tarea como completada»
-    // aunque enseña «✓ ¡HECHO!» (WCAG 2.5.3) y el role="progressbar" no lleva aria-valuenow.
-    test.fail();
+  test('HALLAZGO (19/11/2026, REPARADO) · al pulsar ¡HECHO! una región viva anuncia la tarea nueva', async ({ page }) => {
+    // Antes: la vista no tenía ninguna región viva, el botón se llamaba «Marcar tarea como completada»
+    // aunque enseña «✓ ¡HECHO!» (WCAG 2.5.3) y el role="progressbar" no llevaba aria-valuenow.
     await abrir(page);
     await page.getByRole('button', { name: 'Iniciar rutina Mañana' }).click();
     await expect(tareaActual(page)).toHaveText('Levantarse');
@@ -288,14 +310,23 @@ test.describe('Foco, anuncios y selector', () => {
     }
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · el selector ofrece 💊 dos veces y el emoji de «Después:» se lee', async ({ page }) => {
-    // Hoy: 45 opciones con 💊 en las posiciones 20 y 42 (las dos aria-selected al elegirla), y el
-    // lector lee «Después: 🚿 Ducharse» porque ese emoji no lleva aria-hidden.
-    test.fail();
+  test('HALLAZGO (19/11/2026, REPARADO) · el selector ofrece cada emoji una vez, responde a flechas y Escape, y el emoji de «Después:» no se lee', async ({ page }) => {
+    // Antes: 45 opciones con 💊 en las posiciones 20 y 42 (las dos aria-selected al elegirla), el
+    // listbox no respondía a las flechas ni a Escape, y el lector leía «Después: 🚿 Ducharse».
     await abrir(page);
     await page.getByRole('button', { name: 'Crear nueva rutina' }).click();
     await page.getByRole('button', { name: /Emoji seleccionado/ }).click();
     await expect(page.getByRole('option', { name: '💊', exact: true })).toHaveCount(1);
+    const opciones = await page.getByRole('option').allTextContents();
+    expect(new Set(opciones).size).toBe(opciones.length);
+
+    // Flecha derecha en la 1.ª (☀️) lleva a la 2.ª (🌙); Escape cierra y devuelve el foco al botón
+    await page.getByRole('option').first().focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator(':focus')).toHaveText('🌙');
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('listbox')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Emoji seleccionado/ })).toBeFocused();
 
     await page.getByRole('button', { name: '← Volver' }).click();
     await page.getByRole('button', { name: 'Iniciar rutina Mañana' }).click();
@@ -322,10 +353,9 @@ test.describe('Foco, anuncios y selector', () => {
 });
 
 test.describe('Contenido declarado', () => {
-  test('HALLAZGO (19/11/2026, ABIERTO) · «¿Cuántas actividades/tareas…?» tiene una respuesta en el JSON-LD y otra en la página', async ({ page }) => {
-    // JSON-LD: 4-6 · 6-10 · 10-15 por edad. FAQ visible: 4-6 para TEA o DI y ampliar tras 2-3
-    // semanas. Ninguna cita fuente. Reparación: UNA constante que importen las dos (check:faq-unica).
-    test.fail();
+  test('HALLAZGO (19/11/2026, REPARADO) · «¿Cuántas tareas…?» tiene la misma respuesta en el JSON-LD y en la página', async ({ page }) => {
+    // Antes JSON-LD: 4-6 · 6-10 · 10-15 por edad. FAQ visible: 4-6 para TEA o DI y ampliar tras 2-3
+    // semanas. Ninguna citaba fuente. Ahora UNA constante, sin cifras, que importan las dos.
     await page.goto(RUTA);
     const preguntas = await page.locator('script[type="application/ld+json"]').evaluateAll((ss) =>
       ss
@@ -339,15 +369,20 @@ test.describe('Contenido declarado', () => {
       copia.querySelectorAll('script').forEach((s) => s.remove());
       return copia.textContent ?? '';
     });
-    for (const q of preguntas.filter((p) => /Cuántas (actividades|tareas)/i.test(p.name))) {
+    const cuantas = preguntas.filter((p) => /Cuántas (actividades|tareas)/i.test(p.name));
+    expect(cuantas.length).toBe(1);
+    for (const q of cuantas) {
       expect(visible, `la respuesta del JSON-LD a «${q.name}» está en la página`).toContain(q.acceptedAnswer.text);
+      // Sin las cifras de tareas por edad que no citaban fuente
+      expect(q.acceptedAnswer.text).not.toMatch(/\d+-\d+/);
     }
+    // §1.ter: las respuestas del FAQPage no nombran a meskeIA
+    for (const q of preguntas) expect(q.acceptedAnswer.text, q.name).not.toMatch(/meskeIA/i);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · promete «pantalla completa» y una exportación «prevista»', async ({ page }) => {
-    // features: «Modo seguimiento en pantalla completa» (la vista conserva logo y pie y no pide
+  test('HALLAZGO (19/11/2026, REPARADO) · no promete «pantalla completa» ni una exportación «prevista»', async ({ page }) => {
+    // Antes features: «Modo seguimiento en pantalla completa» (la vista conserva logo y pie y no pide
     // pantalla completa). FAQ: «Una función de exportación/importación está prevista».
-    test.fail();
     await page.goto(RUTA);
     const caracteristicas = await page.locator('script[type="application/ld+json"]').evaluateAll((ss) =>
       ss.flatMap((s) => ((JSON.parse(s.textContent ?? '{}') as { featureList?: string[] }).featureList ?? [])),
@@ -367,10 +402,9 @@ test.describe('Móvil (Pixel 7)', () => {
     hasTouch: true,
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · al tocar «Iniciar» la tarea actual queda por encima de la pantalla', async ({ page }) => {
-    // Hoy: la vista nueva hereda el desplazamiento de la lista (scrollY ≈ 434) y el nombre de la
-    // tarea queda en top ≈ −127 px; solo se ve el botón ¡HECHO!.
-    test.fail();
+  test('HALLAZGO (19/11/2026, REPARADO) · al tocar «Iniciar» la tarea actual queda a la vista', async ({ page }) => {
+    // Antes: la vista nueva heredaba el desplazamiento de la lista (scrollY ≈ 434) y el nombre de la
+    // tarea quedaba en top ≈ −127 px; solo se veía el botón ¡HECHO!.
     await abrir(page);
     const iniciar = page.getByRole('button', { name: 'Iniciar rutina Mañana' });
     await iniciar.scrollIntoViewIfNeeded();
@@ -378,5 +412,16 @@ test.describe('Móvil (Pixel 7)', () => {
     await iniciar.tap();
     await expect(tareaActual(page)).toHaveText('Levantarse');
     await expect(tareaActual(page)).toBeInViewport({ ratio: 1 });
+    await expect(page.locator('[class$="_tareaActualEmoji"]')).toBeInViewport({ ratio: 1 });
+  });
+
+  test('HALLAZGO (19/11/2026, REPARADO) · tras Guardar, la tarjeta recién guardada queda a la vista', async ({ page }) => {
+    // Antes la tarjeta guardada quedaba en top −178 px en móvil
+    await abrir(page);
+    await crearRutina(page, 'Tarde', [['Merendar', 15], ['Jugar'], ['Deberes', 30]]);
+    const guardar = page.getByRole('button', { name: /Guardar rutina/ });
+    await guardar.scrollIntoViewIfNeeded();
+    await guardar.tap();
+    await expect(page.getByRole('heading', { name: 'Tarde', level: 3 })).toBeInViewport({ ratio: 1 });
   });
 });

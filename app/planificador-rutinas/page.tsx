@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import type { KeyboardEvent as EventoTeclado } from 'react';
 import styles from './PlanificadorRutinas.module.css';
 import {
   MeskeiaLogo,
@@ -11,6 +12,9 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
+import { enfocarALaVista } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
+import { PREGUNTA_CUANTAS_TAREAS } from './metadata';
 
 // ============================================
 // Tipos
@@ -39,8 +43,15 @@ const EMOJIS_FRECUENTES = [
   '☀️','🌙','🛏️','🚿','🪥','👕','👗','🍳','🥣','🥛','☕','🧃',
   '🎒','🚌','🏫','✏️','📚','🍎','🥪','💊','🏃','🚶','🚴',
   '🛁','🧹','🍽️','🍲','🥗','🎮','📺','📱','📖','🎨','🎵',
-  '🧩','🐕','🐈','🌳','🛒','💊','🩺','😴','🙏','❤️','⭐',
+  '🧩','🐕','🐈','🌳','🛒','🩺','😴','🙏','❤️','⭐',
 ];
+
+/** Duración de una tarea: minutos enteros entre 0 y 120, lo que declara el campo (min y max). */
+const acotarDuracion = (valor: string): number => {
+  const n = Number(valor);
+  if (!Number.isFinite(n)) return 0;
+  return Math.min(120, Math.max(0, Math.round(n)));
+};
 
 const RUTINA_EJEMPLO: Rutina = {
   id: 'ejemplo',
@@ -96,16 +107,49 @@ export default function PlanificadorRutinasPage() {
   const [nuevaDuracion, setNuevaDuracion] = useState(0);
   const [mostrarPicker, setMostrarPicker] = useState(false);
   const [modoEdicion, setModoEdicion] = useState<'nueva' | string>('nueva'); // 'nueva' o id de rutina
+  const [cargado, setCargado] = useState(false);
+
+  // Las tres vistas son ramas del mismo componente: al pasar de una a otra el control pulsado
+  // desaparece (el foco caía a <body>) y la vista nueva heredaba el desplazamiento de la anterior
+  // (en móvil, la tarea actual quedaba por encima de la pantalla). Cada cambio deja aquí a qué
+  // elemento va el foco, y el efecto de abajo lo enfoca y lo trae a la vista tras pintar.
+  const focoPendiente = useRef<(() => HTMLElement | null) | null>(null);
+  const pedirFoco = (destino: () => HTMLElement | null) => { focoPendiente.current = destino; };
+  const tareaCardRef = useRef<HTMLDivElement>(null);
+  const finTituloRef = useRef<HTMLHeadingElement>(null);
+  const editorTituloRef = useRef<HTMLHeadingElement>(null);
+  const misRutinasRef = useRef<HTMLHeadingElement>(null);
+  const tareasTituloRef = useRef<HTMLHeadingElement>(null);
+  const emojiBtnRef = useRef<HTMLButtonElement>(null);
+  const nuevoNombreRef = useRef<HTMLInputElement>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
+  // El 2.º toque de una ráfaga caía sobre ¡HECHO! en la tarea siguiente y la marcaba sin verla
+  const marcarCambioPantalla = useGuardaRafaga();
+
+  useEffect(() => {
+    const destino = focoPendiente.current;
+    if (!destino) return;
+    focoPendiente.current = null;
+    enfocarALaVista(destino());
+  });
 
   // Cargar desde localStorage
   useEffect(() => {
     setRutinas(cargarRutinas());
+    setCargado(true);
   }, []);
 
-  // Guardar cuando cambian las rutinas
+  // Guardar cuando cambian las rutinas, también la lista vacía (antes solo con length > 0,
+  // y la última rutina borrada volvía al recargar)
   useEffect(() => {
-    if (rutinas.length > 0) guardarRutinas(rutinas);
-  }, [rutinas]);
+    if (cargado) guardarRutinas(rutinas);
+  }, [rutinas, cargado]);
+
+  const irALista = (enfocar?: () => HTMLElement | null) => {
+    marcarCambioPantalla();
+    setVista('lista');
+    pedirFoco(enfocar ?? (() => misRutinasRef.current));
+  };
 
   // ——— EDITOR ———
 
@@ -116,7 +160,9 @@ export default function PlanificadorRutinasPage() {
     setNuevoNombre('');
     setNuevaDuracion(0);
     setModoEdicion('nueva');
+    marcarCambioPantalla();
     setVista('editor');
+    pedirFoco(() => editorTituloRef.current);
   };
 
   const abrirEditorRutina = (rutina: Rutina) => {
@@ -126,7 +172,9 @@ export default function PlanificadorRutinasPage() {
     setNuevoNombre('');
     setNuevaDuracion(0);
     setModoEdicion(rutina.id);
+    marcarCambioPantalla();
     setVista('editor');
+    pedirFoco(() => editorTituloRef.current);
   };
 
   const agregarTarea = () => {
@@ -142,13 +190,17 @@ export default function PlanificadorRutinasPage() {
     setNuevoNombre('');
     setNuevaDuracion(0);
     setMostrarPicker(false);
+    // «+ Añadir tarea» se deshabilita con el nombre vacío: el foco vuelve al campo del nombre
+    pedirFoco(() => nuevoNombreRef.current);
   };
 
   const eliminarTarea = (id: string) => {
     setTareas(prev => prev.filter(t => t.id !== id));
+    pedirFoco(() => tareasTituloRef.current);
   };
 
   const moverTarea = (idx: number, dir: 'arriba' | 'abajo') => {
+    const id = tareas[idx]?.id;
     setTareas(prev => {
       const arr = [...prev];
       const destino = dir === 'arriba' ? idx - 1 : idx + 1;
@@ -156,10 +208,18 @@ export default function PlanificadorRutinasPage() {
       [arr[idx], arr[destino]] = [arr[destino], arr[idx]];
       return arr;
     });
+    // El foco sigue a la tarea movida; si su botón se deshabilita (llegó al extremo), al otro
+    pedirFoco(() => {
+      const item = document.querySelector(`[data-tarea-id="${id}"]`);
+      const mismo = item?.querySelector<HTMLButtonElement>(`button[data-dir="${dir}"]`);
+      if (mismo && !mismo.disabled) return mismo;
+      return item?.querySelector<HTMLButtonElement>('button[data-dir]:not(:disabled)') ?? null;
+    });
   };
 
   const guardarRutina = () => {
     if (!nombreRutina.trim() || tareas.length === 0) return;
+    let idGuardada = modoEdicion;
     if (modoEdicion === 'nueva') {
       const nueva: Rutina = {
         id: generarId(),
@@ -167,6 +227,7 @@ export default function PlanificadorRutinasPage() {
         tareas: tareas.map(t => ({ ...t, completada: false })),
         creadaEn: new Date().toISOString(),
       };
+      idGuardada = nueva.id;
       setRutinas(prev => [...prev, nueva]);
     } else {
       setRutinas(prev => prev.map(r =>
@@ -175,11 +236,13 @@ export default function PlanificadorRutinasPage() {
           : r
       ));
     }
-    setVista('lista');
+    // La tarjeta recién guardada, a la vista y con el foco en su nombre
+    irALista(() => document.querySelector<HTMLElement>(`[data-rutina-id="${idGuardada}"] h3`));
   };
 
   const eliminarRutina = (id: string) => {
     setRutinas(prev => prev.filter(r => r.id !== id));
+    pedirFoco(() => misRutinasRef.current);
   };
 
   // ——— MODO SEGUIR ———
@@ -190,11 +253,41 @@ export default function PlanificadorRutinasPage() {
       tareas: rutina.tareas.map(t => ({ ...t, completada: false })),
     });
     setTareaActualIdx(0);
+    marcarCambioPantalla();
     setVista('seguir');
+    pedirFoco(() => tareaCardRef.current);
+  };
+
+  // ——— SELECTOR DE EMOJI ———
+
+  const elegirEmoji = (e: string) => {
+    setNuevoEmoji(e);
+    setMostrarPicker(false);
+    pedirFoco(() => emojiBtnRef.current);
+  };
+
+  /** Flechas, Inicio y Fin recorren las opciones del listbox; Escape lo cierra. */
+  const teclaEnPicker = (e: EventoTeclado<HTMLDivElement>) => {
+    const opciones = Array.from(pickerRef.current?.querySelectorAll<HTMLButtonElement>('[role="option"]') ?? []);
+    const actual = opciones.indexOf(document.activeElement as HTMLButtonElement);
+    let destino = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') destino = Math.min(opciones.length - 1, actual + 1);
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') destino = Math.max(0, actual - 1);
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = opciones.length - 1;
+    else if (e.key === 'Escape') {
+      e.preventDefault();
+      setMostrarPicker(false);
+      pedirFoco(() => emojiBtnRef.current);
+      return;
+    } else return;
+    e.preventDefault();
+    opciones[destino]?.focus();
   };
 
   const marcarCompletada = useCallback(() => {
     if (!rutinaActiva) return;
+    marcarCambioPantalla();
 
     // Tono de éxito
     try {
@@ -226,8 +319,10 @@ export default function PlanificadorRutinasPage() {
       setTareaActualIdx(siguienteIdx);
     } else {
       setTareaActualIdx(rutinaActiva.tareas.length); // Fin
+      // ¡HECHO! desaparece con la última tarea: el foco va al título del fin de rutina
+      focoPendiente.current = () => finTituloRef.current;
     }
-  }, [rutinaActiva, tareaActualIdx]);
+  }, [rutinaActiva, tareaActualIdx, marcarCambioPantalla]);
 
   const rutinaTerminada = rutinaActiva && tareaActualIdx >= rutinaActiva.tareas.length;
   const tareasCompletadas = rutinaActiva?.tareas.filter(t => t.completada).length ?? 0;
@@ -258,7 +353,7 @@ export default function PlanificadorRutinasPage() {
             // ——— FIN DE RUTINA ———
             <div className={styles.finRutina} role="status" aria-live="polite">
               <div className={styles.finEmoji} aria-hidden="true">🎉</div>
-              <h2 className={styles.finTitulo}>¡Rutina completada!</h2>
+              <h2 className={styles.finTitulo} ref={finTituloRef} tabIndex={-1}>¡Rutina completada!</h2>
               <p className={styles.finSubtitulo}>Has completado todas las tareas de <strong>{rutinaActiva.nombre}</strong></p>
               <div className={styles.finAcciones}>
                 <button
@@ -271,7 +366,7 @@ export default function PlanificadorRutinasPage() {
                 <button
                   type="button"
                   className={styles.btnFinSecundario}
-                  onClick={() => setVista('lista')}
+                  onClick={() => irALista()}
                 >
                   ↩ Volver al inicio
                 </button>
@@ -285,10 +380,17 @@ export default function PlanificadorRutinasPage() {
                 <span className={styles.rutinaHeaderProgreso}>{tareasCompletadas + 1} / {totalTareas}</span>
               </div>
 
-              {/* Tarea actual — grande y clara */}
-              <div className={styles.tareaActualCard}>
+              {/* Tarea actual — grande y clara. Región viva: al pulsar ¡HECHO! el foco se queda en
+                  el botón y esto anuncia la tarea nueva */}
+              <div
+                className={styles.tareaActualCard}
+                ref={tareaCardRef}
+                tabIndex={-1}
+                aria-live="polite"
+                aria-atomic="true"
+              >
                 <div className={styles.tareaActualEmoji} aria-hidden="true">{tareaActual.emoji}</div>
-                <div className={styles.tareaActualNombre}>{tareaActual.nombre}</div>
+                <h2 className={styles.tareaActualNombre}>{tareaActual.nombre}</h2>
                 {tareaActual.duracion > 0 && (
                   <div className={styles.tareaActualDuracion}><span aria-hidden="true">⏱️</span> {tareaActual.duracion} min</div>
                 )}
@@ -298,7 +400,7 @@ export default function PlanificadorRutinasPage() {
               {tareaActualIdx + 1 < totalTareas && (
                 <div className={styles.proximaTarea} aria-label="Próxima tarea">
                   <span className={styles.proximaLabel}>Después:</span>
-                  <span className={styles.proximaEmoji}>{rutinaActiva.tareas[tareaActualIdx + 1].emoji}</span>
+                  <span className={styles.proximaEmoji} aria-hidden="true">{rutinaActiva.tareas[tareaActualIdx + 1].emoji}</span>
                   <span className={styles.proximaNombre}>{rutinaActiva.tareas[tareaActualIdx + 1].nombre}</span>
                 </div>
               )}
@@ -308,13 +410,21 @@ export default function PlanificadorRutinasPage() {
                 type="button"
                 className={styles.btnHecho}
                 onClick={marcarCompletada}
-                aria-label="Marcar tarea como completada"
               >
-                ✓ ¡HECHO!
+                {/* Sin aria-label: el nombre accesible es lo que se ve (WCAG 2.5.3) */}
+                <span aria-hidden="true">✓</span> ¡HECHO!
               </button>
 
               {/* Puntos de progreso — menos ruido visual para usuarios con DI/TEA */}
-              <div className={styles.progresoPuntos} role="progressbar" aria-label={`Tarea ${tareasCompletadas + 1} de ${totalTareas}`}>
+              <div
+                className={styles.progresoPuntos}
+                role="progressbar"
+                aria-label={`Tarea ${tareasCompletadas + 1} de ${totalTareas}`}
+                aria-valuemin={0}
+                aria-valuemax={totalTareas}
+                aria-valuenow={tareasCompletadas}
+                aria-valuetext={`${tareasCompletadas} de ${totalTareas} tareas hechas`}
+              >
                 {rutinaActiva.tareas.map((t, i) => (
                   <div
                     key={t.id}
@@ -328,10 +438,10 @@ export default function PlanificadorRutinasPage() {
               <button
                 type="button"
                 className={styles.btnSalir}
-                onClick={() => setVista('lista')}
+                onClick={() => irALista()}
                 aria-label="Salir del modo seguir rutina"
               >
-                ✕ Salir
+                <span aria-hidden="true">✕</span> Salir
               </button>
             </>
           )}
@@ -350,10 +460,10 @@ export default function PlanificadorRutinasPage() {
 
         <div className={styles.editorWrapper}>
           <div className={styles.editorHeader}>
-            <button type="button" className={styles.btnVolver} onClick={() => setVista('lista')}>
+            <button type="button" className={styles.btnVolver} onClick={() => irALista()}>
               ← Volver
             </button>
-            <h2 className={styles.editorTitulo}>
+            <h2 className={styles.editorTitulo} ref={editorTituloRef} tabIndex={-1}>
               {modoEdicion === 'nueva' ? 'Nueva rutina' : 'Editar rutina'}
             </h2>
           </div>
@@ -374,12 +484,12 @@ export default function PlanificadorRutinasPage() {
 
           {/* Lista de tareas */}
           <div className={styles.tareasList}>
-            <h3 className={styles.tareasListTitulo}>Tareas ({tareas.length})</h3>
+            <h3 className={styles.tareasListTitulo} ref={tareasTituloRef} tabIndex={-1}>Tareas ({tareas.length})</h3>
             {tareas.length === 0 && (
               <p className={styles.tareasVacias}>Añade la primera tarea abajo ↓</p>
             )}
             {tareas.map((t, idx) => (
-              <div key={t.id} className={styles.tareaEditorItem}>
+              <div key={t.id} className={styles.tareaEditorItem} data-tarea-id={t.id}>
                 <span className={styles.tareaEditorEmoji} aria-hidden="true">{t.emoji}</span>
                 <div className={styles.tareaEditorInfo}>
                   <span className={styles.tareaEditorNombre}>{t.nombre}</span>
@@ -393,6 +503,7 @@ export default function PlanificadorRutinasPage() {
                     className={styles.btnOrden}
                     onClick={() => moverTarea(idx, 'arriba')}
                     disabled={idx === 0}
+                    data-dir="arriba"
                     aria-label="Mover arriba"
                   >▲</button>
                   <button
@@ -400,6 +511,7 @@ export default function PlanificadorRutinasPage() {
                     className={styles.btnOrden}
                     onClick={() => moverTarea(idx, 'abajo')}
                     disabled={idx === tareas.length - 1}
+                    data-dir="abajo"
                     aria-label="Mover abajo"
                   >▼</button>
                   <button
@@ -421,6 +533,7 @@ export default function PlanificadorRutinasPage() {
             <div className={styles.emojiSelector}>
               <button
                 type="button"
+                ref={emojiBtnRef}
                 className={styles.btnEmojiActual}
                 onClick={() => setMostrarPicker(p => !p)}
                 aria-label={`Emoji seleccionado: ${nuevoEmoji}. Pulsa para cambiar`}
@@ -429,13 +542,19 @@ export default function PlanificadorRutinasPage() {
                 {nuevoEmoji}
               </button>
               {mostrarPicker && (
-                <div className={styles.emojiPicker} role="listbox" aria-label="Seleccionar emoji">
+                <div
+                  className={styles.emojiPicker}
+                  role="listbox"
+                  aria-label="Seleccionar emoji"
+                  ref={pickerRef}
+                  onKeyDown={teclaEnPicker}
+                >
                   {EMOJIS_FRECUENTES.map(e => (
                     <button
                       type="button"
                       key={e}
                       className={`${styles.emojiOpcion} ${e === nuevoEmoji ? styles.emojiOpcionActiva : ''}`}
-                      onClick={() => { setNuevoEmoji(e); setMostrarPicker(false); }}
+                      onClick={() => elegirEmoji(e)}
                       role="option"
                       aria-selected={e === nuevoEmoji}
                       aria-label={e}
@@ -452,6 +571,7 @@ export default function PlanificadorRutinasPage() {
                 <label className={styles.campoLabel} htmlFor="nueva-tarea-nombre">Nombre de la tarea</label>
                 <input
                   id="nueva-tarea-nombre"
+                  ref={nuevoNombreRef}
                   className={styles.inputTarea}
                   type="text"
                   value={nuevoNombre}
@@ -470,7 +590,8 @@ export default function PlanificadorRutinasPage() {
                   min={0}
                   max={120}
                   value={nuevaDuracion === 0 ? '' : nuevaDuracion}
-                  onChange={e => setNuevaDuracion(Number(e.target.value) || 0)}
+                  step={1}
+                  onChange={e => setNuevaDuracion(acotarDuracion(e.target.value))}
                   placeholder="0"
                 />
               </div>
@@ -524,7 +645,7 @@ export default function PlanificadorRutinasPage() {
       {/* Lista de rutinas */}
       <section className={styles.rutinasSección} aria-label="Mis rutinas">
         <div className={styles.rutinasSectionHeader}>
-          <h2 className={styles.seccionTitulo}>Mis rutinas</h2>
+          <h2 className={styles.seccionTitulo} ref={misRutinasRef} tabIndex={-1}>Mis rutinas</h2>
           <button
             type="button"
             className={styles.btnNuevaRutina}
@@ -544,9 +665,9 @@ export default function PlanificadorRutinasPage() {
 
         <div className={styles.rutinasGrid}>
           {rutinas.map(rutina => (
-            <div key={rutina.id} className={styles.rutinaCard}>
+            <div key={rutina.id} className={styles.rutinaCard} data-rutina-id={rutina.id}>
               <div className={styles.rutinaCardHeader}>
-                <h3 className={styles.rutinaCardNombre}>{rutina.nombre}</h3>
+                <h3 className={styles.rutinaCardNombre} tabIndex={-1}>{rutina.nombre}</h3>
                 <span className={styles.rutinaCardCount}>{rutina.tareas.length} tareas</span>
               </div>
 
@@ -727,11 +848,12 @@ export default function PlanificadorRutinasPage() {
             </div>
             <div className={styles.faqItem}>
               <dt>¿Puedo compartir una rutina entre varios dispositivos?</dt>
-              <dd>No directamente: los datos se guardan en local en cada dispositivo. Para compartir, tendrías que replicar la rutina manualmente en el otro dispositivo. Una función de exportación/importación está prevista para futuras versiones.</dd>
+              <dd>No directamente: los datos se guardan en local en cada dispositivo. Para compartir, tendrías que replicar la rutina manualmente en el otro dispositivo.</dd>
             </div>
             <div className={styles.faqItem}>
-              <dt>¿Cuántas tareas debo incluir en una rutina?</dt>
-              <dd>Para usuarios con TEA o DI, empieza con 4-6 tareas. Rutinas muy largas pueden resultar abrumadoras. Una vez que la rutina esté bien interiorizada (2-3 semanas), puedes añadir más pasos gradualmente.</dd>
+              {/* La misma pregunta va en el FAQPage: una sola fuente, en metadata.ts */}
+              <dt>{PREGUNTA_CUANTAS_TAREAS.question}</dt>
+              <dd>{PREGUNTA_CUANTAS_TAREAS.answer}</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Es adecuado para personas con demencia?</dt>
@@ -782,7 +904,7 @@ export default function PlanificadorRutinasPage() {
             <li className={styles.step}>
               <span className={styles.stepNumber}>6</span>
               <div>
-                <strong>Pulsa ✓ HECHO cuando complete cada tarea</strong>
+                <strong>Pulsa <span aria-hidden="true">✓</span> HECHO cuando complete cada tarea</strong>
                 <p>El tono de éxito confirma la acción y la app pasa automáticamente a la siguiente tarea. Deja que el usuario pulse el botón siempre que sea posible para fomentar su autonomía.</p>
               </div>
             </li>
