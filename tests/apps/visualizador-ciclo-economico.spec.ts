@@ -17,8 +17,10 @@ import { contrasteSobreFondoReal } from './_contraste';
  * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (.inspector-trabajo/vce-esperados.mjs)
  *   CASO 1 (normal) — simulador con una expansión de manual: PIB creció Sí, paro bajando Sí,
  *     inflación > 3 % No, tipos subiendo No, PMI > 50 Sí, curva invertida No. Con las reglas de
- *     interpretarRespuestas: Expansión 2+2+1+1+2+1 = 9 · Valle 2+2+1 = 5 · Pico 1+1 = 2 ·
- *     Recesión 0 → «Expansión». Seis Sí: Pico 7 · Expansión 6 · Recesión 4 → «Pico».
+ *     interpretarRespuestas reparadas el 19/11/2026 (hallazgo 5125): Expansión 2+2+1+0+2+1 = 8 ·
+ *     Pico 2+1+0+0+1+0 = 4 · Valle 0+0+1+1+1+1 = 4 → «Expansión». Seis Sí: Pico 2+1+2+2+1+2 = 10 ·
+ *     Expansión 2+2+0+1+2+0 = 7 · Valle 1 → «Pico». (Con el PIB creciendo, Recesión no se elige;
+ *     sin crecer, Expansión y Pico tampoco.)
  *   CASO 2 (límite: los extremos de la curva) — la sinusoide tiene su máximo en t = 0,2
  *     (x 164, y 40) y su mínimo en t = 0,6 (x 412, y 180); el eje los rotula «Pico» (40, 32) y
  *     «Valle» (40, 198), y la página define el Pico como «la economía está en su punto máximo» y el
@@ -100,12 +102,12 @@ test.describe('Simulador «¿En qué fase estamos?»', () => {
     await expect(preguntas(page)).toHaveCount(6);
   });
 
-  test('CASO 1 (normal): una expansión de manual (Sí, Sí, No, No, Sí, No) da «Expansión» (9 frente a 5)', async ({ page }) => {
+  test('CASO 1 (normal): una expansión de manual (Sí, Sí, No, No, Sí, No) da «Expansión» (8 frente a 4)', async ({ page }) => {
     await responder(page, ['Sí', 'Sí', 'No', 'No', 'Sí', 'No']);
     await expect(resultado(page).locator('h3')).toHaveText('Fase estimada: Expansión');
   });
 
-  test('seis Sí dan «Pico» (7 frente a 6 de Expansión)', async ({ page }) => {
+  test('seis Sí dan «Pico» (10 frente a 7 de Expansión)', async ({ page }) => {
     await responder(page, ['Sí', 'Sí', 'Sí', 'Sí', 'Sí', 'Sí']);
     await expect(resultado(page).locator('h3')).toHaveText('Fase estimada: Pico');
   });
@@ -121,12 +123,27 @@ test.describe('Simulador «¿En qué fase estamos?»', () => {
     await expect(resultado(page)).toHaveCount(0);
   });
 
-  test.fail('CASO 3 (rechazo) — HALLAZGO ABIERTO: con el PIB creciendo y el paro bajando no puede salir «Recesión»', async ({ page }) => {
+  test('CASO 3 (rechazo) — REPARADO 5125: con el PIB creciendo y el paro bajando no puede salir «Recesión»', async ({ page }) => {
     // La propia página: «Técnicamente: dos trimestres consecutivos de PIB negativo» y «Destrucción
-    // de empleo, paro en alza». Hoy: Recesión 6 · Expansión 5 · Pico 5 → «Recesión».
+    // de empleo, paro en alza». Antes: Recesión 6 · Expansión 5 · Pico 5 → «Recesión». Ahora la
+    // inflación alta y la curva invertida son señales de pico (la página: la inversión PRECEDE a la
+    // recesión): Pico 2+1+2+0+0+2 = 7 · Expansión 4 · Valle 2 → «Pico».
     await responder(page, ['Sí', 'Sí', 'Sí', 'No', 'No', 'Sí']);
-    await expect(resultado(page).locator('h3')).toContainText('Fase estimada:');
-    await expect(resultado(page).locator('h3')).not.toContainText('Recesión');
+    await expect(resultado(page).locator('h3')).toHaveText('Fase estimada: Pico');
+  });
+
+  test('REPARADO 5125: el perfil de la tarjeta Recesión (seis No) da «Recesión», no «Valle»', async ({ page }) => {
+    // Antes: Valle 8 · Recesión 5 → «Valle / Recuperación». Ahora Recesión 2+2+1+1+2+0 = 8 ·
+    // Valle 2+1+1+1+1+1 = 7.
+    await responder(page, ['No', 'No', 'No', 'No', 'No', 'No']);
+    await expect(resultado(page).locator('h3')).toHaveText('Fase estimada: Recesión');
+  });
+
+  test('REPARADO 5125: PIB que no crece con el PMI ya por encima de 50 da «Valle / Recuperación»', async ({ page }) => {
+    // No, No, No, No, Sí, No: Valle 2+1+1+1+1+1 = 7 · Recesión 2+2+1+1+0+0 = 6 (Expansión y Pico,
+    // fuera: el PIB no creció). Es la tarjeta del valle: «primeros síntomas de rebote».
+    await responder(page, ['No', 'No', 'No', 'No', 'Sí', 'No']);
+    await expect(resultado(page).locator('h3')).toHaveText('Fase estimada: Valle / Recuperación');
   });
 });
 
@@ -222,12 +239,14 @@ test.describe('Indicadores', () => {
     await abrir(page);
   });
 
-  test.fail('HALLAZGO ABIERTO: el dato «Eurozona» de los Tipos de Interés Oficiales es el del BCE, no el de la Fed', async ({ page }) => {
+  test('REPARADO 5126: el dato «Eurozona» de los Tipos de Interés Oficiales es el del BCE, no el de la Fed', async ({ page }) => {
     const detalle = await abrirIndicador(page, 'Tipos de Interés Oficiales');
     const eurozona = detalle.locator('div', { hasText: 'Eurozona' }).last().locator('strong');
     await expect(eurozona).toBeVisible();
-    // Hoy: «Fed Funds rate (abr. 2024): 5,25-5,50% (tipos máximos desde 2001)»
+    // Antes: «Fed Funds rate (abr. 2024): 5,25-5,50% (tipos máximos desde 2001)». BCE, tabla «Key ECB
+    // interest rates»: operaciones principales al 4,50 % del 20/09/2023 al 12/06/2024.
     await expect(eurozona).not.toContainText('Fed');
+    await expect(eurozona).toContainText('BCE (abr. 2024): 4,50 %');
   });
 
   test.fail('HALLAZGO ABIERTO: «Ver solo España» deja ver solo el dato de España', async ({ page }) => {
@@ -240,7 +259,9 @@ test.describe('Indicadores', () => {
     await expect(detalle.getByText('PIB Eurozona Q1 2024')).toBeHidden();
   });
 
-  test.fail('HALLAZGO ABIERTO: lo que se anuncia como «los datos actuales» no puede ser el tipo del BCE de abril de 2024', async ({ page }) => {
+  test('REPARADO 5127: lo que se anuncia como «los datos actuales» no puede ser el tipo del BCE de abril de 2024', async ({ page }) => {
+    // Reparado bajando la promesa: el subtítulo dice ahora «un dato de ejemplo de 2023-2024 (no son
+    // los últimos publicados)».
     // BCE: 4,50 % hasta el 12/06/2024 (primera bajada, 4,25 %); 2,65 % desde el 16/09/2026.
     const subtitulo = await page
       .getByRole('heading', { name: 'Indicadores leading, coincident y lagging' })
@@ -251,6 +272,7 @@ test.describe('Indicadores', () => {
     const prometeActuales = /datos actuales/i.test(subtitulo);
     const esDeAbril2024 = /abr\. 2024/.test(espana);
     expect(prometeActuales && esDeAbril2024, `«${subtitulo}» frente a «${espana}»`).toBe(false);
+    expect(subtitulo).toContain('no son los últimos publicados');
   });
 });
 
@@ -300,7 +322,7 @@ test.describe('Datos de los indicadores frente a su fuente (cabo C0825)', () => 
 });
 
 test.describe('Accesibilidad', () => {
-  test.fail('HALLAZGO ABIERTO: el texto blanco de «Sí» y «No» marcados llega a 4,5:1', async ({ page }) => {
+  test('REPARADO 5129: el texto blanco de «Sí» y «No» marcados llega a 4,5:1', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' }); // sin la transición de 0,2 s del fondo
     await abrir(page);
     const si = preguntas(page).nth(0).getByRole('button', { name: 'Sí', exact: true });
@@ -309,7 +331,7 @@ test.describe('Accesibilidad', () => {
     await no.click();
     await expect(si).toHaveAttribute('aria-pressed', 'true');
     await expect(no).toHaveAttribute('aria-pressed', 'true');
-    // Hoy: blanco sobre #22c55e = 2,28:1 y sobre #ef4444 = 3,76:1, en los dos temas
+    // Antes: blanco sobre #22c55e = 2,28:1 y sobre #ef4444 = 3,76:1; ahora #136E35 y #B91C1C
     expect(await contrasteSobreFondoReal(si), 'Sí marcado').toBeGreaterThanOrEqual(4.5);
     expect(await contrasteSobreFondoReal(no), 'No marcado').toBeGreaterThanOrEqual(4.5);
   });

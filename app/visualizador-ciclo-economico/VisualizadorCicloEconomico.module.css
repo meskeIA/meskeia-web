@@ -803,16 +803,18 @@
   outline-offset: 2px;
 }
 
+/* Hallazgo 5129 (19/11/2026): blanco sobre #22c55e (2,28:1) y #ef4444 (3,76:1). Los mismos tonos
+   que ya usan los .tipoBadge_* de este módulo (nota C0297): 6,35:1 y 6,47:1, en los dos temas. */
 .btnRespuestaSi {
-  background: #22c55e;
+  background: #136E35;
   color: white;
-  border-color: #22c55e;
+  border-color: #136E35;
 }
 
 .btnRespuestaNo {
-  background: #ef4444;
+  background: #B91C1C;
   color: white;
-  border-color: #ef4444;
+  border-color: #B91C1C;
 }
 
 /* Resultado simulador */

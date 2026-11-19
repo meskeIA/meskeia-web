@@ -273,8 +273,13 @@ const INDICADORES: Indicador[] = [
       'Los tipos que fija el banco central (BCE, Fed). Suben para frenar la inflación y bajan para estimular la economía.',
     porQue:
       'Los bancos centrales actúan después de ver datos confirmados de inflación o recesión. En 2022, el BCE tardó meses en subir tipos pese a que la inflación llevaba trimestres disparada. La política monetaria es lagging por diseño.',
-    datoEspana: 'Tipo refinanciación BCE (abr. 2024): 4,50% (iniciando bajadas)',
-    datoEurozona: 'Fed Funds rate (abr. 2024): 5,25-5,50% (tipos máximos desde 2001)',
+    // Hallazgo 5126 (19/11/2026): el recuadro «Eurozona» llevaba el tipo de la Fed de EEUU y el del
+    // BCE estaba en el de España, que no fija tipos propios. «Iniciando bajadas» tampoco era de abril
+    // de 2024: la primera bajada fue el 12/06/2024. Tabla «Key ECB interest rates»
+    // (www.ecb.europa.eu, consultada el 19/11/2026): operaciones principales al 4,50 % desde el
+    // 20/09/2023 y al 4,25 % desde el 12/06/2024.
+    datoEspana: 'España no fija tipos propios: aplica los del BCE (abr. 2024: 4,50 %)',
+    datoEurozona: 'Tipo de las operaciones principales del BCE (abr. 2024): 4,50 % (sin cambios desde sept. 2023)',
   },
 ];
 
@@ -422,20 +427,27 @@ function interpretarRespuestas(respuestas: RespuestaSimulador[]): {
     valle: 0,
   };
 
-  if (pibCrecio === 'si') { puntos.expansion += 2; puntos.pico += 1; }
-  if (pibCrecio === 'no') { puntos.recesion += 2; puntos.valle += 1; }
+  // Hallazgo 5125 (19/11/2026): las reglas contradecían las fases que define la propia página. La
+  // curva invertida sumaba 3 a Recesión (y la página dice que la PRECEDE en 6-24 meses: es señal de
+  // pico), la inflación alta sumaba a Recesión («Inflación cae» en su tarjeta), y salía «Recesión»
+  // con el PIB creciendo, cuando la página la define como «dos trimestres consecutivos de PIB
+  // negativo». Ahora cada respuesta suma a las fases cuya tarjeta la describe, y la pregunta del PIB
+  // decide entre qué fases se elige: si creció, Recesión queda fuera; si no, Expansión y Pico.
+  if (pibCrecio === 'si') { puntos.expansion += 2; puntos.pico += 2; }
+  if (pibCrecio === 'no') { puntos.recesion += 2; puntos.valle += 2; }
   if (paroBaja === 'si') { puntos.expansion += 2; puntos.pico += 1; }
-  if (paroBaja === 'no') { puntos.recesion += 1; puntos.valle += 1; }
-  if (inflacionAlta === 'si') { puntos.pico += 2; puntos.recesion += 1; }
-  if (inflacionAlta === 'no') { puntos.expansion += 1; puntos.valle += 2; }
-  if (tiposSuben === 'si') { puntos.pico += 2; }
-  if (tiposSuben === 'no') { puntos.expansion += 1; puntos.valle += 2; }
-  if (pmiAlto === 'si') { puntos.expansion += 2; }
+  if (paroBaja === 'no') { puntos.recesion += 2; puntos.valle += 1; }
+  if (inflacionAlta === 'si') { puntos.pico += 2; }
+  if (inflacionAlta === 'no') { puntos.expansion += 1; puntos.recesion += 1; puntos.valle += 1; }
+  if (tiposSuben === 'si') { puntos.pico += 2; puntos.expansion += 1; }
+  if (tiposSuben === 'no') { puntos.recesion += 1; puntos.valle += 1; }
+  if (pmiAlto === 'si') { puntos.expansion += 2; puntos.pico += 1; puntos.valle += 1; }
   if (pmiAlto === 'no') { puntos.recesion += 2; puntos.valle += 1; }
-  if (curvaInvertida === 'si') { puntos.recesion += 3; puntos.pico += 1; }
+  if (curvaInvertida === 'si') { puntos.pico += 2; }
   if (curvaInvertida === 'no') { puntos.expansion += 1; puntos.valle += 1; }
 
-  const entries = Object.entries(puntos) as [FaseId, number][];
+  const posibles: FaseId[] = pibCrecio === 'si' ? ['expansion', 'pico', 'valle'] : ['recesion', 'valle'];
+  const entries = (Object.entries(puntos) as [FaseId, number][]).filter(([id]) => posibles.includes(id));
   const mejor = entries.reduce((a, b) => (b[1] > a[1] ? b : a));
   const faseId = mejor[0];
   const fase = FASES.find((f) => f.id === faseId);
@@ -739,7 +751,10 @@ export default function VisualizadorCicloEconomicoPage() {
             <div>
               <h2 className={styles.sectionTitle}>Indicadores leading, coincident y lagging</h2>
               <p className={styles.sectionSubtitle}>
-                Haz clic en un indicador para ver por qué es de ese tipo y los datos actuales
+                {/* Hallazgo 5127 (19/11/2026): prometía «los datos actuales» y todos son de 2023 o
+                    de febrero-abril de 2024 */}
+                Haz clic en un indicador para ver por qué es de ese tipo y un dato de ejemplo de
+                2023-2024 (no son los últimos publicados)
               </p>
             </div>
           </div>
