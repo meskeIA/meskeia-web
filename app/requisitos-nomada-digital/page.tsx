@@ -19,10 +19,22 @@ import {
   MINIMO_INGRESOS_DEPENDIENTE_NOMADA,
   SMI_MENSUAL_NOMADA,
   NOMADA_DIGITAL_META,
+  MAX_CLIENTES_ESPANA_PORCENTAJE,
+  ANTIGUEDAD_MINIMA_EMPLEADO_MESES,
+  DURACION_VISADO_MESES,
+  DURACION_AUTORIZACION_INICIAL_MESES,
+  DURACION_RENOVACION_MESES,
 } from '@/data/fiscal';
+import { FAQ_PLAZO, FAQ_FISCAL } from './faq';
 
 type Perfil = 'empleado' | 'freelancer' | '';
 type Respuesta = true | false | null;
+
+/** «20 %» con espacio duro (CLAUDE.md §2) */
+const pct = (n: number): string => `${n} %`;
+const TOPE_ESPANA = pct(MAX_CLIENTES_ESPANA_PORCENTAJE);
+const MESES_ANTIGUEDAD = ANTIGUEDAD_MINIMA_EMPLEADO_MESES;
+const anios = (meses: number): string => (meses === 12 ? '1 año' : `${meses / 12} años`);
 
 interface Requisito {
   id: string;
@@ -30,78 +42,81 @@ interface Requisito {
   explicacion: string;
   soloEmpleado?: boolean;
   soloFreelancer?: boolean;
-  bloqueante?: boolean; // requisito que si falla, descalifica directamente
 }
 
+// Todos son requisitos de la Ley 14/2013 (arts. 62.3, 74 bis y 74 ter, leídos en el BOE el
+// 19/11/2026): un «No» en cualquiera impide el visado o la autorización. Antes cuatro de ellos no
+// eran «imprescindibles» y un solo «No» daba «Casi cumples» (hallazgo 5170).
 const REQUISITOS: Requisito[] = [
   {
     id: 'noUE',
     pregunta: '¿Eres ciudadano/a de un país no perteneciente a la UE / EEE / Suiza?',
     explicacion:
       'Los ciudadanos de la UE, el Espacio Económico Europeo y Suiza pueden residir y trabajar libremente en España. Si eres de estos países, no necesitas este visado.',
-    bloqueante: true,
   },
   {
     id: 'trabajoRemoto',
     pregunta: '¿Trabajas (o vas a trabajar) completamente en remoto usando medios telemáticos?',
     explicacion:
       'Tu actividad debe poder realizarse íntegramente a distancia, mediante ordenador u otros medios digitales, sin necesidad de presencia física en la empresa.',
-    bloqueante: true,
   },
   {
     id: 'empresaExtranjera',
-    pregunta: '¿Tu empresa empleadora tiene su sede o domicilio social fuera de España?',
+    pregunta: '¿Tu empresa empleadora está radicada fuera de España?',
     explicacion:
-      'El empleador debe ser una empresa radicada en el extranjero. Si tiene presencia en España, los clientes o facturación española no puede superar el 20% del total.',
+      'Por cuenta ajena solo puedes trabajar para empresas radicadas fuera del territorio nacional (Ley 14/2013, art. 74 bis). Para el empleado la ley no prevé ningún porcentaje de trabajo en España: ese margen es solo de los profesionales por cuenta propia.',
     soloEmpleado: true,
-    bloqueante: true,
   },
   {
     id: 'clientesExtranjeros',
-    pregunta: '¿La mayoría de tus clientes e ingresos provienen de fuera de España?',
+    pregunta: `¿Tu trabajo para empresas ubicadas en España es, como mucho, el ${TOPE_ESPANA} de tu actividad profesional?`,
     explicacion:
-      'Como freelancer, tu actividad económica debe desarrollarse mayoritariamente con empresas o clientes extranjeros. Los clientes en España deben ser minoría.',
+      `Como profesional por cuenta propia puedes trabajar para una empresa ubicada en España siempre que ese trabajo no supere el ${TOPE_ESPANA} del total de tu actividad (Ley 14/2013, art. 74 bis). Con un 60 % para clientes de fuera y un 40 % para empresas de España, la respuesta es «No».`,
     soloFreelancer: true,
-    bloqueante: true,
   },
   {
     id: 'antiguedad',
-    pregunta: '¿Llevas al menos 3 meses trabajando con tu empresa actual?',
+    pregunta: `¿Llevas al menos ${MESES_ANTIGUEDAD} meses trabajando con tu empresa actual?`,
     explicacion:
-      'Se exige una relación laboral preexistente de mínimo 3 meses antes de presentar la solicitud, para acreditar la estabilidad del empleo remoto.',
+      `La relación laboral con la empresa no localizada en España tiene que existir durante, al menos, los ${MESES_ANTIGUEDAD} meses anteriores a la solicitud (Ley 14/2013, art. 74 ter c).`,
     soloEmpleado: true,
   },
   {
-    id: 'experiencia',
-    pregunta: '¿Tienes al menos 1 año de experiencia profesional acreditable en tu campo?',
+    id: 'relacionMercantil',
+    pregunta: `¿Llevas al menos ${MESES_ANTIGUEDAD} meses trabajando para una o varias empresas no localizadas en España?`,
     explicacion:
-      'Como freelancer debes demostrar experiencia laboral previa mediante contratos, facturas, cartas de clientes u otros documentos que justifiquen tu trayectoria.',
+      `Como freelancer tienes que acreditar una relación mercantil con empresas no localizadas en España durante, al menos, los ${MESES_ANTIGUEDAD} meses anteriores a la solicitud (Ley 14/2013, art. 74 ter d), con contratos o facturas. La ley no pide un año de experiencia propia.`,
     soloFreelancer: true,
   },
   {
-    id: 'titulacion',
-    pregunta: '¿Tienes titulación universitaria o acreditas más de 3 años de experiencia profesional?',
+    id: 'actividadEmpresa',
+    pregunta: '¿La empresa (o grupo) para la que trabajas lleva al menos un año de actividad real y continuada?',
     explicacion:
-      'Se puede acreditar la cualificación con un título universitario homologable en España, o demostrar al menos 3 años de experiencia laboral en el sector.',
+      'La ley exige que la empresa o grupo de empresas con la que mantienes la relación laboral o profesional tenga una actividad real y continuada durante al menos un año (Ley 14/2013, art. 74 ter a). Es la empresa, no tu experiencia, la que tiene que llevar ese año.',
+  },
+  {
+    id: 'titulacion',
+    pregunta: '¿Tienes titulación universitaria o acreditas al menos 3 años de experiencia profesional?',
+    explicacion:
+      'Puedes acreditar la cualificación como graduado o postgraduado universitario, o con una experiencia profesional mínima de tres años (Ley 14/2013, art. 74 bis): con exactamente tres años, la respuesta es «Sí».',
   },
   {
     id: 'sinAntecedentes',
-    pregunta: '¿Estás libre de antecedentes penales en los últimos 5 años en España y en tus países de residencia anteriores?',
+    pregunta: '¿Estás libre de antecedentes penales en España y en los países donde has residido los últimos 2 años?',
     explicacion:
-      'Debes aportar certificado de antecedentes penales del Registro Central de Penados (si ya residiste en España) y de los países donde hayas vivido los últimos 5 años.',
-    bloqueante: true,
+      'Debes carecer de antecedentes penales en España y en los países donde hayas residido durante los dos últimos años, y firmar una declaración responsable de que no los tienes en los últimos cinco (Ley 14/2013, art. 62.3.c).',
   },
   {
     id: 'situacionRegular',
     pregunta: '¿Estás en situación regular en España (o vas a solicitar el visado desde el extranjero)?',
     explicacion:
-      'Si ya estás en España, no puedes estar en situación irregular. Si aún no has llegado, solicitas el visado en el consulado español de tu país y este requisito no aplica.',
+      'Si ya estás en España, no puedes encontrarte en situación irregular (Ley 14/2013, art. 62.3.a). Si aún no has llegado, solicitas el visado en el consulado español de tu país y puedes responder «Sí».',
   },
   {
     id: 'seguroMedico',
     pregunta: '¿Tienes (o puedes contratar) seguro médico con cobertura completa en España?',
     explicacion:
-      'El seguro puede ser privado o público (convenio bilateral, tarjeta sanitaria europea, etc.) pero debe cubrir todos los riesgos sin copagos ni límites de cobertura.',
+      'Necesitas un seguro público o un seguro privado de enfermedad concertado con una entidad aseguradora (Ley 14/2013, art. 62.3.e).',
   },
 ];
 
@@ -109,7 +124,7 @@ const DOCUMENTOS_COMUNES = [
   'Formulario de solicitud oficial (modelo EX-01)',
   'Pasaporte vigente con mínimo 1 año de validez (copia y original)',
   'Fotografía reciente en color con fondo blanco',
-  'Certificado de antecedentes penales apostillado (de España y países de residencia últimos 5 años)',
+  'Certificado de antecedentes penales apostillado de España y de los países de residencia de los últimos 2 años, y declaración responsable de no tenerlos en los últimos 5',
   'Seguro médico con cobertura en España (privado o equivalente)',
   'Justificante de medios económicos (nóminas, extractos bancarios o declaración de ingresos)',
   'Tasas administrativas abonadas',
@@ -117,17 +132,16 @@ const DOCUMENTOS_COMUNES = [
 
 const DOCUMENTOS_EMPLEADO = [
   'Contrato de trabajo con empresa extranjera (traducido y apostillado)',
-  'Carta del empleador confirmando modalidad 100% remota y antigüedad ≥ 3 meses',
-  'Documentación acreditativa de la empresa (registro mercantil, actividad, sede)',
-  `Últimas 3 nóminas que acrediten ingresos ≥ 200% SMI (${MINIMO_INGRESOS_TITULAR_NOMADA.toLocaleString('es-ES')} €/mes)`,
+  `Carta del empleador confirmando modalidad 100 % remota y antigüedad ≥ ${MESES_ANTIGUEDAD} meses`,
+  'Documentación acreditativa de la empresa (registro mercantil, sede fuera de España y al menos un año de actividad)',
+  `Últimas 3 nóminas que acrediten ingresos ≥ ${pct(200)} SMI (${MINIMO_INGRESOS_TITULAR_NOMADA.toLocaleString('es-ES')} €/mes)`,
 ];
 
 const DOCUMENTOS_FREELANCER = [
-  'Contratos o acuerdos con clientes extranjeros (últimos 12 meses)',
-  'Últimas facturas emitidas a clientes fuera de España',
-  `Declaraciones fiscales que acrediten ingresos ≥ 200% SMI (${MINIMO_INGRESOS_TITULAR_NOMADA.toLocaleString('es-ES')} €/mes)`,
-  'Documentación que acredite al menos 1 año de experiencia profesional',
-  'Relación de clientes con indicación de su país (para demostrar mayoría extranjera)',
+  `Contratos o facturas con empresas no localizadas en España de, al menos, los últimos ${MESES_ANTIGUEDAD} meses`,
+  'Documentación de esas empresas que acredite al menos un año de actividad',
+  `Declaraciones fiscales que acrediten ingresos ≥ ${pct(200)} SMI (${MINIMO_INGRESOS_TITULAR_NOMADA.toLocaleString('es-ES')} €/mes)`,
+  `Relación de clientes con indicación de su país (para demostrar que el trabajo para empresas de España no pasa del ${TOPE_ESPANA})`,
 ];
 
 export default function RequisitosNomadaDigitalPage() {
@@ -147,8 +161,12 @@ export default function RequisitosNomadaDigitalPage() {
   );
 
   const ingresosNum = useMemo(() => parseSpanishNumber(ingresos), [ingresos]);
-  const ingresosOk = ingresos !== '' && ingresosNum >= minimoRequerido;
-  const ingresosInsuficientes = ingresos !== '' && ingresosNum < minimoRequerido;
+  // Una cifra que no se puede leer («2.000.50») da NaN, y NaN no es ni ≥ ni < que el mínimo:
+  // antes no contaba como insuficiente y el veredicto salía «Cumples» (hallazgo 5168). Ahora
+  // se avisa y no hay veredicto hasta que se corrija.
+  const ingresosIlegibles = ingresos !== '' && !Number.isFinite(ingresosNum);
+  const ingresosOk = ingresos !== '' && !ingresosIlegibles && ingresosNum >= minimoRequerido;
+  const ingresosInsuficientes = ingresos !== '' && !ingresosIlegibles && ingresosNum < minimoRequerido;
 
   const requisitosAplicables = useMemo(
     () =>
@@ -166,22 +184,16 @@ export default function RequisitosNomadaDigitalPage() {
 
   const resultado = useMemo(() => {
     if (!perfil) return 'sin-perfil';
-    if (ingresos === '') return 'pendiente';
+    if (ingresos === '' || ingresosIlegibles) return 'pendiente';
 
     const respondidos = requisitosAplicables.filter((r) => respuestas[r.id] !== undefined);
     if (respondidos.length < requisitosAplicables.length) return 'pendiente';
 
-    // Requisitos bloqueantes fallidos
-    const bloqueanteFallido = requisitosAplicables.some(
-      (r) => r.bloqueante && respuestas[r.id] === false
-    );
-    if (bloqueanteFallido || ingresosInsuficientes) return 'no-apto';
-
-    const fallidos = requisitosAplicables.filter((r) => respuestas[r.id] === false).length;
-    if (fallidos === 0) return 'apto';
-    if (fallidos <= 1) return 'casi';
-    return 'no-apto';
-  }, [perfil, respuestas, requisitosAplicables, ingresos, ingresosInsuficientes]);
+    // Cualquier requisito legal con «No», o ingresos por debajo del mínimo, descalifica
+    const fallido = requisitosAplicables.some((r) => respuestas[r.id] === false);
+    if (fallido || ingresosInsuficientes) return 'no-apto';
+    return 'apto';
+  }, [perfil, respuestas, requisitosAplicables, ingresos, ingresosIlegibles, ingresosInsuficientes]);
 
   const totalRespondidos = requisitosAplicables.filter((r) => respuestas[r.id] !== undefined).length;
   const totalOk = requisitosAplicables.filter((r) => respuestas[r.id] === true).length;
@@ -230,7 +242,7 @@ export default function RequisitosNomadaDigitalPage() {
           >
             <span className={styles.perfilIcon} aria-hidden="true">👔</span>
             <strong>Empleado por cuenta ajena</strong>
-            <span>Trabajo para una empresa con sede fuera de España</span>
+            <span>Trabajo para una empresa radicada fuera de España</span>
           </button>
           <button
             type="button"
@@ -240,7 +252,7 @@ export default function RequisitosNomadaDigitalPage() {
           >
             <span className={styles.perfilIcon} aria-hidden="true">💻</span>
             <strong>Freelancer / Autónomo</strong>
-            <span>Tengo clientes propios mayoritariamente fuera de España</span>
+            <span>{`Trabajo por cuenta propia; como mucho el ${TOPE_ESPANA} para empresas de España`}</span>
           </button>
         </div>
       </section>
@@ -268,7 +280,7 @@ export default function RequisitosNomadaDigitalPage() {
                     onClick={() => setDependientes(String(Math.max(0, dependientesNum - 1)))}
                     aria-label="Reducir dependientes"
                   >−</button>
-                  <span className={styles.stepperValue}>{dependientesNum}</span>
+                  <span className={styles.stepperValue} aria-live="polite">{dependientesNum}</span>
                   <button
                     type="button"
                     className={styles.stepperBtn}
@@ -284,15 +296,20 @@ export default function RequisitosNomadaDigitalPage() {
               </div>
             </div>
 
-            {ingresos !== '' && (
-              <div className={`${styles.ingresosBanner} ${ingresosOk ? styles.bannerOk : styles.bannerError}`}>
-                {ingresosOk ? (
-                  <><span aria-hidden="true">✅</span> Ingresos suficientes — {formatCurrency(ingresosNum)}/mes ≥ mínimo de {formatCurrency(minimoRequerido)}/mes</>
-                ) : (
-                  <><span aria-hidden="true">❌</span> Ingresos insuficientes — {formatCurrency(ingresosNum)}/mes &lt; mínimo de {formatCurrency(minimoRequerido)}/mes</>
-                )}
-              </div>
-            )}
+            {/* Región viva siempre montada: el lector anuncia el banner al teclear (hallazgo 5180) */}
+            <div role="status" aria-live="polite">
+              {ingresos !== '' && (
+                <div className={`${styles.ingresosBanner} ${ingresosOk ? styles.bannerOk : styles.bannerError}`}>
+                  {ingresosIlegibles ? (
+                    <span key="ilegible"><span aria-hidden="true">⚠️</span>{' '}No se puede leer la cifra de ingresos. Escríbela con coma decimal, por ejemplo 2.000,50</span>
+                  ) : ingresosOk ? (
+                    <span key="ok"><span aria-hidden="true">✅</span>{` Ingresos suficientes — ${formatCurrency(ingresosNum)}/mes ≥ mínimo de ${formatCurrency(minimoRequerido)}/mes`}</span>
+                  ) : (
+                    <span key="insuficiente"><span aria-hidden="true">❌</span>{` Ingresos insuficientes — ${formatCurrency(ingresosNum)}/mes < mínimo de ${formatCurrency(minimoRequerido)}/mes`}</span>
+                  )}
+                </div>
+              )}
+            </div>
           </section>
 
           {/* Checklist de requisitos */}
@@ -301,6 +318,10 @@ export default function RequisitosNomadaDigitalPage() {
               Requisitos legales
               <span className={styles.progreso}>{totalRespondidos}/{requisitosAplicables.length} respondidos</span>
             </h2>
+            <p className={styles.reqExplicacion}>
+              Todos son requisitos de la Ley 14/2013: un «No» en cualquiera de ellos impide el visado
+              o la autorización.
+            </p>
 
             <div className={styles.checklistGrid}>
               {requisitosAplicables.map((req) => {
@@ -317,9 +338,6 @@ export default function RequisitosNomadaDigitalPage() {
                         {resp === true ? '✅' : resp === false ? '❌' : '⬜'}
                       </span>
                       <p className={styles.reqPregunta}>{req.pregunta}</p>
-                      {req.bloqueante && (
-                        <span className={styles.badgeBloqueante}>Imprescindible</span>
-                      )}
                     </div>
                     <p className={styles.reqExplicacion}>{req.explicacion}</p>
                     <div className={styles.reqBotones}>
@@ -346,7 +364,9 @@ export default function RequisitosNomadaDigitalPage() {
             </div>
           </section>
 
-          {/* Resultado */}
+          {/* Resultado — en una región viva siempre montada: el veredicto se anuncia al
+              contestar la última pregunta (hallazgo 5180) */}
+          <div aria-live="polite">
           {resultado !== 'pendiente' && resultado !== 'sin-perfil' && (
             <section className={styles.resultadoSection}>
               <div className={`${styles.resultadoCard} ${styles[`resultado-${resultado}`]}`}>
@@ -367,23 +387,12 @@ export default function RequisitosNomadaDigitalPage() {
                     </div>
                   </>
                 )}
-                {resultado === 'casi' && (
-                  <>
-                    <div className={styles.resultadoIcon} aria-hidden="true">⚠️</div>
-                    <h2 className={styles.resultadoTitulo}>Casi cumples los requisitos</h2>
-                    <p className={styles.resultadoTexto}>
-                      Tienes algún requisito sin cubrir totalmente. Revisa los requisitos a los que has respondido «No» (marcados con <span aria-hidden="true">❌</span>)
-                      y consulta con un abogado especializado: en algunos casos hay margen de interpretación
-                      o documentación alternativa.
-                    </p>
-                  </>
-                )}
                 {resultado === 'no-apto' && (
                   <>
                     <div className={styles.resultadoIcon} aria-hidden="true">❌</div>
                     <h2 className={styles.resultadoTitulo}>No cumples algún requisito clave</h2>
                     <p className={styles.resultadoTexto}>
-                      Hay uno o más requisitos imprescindibles que no se cumplen según tus respuestas.
+                      Hay uno o más requisitos legales que no se cumplen según tus respuestas.
                       Revisa los requisitos a los que has respondido «No» (marcados con <span aria-hidden="true">❌</span>). Si tienes dudas, consulta con un abogado
                       especializado en derecho migratorio: los casos tienen matices.
                     </p>
@@ -392,7 +401,7 @@ export default function RequisitosNomadaDigitalPage() {
               </div>
 
               {/* Documentación necesaria */}
-              {resultado === 'apto' || resultado === 'casi' ? (
+              {resultado === 'apto' ? (
                 <div className={styles.documentosSection}>
                   <h3 className={styles.docsTitulo}><span aria-hidden="true">📄</span> Documentación que necesitarás</h3>
                   <div className={styles.docsGrid}>
@@ -417,6 +426,7 @@ export default function RequisitosNomadaDigitalPage() {
               ) : null}
             </section>
           )}
+          </div>
         </>
       )}
 
@@ -476,23 +486,23 @@ export default function RequisitosNomadaDigitalPage() {
                 </tr>
                 <tr>
                   <td>Duración</td>
-                  <td>1 año (no renovable)</td>
-                  <td>3 años (renovable 2 años más)</td>
+                  <td>{`Hasta ${anios(DURACION_VISADO_MESES)}`}</td>
+                  <td>{`Hasta ${anios(DURACION_AUTORIZACION_INICIAL_MESES)}, renovable por períodos de ${anios(DURACION_RENOVACION_MESES)}`}</td>
                 </tr>
                 <tr>
                   <td>Trabajo en España</td>
-                  <td>No autorizado (solo remoto para empresa extranjera)</td>
-                  <td>No autorizado (solo remoto para empresa extranjera)</td>
+                  <td>{`En remoto; por cuenta ajena, solo para empresas radicadas fuera de España; por cuenta propia, hasta el ${TOPE_ESPANA} para empresas de España`}</td>
+                  <td>{`En remoto; por cuenta ajena, solo para empresas radicadas fuera de España; por cuenta propia, hasta el ${TOPE_ESPANA} para empresas de España`}</td>
                 </tr>
                 <tr>
                   <td>Residencia fiscal</td>
-                  <td>Posible régimen especial (24% fijo hasta 600.000 €)</td>
-                  <td>Posible régimen especial (24% fijo hasta 600.000 €)</td>
+                  <td>{`Posible régimen especial (${pct(24)} de la base liquidable hasta 600.000 €)`}</td>
+                  <td>{`Posible régimen especial (${pct(24)} de la base liquidable hasta 600.000 €)`}</td>
                 </tr>
                 <tr>
                   <td>Plazo de resolución</td>
-                  <td>~10 días hábiles</td>
-                  <td>~10 días hábiles</td>
+                  <td>10 días hábiles (art. 75.5)</td>
+                  <td>Veinte días; sin respuesta, concedida por silencio (art. 76)</td>
                 </tr>
               </tbody>
             </table>
@@ -508,7 +518,7 @@ export default function RequisitosNomadaDigitalPage() {
               <h3>Desarrollador de software</h3>
               <p>
                 Trabaja para una startup norteamericana en remoto. Quiere vivir en España disfrutando
-                del clima y la calidad de vida. Si lleva ≥3 meses en la empresa y gana ≥{MINIMO_INGRESOS_TITULAR_NOMADA.toLocaleString('es-ES')} €/mes,
+                del clima y la calidad de vida. Si lleva ≥{MESES_ANTIGUEDAD} meses en la empresa y gana ≥{MINIMO_INGRESOS_TITULAR_NOMADA.toLocaleString('es-ES')} €/mes,
                 puede solicitar el visado en el consulado.
               </p>
             </div>
@@ -533,9 +543,7 @@ export default function RequisitosNomadaDigitalPage() {
               <span className={styles.scenarioIcon} aria-hidden="true">✍️</span>
               <h3>Copywriter internacional</h3>
               <p>
-                Escribe contenido para marcas de EE.UU. y el Reino Unido. Sus ingresos superan el mínimo
-                pero tiene un cliente español. Puede optar al visado si los ingresos de España no superan
-                el 20% del total.
+                {`Escribe contenido para marcas de EE.UU. y el Reino Unido. Sus ingresos superan el mínimo, pero tiene un cliente español. Como profesional por cuenta propia, puede optar al visado si su trabajo para empresas de España no supera el ${TOPE_ESPANA} de su actividad.`}
               </p>
             </div>
           </div>
@@ -548,65 +556,45 @@ export default function RequisitosNomadaDigitalPage() {
             <div className={styles.faqItem}>
               <h3>¿Puedo tener algún cliente en España siendo freelancer?</h3>
               <p>
-                Sí, pero de forma minoritaria. La ley no especifica un porcentaje exacto para freelancers,
-                pero la práctica habitual es que los ingresos procedentes de España representen una parte
-                claramente menor del total. Para empleados, el límite del empleador es claro: máximo el
-                20% de actividad en España.
+                {`Sí, con un tope: como profesional por cuenta propia puedes trabajar para empresas ubicadas en España siempre que ese trabajo no supere el ${TOPE_ESPANA} del total de tu actividad profesional (Ley 14/2013, art. 74 bis). Ese margen es solo del freelancer: por cuenta ajena solo puedes trabajar para empresas radicadas fuera de España.`}
               </p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué ocurre después del año del visado?</h3>
               <p>
-                Una vez en España con el visado, puedes solicitar la Autorización de Residencia para
-                Teletrabajo Internacional, que se concede por 3 años y es renovable por periodos de 2 años.
+                {`Una vez en España con el visado, puedes solicitar la Autorización de Residencia para Teletrabajo Internacional, que se concede por un máximo de ${anios(DURACION_AUTORIZACION_INICIAL_MESES)} y es renovable por períodos de ${anios(DURACION_RENOVACION_MESES)} (Ley 14/2013, art. 74 quinquies).`}
               </p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Puedo incluir a mi familia?</h3>
               <p>
-                Sí. El cónyuge o pareja de hecho y los hijos menores a cargo pueden obtener autorización
-                de residencia vinculada. Por cada familiar dependiente, los ingresos mínimos se incrementan
-                en un 75% del SMI (≈{MINIMO_INGRESOS_DEPENDIENTE_NOMADA.toLocaleString('es-ES')} €/mes por persona).
+                {`Sí. El cónyuge o pareja de hecho y los hijos menores a cargo pueden obtener autorización de residencia vinculada. Por cada familiar dependiente, los ingresos mínimos se incrementan en un ${pct(75)} del SMI (≈${MINIMO_INGRESOS_DEPENDIENTE_NOMADA.toLocaleString('es-ES')} €/mes por persona).`}
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h3>¿Tengo que pagar impuestos en España?</h3>
-              <p>
-                Si resides en España más de 183 días al año, pasas a ser residente fiscal. Puedes acogerte
-                al régimen especial del art. 93 LIRPF (conocido como "Ley Beckham") que permite tributar
-                a tipo fijo del 24% sobre los primeros 600.000 € durante 5 años.
-              </p>
+              <h3>{FAQ_FISCAL.pregunta}</h3>
+              <p>{FAQ_FISCAL.respuesta}</p>
             </div>
             <div className={styles.faqItem}>
-              <h3>¿Cuánto tarda la resolución?</h3>
-              <p>
-                La ley establece un plazo máximo de 10 días hábiles para resolver la solicitud (vs. los
-                meses habituales en otros trámites de extranjería). En la práctica puede variar según el
-                consulado o la oficina gestora.
-              </p>
+              <h3>{FAQ_PLAZO.pregunta}</h3>
+              <p>{FAQ_PLAZO.respuesta}</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Puedo trabajar para una empresa española también?</h3>
               <p>
-                La autorización no habilita para trabajar para empresas españolas ni realizar actividades
-                económicas en territorio español (salvo el porcentaje permitido). Si quieres trabajar para
-                empresas españolas, necesitarías una autorización de trabajo diferente.
+                {`Depende del perfil. Por cuenta ajena, no: solo puedes trabajar para empresas radicadas fuera de España. Por cuenta propia, sí, siempre que ese trabajo no supere el ${TOPE_ESPANA} de tu actividad profesional (Ley 14/2013, art. 74 bis). Para trabajar más para empresas españolas, necesitarías una autorización de trabajo diferente.`}
               </p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué pasa si mi empresa tiene oficina en España?</h3>
               <p>
-                Es posible si tu empleador tiene establecimiento en España, siempre que la actividad
-                desarrollada desde España sea mayoritariamente para sus clientes o mercados extranjeros
-                (máximo 20% en España).
+                {`Si trabajas por cuenta ajena, la ley exige que tu empleador sea una empresa radicada fuera de España (Ley 14/2013, art. 74 bis); el margen del ${TOPE_ESPANA} de trabajo para empresas de España es solo de los profesionales por cuenta propia. Si tu empleador tiene sede o establecimiento en España, consulta con un abogado si cumple ese requisito antes de solicitar.`}
               </p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué es el SMI y por qué se usa como referencia?</h3>
               <p>
-                El Salario Mínimo Interprofesional (SMI) es el salario mínimo legalmente establecido en
-                España. En 2026 es de {SMI_MENSUAL_NOMADA.toLocaleString('es-ES')} €/mes (14 pagas). La Ley de Startups fija el mínimo de
-                ingresos en 200% del SMI para garantizar la solvencia económica del nómada digital.
+                {`El Salario Mínimo Interprofesional (SMI) es el salario mínimo legalmente establecido en España. En 2026 es de ${SMI_MENSUAL_NOMADA.toLocaleString('es-ES')} €/mes (14 pagas). Para la visa de teletrabajo se toma como referencia un mínimo de ingresos del ${pct(200)} del SMI, que sirve para acreditar los recursos económicos suficientes que exige la ley.`}
               </p>
             </div>
           </div>
@@ -620,9 +608,7 @@ export default function RequisitosNomadaDigitalPage() {
               <div className={styles.stepNum}>1</div>
               <h3>Verifica tu elegibilidad</h3>
               <p>
-                Comprueba que cumples todos los requisitos: perfil de trabajo remoto, empleador
-                o clientes extranjeros, ingresos mínimos (≥200% SMI) y ausencia de antecedentes
-                penales en los últimos 5 años.
+                {`Comprueba que cumples todos los requisitos: perfil de trabajo remoto, empleador o clientes extranjeros, ingresos mínimos (≥${pct(200)} SMI) y ausencia de antecedentes penales en España y en los países de residencia de los últimos 2 años.`}
               </p>
             </div>
             <div className={styles.stepCard}>
@@ -654,9 +640,10 @@ export default function RequisitosNomadaDigitalPage() {
               <div className={styles.stepNum}>5</div>
               <h3>Espera la resolución</h3>
               <p>
-                El plazo legal es de 10 días hábiles. Si pasado ese plazo no hay respuesta, se entiende
-                concedida por silencio administrativo positivo (en la práctica, espera la resolución
-                expresa).
+                El visado se resuelve en 10 días hábiles (Ley 14/2013, art. 75.5). La autorización de
+                residencia, en veinte días desde la presentación electrónica; si en ese plazo no hay
+                respuesta, se entiende concedida por silencio administrativo (art. 76). En la práctica,
+                espera la resolución expresa.
               </p>
             </div>
             <div className={styles.stepCard}>
@@ -715,17 +702,14 @@ export default function RequisitosNomadaDigitalPage() {
               <span className={styles.tipIcon} aria-hidden="true">📧</span>
               <h3>Pide carta detallada al empleador</h3>
               <p>
-                La carta del empleador debe detallar: que el trabajo es 100% remoto, tu antigüedad
-                en la empresa (≥3 meses), tu salario bruto mensual y que la empresa no tiene actividad
-                mayoritaria en España.
+                {`La carta del empleador debe detallar: que el trabajo es 100 % remoto, tu antigüedad en la empresa (≥${MESES_ANTIGUEDAD} meses), tu salario bruto mensual, que la empresa está radicada fuera de España y que lleva al menos un año de actividad.`}
               </p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🌍</span>
               <h3>Evalúa el régimen fiscal especial</h3>
               <p>
-                Si te conviertes en residente fiscal en España, estudia si te interesa el régimen del
-                art. 93 LIRPF (24% fijo hasta 600.000 €). Debes solicitarlo en los 6 meses siguientes
+                {`Si te conviertes en residente fiscal en España, estudia si te interesa el régimen del art. 93 LIRPF (${pct(24)} de la base liquidable hasta 600.000 €) y si tu perfil puede acogerse a él. Debes solicitarlo`} en los 6 meses siguientes
                 al inicio de la actividad en España.
               </p>
             </div>
@@ -746,23 +730,20 @@ export default function RequisitosNomadaDigitalPage() {
             <div className={styles.warningItem}>
               <strong>2. Ingresos documentados por debajo del mínimo</strong>
               <p>
-                No basta con tener ese salario: hay que demostrarlo. Si tienes ingresos variables,
-                usa el promedio de los últimos 6 meses para superar con margen el umbral del 200% SMI.
+                {`No basta con tener ese salario: hay que demostrarlo. Si tienes ingresos variables, usa el promedio de los últimos 6 meses para superar con margen el umbral del ${pct(200)} SMI.`}
               </p>
             </div>
             <div className={styles.warningItem}>
-              <strong>3. No acreditar la modalidad 100% remota</strong>
+              <strong>{'3. No acreditar la modalidad 100 % remota'}</strong>
               <p>
                 Debes demostrar que tu trabajo se realiza íntegramente a distancia. Un contrato
                 híbrido o con presencia física obligatoria en la empresa puede invalidar la solicitud.
               </p>
             </div>
             <div className={styles.warningItem}>
-              <strong>4. Empresa con más del 20% de actividad en España</strong>
+              <strong>{`4. Superar el ${TOPE_ESPANA} de trabajo para España, o un empleador radicado en España`}</strong>
               <p>
-                Si tu empleador supera ese umbral de actividad española, tu solicitud puede ser
-                denegada. Solicita documentación a la empresa sobre su distribución geográfica de
-                clientes e ingresos.
+                {`Como freelancer, si tu trabajo para empresas de España supera el ${TOPE_ESPANA} de tu actividad, tu solicitud puede ser denegada: guarda facturas que muestren el reparto por países. Como empleado no hay margen: tu empresa tiene que estar radicada fuera de España.`}
               </p>
             </div>
             <div className={styles.warningItem}>
@@ -776,9 +757,7 @@ export default function RequisitosNomadaDigitalPage() {
             <div className={styles.warningItem}>
               <strong>6. Olvidar el plazo para el régimen fiscal especial</strong>
               <p>
-                Si te interesa tributar al 24% (régimen del art. 93 LIRPF), debes solicitarlo
-                en los 6 meses siguientes al inicio de tu actividad en España. Pasado ese plazo,
-                perderás la opción para ese periodo.
+                {`Si te interesa tributar al ${pct(24)} (régimen del art. 93 LIRPF), debes solicitarlo en los 6 meses siguientes al inicio de tu actividad en España. Pasado ese plazo, perderás la opción para ese periodo.`}
               </p>
             </div>
           </div>
