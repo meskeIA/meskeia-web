@@ -164,6 +164,28 @@ export interface MotorInfo {
   descDGT: string;
 }
 
+/**
+ * El acceso a las ZBE, dicho UNA vez para la tarjeta de la C, el aviso de gran ciudad y el
+ * FAQPage. Hasta el 19/11/2026 había tres versiones incompatibles («restricciones solo en alta
+ * contaminación», «solo pueden circular libremente ECO o ZERO», «sin CERO o ECO tienen
+ * limitaciones en Madrid, Barcelona…»), y ninguna casaba con la de app/etiqueta-dgt/zbe.ts, que
+ * tiene fuentes: en Madrid la C circula por el municipio pero no atraviesa Distrito Centro, y la
+ * ZBE Rondes de Barcelona solo restringe a los vehículos sin distintivo (hallazgo 5242). Las reglas
+ * las fija cada ordenanza municipal (RD 1052/2022, art. 5.2): aquí no se da veredicto por ciudad.
+ */
+export const ZBE_SEGUN_CIUDAD =
+  'Cada ciudad fija en su ordenanza qué distintivos entran en su ZBE y dónde: en unas la C y la B circulan sin restricciones, y en otras no pueden entrar en el centro o se limitan en episodios de alta contaminación.';
+
+/**
+ * Qué coches llevan la C y la B (Orden PCI/810/2018, BOE-A-2018-10856, anexo II, consultada el
+ * 19/11/2026: C = «gasolina Euro 4/IV, 5/V o 6/VI o diésel Euro 6/VI»; B = «gasolina Euro 3/III o
+ * diésel Euro 4/IV o 5/V»), con las fechas de la DGT de FECHAS_DGT (app/etiqueta-dgt/motor.ts).
+ * El FAQPage decía «etiqueta B (la mayoría de gasolina anteriores a 2015 y diésel anteriores a
+ * 2019)» y «ECO o ZERO»: la etiqueta se llama «0 emisiones» o CERO (hallazgo 5241).
+ */
+export const ETIQUETAS_C_Y_B =
+  'La C corresponde a los turismos de gasolina Euro 4, 5 o 6 (en general, matriculados desde 2006) y a los diésel Euro 6 (desde septiembre de 2015); la B, a los de gasolina Euro 3 (desde 2001) y a los diésel Euro 4 o 5 (de 2006 a agosto de 2015).';
+
 export const MOTORES: Record<TipoMotor, MotorInfo> = {
   electrico: {
     nombre: '100% Eléctrico',
@@ -179,7 +201,7 @@ export const MOTORES: Record<TipoMotor, MotorInfo> = {
     etiquetaDGT: 'CERO',
     colorDGT: 'cero',
     descDGT:
-      'Etiqueta CERO como los eléctricos puros: acceso libre en ZBE, plazas ORA bonificadas. Permite circular en modo eléctrico en ciudad y usar el motor térmico en viajes largos.',
+      'Etiqueta CERO («0 emisiones») como los eléctricos puros si su autonomía eléctrica es de 40 km o más; por debajo, ECO. Permite circular en modo eléctrico en ciudad y usar el motor térmico en viajes largos.',
   },
   hibrido: {
     nombre: 'Híbrido (HEV)',
@@ -194,16 +216,14 @@ export const MOTORES: Record<TipoMotor, MotorInfo> = {
     icon: '⛽',
     etiquetaDGT: 'C',
     colorDGT: 'c',
-    descDGT:
-      'Acceso restringido en ZBE solo en episodios de contaminación de nivel 3 o superior. Sin restricciones en la mayoría de días. Aplica a vehículos Euro 6.',
+    descDGT: `Gasolina Euro 4, 5 o 6 (en general, matriculada desde 2006). ${ZBE_SEGUN_CIUDAD}`,
   },
   diesel: {
     nombre: 'Diésel',
     icon: '🛢️',
     etiquetaDGT: 'C',
     colorDGT: 'c',
-    descDGT:
-      'Igual que gasolina Euro 6: restricciones ZBE solo en alta contaminación. Seguimiento a largo plazo recomendable si vives en gran ciudad.',
+    descDGT: `Diésel Euro 6 (matriculado desde septiembre de 2015); los Euro 4 y 5 llevan la B. ${ZBE_SEGUN_CIUDAD}`,
   },
 };
 
@@ -614,7 +634,7 @@ export function calcularRecomendacion(r: Record<number, string>): Resultado {
 
   if (zona === 'gran-ciudad') {
     alertas.push(
-      '🏙️ Verifica las restricciones ZBE de tu ciudad. Los vehículos sin etiqueta CERO o ECO tienen limitaciones en Madrid, Barcelona, Sevilla y otras ciudades.'
+      `🏙️ Consulta la ZBE de tu ciudad antes de elegir. ${ZBE_SEGUN_CIUDAD} Las etiquetas CERO y ECO son las que menos restricciones tienen, y los vehículos sin distintivo, los que más.`
     );
   }
   if (motorPrincipal === 'electrico' && (soloPublico || sinCarga)) {

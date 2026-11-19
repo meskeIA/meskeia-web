@@ -1,5 +1,20 @@
 import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { ETIQUETAS_C_Y_B, TOTAL, ZBE_SEGUN_CIUDAD } from './motor';
+
+/**
+ * Características vistas funcionar (propuesta del Inspector, hallazgo 5246), para el jsonLd y el
+ * meta schema:WebApplication: hasta el 19/11/2026 el jsonLd iba con `features: []` y el meta
+ * prometía un «Test de 9 preguntas» en un test de 13 (5245). El número sale de PREGUNTAS.
+ */
+const CARACTERISTICAS = [
+  `Test de ${TOTAL} preguntas sobre uso, situación y prioridades`,
+  'Recomendación de segmento: urbano, compacto, SUV, berlina o monovolumen',
+  'Recomendación de motorización (gasolina, diésel, híbrido, híbrido enchufable o eléctrico) con su etiqueta DGT',
+  'Coste anual y a 5 años por tipo de motor: combustible, mantenimiento y fijos',
+  'Rangos de precio nuevo y de segunda mano del segmento',
+  'Avisos según el perfil (ZBE, km altos)',
+];
 
 export const metadata: Metadata = {
   title: 'Selector de Tipo de Vehículo — ¿Qué coche, carro o auto me conviene? | meskeIA',
@@ -20,7 +35,7 @@ export const metadata: Metadata = {
     'híbrido o gasolina',
   ],
   openGraph: {
-    title: '¿Qué tipo de coche, carro o auto te conviene? Test en 9 preguntas | meskeIA',
+    title: `¿Qué tipo de coche, carro o auto te conviene? Test en ${TOTAL} preguntas | meskeIA`,
     description:
       'Descubre el segmento y motorización ideal para tu perfil real (coche, carro o auto). Compacto, SUV, familiar. Gasolina, híbrido, eléctrico. Comparativa de costes anuales estimados.',
     type: 'website',
@@ -38,7 +53,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: '¿Qué coche, carro o auto te conviene? Test gratuito | meskeIA',
     description:
-      'Test de 9 preguntas para encontrar tu tipo de coche, carro o auto ideal según tus km, uso, presupuesto y estilo de vida.',
+      `Test de ${TOTAL} preguntas para encontrar tu tipo de coche, carro o auto ideal según tus km, uso, presupuesto y estilo de vida.`,
     images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
@@ -51,16 +66,7 @@ export const metadata: Metadata = {
         description:
           'Test orientativo para descubrir qué tipo de coche, carro o auto (segmento y motorización) se adapta mejor a tu perfil de uso, presupuesto y estilo de vida. Incluye comparativa de costes anuales estimados.',
         url: 'https://meskeia.com/selector-vehiculo/',
-        features: [
-          'Test de 9 preguntas sobre uso y perfil',
-          'Recomendación de segmento (urbano, compacto, SUV, familiar)',
-          'Recomendación de motorización (gasolina, diésel, híbrido, eléctrico)',
-          'Comparativa de coste anual estimado por tipo de motor',
-          'Alertas contextuales (ZBE, puntos de carga, km altos)',
-          '100% en el navegador, sin registro ni instalación',
-          'Gratuito y sin publicidad',
-          'En español',
-        ],
+        features: CARACTERISTICAS,
       })
     ),
   },
@@ -71,7 +77,7 @@ export const jsonLd = generateWebAppSchema({
   description: "Test para saber qué tipo de coche, carro o auto te conviene según tu uso, presupuesto y estilo de vida. Compacto, SUV, familiar. Gasolina, híbrido o eléctrico. Comparativa de costes anuales incluida.",
   url: "https://meskeia.com/selector-vehiculo/",
   category: 'FinanceApplication',
-  features: [],
+  features: CARACTERISTICAS,
 });
 
 export const faqJsonLd = {
@@ -96,7 +102,7 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Merece la pena comprar un coche eléctrico en 2025?',
+      name: '¿Merece la pena comprar un coche eléctrico?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Depende de tu perfil. Si tienes cargador en casa o en el trabajo, haces trayectos habituales de menos de 400 km y no necesitas hacer viajes largos frecuentes, el eléctrico puede ahorrar entre 800 y 1.500 € anuales en combustible y mantenimiento respecto a un gasolina equivalente. Las barreras principales siguen siendo el precio de compra más elevado, la red de carga rápida en rutas secundarias y los tiempos de recarga en viajes largos.',
@@ -107,7 +113,7 @@ export const faqJsonLd = {
       name: '¿Qué es una Zona de Bajas Emisiones (ZBE) y cómo afecta a la elección del coche?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las Zonas de Bajas Emisiones (ZBE) son áreas urbanas donde solo pueden circular libremente vehículos con etiqueta ECO o ZERO de la DGT. Los coches con etiqueta B (la mayoría de gasolina anteriores a 2015 y diésel anteriores a 2019) pueden tener restricciones de acceso en días de alta contaminación. Si vives o trabajas habitualmente en ciudades con ZBE establecida (Madrid, Barcelona, Valencia, Sevilla, entre otras), la etiqueta del vehículo es un criterio de compra relevante.',
+        text: `Las Zonas de Bajas Emisiones (ZBE) son áreas urbanas en las que el acceso depende del distintivo ambiental de la DGT: «0 emisiones» (CERO), ECO, C o B; los vehículos sin distintivo son los más restringidos. ${ZBE_SEGUN_CIUDAD} ${ETIQUETAS_C_Y_B} Si vives o trabajas habitualmente en una ciudad con ZBE, la etiqueta del vehículo es un criterio de compra relevante.`,
       },
     },
     {

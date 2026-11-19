@@ -425,44 +425,71 @@ test.describe('selector-vehiculo — hallazgos (inspector 19/11/2026)', () => {
     await expect(opciones(page).and(page.locator('[aria-pressed="true"]'))).toHaveCount(0);
   });
 
-  test('HALLAZGO · los metadatos dicen las mismas 13 preguntas que la página', async ({ page }) => {
-    // ABIERTO: og:title «Test en 9 preguntas», twitter:description «Test de 9 preguntas» y la
-    // característica «Test de 9 preguntas sobre uso y perfil» del meta schema:WebApplication; la
-    // página dice «13 preguntas» y la barra «Pregunta 1 de 13».
-    test.fail();
+  test('HALLAZGO 5245 · los metadatos dicen las mismas 13 preguntas que la página', async ({ page }) => {
+    // REPARADO 19/11/2026: og:title «Test en 9 preguntas», twitter:description «Test de 9 preguntas»
+    // y la característica «Test de 9 preguntas sobre uso y perfil» del meta schema:WebApplication;
+    // la página dice «13 preguntas» y la barra «Pregunta 1 de 13». Ahora el número sale de TOTAL.
     await page.goto(RUTA);
     await expect(page.getByText('13 preguntas para dar con el coche')).toBeVisible();
-    expect(await page.locator('meta[property="og:title"]').getAttribute('content')).not.toContain('9 preguntas');
-    expect(await page.locator('meta[name="twitter:description"]').getAttribute('content')).not.toContain('9 preguntas');
+    expect(await page.locator('meta[property="og:title"]').getAttribute('content')).toContain('Test en 13 preguntas');
+    expect(await page.locator('meta[name="twitter:description"]').getAttribute('content')).toContain('Test de 13 preguntas');
+    const meta = await page.locator('meta[name="schema:WebApplication"]').getAttribute('content');
+    expect(meta).toContain('Test de 13 preguntas');
+    expect(meta).not.toContain('9 preguntas');
   });
 
-  test('HALLAZGO · el JSON-LD WebApplication lista al menos 4 características', async ({ page }) => {
-    // ABIERTO: jsonLd de metadata.ts con `features: []` → «featureList»: [] en el HTML servido.
-    test.fail();
+  test('HALLAZGO 5246 · el JSON-LD WebApplication lista al menos 4 características', async ({ page }) => {
+    // REPARADO 19/11/2026: jsonLd de metadata.ts con `features: []` → «featureList»: [] en el HTML
+    // servido. Ahora lleva las seis que propuso el Inspector tras verlas funcionar.
     await page.goto(RUTA);
     const app = await jsonLd(page, 'WebApplication');
-    expect((app.featureList as unknown[]).length).toBeGreaterThanOrEqual(4);
+    const lista = app.featureList as string[];
+    expect(lista.length).toBeGreaterThanOrEqual(4);
+    expect(lista.length).toBeLessThanOrEqual(8);
+    expect(lista).toContain('Test de 13 preguntas sobre uso, situación y prioridades');
   });
 
-  test('HALLAZGO · el FAQPage da bien las etiquetas DGT y el acceso a las ZBE', async ({ page }) => {
-    // ABIERTO: «solo pueden circular libremente vehículos con etiqueta ECO o ZERO» (la etiqueta es
-    // «0 emisiones»/CERO; la propia página dice que la C circula «Sin restricciones en la mayoría de
-    // días») y «etiqueta B (la mayoría de gasolina anteriores a 2015 y diésel anteriores a 2019)»:
-    // la Orden PCI/810/2018 da la C a la gasolina Euro 4/5/6 (desde 2006) y al diésel Euro 6 (desde
-    // septiembre de 2015); la B es gasolina Euro 3 y diésel Euro 4/5.
-    test.fail();
+  test('HALLAZGO 5241 · el FAQPage da bien las etiquetas DGT', async ({ page }) => {
+    // REPARADO 19/11/2026: «solo pueden circular libremente vehículos con etiqueta ECO o ZERO» (la
+    // etiqueta es «0 emisiones»/CERO) y «etiqueta B (la mayoría de gasolina anteriores a 2015 y
+    // diésel anteriores a 2019)». La Orden PCI/810/2018 (BOE-A-2018-10856, anexo II, leída el
+    // 19/11/2026) da la C a la «gasolina Euro 4/IV, 5/V o 6/VI o diésel Euro 6/VI» y la B a la
+    // «gasolina Euro 3/III o diésel Euro 4/IV o 5/V»; fechas de la DGT en FECHAS_DGT de etiqueta-dgt.
     await page.goto(RUTA);
     const faq = JSON.stringify(await jsonLd(page, 'FAQPage'));
     expect(faq).not.toContain('ZERO');
     expect(faq).not.toContain('gasolina anteriores a 2015');
     expect(faq).not.toContain('solo pueden circular libremente');
+    expect(faq).toContain('«0 emisiones» (CERO)');
+    expect(faq).toContain('La C corresponde a los turismos de gasolina Euro 4, 5 o 6 (en general, matriculados desde 2006) y a los diésel Euro 6 (desde septiembre de 2015)');
+    expect(faq).toContain('la B, a los de gasolina Euro 3 (desde 2001) y a los diésel Euro 4 o 5 (de 2006 a agosto de 2015)');
   });
 
-  test('HALLAZGO · el FAQPage no pregunta por «2025» en una página de 2026', async ({ page }) => {
-    // ABIERTO: «¿Merece la pena comprar un coche eléctrico en 2025?».
-    test.fail();
+  test('HALLAZGO 5242 · el acceso de la C a las ZBE se dice igual en la tarjeta, el aviso y el FAQPage', async ({ page }) => {
+    // REPARADO 19/11/2026: tres versiones incompatibles —tarjeta C «restricciones ZBE solo en alta
+    // contaminación», FAQPage «solo pueden circular libremente ECO o ZERO», aviso «sin etiqueta CERO
+    // o ECO tienen limitaciones en Madrid, Barcelona, Sevilla»— y ninguna como app/etiqueta-dgt/zbe.ts
+    // (Barcelona no restringe la C ni la B). Ahora las tres dicen ZBE_SEGUN_CIUDAD.
+    const comun = 'Cada ciudad fija en su ordenanza qué distintivos entran en su ZBE y dónde';
+    await page.goto(RUTA);
+    expect(JSON.stringify(await jsonLd(page, 'FAQPage'))).toContain(comun);
+    // Tarjeta de la C (diésel, PLANETA_DIESEL)
+    await responder(page, PLANETA_DIESEL);
+    const tarjeta = page.getByText('Motorización recomendada', { exact: true }).locator('..');
+    await expect(tarjeta).toContainText(comun);
+    await expect(tarjeta).toContainText('Diésel Euro 6 (matriculado desde septiembre de 2015)');
+    await expect(tarjeta).not.toContainText('solo en alta contaminación');
+    // Aviso de gran ciudad (PHEV_KM_ALTO vive en «Gran ciudad»)
+    await responder(page, PHEV_KM_ALTO);
+    await expect(avisoApp(page)).toContainText(comun);
+    await expect(avisoApp(page)).not.toContainText('Madrid, Barcelona, Sevilla');
+  });
+
+  test('HALLAZGO 5248 · el FAQPage no pregunta por «2025» en una página de 2026', async ({ page }) => {
+    // REPARADO 19/11/2026: «¿Merece la pena comprar un coche eléctrico en 2025?» → sin año.
     await page.goto(RUTA);
     const faq = JSON.stringify(await jsonLd(page, 'FAQPage'));
     expect(faq).not.toContain('en 2025?');
+    expect(faq).toContain('¿Merece la pena comprar un coche eléctrico?');
   });
 });
