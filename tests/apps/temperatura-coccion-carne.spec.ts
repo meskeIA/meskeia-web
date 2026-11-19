@@ -229,13 +229,13 @@ test.describe('Temperaturas y puntos de cocción', () => {
 });
 
 test.describe('Contenido de seguridad alimentaria', () => {
-  // HALLAZGO [medio] (16/11/2026, ABIERTO): el cerdo sale «seguro» a 63 °C sin ningún matiz. La
-  // AESAN (ficha «Triquinelosis»): la carne comercial está analizada, pero «el principal riesgo
-  // recae en la carne de cerdos sacrificados en matanzas domiciliarias y de jabalíes cazados para
+  // REPARADO el 19/11/2026 (hallazgo 4853, decidido en /reparar pendientes, cabo C0845): el cerdo
+  // salía «seguro» a 63 °C sin ningún matiz. La AESAN (ficha «Triquinelosis», 13/03/2025,
+  // consultada el 19/11/2026): la carne comercial está analizada, pero «el principal riesgo recae
+  // en la carne de cerdos sacrificados en matanzas domiciliarias y de jabalíes cazados para
   // autoconsumo que no son sometidos a análisis de triquina», y para ellos: «Cocinar bien la carne
-  // a 70° C al menos 2 minutos». La app no nombra ni la AESAN ni ese caso.
-  test('HALLAZGO (16/11/2026, ABIERTO) · el cerdo avisa del caso de matanza o jabalí sin análisis de triquina (70 °C, 2 min)', async ({ page }) => {
-    test.fail();
+  // a 70° C al menos 2 minutos». Ahora el cerdo lleva ese aviso bajo la tabla, sin tocar el 63.
+  test('HALLAZGO 4853 (16/11/2026, REPARADO) · el cerdo avisa del caso de matanza o jabalí sin análisis de triquina (70 °C, 2 min)', async ({ page }) => {
     await elegir(page, 'Cerdo (pieza entera)');
     // A la vista, no dentro de la sección educativa (que nace plegada): caja, tabla y nota.
     const aLaVista = [
@@ -245,6 +245,15 @@ test.describe('Contenido de seguridad alimentaria', () => {
     ].join(' ');
     expect(aLaVista).toMatch(/triquin|matanza|jabal/i);
     expect(aLaVista).toMatch(/70\s?°C/);
+    // La cifra va con su tiempo y su fuente, y lo primero que pide la AESAN es el análisis
+    expect(aLaVista).toMatch(/70\s?°C al menos 2 minutos/);
+    expect(aLaVista).toContain('AESAN');
+    expect(aLaVista).toMatch(/analizar la carne antes de comerla/);
+    // El mínimo del USDA para el cerdo comercial no cambia
+    await expect(cajaMinimo(page)).toContainText('63 °C / 145 °F');
+    // Y el aviso es solo del cerdo: el vacuno no habla de triquina
+    await elegir(page, 'Vacuno y cordero (pieza entera)');
+    await expect(regionPuntos(page)).not.toContainText(/triquin/i);
   });
 
   // REPARADO el 19/11/2026 (hallazgo 4854): «usa pescado muy fresco y previamente congelado

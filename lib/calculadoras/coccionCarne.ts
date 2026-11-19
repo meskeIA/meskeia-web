@@ -36,7 +36,9 @@ export interface AlimentoCoccion {
   minSeguroC: number;
   minSeguroF: number;
   reposoMin: number; // minutos de reposo recomendados tras la cocción
-  avisoCrudo?: string; // matiz cuando hay puntos por debajo del mínimo
+  // Matiz a la vista bajo la tabla: puntos por debajo del mínimo, o un caso en el que el mínimo
+  // del USDA no basta (el cerdo de matanza casera sin análisis de triquina)
+  avisoCrudo?: string;
   puntos: PuntoCoccion[];
 }
 
@@ -64,6 +66,14 @@ export const ALIMENTOS_COCCION: AlimentoCoccion[] = [
     minSeguroC: 63,
     minSeguroF: 145,
     reposoMin: 3,
+    // AESAN, ficha «Triquinelosis» (13/03/2025, consultada el 19/11/2026), págs. 4-6: la carne
+    // comercializada se analiza (Reglamento de Ejecución (UE) 2015/1375) y «no son necesarias
+    // medidas específicas en el hogar»; «el principal riesgo recae en la carne de cerdos
+    // sacrificados en matanzas domiciliarias y de jabalíes cazados para autoconsumo que no son
+    // sometidos a análisis de triquina»; además, «Cocinar bien la carne a 70° C al menos 2 minutos
+    // de forma que se alcance esta temperatura en todo el producto»; la salazón, el ahumado, la
+    // desecación y la congelación no son métodos seguros.
+    avisoCrudo: 'El cerdo que se vende en la Unión Europea ya pasa el análisis de triquina, y para él basta el mínimo del USDA. El riesgo está en el cerdo de matanza casera y en el jabalí cazado para consumo propio sin ese análisis: la AESAN pide analizar la carne antes de comerla y, además, cocinarla a 70 °C al menos 2 minutos en toda la pieza. Ni el curado, ni el ahumado, ni la congelación la hacen segura.',
     puntos: [
       { nombre: 'Jugoso', tempC: 63, tempF: 145, descripcion: 'Ligeramente rosado y jugoso. Mínimo seguro con 3 min de reposo.', seguro: true },
       { nombre: 'Al punto', tempC: 68, tempF: 154, descripcion: 'Apenas rosado, tierno.', seguro: true },
