@@ -19,12 +19,14 @@ interface AudioInfo {
   type: string;
 }
 
-// Función para formatear tiempo en mm:ss.ms
+// Función para formatear tiempo en mm:ss.cc. Se cuenta en centésimas enteras: con
+// Math.floor((s % 1) * 100) la coma flotante rebajaba una de cada tres (1,13 % 1 = 0,12999… → «.12»)
 const formatTime = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  const ms = Math.floor((seconds % 1) * 100);
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
+  const centesimas = Math.round(seconds * 100);
+  const mins = Math.floor(centesimas / 6000);
+  const secs = Math.floor(centesimas / 100) % 60;
+  const cc = centesimas % 100;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${cc.toString().padStart(2, '0')}`;
 };
 
 // Función para formatear tamaño de archivo
@@ -157,7 +159,15 @@ export default function RecortadorAudioPage() {
       // Dibujar waveform
       drawWaveform(buffer);
     } catch {
-      alert('Error al procesar el archivo de audio');
+      // Sin esto audioFile quedaba fijado sin audioInfo: no se pintaba ni la zona de carga ni el
+      // editor, y no había forma de elegir otro archivo sin recargar
+      URL.revokeObjectURL(url);
+      setAudioUrl(null);
+      setAudioFile(null);
+      setAudioBuffer(null);
+      setAudioInfo(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      alert('Error al procesar el archivo de audio: el navegador no puede decodificarlo. Prueba con otro archivo.');
     }
   }, [audioUrl, processedUrl, getAudioContext]);
 
@@ -433,6 +443,31 @@ export default function RecortadorAudioPage() {
     setIsProcessing(false);
   }, [audioBuffer, startTime, endTime, volume, fadeIn, fadeOut, outputFormat, processedUrl, getAudioContext]);
 
+  // El fundido llega como mucho a la mitad de la selección (y a 5 s): si la selección se
+  // estrecha, se acota también el valor, no solo el máximo del deslizador. Antes el rótulo seguía
+  // en el valor viejo y el WAV aplicaba una rampa más larga que el audio, que no llegaba a su volumen.
+  const maxFundido = Math.min(5, (endTime - startTime) / 2);
+  useEffect(() => {
+    setFadeIn((f) => Math.min(f, maxFundido));
+    setFadeOut((f) => Math.min(f, maxFundido));
+  }, [maxFundido]);
+
+  // Mover el inicio, el fin, el volumen o un fundido invalida el resultado, como cambiar de
+  // formato: si no, el recuadro enseñaba la duración nueva y «Descargar» entregaba el recorte viejo
+  const parametrosRef = useRef('');
+  useEffect(() => {
+    const clave = `${startTime}|${endTime}|${volume}|${fadeIn}|${fadeOut}`;
+    if (parametrosRef.current && parametrosRef.current !== clave) {
+      setProcessedUrl((anterior) => {
+        if (anterior) URL.revokeObjectURL(anterior);
+        return null;
+      });
+      setProcessedSize(null);
+      setProcessedFormat(null);
+    }
+    parametrosRef.current = clave;
+  }, [startTime, endTime, volume, fadeIn, fadeOut]);
+
   // Cambiar de formato invalida el resultado anterior, que se generó con el otro
   const elegirFormato = useCallback((formato: OutputFormat) => {
     if (formato === outputFormat) return;
@@ -539,7 +574,10 @@ export default function RecortadorAudioPage() {
         {!audioFile && (
           <div
             className={`${styles.dropZone} ${isDragging ? styles.dropZoneDragging : ''}`}
-            onClick={() => fileInputRef.current?.click()}
+            onClick={(e) => {
+              // El clic del propio input (Enter o Espacio con el teclado) ya abre el selector
+              if (e.target !== fileInputRef.current) fileInputRef.current?.click();
+            }}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -547,12 +585,15 @@ export default function RecortadorAudioPage() {
             <span className={styles.dropIcon} aria-hidden="true">🎵</span>
             <p className={styles.dropText}>Arrastra un archivo de audio aquí o haz clic para seleccionar</p>
             <span className={styles.dropHint}>MP3, WAV, OGG, M4A, FLAC</span>
+            {/* Oculto solo a la vista: con display: none el Tab no llegaba y sin ratón no se podía
+                cargar nada (WCAG 2.1.1). El foco se ve en el contorno de la zona (:focus-within) */}
             <input
               ref={fileInputRef}
               type="file"
               accept="audio/*,.opus"
               onChange={handleInputChange}
               className={styles.fileInput}
+              aria-label="Seleccionar archivo de audio"
             />
           </div>
         )}
@@ -666,7 +707,7 @@ export default function RecortadorAudioPage() {
                     id="fade-in"
                     type="range"
                     min={0}
-                    max={Math.min(5, selectedDuration / 2)}
+                    max={maxFundido}
                     step={0.1}
                     value={fadeIn}
                     onChange={(e) => setFadeIn(parseFloat(e.target.value))}
@@ -680,7 +721,7 @@ export default function RecortadorAudioPage() {
                     id="fade-out"
                     type="range"
                     min={0}
-                    max={Math.min(5, selectedDuration / 2)}
+                    max={maxFundido}
                     step={0.1}
                     value={fadeOut}
                     onChange={(e) => setFadeOut(parseFloat(e.target.value))}

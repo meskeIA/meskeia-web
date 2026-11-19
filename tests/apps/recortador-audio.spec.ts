@@ -481,11 +481,11 @@ test.describe('recortador-audio · inspección 19/11/2026', () => {
     await expect(page.getByText(/^Duración: 00:01\.16$/)).toBeVisible();
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · el rótulo de tiempo pinta mal la centésima: 1,13 s sale «00:01.12»', async ({ page }) => {
-    // formatTime hace Math.floor((s % 1) * 100) y 1,13 % 1 = 0,12999… → 12. Pasa en 367 de las
+  test('HALLAZGO (19/11/2026, REPARADO) · el rótulo de tiempo pinta bien la centésima: 1,13 s sale «00:01.13»', async ({ page }) => {
+    // formatTime hacía Math.floor((s % 1) * 100) y 1,13 % 1 = 0,12999… → 12. Pasaba en 367 de las
     // 1.001 posiciones de 0,00 a 10,00 s (1,13-1,22, 1,38-1,45, 2,01, 2,03…), y con las flechas,
-    // que la guía da como el modo de afinar «de centésima en centésima», 1,14 se lee «00:01.13».
-    test.fail();
+    // que la guía da como el modo de afinar «de centésima en centésima», 1,14 se leía «00:01.13».
+    // Ahora cuenta centésimas enteras (Math.round(s · 100)).
     await cargar(page, wavSeno(3, 44_100, 2));
     await sembrarValor(page, '#inicio-recorte', 1.13);
     await expect(page.locator('#inicio-recorte + span')).toHaveText('00:01.13');
@@ -519,12 +519,11 @@ test.describe('recortador-audio · inspección 19/11/2026', () => {
     expect(saturadas / w.muestras.length).toBeLessThan(0.62);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · un fundido de 5 s sobrevive a estrechar la selección a 2 s y el audio no llega a su volumen', async ({ page }) => {
+  test('HALLAZGO (19/11/2026, REPARADO) · un fundido de 5 s se acota al estrechar la selección a 2 s y el audio llega a su volumen', async ({ page }) => {
     // Con 10 s el fundido llega a 5 s (la mitad de la selección); al dejar la selección en 2 s el
-    // deslizador ya solo llega a 1 s y se pinta ahí, pero el estado sigue en 5: el rótulo dice
-    // «Fade In: 5,0s» y el WAV aplica 5 s de rampa a 2 s de audio (ganancia final 2/5 = 0,4,
-    // pico del último medio segundo ≈ 6.550 en vez de 0,5 × 32.767 ≈ 16.383).
-    test.fail();
+    // deslizador ya solo llega a 1 s y se pinta ahí, pero el estado seguía en 5: el rótulo decía
+    // «Fade In: 5,0s» y el WAV aplicaba 5 s de rampa a 2 s de audio (ganancia final 2/5 = 0,4,
+    // pico del último medio segundo ≈ 6.550 en vez de 0,5 × 32.767 ≈ 16.383). Ahora se acota a 1 s.
     await cargar(page, wavSeno(10, 44_100, 1));
     await sembrarValor(page, '#fade-in', 5);
     await sembrarValor(page, '#fin-recorte', 2);
@@ -536,11 +535,10 @@ test.describe('recortador-audio · inspección 19/11/2026', () => {
     await expect(page.locator('label[for="fade-in"]')).toHaveText(/Fade In: (0,\d|1,0)\s?s/);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · mover el fin tras procesar deja el resultado viejo con la duración nueva', async ({ page }) => {
-    // Cambiar de formato retira el resultado (elegirFormato); mover inicio, fin, volumen o
-    // fundidos no. Se procesa de 1 a 2 s, se lleva el fin a 3 s y el recuadro dice «Duración:
-    // 00:02.00» mientras «Descargar audio» entrega el WAV de 1 s (192.044 B a 48 kHz).
-    test.fail();
+  test('HALLAZGO (19/11/2026, REPARADO) · mover el fin o el volumen tras procesar retira el resultado viejo', async ({ page }) => {
+    // Cambiar de formato retiraba el resultado (elegirFormato); mover inicio, fin, volumen o
+    // fundidos no. Se procesaba de 1 a 2 s, se llevaba el fin a 3 s y el recuadro decía «Duración:
+    // 00:02.00» mientras «Descargar audio» entregaba el WAV de 1 s (192.044 B a 48 kHz).
     await cargar(page, wavSeno(3, 44_100, 2));
     await sembrarValor(page, '#fin-recorte', 2);
     await sembrarValor(page, '#inicio-recorte', 1);
@@ -556,6 +554,14 @@ test.describe('recortador-audio · inspección 19/11/2026', () => {
       const w = leerWav([...readFileSync(await d.path())]);
       expect(Math.abs(w.tramas / w.sr - segundosDeRotulo(rotulo))).toBeLessThan(0.02);
     }
+    // La reparación elegida: el resultado se retira
+    await expect(descargar).toHaveCount(0);
+
+    // Lo mismo con el volumen: se procesa otra vez y se mueve al 50 %
+    await page.getByRole('button', { name: /Recortar y Procesar/ }).click();
+    await expect(descargar).toBeVisible({ timeout: 20_000 });
+    await sembrarValor(page, '#volumen', 50);
+    await expect(descargar).toHaveCount(0);
   });
 
   test('CASO 3 (rechazo) · el inicio no pasa del fin ni el fin del inicio, y el WAV sigue de 0 a 2 s', async ({ page }) => {
@@ -583,11 +589,10 @@ test.describe('recortador-audio · inspección 19/11/2026', () => {
     await expect(page.getByRole('button', { name: /Recortar y Procesar/ })).toHaveCount(0);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · un audio que el navegador no decodifica deja la página sin zona de carga', async ({ page }) => {
-    // handleFileSelect fija audioFile antes de decodificar y, si decodeAudioData falla, avisa
-    // pero no lo devuelve a null: la zona de carga (solo sin audioFile) y el editor (solo con
-    // audioInfo) desaparecen los dos, y no hay forma de elegir otro archivo sin recargar.
-    test.fail();
+  test('HALLAZGO (19/11/2026, REPARADO) · un audio que el navegador no decodifica avisa y deja la zona de carga', async ({ page }) => {
+    // handleFileSelect fijaba audioFile antes de decodificar y, si decodeAudioData fallaba, avisaba
+    // pero no lo devolvía a null: la zona de carga (solo sin audioFile) y el editor (solo con
+    // audioInfo) desaparecían los dos, y no había forma de elegir otro archivo sin recargar.
     const alertas: string[] = [];
     page.on('dialog', (d) => { alertas.push(d.message()); void d.accept(); });
     await page.locator('input[type="file"]').setInputFiles({ name: 'falso.mp3', mimeType: 'audio/mpeg', buffer: Buffer.from('esto no es audio, '.repeat(60)) });
@@ -595,10 +600,10 @@ test.describe('recortador-audio · inspección 19/11/2026', () => {
     await expect(page.locator('input[type="file"]')).toHaveCount(1);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · con el teclado no se puede abrir el selector de archivo', async ({ page }) => {
-    // La zona de carga es un <div onClick> sin tabIndex ni teclado y el <input type="file"> va
-    // con display: none, así que el Tab no pasa por ningún control que cargue audio (WCAG 2.1.1).
-    test.fail();
+  test('HALLAZGO (19/11/2026, REPARADO) · con el teclado se puede abrir el selector de archivo', async ({ page }) => {
+    // La zona de carga es un <div onClick> sin tabIndex ni teclado y el <input type="file"> iba
+    // con display: none, así que el Tab no pasaba por ningún control que cargue audio (WCAG 2.1.1).
+    // Ahora el input está oculto solo a la vista y entra en el Tab.
     let abierto = false;
     page.on('filechooser', () => { abierto = true; });
     for (let i = 0; i < 40 && !abierto; i++) {
