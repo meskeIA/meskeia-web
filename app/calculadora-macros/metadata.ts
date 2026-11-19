@@ -76,8 +76,10 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         // Hasta el 18/11/2026 daba «proteínas 30-35 %… grasas 20-25 %» con un ejemplo que no cuadraba
-        // (150 g = 600 kcal, no 660; un 20 % de proteína y un 30 % de grasa) ni con la app (hallazgo 5035)
-        text: 'Esta calculadora, en volumen, suma 400 kcal a tu gasto diario (TDEE) y reparte las calorías en un 25 % de proteínas, un 50 % de carbohidratos y un 25 % de grasas. Por ejemplo, con un TDEE de 2.700 kcal el objetivo es 3.100 kcal: unos 194 g de proteínas (775 kcal), 388 g de carbohidratos (1.550 kcal) y 86 g de grasas (775 kcal). Otras pautas fijan primero la proteína por kilo de peso corporal (de 1,6 a 2,2 g/kg) y reparten el resto entre carbohidratos y grasas. Los números exactos varían según la respuesta individual y el tipo de entrenamiento.',
+        // (hallazgo 5035); hasta el 19/11/2026, el reparto fijo 25/50/25 que la app ya no usa (hallazgo
+        // 5034). Ejemplo: 1,8 × 75 = 135 g (540 kcal); grasa 20 % de 3.100 = 620 kcal → 68,9 g (más
+        // que 0,8 × 75 = 60 g); carbohidratos 3.100 − 540 − 620 = 1.940 kcal → 485 g.
+        text: 'Esta calculadora, en volumen, suma 400 kcal a tu gasto diario (TDEE), fija primero la proteína en 1,8 g por kilo de peso corporal (el punto medio del rango de 1,6 a 2,0 g/kg), da a la grasa al menos el 20 % de las calorías y asigna el resto a los carbohidratos. Por ejemplo, una persona de 75 kg con un TDEE de 2.700 kcal tiene un objetivo de 3.100 kcal: 135 g de proteínas (540 kcal), unos 69 g de grasas (620 kcal) y 485 g de carbohidratos (1.940 kcal). Los números exactos varían según la respuesta individual y el tipo de entrenamiento.',
       },
     },
   ],

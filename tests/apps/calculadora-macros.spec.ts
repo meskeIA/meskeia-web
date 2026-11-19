@@ -1,6 +1,7 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact, esperarPaginaAsentada } from './_hidratacion';
 import { contrasteSobreFondoReal } from './_contraste';
+import { calcularMacros } from '../../lib/calculadoras/macros';
 
 /**
  * Inspector — calculadora-macros (segmento cálculo · riesgo 2, salud/nutrición)
@@ -14,8 +15,12 @@ import { contrasteSobreFondoReal } from './_contraste';
  *   · TMB Mifflin-St Jeor: 10·peso + 6,25·altura − 5·edad + 5 (hombre) / − 161 (mujer).
  *   · TDEE = TMB × 1,2 · 1,375 · 1,55 · 1,725 · 1,9 (sedentario … muy activo).
  *   · Objetivo = round(TDEE + ajuste): definición −500 · mantenimiento 0 · volumen +400.
- *   · Reparto en % de las kcal: definición 30/40/30, mantenimiento y volumen 25/50/25; g = kcal / 4,
- *     4 y 9. Se pinta con formatNumber(…, 0); los g/kg, con un decimal.
+ *   · Reparto (desde el 19/11/2026, hallazgo 5034, decidido por el usuario: cabo C0819): proteína
+ *     en g/kg según objetivo (definición 2,1 · mantenimiento 1,7 · volumen 1,8, puntos medios de la
+ *     tabla de la app), grasa = máx(20 % de las kcal, 0,6 g/kg en definición u 0,8 g/kg en el resto)
+ *     y carbohidratos el resto; g = kcal / 4, 4 y 9. Antes: % fijo de las kcal (30/40/30 y
+ *     25/50/25). Se pinta con formatNumber(…, 0); los g/kg, con un decimal. El motor es
+ *     lib/calculadoras/macros.ts, el mismo que usa el MCP.
  *   Los coeficientes de Mifflin y los factores de actividad NO se pudieron cotejar con su fuente: la
  *   publicación original (Am J Clin Nutr 1990) y las opiniones de la EFSA (alojadas en
  *   efsa.onlinelibrary.wiley.com) están fuera de la red de fuentes de la tarea. Los esperados salen de
@@ -134,7 +139,7 @@ test.describe('Cálculo: Mifflin-St Jeor, factor de actividad y reparto', () => 
     await abrir(page);
   });
 
-  test('Caso 1 · hombre 70 kg, 175 cm, 30 años, moderado, mantenimiento → 2556 kcal; 160 / 320 / 71 g', async ({ page }) => {
+  test('Caso 1 · hombre 70 kg, 175 cm, 30 años, moderado, mantenimiento → 2556 kcal; 119 / 392 / 57 g', async ({ page }) => {
     await calcular(page, { peso: '70', altura: '175', edad: '30' });
     await expect(panel(page)).toContainText('Calorías diarias objetivo');
     const t = await texto(page);
@@ -145,11 +150,13 @@ test.describe('Cálculo: Mifflin-St Jeor, factor de actividad y reparto', () => 
     expect(t).toContain('TMB (Tasa Metabólica Basal) 1649 kcal');
     expect(t).toContain('TDEE (Gasto Total Diario) 2556 kcal');
     expect(t).toContain('= 1649 kcal');
-    // 25 / 50 / 25 de 2556: 639 kcal → 159,75 g; 1278 kcal → 319,5 g; 639 kcal / 9 → 71 g
-    expect(t).toMatch(/Proteínas 160 ?g 639 kcal 2,3 ?g\/kg/);
-    expect(t).toMatch(/Carbohidratos 320 ?g 1278 kcal 4,6 ?g\/kg/);
-    expect(t).toMatch(/Grasas 71 ?g 639 kcal 1,0 ?g\/kg/);
-    expect(t).toMatch(/Proteínas \(25 ?%\) Carbohidratos \(50 ?%\) Grasas \(25 ?%\)/);
+    // Proteína primero (hallazgo 5034): 1,7 × 70 = 119 g → 476 kcal; grasa máx(20 % de 2556 = 511,2
+    // kcal, 0,8 × 70 = 56 g = 504 kcal) = 511,2 kcal → 56,8 g; carbohidratos 2556 − 476 − 511,2 =
+    // 1568,8 kcal → 392,2 g. Reparto 476/2556 = 18,6 % → 19 · 61,4 % → 61 · 20 %.
+    expect(t).toMatch(/Proteínas 119 ?g 476 kcal 1,7 ?g\/kg/);
+    expect(t).toMatch(/Carbohidratos 392 ?g 1569 kcal 5,6 ?g\/kg/);
+    expect(t).toMatch(/Grasas 57 ?g 511 kcal 0,8 ?g\/kg/);
+    expect(t).toMatch(/Proteínas \(19 ?%\) Carbohidratos \(61 ?%\) Grasas \(20 ?%\)/);
   });
 
   test('Caso 1b · mujer 70/175/30, moderado, definición → TMB 1483, TDEE 2298, 1798 kcal', async ({ page }) => {
@@ -173,13 +180,17 @@ test.describe('Cálculo: Mifflin-St Jeor, factor de actividad y reparto', () => 
 
   test('Caso 2 · límite: mujer 30 kg, 100 cm, 100 años, sedentaria → TMB 264, TDEE 317', async ({ page }) => {
     // Con definición el objetivo saldría negativo: desde el 18/11/2026 (hallazgo 5032) se rechaza, y
-    // el rechazo da la TMB y el TDEE. Con mantenimiento se pintan en su sitio.
+    // el rechazo da la TMB y el TDEE. Reescrito el 19/11/2026 (hallazgo 5034): con mantenimiento
+    // también se rechaza, porque la proteína por kg (1,7 × 30 = 51 g = 204 kcal) y la grasa mínima
+    // (0,8 × 30 = 24 g = 216 kcal) suman 420 kcal, más que las 317 del objetivo; el rechazo da
+    // igualmente la TMB y el TDEE. Antes salía con el reparto 25/50/25 de 317 kcal.
     await calcular(page, { peso: '30', altura: '100', edad: '100', sexo: 'Mujer', objetivo: 'Mantenimiento', actividad: 'Sedentario' });
-    await expect(panel(page)).toContainText('TMB');
+    await expect(panel(page)).toContainText('metabolismo basal');
     const t = await texto(page);
     // 300 + 625 − 500 − 161 = 264; × 1,2 = 316,8 → 317
-    expect(t).toContain('TMB (Tasa Metabólica Basal) 264 kcal');
-    expect(t).toContain('TDEE (Gasto Total Diario) 317 kcal');
+    expect(t).toContain('metabolismo basal estimado es de 264 kcal y el gasto diario de 317 kcal');
+    expect(t).toContain('suman 420 kcal, más que el objetivo de 317 kcal');
+    expect(t).not.toContain('Calorías diarias objetivo');
   });
 
   test('Caso 2b · mujer 45 kg, 150 cm, 30 años, sedentaria, definición → TMB 1077, TDEE 1292, 792 kcal', async ({ page }) => {
@@ -200,6 +211,47 @@ test.describe('Cálculo: Mifflin-St Jeor, factor de actividad y reparto', () => 
     expect(t).toContain('TDEE (Gasto Total Diario) 3133 kcal');
     expect(t).toContain('Calorías diarias objetivo 3533 kcal');
     expect(t).toContain('Ajuste por objetivo +400 kcal');
+  });
+});
+
+/*
+ * Motor (lib/calculadoras/macros.ts, el de la página y el del MCP), casos resueltos a mano el
+ * 19/11/2026 antes de tocar la vista (hallazgo 5034, cabo C0819):
+ *   · 2b mujer 45/150/30 sedentaria definición: 792 kcal · P 2,1 × 45 = 94,5 g = 378 kcal · grasa
+ *     máx(20 % = 158,4 kcal, 0,6 × 45 = 27 g = 243 kcal) = 243 kcal = 27 g · C 792 − 378 − 243 =
+ *     171 kcal = 42,75 g → 43 g.
+ *   · 2c hombre 70/175/30 muy activo volumen: 3533 kcal · P 1,8 × 70 = 126 g = 504 kcal · grasa
+ *     máx(706,6 kcal, 56 g = 504 kcal) = 706,6 kcal = 78,5 g → 79 g · C 3533 − 504 − 706,6 =
+ *     2322,4 kcal = 580,6 g → 581 g · reparto 14 / 66 / 20.
+ *   · mujer 300 kg, 100 cm, 100 años, sedentaria, definición: 3057 kcal · P 630 g = 2520 kcal y
+ *     grasa 0,6 × 300 = 180 g = 1620 kcal suman 4140 > 3057 → error, sin cifra.
+ */
+test.describe('Motor de macros: proteína primero (hallazgo 5034)', () => {
+  test('2b y 2c, resueltos a mano', () => {
+    const d = calcularMacros({ peso: 45, altura: 150, edad: 30, sexo: 'mujer', nivelActividad: 'sedentario', objetivo: 'definicion' });
+    expect(d.caloriasObjetivo).toBe(792);
+    expect(d.macros).toEqual({
+      proteinas: 95, // 94,5 → Math.round
+      carbohidratos: 43,
+      grasas: 27,
+      caloriasProteinas: 378,
+      caloriasCarbohidratos: 171,
+      caloriasGrasas: 243,
+    });
+    const v = calcularMacros({ peso: 70, altura: 175, edad: 30, sexo: 'hombre', nivelActividad: 'muy_activo', objetivo: 'volumen' });
+    expect(v.caloriasObjetivo).toBe(3533);
+    expect(v.macros.proteinas).toBe(126);
+    expect(v.macros.caloriasGrasas).toBeCloseTo(706.6, 2);
+    expect(v.macros.grasas).toBe(79);
+    expect(v.macros.caloriasCarbohidratos).toBeCloseTo(2322.4, 2);
+    expect(v.macros.carbohidratos).toBe(581);
+    expect(v.ratios).toEqual({ proteinas: 14, carbohidratos: 66, grasas: 20 });
+  });
+
+  test('si la proteína y la grasa mínima no caben en el objetivo, error y sin cifra', () => {
+    expect(() =>
+      calcularMacros({ peso: 300, altura: 100, edad: 100, sexo: 'mujer', nivelActividad: 'sedentario', objetivo: 'definicion' }),
+    ).toThrow(/suman 4140 kcal, más que el objetivo de 3057 kcal/);
   });
 });
 
@@ -293,11 +345,11 @@ test.describe('Hallazgos de cálculo (18/11/2026)', () => {
     await expect(page.getByText('La altura va en centímetros: 175, no 1,75.')).toBeVisible();
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · la proteína por kg que da la app cae fuera del rango que su propia tabla pide para ese objetivo', async ({ page }) => {
-    // ABIERTO: el reparto es un % fijo de las kcal, no la «proteína primero» por kg de su guía paso a
-    // paso. 2c (volumen, muy activo, 70 kg) → «221g · 3,2g/kg» con la tabla en 1,6 – 2,0 g/kg; 2b
-    // (definición, sedentaria, 45 kg) → «59g · 1,3g/kg» con la tabla en 2,0 – 2,2 g/kg.
-    test.fail();
+  test('HALLAZGO 5034 (18/11/2026, REPARADO 19/11/2026) · la proteína por kg que da la app caía fuera del rango que su propia tabla pide para ese objetivo', async ({ page }) => {
+    // REPARADO: el reparto era un % fijo de las kcal, no la «proteína primero» por kg de su guía paso
+    // a paso. 2c (volumen, muy activo, 70 kg) daba «221g · 3,2g/kg» con la tabla en 1,6 – 2,0 g/kg;
+    // 2b (definición, sedentaria, 45 kg), «59g · 1,3g/kg» con la tabla en 2,0 – 2,2 g/kg. Ahora 1,8 y
+    // 2,1 g/kg (126 g y 94,5 g).
     await abrirGuia(page);
     const rango = async (fila: RegExp): Promise<[number, number]> => {
       const celda = await page.getByRole('row', { name: fila }).getByRole('cell').nth(2).innerText();
@@ -322,6 +374,8 @@ test.describe('Hallazgos de cálculo (18/11/2026)', () => {
     const d = await proteinaPorKg();
     if (d < dMin || d > dMax) fallos.push(`definición ${d} g/kg fuera de ${dMin}–${dMax}`);
     expect(fallos).toEqual([]);
+    expect(v).toBe(1.8);
+    expect(d).toBe(2.1);
   });
 });
 
@@ -364,8 +418,13 @@ test.describe('Hallazgos de contenido (18/11/2026)', () => {
       if (cuota < Number(rangoG[1]) || cuota > Number(rangoG[2])) fallos.push(`la grasa del ejemplo es el ${cuota.toFixed(0)} %`);
     }
     expect(fallos).toEqual([]);
-    expect(r).toContain('25 % de proteínas');
-    expect(r).toContain('3.100 kcal: unos 194 g de proteínas (775 kcal), 388 g de carbohidratos (1.550 kcal) y 86 g de grasas (775 kcal)');
+    // Desde el 19/11/2026 (hallazgo 5034) la app fija la proteína por kg: el FAQPage describe ese
+    // reparto. Ejemplo, 75 kg y TDEE 2.700 → 3.100 kcal: 1,8 × 75 = 135 g = 540 kcal; grasa 20 % =
+    // 620 kcal (68,9 g, más que 0,8 × 75 = 60 g); carbohidratos 3.100 − 540 − 620 = 1.940 kcal = 485 g.
+    expect(r).not.toMatch(/25\s%\sde proteínas/);
+    expect(r).toContain('1,8 g por kilo de peso corporal');
+    expect(r).toContain('3.100 kcal: 135 g de proteínas (540 kcal), unos 69 g de grasas (620 kcal) y 485 g de carbohidratos (1.940 kcal)');
+    expect(135 * 4 + 620 + 485 * 4).toBe(3100);
   });
 
   test('HALLAZGO (18/11/2026, REPARADO) · el paso 2 de la guía llama «Muy activo» al × 1,725, que en el selector es «Activo»', async ({ page }) => {
@@ -394,17 +453,18 @@ test.describe('Hallazgos de contenido (18/11/2026)', () => {
   });
 
   test('HALLAZGO (18/11/2026, REPARADO) · el resultado pega el % y la unidad: «Proteínas (25%)», «160g»', async ({ page }) => {
+    // Cifras del Caso 1 con el reparto por kg desde el 19/11/2026 (hallazgo 5034): 19 %, 1,7 g/kg y 119 g.
     // REPARADO: regla del 25/09/2026 (CLAUDE.md global §2): «25 %» con espacio duro, como hace
     // formatPercentage; y el símbolo de unidad separado de la cifra («160 g», «2,3 g/kg»).
     await calcular(page, { peso: '70', altura: '175', edad: '30' });
     await expect(panel(page)).toContainText('Calorías diarias objetivo');
     const fallos: string[] = [];
     const leyenda = (await panel(page).locator('span', { hasText: /^Proteínas \(/ }).first().textContent()) ?? '';
-    if (!/\(25[  ]%\)/.test(leyenda)) fallos.push(`leyenda «${leyenda}»`);
+    if (!/\(19[  ]%\)/.test(leyenda)) fallos.push(`leyenda «${leyenda}»`);
     const porKg = (await page.locator('[class$="_macroPorKg"]').first().textContent()) ?? '';
-    if (!/^2,3 g\/kg$/.test(porKg.trim())) fallos.push(`g/kg «${porKg.trim()}»`);
+    if (!/^1,7 g\/kg$/.test(porKg.trim())) fallos.push(`g/kg «${porKg.trim()}»`);
     const gramos = (await page.locator('[class$="_macroGramos"]').first().textContent()) ?? '';
-    if (!/^160[   ]g$/.test(gramos.trim())) fallos.push(`gramos «${gramos.trim()}»`);
+    if (!/^119[   ]g$/.test(gramos.trim())) fallos.push(`gramos «${gramos.trim()}»`);
     expect(fallos).toEqual([]);
   });
 

@@ -786,8 +786,9 @@ function crearServidorMCP(): McpServer {
         ),
       objetivo: z.enum(['definicion', 'mantenimiento', 'volumen'])
         .describe(
-          '"definicion" (déficit -500 kcal, 30P/40C/30G%), "mantenimiento" (0 kcal, 25P/50C/25G%), ' +
-          '"volumen" (superávit +400 kcal, 25P/50C/25G%)'
+          '"definicion" (déficit -500 kcal, proteína 2,1 g/kg), "mantenimiento" (0 kcal, proteína 1,7 g/kg), ' +
+          '"volumen" (superávit +400 kcal, proteína 1,8 g/kg). La grasa es al menos el 20 % de las kcal ' +
+          '(y no menos de 0,6 g/kg en definición u 0,8 g/kg en el resto); los carbohidratos, el resto'
         ),
     },
     { title: 'Calcula las necesidades calóricas diarias y la distribución', readOnlyHint: true },

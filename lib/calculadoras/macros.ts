@@ -2,8 +2,10 @@
  * Calculadora de Macronutrientes — lógica pura sin React ni DOM
  * Usada por: MCP server (calcular_macros)
  *
- * Calcula TMB (Tasa Metabólica Basal) con fórmula Mifflin-St Jeor,
- * TDEE según nivel de actividad y distribución de macros por objetivo.
+ * Usada también por: app/calculadora-macros (desde el 18/11/2026)
+ *
+ * Calcula TMB (Tasa Metabólica Basal) con fórmula Mifflin-St Jeor, TDEE según nivel de actividad
+ * y el reparto de macros por objetivo: proteína por kg, grasa mínima y el resto en carbohidratos.
  */
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -75,14 +77,30 @@ const FACTORES_ACTIVIDAD: Record<NivelActividad, number> = {
   muy_activo:   1.9,    // Ejercicio intenso diario o 2x/día
 };
 
+/**
+ * Reparto «proteína primero» (hallazgo 5034, decidido por el usuario el 18/11/2026, cabo C0819).
+ * Hasta entonces era un % fijo de las kcal (30/40/30 en definición, 25/50/25 en el resto) y la
+ * proteína crecía con las kcal: 3,2 g/kg en volumen muy activo y 1,3 g/kg en definición sedentaria,
+ * fuera de los rangos que la propia app enseña. Ahora, como su guía paso a paso (pasos 4-6):
+ *   · proteína en g/kg según objetivo: el punto medio del rango de la tabla «Comparativa de macros
+ *     por objetivo» de la app (definición 2,0-2,2 → 2,1; mantenimiento 1,6-1,8 → 1,7; volumen
+ *     1,6-2,0 → 1,8);
+ *   · grasa: al menos el 20 % de las kcal (paso 5 de la guía) y no menos de los g/kg mínimos de la
+ *     misma tabla (definición «Mínimo 0,6 g/kg»; mantenimiento y volumen «0,8-1,0 g/kg» → 0,8);
+ *   · carbohidratos: el resto de las kcal.
+ */
 const CONFIG_OBJETIVOS: Record<ObjetivoNutricional, {
   ajusteKcal: number;
-  ratios: { proteinas: number; carbohidratos: number; grasas: number };
+  proteinaGKg: number;
+  grasaMinGKg: number;
 }> = {
-  definicion:    { ajusteKcal: -500, ratios: { proteinas: 30, carbohidratos: 40, grasas: 30 } },
-  mantenimiento: { ajusteKcal: 0,    ratios: { proteinas: 25, carbohidratos: 50, grasas: 25 } },
-  volumen:       { ajusteKcal: 400,  ratios: { proteinas: 25, carbohidratos: 50, grasas: 25 } },
+  definicion:    { ajusteKcal: -500, proteinaGKg: 2.1, grasaMinGKg: 0.6 },
+  mantenimiento: { ajusteKcal: 0,    proteinaGKg: 1.7, grasaMinGKg: 0.8 },
+  volumen:       { ajusteKcal: 400,  proteinaGKg: 1.8, grasaMinGKg: 0.8 },
 };
+
+/** Grasa mínima como fracción de las kcal objetivo (paso 5 de la guía de la app). */
+const GRASA_MIN_FRACCION_KCAL = 0.2;
 
 // ─── Función principal ─────────────────────────────────────────────────────────
 
@@ -120,10 +138,29 @@ export function calcularMacros(p: ParametrosMacros): ResultadoMacros {
     );
   }
 
-  // Macros
-  const kcalProteinas = r(caloriasObjetivo * config.ratios.proteinas / 100);
-  const kcalCarbohidratos = r(caloriasObjetivo * config.ratios.carbohidratos / 100);
-  const kcalGrasas = r(caloriasObjetivo * config.ratios.grasas / 100);
+  // Macros: proteína primero (g/kg), grasa mínima y el resto a carbohidratos
+  const kcalProteinas = r(p.peso * config.proteinaGKg * 4);
+  const kcalGrasas = r(Math.max(caloriasObjetivo * GRASA_MIN_FRACCION_KCAL, p.peso * config.grasaMinGKg * 9));
+  const kcalCarbohidratos = r(caloriasObjetivo - kcalProteinas - kcalGrasas);
+
+  // Con mucho peso y pocas kcal (300 kg en definición, por ejemplo) la proteína por kilo y la grasa
+  // mínima no caben en el objetivo: los g/kg de la tabla están pensados para personas que entrenan,
+  // y no hay cifra honesta que dar.
+  if (kcalCarbohidratos < 0) {
+    throw new Error(
+      `Con estos datos el metabolismo basal estimado es de ${ri(tmb)} kcal y el gasto diario de ` +
+      `${ri(tdee)} kcal, y la proteína (${ri(kcalProteinas / 4)} g) y la grasa mínima ` +
+      `(${ri(kcalGrasas / 9)} g) suman ${ri(kcalProteinas + kcalGrasas)} kcal, más que el objetivo de ` +
+      `${caloriasObjetivo} kcal: el reparto por kilo de peso no sirve para este caso. Un ` +
+      `dietista-nutricionista puede calcularlo con tu masa magra.`
+    );
+  }
+
+  const ratios = {
+    proteinas: ri(kcalProteinas / caloriasObjetivo * 100),
+    carbohidratos: ri(kcalCarbohidratos / caloriasObjetivo * 100),
+    grasas: ri(kcalGrasas / caloriasObjetivo * 100),
+  };
 
   const macros: MacrosDetalle = {
     proteinas: ri(kcalProteinas / 4),
@@ -145,7 +182,7 @@ export function calcularMacros(p: ParametrosMacros): ResultadoMacros {
     factorActividad,
     objetivo: p.objetivo,
     macros,
-    ratios: config.ratios,
+    ratios,
     imc,
     bajoTmb: caloriasObjetivo < tmb,
   };
