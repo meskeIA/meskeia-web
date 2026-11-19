@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FAQ_FRECUENCIA } from './faq';
 
 export const metadata: Metadata = {
   title: 'Test de Tolerancia al Riesgo Detallado | meskeIA',
@@ -76,15 +77,17 @@ export const faqJsonLd = {
       name: '¿En qué se diferencia este test de otros cuestionarios de perfil inversor?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Este test evalúa cinco dimensiones independientes (horizonte temporal, capacidad financiera, reacción emocional, experiencia inversora y objetivos) en lugar de dar una puntuación única. Eso permite detectar contradicciones entre lo que el inversor cree tolerar y lo que realmente puede asumir. Los cuestionarios habituales de los bancos suelen tener 5-8 preguntas; este test emplea 20 para mayor precisión.',
+        // Bajado a lo que la app hace (hallazgo 5208): el perfil sale de la suma de las 20
+        // respuestas, la pantalla no avisa de contradicciones y la cifra de los bancos no tenía fuente
+        text: 'Este test hace 20 preguntas agrupadas en cinco bloques (horizonte temporal, capacidad financiera, reacción emocional, experiencia inversora y objetivos). El perfil sale de la puntuación total, y además enseña el desglose por bloque, para que veas en cuál puntúas más bajo: por ejemplo, si toleras el riesgo emocionalmente pero tu capacidad financiera es baja.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Con qué frecuencia debería revisar mi tolerancia al riesgo?',
+      name: FAQ_FRECUENCIA.pregunta,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Se recomienda revisar el perfil inversor al menos una vez al año y siempre que haya cambios significativos en tu vida: cambio de empleo, llegada de hijos, compra de vivienda, jubilación próxima o herencia. La tolerancia al riesgo no es estática; suele reducirse a medida que el horizonte de inversión se acorta o aumentan las responsabilidades financieras.',
+        text: FAQ_FRECUENCIA.respuesta,
       },
     },
   ],

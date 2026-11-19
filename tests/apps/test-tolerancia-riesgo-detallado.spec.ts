@@ -278,11 +278,10 @@ test.describe('hallazgos 18/11/2026', () => {
     await expect(nivelesDimension(page).nth(0)).not.toHaveText(/^Alto/);
   });
 
-  test('ABIERTO (medio) — un doble clic en «Ver mi perfil de riesgo» pulsa «Repetir el test» y borra las 20 respuestas', async ({
+  test('REPARADO 5203 (19/11/2026) — un doble clic en «Ver mi perfil de riesgo» pulsa «Repetir el test» y borra las 20 respuestas', async ({
     page,
   }) => {
-    test.fail();
-    // Al pasar al resultado la página encoge (6.511 px de scroll → 1.362), el navegador recoloca la
+    // Reparado con useGuardaRafaga. Era: al pasar al resultado la página encoge (6.511 px de scroll → 1.362), el navegador recoloca la
     // vista y «Repetir el test» queda justo bajo el puntero: el segundo clic, si llega antes de que
     // el desplazamiento suave arranque (≤ 30-60 ms en este equipo), vuelve a la portada sin aviso.
     await empezar(page);
@@ -292,10 +291,9 @@ test.describe('hallazgos 18/11/2026', () => {
     await expect(puntuacion(page)).toHaveText(/60\s*\/\s*80/);
   });
 
-  test('ABIERTO (medio) — el aviso de cuestionario incompleto no se anuncia y dice «Faltan 1 pregunta»', async ({
+  test('REPARADO 5204 (19/11/2026) — el aviso de cuestionario incompleto no se anuncia y dice «Faltan 1 pregunta»', async ({
     page,
   }) => {
-    test.fail();
     await empezar(page);
     await responder(page, [...rep(3, 19), null]);
     await verPerfil(page);
@@ -307,11 +305,13 @@ test.describe('hallazgos 18/11/2026', () => {
     expect(
       await aviso.evaluate((el) => Boolean(el.closest('[role="alert"], [role="status"], [aria-live]'))),
     ).toBe(true);
+    // Y señala la que falta: el foco va a la pregunta 20
+    expect(await page.evaluate(() => (document.activeElement as HTMLInputElement | null)?.name)).toBe('pregunta-20');
   });
 
-  test('ABIERTO (medio) — al cambiar de fase el foco cae a <body>', async ({ page }) => {
-    test.fail();
-    // «Comenzar el test», «Ver mi perfil de riesgo» y «Repetir el test» se desmontan al pulsarlos.
+  test('REPARADO 5205 (19/11/2026) — al cambiar de fase el foco cae a <body>', async ({ page }) => {
+    // «Comenzar el test», «Ver mi perfil de riesgo» y «Repetir el test» se desmontan al pulsarlos;
+    // ahora el foco va al contador del cuestionario, al nombre del perfil y al título de la portada.
     await cargar(page);
     await page.getByRole('button', { name: /Comenzar el test/ }).click();
     await expect(progreso(page)).toBeVisible();
@@ -320,7 +320,11 @@ test.describe('hallazgos 18/11/2026', () => {
     await verPerfil(page);
     await expect(perfilNombre(page)).toBeVisible();
     const trasResultado = await page.evaluate(() => document.activeElement?.tagName);
-    expect([trasComenzar, trasResultado]).not.toContain('BODY');
+    await page.getByRole('button', { name: /Repetir el test/ }).click();
+    await expect(page.getByRole('button', { name: /Comenzar el test/ })).toBeVisible();
+    const trasRepetir = await page.evaluate(() => document.activeElement?.tagName);
+    expect([trasComenzar, trasResultado, trasRepetir]).not.toContain('BODY');
+    expect(await page.evaluate(() => document.activeElement?.textContent ?? '')).toContain('¿Cuánto riesgo estás realmente dispuesto a asumir?');
   });
 
   test('ABIERTO (bajo) — barra de progreso sin nombre accesible y aria-label en <div> sin rol', async ({ page }) => {
@@ -332,10 +336,9 @@ test.describe('hallazgos 18/11/2026', () => {
     expect(await page.locator('[class*="asignacionBar"][aria-label]:not([role])').count()).toBe(0);
   });
 
-  test('ABIERTO (medio) — la misma pregunta de la frecuencia de revisión, con dos respuestas distintas', async ({
+  test('REPARADO 5207 (19/11/2026) — la misma pregunta de la frecuencia de revisión, con dos respuestas distintas', async ({
     page,
   }) => {
-    test.fail();
     await cargar(page);
     const enLd = await page.evaluate(() => {
       for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
@@ -355,17 +358,20 @@ test.describe('hallazgos 18/11/2026', () => {
     // FAQPage: «al menos una vez al año» · visible: «Al menos cada 2-3 años». Una sola constante.
     expect(enLd).not.toBe('');
     expect(visible).toBe(enLd);
+    expect(visible).not.toContain('2-3 años');
   });
 
-  test('ABIERTO (medio) — el FAQPage promete detectar contradicciones «en lugar de dar una puntuación única»', async ({
+  test('REPARADO 5208 (19/11/2026) — el FAQPage promete detectar contradicciones «en lugar de dar una puntuación única»', async ({
     page,
   }) => {
-    test.fail();
     await cargar(page);
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
     // El perfil sale SOLO de la suma (`obtenerPerfil(puntuacionTotal)`), la pantalla enseña
     // «Puntuación: N / 80» y ninguna combinación de respuestas produce un aviso de contradicción.
     expect(ld).not.toContain('en lugar de dar una puntuación única');
+    expect(ld).not.toContain('detectar contradicciones');
+    expect(ld).not.toContain('5-8 preguntas');
+    expect(ld).toContain('El perfil sale de la puntuación total');
   });
 
   test('ABIERTO (bajo) — jsonLd con features vacía y la descripción cortada a media palabra', async ({ page }) => {
@@ -394,10 +400,9 @@ test.describe('hallazgos 18/11/2026', () => {
     await expect(page.getByText(/porcentaje en renta fija ≈ tu edad/)).toHaveCount(0);
   });
 
-  test('ABIERTO (medio) — el resultado llama «índice global» al S&P 500 y dice que el mercado «siempre se recuperó»', async ({
+  test('REPARADO 5211 (19/11/2026) — el resultado llama «índice global» al S&P 500 y dice que el mercado «siempre se recuperó»', async ({
     page,
   }) => {
-    test.fail();
     const problemas: string[] = [];
     // Moderado (49 puntos, el caso normal): «ETFs de índices globales (MSCI World, S&P 500)»
     await empezar(page);

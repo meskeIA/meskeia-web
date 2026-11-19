@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -10,7 +10,9 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import styles from './TestToleranciaRiesgo.module.css';
+import { FAQ_FRECUENCIA } from './faq';
 
 type Fase = 'inicio' | 'test' | 'resultado';
 
@@ -265,7 +267,7 @@ const PERFILES: Perfil[] = [
       'Fondos monetarios y depósitos garantizados como núcleo de la cartera.',
       'ETFs de renta fija de corto plazo para algo más de rentabilidad sin gran riesgo.',
       'Una pequeña exposición (10-15%) a renta variable de baja volatilidad como diversificación.',
-      'Revisa tu perfil cada 2-3 años: los objetivos cambian con el tiempo.',
+      'Revisa tu perfil al menos una vez al año y cuando cambie tu situación: los objetivos cambian con el tiempo.',
     ],
   },
   {
@@ -287,7 +289,7 @@ const PERFILES: Perfil[] = [
     detalle: 'Renta variable global (55-60%) + renta fija diversificada (40%) como amortiguador en caídas.',
     recomendaciones: [
       'Una cartera 60/40 de renta variable/fija es el punto de partida ideal.',
-      'ETFs de índices globales (MSCI World, S&P 500) para la parte de renta variable.',
+      'ETFs de índices globales (por ejemplo, de tipo MSCI World o MSCI ACWI) para la parte de renta variable; un índice de un solo país, como el S&P 500 de EE. UU., no es global.',
       'Mantén el rumbo en caídas: no cambies tu estrategia en plena corrección de mercado.',
       'Rebalancea la cartera una vez al año para mantener la asignación objetivo.',
     ],
@@ -298,10 +300,10 @@ const PERFILES: Perfil[] = [
     rf: 20, rv: 80,
     detalle: 'Renta variable diversificada (75-80%) con ETFs globales, emergentes y small caps + algo de renta fija como colchón (20%).',
     recomendaciones: [
-      'ETFs de renta variable global como núcleo (MSCI World, S&P 500, ETFs temáticos).',
+      'ETFs de renta variable global como núcleo (por ejemplo, de tipo MSCI World o MSCI ACWI); los temáticos o de un solo país, como satélites.',
       'Incluye exposición a mercados emergentes (10-15%) para mayor diversificación y potencial.',
       'Mantén un pequeño colchón de renta fija para rebalancear oportunistamente en caídas.',
-      'Acepta las correcciones como parte del proceso; históricamente el mercado siempre se recuperó.',
+      'Acepta las correcciones como parte del proceso, sin darlas por recuperadas: la diversificación global ayuda, pero no hay garantía y algunos mercados han tardado décadas (el Nikkei japonés, de 1989 a 2024).',
     ],
   },
   {
@@ -339,6 +341,23 @@ export default function TestToleranciaRiesgoDetallado() {
   const [respuestas, setRespuestas] = useState<Record<number, number>>({});
   const [errorCalc, setErrorCalc] = useState('');
 
+  // El 2.º clic de un doble clic en «Ver mi perfil» caía sobre «Repetir el test», que la página
+  // recolocada deja bajo el puntero, y borraba las 20 respuestas (hallazgo 5203)
+  const marcarCambioPantalla = useGuardaRafaga();
+
+  // Cada cambio de fase desmonta el botón pulsado y el foco caía a <body>: se lleva al encabezado
+  // de la fase nueva (hallazgo 5205); con preguntas sin contestar, a la primera de ellas (5204)
+  const tituloInicioRef = useRef<HTMLHeadingElement>(null);
+  const progresoRef = useRef<HTMLParagraphElement>(null);
+  const tituloPerfilRef = useRef<HTMLHeadingElement>(null);
+  const [focoPendiente, setFocoPendiente] = useState<Fase | null>(null);
+  useEffect(() => {
+    if (!focoPendiente) return;
+    const destino = { inicio: tituloInicioRef, test: progresoRef, resultado: tituloPerfilRef }[focoPendiente];
+    destino.current?.focus({ preventScroll: true });
+    setFocoPendiente(null);
+  }, [focoPendiente]);
+
   const totalPreguntas = PREGUNTAS.length;
   const respondidas = Object.keys(respuestas).length;
 
@@ -347,20 +366,33 @@ export default function TestToleranciaRiesgoDetallado() {
     setErrorCalc('');
   }
 
+  function comenzar() {
+    marcarCambioPantalla();
+    setFase('test');
+    setFocoPendiente('test');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   function calcular() {
     const sinResponder = PREGUNTAS.filter(p => respuestas[p.id] === undefined);
     if (sinResponder.length > 0) {
-      setErrorCalc(`Faltan ${sinResponder.length} pregunta${sinResponder.length > 1 ? 's' : ''} por responder.`);
+      const n = sinResponder.length;
+      setErrorCalc(n === 1 ? 'Falta 1 pregunta por responder.' : `Faltan ${n} preguntas por responder.`);
+      document.querySelector<HTMLInputElement>(`input[name="pregunta-${sinResponder[0].id}"]`)?.focus();
       return;
     }
+    marcarCambioPantalla();
     setFase('resultado');
+    setFocoPendiente('resultado');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function reiniciar() {
+    marcarCambioPantalla();
     setRespuestas({});
     setErrorCalc('');
     setFase('inicio');
+    setFocoPendiente('inicio');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -398,7 +430,7 @@ export default function TestToleranciaRiesgoDetallado() {
         {/* INICIO */}
         {fase === 'inicio' && (
           <div className={styles.inicioBox}>
-            <h2>¿Cuánto riesgo estás realmente dispuesto a asumir?</h2>
+            <h2 ref={tituloInicioRef} tabIndex={-1}>¿Cuánto riesgo estás realmente dispuesto a asumir?</h2>
             <p>
               Muchos inversores sobreestiman su tolerancia al riesgo en momentos de calma y la subestiman en
               plena caída. Este test evalúa 5 dimensiones clave para darte un perfil más preciso y realista
@@ -412,7 +444,7 @@ export default function TestToleranciaRiesgoDetallado() {
                 </div>
               ))}
             </div>
-            <button type="button" className={styles.startBtn} onClick={() => { setFase('test'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+            <button type="button" className={styles.startBtn} onClick={comenzar}>
               Comenzar el test →
             </button>
           </div>
@@ -421,7 +453,7 @@ export default function TestToleranciaRiesgoDetallado() {
         {/* TEST */}
         {fase === 'test' && (
           <div>
-            <p className={styles.progressText}>{respondidas} / {totalPreguntas} preguntas respondidas</p>
+            <p className={styles.progressText} ref={progresoRef} tabIndex={-1}>{respondidas} / {totalPreguntas} preguntas respondidas</p>
             <div className={styles.progressBar}>
               <div
                 className={styles.progressFill}
@@ -466,7 +498,10 @@ export default function TestToleranciaRiesgoDetallado() {
             ))}
 
             <div className={styles.calcularBox}>
-              {errorCalc && <p className={styles.errorMsg}>{errorCalc}</p>}
+              {/* Región viva siempre montada: el aviso se anuncia al aparecer (hallazgo 5204) */}
+              <div role="alert">
+                {errorCalc && <p className={styles.errorMsg}>{errorCalc}</p>}
+              </div>
               <button type="button" className={styles.calcularBtn} onClick={calcular}>
                 Ver mi perfil de riesgo →
               </button>
@@ -479,7 +514,7 @@ export default function TestToleranciaRiesgoDetallado() {
           <div>
             <div className={styles.resultadoHero}>
               <div className={styles.perfilBadge}>Tu perfil</div>
-              <h2 className={styles.perfilNombre}>{perfil.nombre}</h2>
+              <h2 className={styles.perfilNombre} ref={tituloPerfilRef} tabIndex={-1}>{perfil.nombre}</h2>
               <p className={styles.perfilDescripcion}>{perfil.descripcion}</p>
               <p className={styles.puntuacionTotal}>
                 Puntuación: <strong>{puntuacionTotal}</strong> / 80
@@ -635,8 +670,8 @@ export default function TestToleranciaRiesgoDetallado() {
               <p className={styles.faqTip}>La dimensión Capacidad Financiera suele sorprender: puedes tolerar el riesgo emocionalmente pero no económicamente.</p>
             </div>
             <div className={styles.faqItem}>
-              <strong>¿Con qué frecuencia debería repetir el test?</strong>
-              <p>Al menos cada 2-3 años, o ante cambios vitales significativos: nuevo empleo, matrimonio, hijos, herencia, cambio de deuda. Tu perfil evoluciona con tu vida.</p>
+              <strong>{FAQ_FRECUENCIA.pregunta}</strong>
+              <p>{FAQ_FRECUENCIA.respuesta}</p>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Qué son la renta fija y la renta variable?</strong>
