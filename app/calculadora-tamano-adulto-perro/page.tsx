@@ -4,7 +4,14 @@ import { useEffect, useMemo, useState } from 'react';
 import styles from './CalculadoraTamanoAdultoPerro.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, DataReference, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { energiaCrecimientoKcal, gramosDePienso, KCAL_POR_KG_MIN, KCAL_POR_KG_MAX } from './motor';
+import {
+  energiaCrecimientoKcal,
+  gramosDePienso,
+  tamanosQueEncajan,
+  KCAL_POR_KG_MIN,
+  KCAL_POR_KG_MAX,
+  type TamanoQueEncaja,
+} from './motor';
 import {
   razasReferencia,
   rangosTipicos,
@@ -40,6 +47,30 @@ const etiquetasTamano: Record<TamanoRaza, string> = {
   mediano: 'Mediano',
   grande: 'Grande',
   gigante: 'Gigante',
+};
+
+/** Los cinco tamaños, de menor a mayor: el orden de los botones y el de los candidatos. */
+const TAMANOS: TamanoRaza[] = ['mini', 'pequeno', 'mediano', 'grande', 'gigante'];
+
+/**
+ * Lo que se elige en el grupo de tamaño: uno de los cinco o «no lo sé» (S0283), que prueba las
+ * cinco curvas y se queda con los tamaños que encajan con el peso del cachorro (./motor.ts).
+ */
+type SeleccionTamano = TamanoRaza | 'desconocido';
+
+// Edad a la que deja de crecer, según el tamaño
+const edadesMaduracion: Record<TamanoRaza, string> = {
+  mini: '8-10 meses',
+  pequeno: '10-12 meses',
+  mediano: '12-15 meses',
+  grande: '18-24 meses',
+  gigante: '24-36 meses',
+};
+
+/** «mini», «pequeño o mediano», «pequeño, mediano o grande»: los tamaños en minúscula, unidos con «o». */
+const listaTamanos = (tamanos: TamanoRaza[]): string => {
+  const nombres = tamanos.map((t) => etiquetasTamano[t].toLowerCase());
+  return nombres.length <= 1 ? nombres.join('') : `${nombres.slice(0, -1).join(', ')} o ${nombres[nombres.length - 1]}`;
 };
 
 const obtenerPorcentajeCrecimiento = (edad: number, tamano: TamanoRaza): number => {
@@ -112,7 +143,13 @@ const plotH = VB_H - M.top - M.bottom;
 export default function CalculadoraTamanoAdultoPerroPage() {
   const [pesoActual, setPesoActual] = useState('');
   const [edadSemanas, setEdadSemanas] = useState('');
-  const [tamanoRaza, setTamanoRaza] = useState<TamanoRaza>('mediano');
+  const [tamanoRaza, setTamanoRaza] = useState<SeleccionTamano>('mediano');
+  /**
+   * Con «no lo sé», los tamaños que encajan cuando son VARIOS (S0283). Entonces no hay un solo
+   * peso adulto que dar, ni una curva ni una ración, y la vista enseña la horquilla con un botón
+   * por tamaño para ver la curva de ese. Con uno solo, el resultado es el normal de ese tamaño.
+   */
+  const [varios, setVarios] = useState<TamanoQueEncaja<TamanoRaza>[] | null>(null);
   const [filtroRaza, setFiltroRaza] = useState<TamanoRaza | 'todas'>('todas');
   const [error, setError] = useState<string | null>(null);
   /** Energía del pienso en kcal/kg, tal como la escribe el usuario. Opcional: sin ella sale solo la energía. */
@@ -136,9 +173,18 @@ export default function CalculadoraTamanoAdultoPerroPage() {
     tamano: TamanoRaza;
     edad: number;
     peso: number;
+    /**
+     * Si el tamaño lo dedujo «no lo sé»: 'encaja' cuando su proyección cae en su rango, 'cercano'
+     * cuando no encajaba ninguno y es el que menos se aleja. Ausente si lo eligió el usuario.
+     */
+    inferido?: 'encaja' | 'cercano';
   } | null>(null);
 
-  const calcular = () => {
+  /**
+   * `tamanoForzado` lo pasan los botones «Ver su curva como…» de la horquilla: calculan con ese
+   * tamaño sin esperar a que el estado de la selección se actualice.
+   */
+  const calcular = (tamanoForzado?: TamanoRaza) => {
     // parseSpanishNumber y no parseFloat: el parseo casero se quedaba con el número de delante
     // de cualquier basura («12abc» → 12) y con él daba peso adulto y ración sin avisar
     // (hallazgo 3334, 16/10/2026). La coma decimal la admite igual (Inspector, 20/08/2026).
@@ -148,16 +194,44 @@ export default function CalculadoraTamanoAdultoPerroPage() {
     if (isNaN(peso) || peso <= 0 || peso > PESO_MAXIMO) {
       setError(`Introduce un peso actual válido, mayor que 0 y hasta ${PESO_MAXIMO} kg.`);
       setResultado(null);
+      setVarios(null);
       return;
     }
     if (isNaN(edad) || edad < EDAD_MINIMA || edad > EDAD_MAXIMA) {
       setError(`Introduce una edad válida, entre ${EDAD_MINIMA} y ${EDAD_MAXIMA} semanas.`);
       setResultado(null);
+      setVarios(null);
       return;
     }
 
     setError(null);
-    const porcentaje = obtenerPorcentajeCrecimiento(edad, tamanoRaza);
+
+    let tamano: TamanoRaza;
+    let inferido: 'encaja' | 'cercano' | undefined;
+    const seleccion = tamanoForzado ?? tamanoRaza;
+    if (seleccion === 'desconocido') {
+      const encajan = tamanosQueEncajan(
+        peso,
+        TAMANOS.map((t) => ({
+          tamano: t,
+          fraccion: obtenerPorcentajeCrecimiento(edad, t),
+          min: rangosTipicos[t].min,
+          max: rangosTipicos[t].max,
+        })),
+      );
+      if (encajan.length > 1) {
+        setResultado(null);
+        setVarios(encajan);
+        return;
+      }
+      tamano = encajan[0].tamano;
+      inferido = encajan[0].encaja ? 'encaja' : 'cercano';
+    } else {
+      tamano = seleccion;
+    }
+
+    setVarios(null);
+    const porcentaje = obtenerPorcentajeCrecimiento(edad, tamano);
 
     // Peso adulto estimado
     const pesoEstimado = peso / porcentaje;
@@ -166,31 +240,30 @@ export default function CalculadoraTamanoAdultoPerroPage() {
     const pesoMin = pesoEstimado * 0.85;
     const pesoMax = pesoEstimado * 1.15;
 
-    // Edad de maduración según tamaño
-    const edadesMaduracion: Record<TamanoRaza, string> = {
-      mini: '8-10 meses',
-      pequeno: '10-12 meses',
-      mediano: '12-15 meses',
-      grande: '18-24 meses',
-      gigante: '24-36 meses',
-    };
-
     setResultado({
       pesoAdultoMin: pesoMin,
       pesoAdultoMax: pesoMax,
       pesoAdultoEstimado: pesoEstimado,
       porcentajeCrecimiento: porcentaje * 100,
-      edadMaduracion: edadesMaduracion[tamanoRaza],
-      tamano: tamanoRaza,
+      edadMaduracion: edadesMaduracion[tamano],
+      tamano,
       edad,
       peso,
+      inferido,
     });
+  };
+
+  /** Desde la horquilla de «no lo sé»: se queda con ese tamaño y enseña su curva y su ración. */
+  const verComoTamano = (t: TamanoRaza) => {
+    setTamanoRaza(t);
+    calcular(t);
   };
 
   const limpiar = () => {
     setPesoActual('');
     setEdadSemanas('');
     setResultado(null);
+    setVarios(null);
     setError(null);
   };
 
@@ -342,29 +415,32 @@ export default function CalculadoraTamanoAdultoPerroPage() {
           <div className={styles.inputGroup}>
             <span className={styles.grupoLabel} id="etiqueta-tamano-raza">Tamaño esperado de la raza</span>
             <div className={styles.tamanoGrid} role="group" aria-labelledby="etiqueta-tamano-raza">
-              {[
-                { id: 'mini' as TamanoRaza, label: 'Mini', peso: rangosTipicos.mini.etiqueta },
-                { id: 'pequeno' as TamanoRaza, label: 'Pequeño', peso: rangosTipicos.pequeno.etiqueta },
-                { id: 'mediano' as TamanoRaza, label: 'Mediano', peso: rangosTipicos.mediano.etiqueta },
-                { id: 'grande' as TamanoRaza, label: 'Grande', peso: rangosTipicos.grande.etiqueta },
-                { id: 'gigante' as TamanoRaza, label: 'Gigante', peso: rangosTipicos.gigante.etiqueta },
-              ].map((t) => (
+              {TAMANOS.map((t) => (
                 <button
                   type="button"
-                  key={t.id}
-                  className={`${styles.tamanoBtn} ${tamanoRaza === t.id ? styles.active : ''}`}
-                  onClick={() => setTamanoRaza(t.id)}
-                  aria-pressed={tamanoRaza === t.id}
+                  key={t}
+                  className={`${styles.tamanoBtn} ${tamanoRaza === t ? styles.active : ''}`}
+                  onClick={() => setTamanoRaza(t)}
+                  aria-pressed={tamanoRaza === t}
                 >
-                  <span className={styles.tamanoLabel}>{t.label}</span>
-                  <span className={styles.tamanoPeso}>{t.peso}</span>
+                  <span className={styles.tamanoLabel}>{etiquetasTamano[t]}</span>
+                  <span className={styles.tamanoPeso}>{rangosTipicos[t].etiqueta}</span>
                 </button>
               ))}
+              <button
+                type="button"
+                className={`${styles.tamanoBtn} ${styles.tamanoBtnNoSe} ${tamanoRaza === 'desconocido' ? styles.active : ''}`}
+                onClick={() => setTamanoRaza('desconocido')}
+                aria-pressed={tamanoRaza === 'desconocido'}
+              >
+                <span className={styles.tamanoLabel}>No lo sé</span>
+                <span className={styles.tamanoPeso}>mestizo o raza desconocida</span>
+              </button>
             </div>
           </div>
 
           <div className={styles.botones}>
-            <button type="button" onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={() => calcular()} className={styles.btnPrimary}>
               Calcular Peso Adulto
             </button>
             <button type="button" onClick={limpiar} className={styles.btnSecondary}>
@@ -391,6 +467,21 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                   Peso adulto estimado
                 </div>
               </div>
+
+              {resultado.inferido === 'encaja' && (
+                <p className={styles.inferidoNota}>
+                  Por su peso a esta edad, encaja con un perro de tamaño{' '}
+                  <strong>{etiquetasTamano[resultado.tamano].toLowerCase()}</strong>{' '}
+                  <span>{`(${rangosTipicos[resultado.tamano].etiqueta} de adulto)`}</span>, y es el único que encaja.
+                </p>
+              )}
+              {resultado.inferido === 'cercano' && (
+                <p className={styles.inferidoNota}>
+                  Su peso no encaja del todo con ningún tamaño habitual a esta edad. El más cercano es el{' '}
+                  <strong>{etiquetasTamano[resultado.tamano].toLowerCase()}</strong>: revisa que el peso y la edad
+                  estén bien escritos.
+                </p>
+              )}
 
               <div className={styles.rangoBox}>
                 <div className={styles.rangoLabel}>Rango probable:</div>
@@ -430,6 +521,44 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                 Los mestizos pueden variar más que las razas puras.
               </div>
             </>
+          ) : varios ? (
+            <div className={styles.variosPanel}>
+              <div className={styles.resultadoPrincipal}>
+                <span className={styles.resultadoIcon} aria-hidden="true">🐕</span>
+                {/* Cada texto variable, hijo único de su elemento: con la página traducida, un nodo
+                    suelto entre textos fijos se queda con el valor viejo al recalcular. */}
+                <div className={styles.resultadoValor}>
+                  {`${formatNumber(Math.min(...varios.map((v) => v.pesoAdulto)), 1)}-${formatNumber(Math.max(...varios.map((v) => v.pesoAdulto)), 1)} kg`}
+                </div>
+                <div className={styles.resultadoLabel}>
+                  {`Puede ser de tamaño ${listaTamanos(varios.map((v) => v.tamano))}`}
+                </div>
+              </div>
+
+              <ul className={styles.variosLista}>
+                {varios.map((v) => (
+                  <li key={v.tamano} className={styles.variosFila}>
+                    <span className={styles.variosTexto}>
+                      <strong>{etiquetasTamano[v.tamano]}</strong>{' '}
+                      <span>{`≈ ${formatNumber(v.pesoAdulto, 1)} kg de adulto · deja de crecer a los ${edadesMaduracion[v.tamano]}`}</span>
+                    </span>
+                    <button
+                      type="button"
+                      className={styles.btnSecondary}
+                      onClick={() => verComoTamano(v.tamano)}
+                    >
+                      {`Ver su curva como ${etiquetasTamano[v.tamano].toLowerCase()}`}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              <div className={styles.notaInfo}>
+                <span aria-hidden="true">💡</span> Con su peso a esta edad encaja más de un tamaño: los pesos habituales
+                se solapan (un perro de 10 kg puede ser pequeño o mediano). Si sabes cuánto pesan sus padres, elige el
+                tamaño que más se parezca; la curva y la ración necesitan uno solo.
+              </div>
+            </div>
           ) : (
             <div className={styles.placeholder}>
               <span className={styles.placeholderIcon} aria-hidden="true">🐾</span>
@@ -576,12 +705,20 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               <strong>{etiquetasTamano[resultado.tamano].toLowerCase()}</strong>, cuyo peso adulto habitual es{' '}
               {curva.rango.etiqueta}.
             </p>
+          ) : resultado.inferido === 'cercano' ? (
+            <p key="aviso-cercano" className={styles.coherenciaAviso} role="status">
+              <span aria-hidden="true">⚠️</span> Ningún tamaño habitual encaja con este peso a esta edad; la curva es la del
+              tamaño más cercano, <strong>{etiquetasTamano[resultado.tamano].toLowerCase()}</strong>{' '}
+              <span>{`(${curva.rango.etiqueta})`}</span>. Comprueba el peso y la edad y, si son correctos, coméntalo en la
+              siguiente revisión veterinaria.
+            </p>
           ) : (
-            <p className={styles.coherenciaAviso} role="status">
+            <p key="aviso-elegido" className={styles.coherenciaAviso} role="status">
               <span aria-hidden="true">⚠️</span> La proyección ({formatNumber(resultado.pesoAdultoEstimado, 1)} kg) queda{' '}
               {curva.coherencia === 'porEncima' ? 'por encima' : 'por debajo'} del peso adulto habitual de la categoría{' '}
               <strong>{etiquetasTamano[resultado.tamano].toLowerCase()}</strong> ({curva.rango.etiqueta}). Suele
-              significar que la categoría elegida no es la que corresponde a la raza —prueba con la de al lado—; si estás
+              significar que la categoría elegida no es la que corresponde a la raza —prueba con la de al lado, o con «No lo
+              sé» para que la app busque las que encajan—; si estás
               seguro de ella, coméntalo en la siguiente revisión veterinaria.
             </p>
           )}
@@ -825,7 +962,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             </details>
             <details className={styles.faqItem}>
               <summary>¿Cómo sé qué tamaño de raza seleccionar?</summary>
-              <p>Si conoces la raza, consulta la tabla. Para mestizos, estima según el tamaño de los padres si los conoces, o consulta con tu veterinario.</p>
+              <p>Si conoces la raza, consulta la tabla. Para mestizos, estima según el tamaño de los padres si los conoces; si no, elige «No lo sé» y la calculadora te dice qué tamaños encajan con su peso a su edad.</p>
             </details>
           </div>
         </section>
@@ -976,7 +1113,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             </li>
             <li className={styles.faqItem}>
               <strong>¿Cómo predigo el tamaño adulto de un mestizo?</strong>
-              <p>Si conoces las razas parentales, promedia sus pesos adultos típicos. Si no las conoces, el tamaño de las patas y la morfología del cráneo dan pistas, aunque con menos precisión que la genética conocida.</p>
+              <p>Si conoces las razas parentales, promedia sus pesos adultos típicos. Si no las conoces, elige «No lo sé» en la calculadora: prueba la curva de cada tamaño y se queda con los que dan un peso adulto habitual para ese tamaño. Como los pesos habituales se solapan, a menudo encajan dos, y entonces te da la horquilla.</p>
               <p className={styles.faqTip}>Un test de ADN canino puede identificar las razas predominantes y mejorar la estimación.</p>
             </li>
             <li className={styles.faqItem}>
@@ -1034,7 +1171,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               <span className={styles.stepNumber}>3</span>
               <div className={styles.stepContent}>
                 <strong>Selecciona la categoría de tamaño correcta</strong>
-                <p>Si conoces la raza, consulta la tabla de razas de referencia. Para mestizos, usa el tamaño de los padres si los conoces, o la categoría que mejor se corresponda con la morfología actual (tamaño de cabeza, longitud de patas, anchura de tórax).</p>
+                <p>Si conoces la raza, consulta la tabla de razas de referencia. Para mestizos, usa el tamaño de los padres si los conoces; si no, elige «No lo sé» y la calculadora buscará los tamaños que encajan con su peso a su edad.</p>
               </div>
             </li>
             <li className={styles.step}>

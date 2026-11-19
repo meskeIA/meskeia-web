@@ -138,6 +138,68 @@
   color: var(--text-muted);
 }
 
+/* «No lo sé» (S0283): fila propia bajo los cinco tamaños, porque no es un tamaño más */
+.tamanoBtnNoSe {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-style: dashed;
+}
+
+.tamanoBtnNoSe.active {
+  border-style: solid;
+}
+
+/* Tamaño deducido con «No lo sé» */
+.inferidoNota {
+  margin: 0 0 20px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* Horquilla cuando encajan varios tamaños */
+.variosPanel {
+  display: flex;
+  flex-direction: column;
+}
+
+.variosLista {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.variosFila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+}
+
+.variosTexto {
+  flex: 1 1 220px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.variosFila .btnSecondary {
+  padding: 8px 14px;
+  font-size: 0.85rem;
+}
+
 .botones {
   display: flex;
   gap: 10px;
@@ -1050,6 +1112,7 @@
 }
 
 [data-theme='dark'] .tamanoBtn,
+[data-theme='dark'] .variosFila,
 [data-theme='dark'] .filtroBtn {
   background: var(--bg-primary);
 }

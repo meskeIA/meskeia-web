@@ -72,3 +72,68 @@ export function gramosDePienso(kcalDia: number, kcalPorKg: number): number {
   if (!Number.isFinite(kcalPorKg) || kcalPorKg < KCAL_POR_KG_MIN || kcalPorKg > KCAL_POR_KG_MAX) return NaN;
   return (kcalDia / kcalPorKg) * 1000;
 }
+
+/*
+ * ── «NO SÉ SU TAMAÑO»: QUÉ TAMAÑOS ENCAJAN CON SU PESO ────────────────────────
+ *
+ * Semilla S0283 (19/11/2026). Quien tiene un mestizo no puede elegir el «tamaño esperado de la
+ * raza», que es justo lo que pregunta («¿cómo saber si un cachorro va a ser grande?»: 132
+ * impresiones en 90 días a las que Google enseñaba la app por debajo de la posición 20).
+ *
+ * La app ya tiene lo necesario para contestarlo sin inventar nada: cada tamaño tiene su curva
+ * (qué fracción del peso adulto lleva a esa edad) y su rango de peso adulto habitual. Se prueba
+ * cada curva y se queda con los tamaños cuya proyección cae DENTRO de su propio rango. Es el
+ * mismo contraste que la vista ya hacía con el tamaño elegido («la proyección encaja con la
+ * categoría…»), recorrido sobre los cinco.
+ *
+ * Los rangos se solapan (pequeño 4-15 kg, mediano 8-20), así que a menudo encajan DOS tamaños,
+ * y entonces la respuesta honrada es la horquilla de los dos, no una cifra. Si no encaja
+ * ninguno (un peso imposible para su edad o un error al teclear), se devuelve el más cercano
+ * con `encaja: false` para que la vista lo diga.
+ */
+
+/** Un tamaño candidato: la fracción del peso adulto que su curva da a esta edad y su rango. */
+export interface CandidataTamano<T extends string> {
+  tamano: T;
+  /** Fracción del peso adulto ya alcanzada según la curva de ese tamaño, entre 0 y 1. */
+  fraccion: number;
+  /** Peso adulto habitual del tamaño, en kg. */
+  min: number;
+  max: number;
+}
+
+export interface TamanoQueEncaja<T extends string> {
+  tamano: T;
+  /** Peso adulto proyectado con la curva de ese tamaño, en kg. */
+  pesoAdulto: number;
+  /** false solo cuando no encajaba ninguno y este es el más cercano. */
+  encaja: boolean;
+}
+
+/**
+ * Los tamaños cuya proyección (peso ÷ fracción) cae dentro de su propio rango, en el orden en
+ * que llegan. Si no encaja ninguno, el más cercano en escala logarítmica, con `encaja: false`.
+ * Lista vacía si el peso o alguna fracción son imposibles.
+ */
+export function tamanosQueEncajan<T extends string>(
+  pesoActualKg: number,
+  candidatas: CandidataTamano<T>[],
+): TamanoQueEncaja<T>[] {
+  if (!Number.isFinite(pesoActualKg) || pesoActualKg <= 0 || candidatas.length === 0) return [];
+  if (candidatas.some((c) => !Number.isFinite(c.fraccion) || c.fraccion <= 0 || c.fraccion > 1)) return [];
+
+  const proyectadas = candidatas.map((c) => {
+    const pesoAdulto = pesoActualKg / c.fraccion;
+    // Distancia al rango en escala logarítmica: 0 dentro; fuera, cuántas veces se pasa o no llega
+    const distancia = pesoAdulto < c.min ? Math.log(c.min / pesoAdulto)
+      : pesoAdulto > c.max ? Math.log(pesoAdulto / c.max)
+        : 0;
+    return { tamano: c.tamano, pesoAdulto, distancia };
+  });
+
+  const dentro = proyectadas.filter((p) => p.distancia === 0);
+  if (dentro.length > 0) return dentro.map(({ tamano, pesoAdulto }) => ({ tamano, pesoAdulto, encaja: true }));
+
+  const cercana = proyectadas.reduce((a, b) => (b.distancia < a.distancia ? b : a));
+  return [{ tamano: cercana.tamano, pesoAdulto: cercana.pesoAdulto, encaja: false }];
+}

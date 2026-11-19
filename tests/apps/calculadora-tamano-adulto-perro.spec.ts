@@ -851,3 +851,127 @@ test.describe('Inspector 16/10/2026 — ración en móvil (390 px) y tema oscuro
     expect(await contrasteSobreFondoReal(avisoPienso(page)), 'aviso del pienso').toBeGreaterThanOrEqual(4.5);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// «No lo sé» (S0283, 19/11/2026) — casos resueltos a mano ANTES de ejecutar, con las curvas de
+// razas.ts y los rangos derivados (mini 1,5-4 · pequeño 4-15 · mediano 8-20 · grande 16-40 ·
+// gigante 35-90 kg). Proyección = peso ÷ fracción de la curva a esa edad.
+//
+//   N1  2,4 kg a las 8 semanas: mini 2,4/0,35 = 6,86 ✗ · pequeño 2,4/0,30 = 8,0 ✓ ·
+//       mediano 2,4/0,25 = 9,6 ✓ · grande 2,4/0,20 = 12 ✗ · gigante 2,4/0,15 = 16 ✗
+//       → «8,0-9,6 kg», pequeño o mediano; con «mediano» la curva da 9,6 kg.
+//   N2  12 kg a las 16 semanas: mini 18,5 ✗ · pequeño 20,7 ✗ · mediano 24 ✗ ·
+//       grande 12/0,40 = 30 ✓ · gigante 12/0,30 = 40 ✓ → «30,0-40,0 kg», grande o gigante.
+//   U1  3 kg a las 24 semanas: mini 3/0,90 = 3,33 ✓ · pequeño 3,75 ✗ (< 4) · mediano 4,29 ✗ ·
+//       grande 5,45 ✗ · gigante 6,98 ✗ → solo mini, «3,3 kg».
+//   C1  0,5 kg a las 24 semanas: todos por debajo de su mínimo. Distancia logarítmica:
+//       mini ln(1,5/0,556) = 0,99 · pequeño ln(4/0,625) = 1,86 · … → el más cercano es mini,
+//       «0,6 kg», con encaja = false.
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+
+test.describe('«No lo sé»: qué tamaños encajan · motor', () => {
+  const RANGOS = {
+    mini: [1.5, 4], pequeno: [4, 15], mediano: [8, 20], grande: [16, 40], gigante: [35, 90],
+  } as const;
+  const candidatas = (fracciones: Record<keyof typeof RANGOS, number>) =>
+    (Object.keys(RANGOS) as (keyof typeof RANGOS)[]).map((t) => ({
+      tamano: t, fraccion: fracciones[t], min: RANGOS[t][0], max: RANGOS[t][1],
+    }));
+  const SEMANA_8 = { mini: 0.35, pequeno: 0.30, mediano: 0.25, grande: 0.20, gigante: 0.15 };
+  const SEMANA_16 = { mini: 0.65, pequeno: 0.58, mediano: 0.50, grande: 0.40, gigante: 0.30 };
+  const SEMANA_24 = { mini: 0.90, pequeno: 0.80, mediano: 0.70, grande: 0.55, gigante: 0.43 };
+
+  test('N1, N2, U1 y C1 a mano', async () => {
+    const { tamanosQueEncajan } = await import('../../app/calculadora-tamano-adulto-perro/motor');
+    const n1 = tamanosQueEncajan(2.4, candidatas(SEMANA_8));
+    expect(n1.map((r) => r.tamano)).toEqual(['pequeno', 'mediano']);
+    expect(n1[0].pesoAdulto).toBeCloseTo(8, 6);
+    expect(n1[1].pesoAdulto).toBeCloseTo(9.6, 6);
+    expect(n1.every((r) => r.encaja)).toBe(true);
+
+    const n2 = tamanosQueEncajan(12, candidatas(SEMANA_16));
+    expect(n2.map((r) => [r.tamano, Math.round(r.pesoAdulto * 10) / 10])).toEqual([['grande', 30], ['gigante', 40]]);
+
+    const u1 = tamanosQueEncajan(3, candidatas(SEMANA_24));
+    expect(u1).toHaveLength(1);
+    expect(u1[0]).toMatchObject({ tamano: 'mini', encaja: true });
+    expect(u1[0].pesoAdulto).toBeCloseTo(3.333, 3);
+
+    const c1 = tamanosQueEncajan(0.5, candidatas(SEMANA_24));
+    expect(c1).toHaveLength(1);
+    expect(c1[0]).toMatchObject({ tamano: 'mini', encaja: false });
+  });
+
+  test('por arriba, el más cercano es el gigante; lo imposible da lista vacía', async () => {
+    const { tamanosQueEncajan } = await import('../../app/calculadora-tamano-adulto-perro/motor');
+    // 110 kg a las 40 semanas: gigante 110/0,65 = 169 kg, el que menos se pasa de su máximo
+    const arriba = tamanosQueEncajan(110, candidatas({ mini: 1, pequeno: 0.98, mediano: 0.92, grande: 0.78, gigante: 0.65 }));
+    expect(arriba).toEqual([expect.objectContaining({ tamano: 'gigante', encaja: false })]);
+    expect(tamanosQueEncajan(0, candidatas(SEMANA_8))).toEqual([]);
+    expect(tamanosQueEncajan(NaN, candidatas(SEMANA_8))).toEqual([]);
+    expect(tamanosQueEncajan(2, candidatas({ ...SEMANA_8, mini: 0 }))).toEqual([]);
+    expect(tamanosQueEncajan(2, [])).toEqual([]);
+  });
+});
+
+test.describe('«No lo sé»: qué tamaños encajan · en la página', () => {
+  /** El panel de resultados: el primer role=status (el aviso de coherencia es el segundo). */
+  const panel = (page: Page) => page.getByRole('status').first();
+  const calcularSinTamano = async (page: Page, peso: string, edad: string) => {
+    await page.locator('#peso-actual').fill(peso);
+    await page.locator('#edad-cachorro').fill(edad);
+    await page.getByRole('button', { name: /^No lo sé/ }).click();
+    await page.getByRole('button', { name: 'Calcular Peso Adulto' }).click();
+  };
+
+  test('N1 — dos tamaños: horquilla, sin curva ni ración, y un botón para ver cada uno', async ({ page }) => {
+    await abrir(page);
+    await calcularSinTamano(page, '2,4', '8');
+    await expect(panel(page).getByText('8,0-9,6 kg', { exact: true })).toBeVisible();
+    await expect(page.getByText('Puede ser de tamaño pequeño o mediano', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Ración diaria orientativa/ })).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: /Cuánto pesará por el camino/ })).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Ver su curva como mediano' }).click();
+    await expect(panel(page).getByText('9,6 kg', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Mediano \d/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('heading', { name: /Cuánto pesará por el camino/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Ración diaria orientativa/ })).toBeVisible();
+  });
+
+  test('N2 — un cachorro de 12 kg a las 16 semanas puede ser grande o gigante', async ({ page }) => {
+    await abrir(page);
+    await calcularSinTamano(page, '12', '16');
+    await expect(panel(page).getByText('30,0-40,0 kg', { exact: true })).toBeVisible();
+    await expect(page.getByText('Puede ser de tamaño grande o gigante', { exact: true })).toBeVisible();
+  });
+
+  test('U1 — un solo tamaño: resultado normal, con la nota de que es el único que encaja', async ({ page }) => {
+    await abrir(page);
+    await calcularSinTamano(page, '3', '24');
+    await expect(panel(page).getByText('3,3 kg', { exact: true })).toBeVisible();
+    await expect(page.getByText(/encaja con un perro de tamaño mini/)).toBeVisible();
+    await expect(page.getByText(/La proyección encaja con la categoría/)).toBeVisible();
+  });
+
+  test('C1 — no encaja ninguno: lo dice, y no culpa a una categoría que nadie eligió', async ({ page }) => {
+    await abrir(page);
+    await calcularSinTamano(page, '0,5', '24');
+    await expect(panel(page).getByText('0,6 kg', { exact: true })).toBeVisible();
+    await expect(page.getByText(/no encaja del todo con ningún tamaño/)).toBeVisible();
+    await expect(page.getByText(/Ningún tamaño habitual encaja/)).toBeVisible();
+    await expect(page.getByText(/la categoría elegida no es la que corresponde/)).toHaveCount(0);
+  });
+
+  test('la horquilla no desborda en móvil', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await abrir(page);
+    await calcularSinTamano(page, '2,4', '8');
+    await expect(panel(page).getByText('8,0-9,6 kg', { exact: true })).toBeVisible();
+    const [ancho, visible] = await page.evaluate(() => [
+      document.documentElement.scrollWidth,
+      document.documentElement.clientWidth,
+    ]);
+    expect(ancho, 'la página desborda en horizontal').toBeLessThanOrEqual(visible);
+  });
+});
