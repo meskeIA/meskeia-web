@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { parseSpanishNumber } from '../../lib/formatters';
+import { calcularCostes, modelosDe, SEGMENTOS } from '../../app/selector-vehiculo/motor';
 
 /**
  * Inspector — selector-vehiculo (segmento CÁLCULO, riesgo 2)
@@ -170,14 +171,21 @@ test.describe('selector-vehiculo — los tres casos resueltos a mano', () => {
     await expect(page.getByText('Más barato')).toHaveCount(0); // el recomendado ya es el más barato
   });
 
-  test('caso 2b · el mismo perfil con 27.500 km cruza la frontera → PHEV', async ({ page }) => {
+  test('caso 2b · el mismo perfil con 27.500 km cruza la frontera → PHEV, con su propia fila y la del eléctrico', async ({ page }) => {
     await responder(page, PHEV_KM_ALTO);
     await expect(page.getByText('Basada en tu perfil de 27.500 km/año')).toBeVisible();
     await expect(page.getByText('Híbrido Enchufable (PHEV)', { exact: true })).toBeVisible();
     await expect(page.getByRole('row').filter({ hasText: 'PHEV' })).toContainText('Recomendado');
-    // Cifras de hoy: la fórmula del eléctrico puro (ver el hallazgo «coste del PHEV»)
-    expect(await fila(page, 'PHEV')).toEqual(['968,00 €', '200,00 €', '805,00 €', '1973,00 €', '9865,00 €']);
+    // REPARADO 19/11/2026 (5234). Hasta entonces la fila «PHEV» era la del eléctrico puro
+    // (968 € = 275 × 16 × 0,22, 200 € de mantenimiento) y la del eléctrico desaparecía. Ahora, con
+    // el supuesto de la nota (mitad de los km en eléctrico, mitad con el consumo del HEV):
+    //   275 × (0,5 × 16 × 0,22 + 0,5 × 5,2 × 1,65) = 484 + 1179,75 = 1663,75 → 1664
+    //   1664 + 350 (mantenimiento del HEV) + 805 = 2819 → × 5 = 14.095
+    expect(await fila(page, 'PHEV')).toEqual(['1664,00 €', '350,00 €', '805,00 €', '2819,00 €', '14.095,00 €']);
+    expect(await fila(page, '100% Eléctrico')).toEqual(['968,00 €', '200,00 €', '805,00 €', '1973,00 €', '9865,00 €']);
+    await expect(page.getByRole('row').filter({ hasText: '100% Eléctrico' })).toContainText('Más barato');
     expect(await fila(page, 'Híbrido (HEV)')).toEqual(['2360,00 €', '350,00 €', '805,00 €', '3515,00 €', '17.575,00 €']);
+    await expect(page.getByText(/PHEV: supone la mitad de los km en eléctrico/)).toBeVisible();
   });
 
   test('caso 3 · sin contestar no se avanza, ni en la primera ni en la última pregunta', async ({ page }) => {
@@ -215,33 +223,48 @@ test.describe('selector-vehiculo — hallazgos (inspector 19/11/2026)', () => {
     expect(euros(recomendado)).toBeLessThanOrEqual(euros(hev));
   });
 
-  test('HALLAZGO · el coste del PHEV incluye la gasolina de sus kilómetros en térmico', async ({ page }) => {
-    // ABIERTO: caso 2b → fila «PHEV» = 275 × 16 kWh × 0,22 € = 968,00 € de electricidad, 0 € de
-    // gasolina y 200 € de mantenimiento: exactamente el eléctrico puro (cuya fila desaparece),
-    // aunque la propia tarjeta dice «motor térmico para los viajes largos».
-    test.fail();
+  test('HALLAZGO 5234 · el coste del PHEV incluye la gasolina de sus kilómetros en térmico', async ({ page }) => {
+    // REPARADO 19/11/2026: la fila «PHEV» era 275 × 16 kWh × 0,22 € = 968,00 € de electricidad,
+    // 0 € de gasolina y 200 € de mantenimiento, exactamente el eléctrico puro. Ahora el PHEV es un
+    // motor propio en motor.ts (cifras del caso 2b).
     await responder(page, PHEV_KM_ALTO);
     const [combustible, mantenimiento] = await fila(page, 'PHEV');
     expect(euros(combustible)).toBeGreaterThan(968);
     expect(euros(mantenimiento)).toBeGreaterThan(200);
   });
 
-  test('HALLAZGO · los ejemplos del mercado de un PHEV son PHEV, no coches de gasolina', async ({ page }) => {
-    // ABIERTO: urbano, compacto-bc y monovolumen no tienen lista «phev» y caen a la de gasolina:
-    // caso 2b → «Renault Clio · Toyota Corolla · Seat Ibiza» bajo «Híbrido Enchufable (PHEV)».
-    test.fail();
-    await responder(page, PHEV_KM_ALTO);
-    await expect(ejemplos(page)).not.toContainText(/Renault Clio|Seat Ibiza/);
+  test('HALLAZGO 5234 · motor: la cuota eléctrica del PHEV se aplica a los km, y sin km eléctricos sería el HEV', () => {
+    const c = calcularCostes(27_500, 0.22);
+    expect(c.phev).toEqual({ combustible: 1664, mantenimiento: 350, total: 2819, total5: 14_095 });
+    // Con la mitad de los km en eléctrico, la energía es la media de la del eléctrico y la del HEV
+    expect(c.phev.combustible).toBe(Math.round((c.electrico.combustible + c.hibrido.combustible) / 2));
+    expect(c.phev.mantenimiento).toBe(c.hibrido.mantenimiento);
   });
 
-  test('HALLAZGO · las razones del PHEV no contradicen «Prácticamente nunca» viajes largos', async ({ page }) => {
-    // ABIERTO: caso 2b → «Tienes punto de carga … y no haces viajes largos → eléctrico totalmente
-    // viable» y, debajo, «Presupuesto alto + carga disponible + viajes largos → PHEV ideal». La
-    // primera se dispara con motorPrincipal === 'electrico', que el PHEV también cumple.
-    test.fail();
+  test('HALLAZGO 5236 · los ejemplos del mercado de un PHEV son PHEV, no coches de gasolina', async ({ page }) => {
+    // REPARADO 19/11/2026: urbano, compacto-bc y monovolumen no tienen lista «phev» y caían a la
+    // de gasolina: caso 2b → «Renault Clio · Toyota Corolla · Seat Ibiza» bajo «Híbrido Enchufable
+    // (PHEV)». Ahora, sin lista, no hay ejemplos (el acta admitía «o ningún ejemplo»).
+    await responder(page, PHEV_KM_ALTO);
+    await expect(page.getByText('Compacto (tipo B/C)', { exact: true })).toBeVisible();
+    await expect(page.getByText('Ejemplos del mercado:')).toHaveCount(0);
+    await expect(page.getByText(/Renault Clio|Seat Ibiza/)).toHaveCount(0);
+    // Y donde la hay, la de su motor
+    expect(modelosDe('suv-familiar', 'phev')).toEqual(['Peugeot 3008 PHEV', 'Hyundai Tucson PHEV', 'Kia Sportage PHEV']);
+    expect(modelosDe('monovolumen', 'phev')).toEqual([]);
+  });
+
+  test('HALLAZGO 5237 · las razones del PHEV no contradicen «Prácticamente nunca» viajes largos', async ({ page }) => {
+    // REPARADO 19/11/2026: caso 2b → «Tienes punto de carga … y no haces viajes largos → eléctrico
+    // totalmente viable» y, debajo, «Presupuesto alto + carga disponible + viajes largos → PHEV
+    // ideal». La primera se disparaba con motorPrincipal === 'electrico', que el PHEV cumplía.
     await responder(page, PHEV_KM_ALTO);
     await expect(razones(page).filter({ hasText: 'eléctrico totalmente viable' })).toHaveCount(0);
-    await expect(razones(page).filter({ hasText: '+ viajes largos →' })).toHaveCount(0);
+    await expect(razones(page).filter({ hasText: 'viajes largos' })).toHaveCount(0);
+    await expect(razones(page)).toHaveText([
+      /^✓\s*27\.500 km\/año con carga en casa → el PHEV hace en eléctrico los trayectos del día a día/,
+      /^✓\s*Presupuesto de más de 25\.000 € → cabe el sobreprecio de un híbrido enchufable$/,
+    ]);
   });
 
   test('HALLAZGO · «Por qué esta recomendación» no da razones contrarias al segmento recomendado (urbano)', async ({ page }) => {
@@ -298,14 +321,16 @@ test.describe('selector-vehiculo — hallazgos (inspector 19/11/2026)', () => {
     expect(electricidad).toBe(Math.round(150 * 16 * precio));
   });
 
-  test('HALLAZGO · bajo «Híbrido (HEV)» con etiqueta ECO no salen híbridos enchufables', async ({ page }) => {
-    // ABIERTO: SUV mediano + HEV → «Toyota RAV4 Hybrid · Kia Sorento Hybrid · Mitsubishi Outlander
-    // PHEV». Un PHEV de ≥ 40 km es «0 emisiones», no ECO (Orden PCI/810/2018, BOE-A-2018-10856).
-    // La lista de berlina-familiar mete igual el «Skoda Octavia iV».
-    test.fail();
+  test('HALLAZGO 5247 · bajo «Híbrido (HEV)» con etiqueta ECO no salen híbridos enchufables', async ({ page }) => {
+    // REPARADO 19/11/2026: SUV mediano + HEV → «Toyota RAV4 Hybrid · Kia Sorento Hybrid ·
+    // Mitsubishi Outlander PHEV». Un PHEV de ≥ 40 km es «0 emisiones», no ECO (Orden PCI/810/2018,
+    // BOE-A-2018-10856, anexo II). La lista de berlina-familiar metía igual el «Skoda Octavia iV».
     await responder(page, HEV_SUV_MEDIANO);
     await expect(page.getByText('Híbrido (HEV)', { exact: true })).toBeVisible();
-    await expect(ejemplos(page)).not.toContainText('PHEV');
+    await expect(ejemplos(page)).toHaveText(/Toyota RAV4 Hybrid\s*Kia Sorento Hybrid$/);
+    for (const seg of Object.keys(SEGMENTOS) as (keyof typeof SEGMENTOS)[]) {
+      expect(modelosDe(seg, 'hibrido').join(' '), seg).not.toMatch(/PHEV|\biV\b|enchufable/i);
+    }
   });
 
   test('HALLAZGO · una familia con 42.000 km por autopista y acceso indiferente puede salir en berlina', async ({ page }) => {

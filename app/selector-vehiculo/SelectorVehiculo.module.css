@@ -476,6 +476,7 @@
 
 /* Filas con color por tipo */
 .fila_electrico { border-left: 3px solid #22c55e; }
+.fila_phev { border-left: 3px solid var(--accent); }
 .fila_hibrido { border-left: 3px solid var(--secondary); }
 .fila_gasolina { border-left: 3px solid #f59e0b; }
 .fila_diesel { border-left: 3px solid #6b7280; }
