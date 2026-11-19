@@ -1057,8 +1057,9 @@ test.describe('CASO 6 (móvil)', () => {
 
   test('en un Pixel 7 se mide, se guarda y el parte sale con su aviso legal', async ({ page }) => {
     // Una medición de verdad no cabe en los 30 s por defecto: hay que esperar al micrófono,
-    // muestrear dos segundos de audio y superar el suelo de 3 s del registro.
-    test.setTimeout(60000);
+    // muestrear dos segundos de audio y superar el suelo de 3 s del registro (de audio medido:
+    // con los pitidos del dispositivo falso, 25-50 s de pared; ver la espera de abajo).
+    test.setTimeout(120000);
 
     // Aquí NO se inyecta oscilador: el micrófono es el dispositivo falso de Chromium, una
     // pista de verdad sobre la que se puede exigir readyState === 'live'.
@@ -1108,7 +1109,13 @@ test.describe('CASO 6 (móvil)', () => {
     expect(medio.noCeros, 'el analizador no está recibiendo audio').toBeGreaterThan(0);
     expect(medio.pico, 'el audio que entra es silencio digital').toBeGreaterThan(0);
 
-    await page.waitForTimeout(3000);
+    // Se espera a que la APP lleve los 3 s mínimos de audio medido, no al reloj de pared: el
+    // dispositivo falso entrega pitidos separados por silencio digital, y desde el hallazgo 3610
+    // (19/11/2026) ese silencio no cuenta como medido. Solo suman los fotogramas del pitido
+    // (~6-12 % del tiempo, ver CASO 3), así que los 3 s piden entre 25 y 50 s de pared.
+    await expect
+      .poll(() => segundosDeApp(page), { timeout: 75000, message: 'la sesión no llegó a 3 s de audio medido' })
+      .toBeGreaterThanOrEqual(3);
     await page.getByRole('button', { name: /Detener y guardar/i }).tap();
     await expect(filasRegistro(page)).toHaveCount(1);
     // Al detener, el micrófono queda cerrado también en móvil
@@ -2976,44 +2983,48 @@ test.describe('inspector 28/10/2026', () => {
   });
 
   /*
-   * HALLAZGO (inspector 28/10/2026) · calculo, medio — tras un silencio a media sesión, el MÍNIMO
-   * graba las ventanas de análisis a medio llenar. Es el artefacto que la app descarta al ARRANCAR
-   * (FOTOGRAMAS_ESTABILIZACION: «Con un tono constante de 61,0 dB(A) el mínimo salía 39,5 solo
-   * por esas primeras ventanas»), pero que a media sesión no descarta: las ventanas que mezclan
-   * tono y ceros —al enmudecer y al volver— entran en el resumen. Medido el 28/10/2026 con el
-   * CASO 17: mínimo 42,3 (con rampas de 20 ms, 44,8) en una sala que no bajó de 61,0, y queda en
-   * la fila, el CSV y el parte. Mientras dura el silencio, además, la lectura grande se queda
-   * congelada en la última de esas ventanas (47,7 · «Silencioso») y el aviso dice «estos 0,0
-   * dB(A) no son una medición» con otra cifra en pantalla.
-   * Mide: el mínimo de la fila es el de la señal, 60,97 (calculado arriba).
+   * HALLAZGO 3609 (inspector 28/10/2026) · calculo, medio — REPARADO el 19/11/2026. Tras un
+   * silencio a media sesión, el MÍNIMO grababa las ventanas de análisis a medio llenar. Es el
+   * artefacto que la app descarta al ARRANCAR (FOTOGRAMAS_ESTABILIZACION), pero que a media sesión
+   * no descartaba: las ventanas que mezclan tono y ceros —al enmudecer y al volver— entraban en el
+   * resumen. Medido el 28/10/2026 con el CASO 17: mínimo 42,3 (con rampas de 20 ms, 44,8) en una
+   * sala que no bajó de 61,0. Mientras duraba el silencio, la lectura grande se quedaba congelada
+   * en la última de esas ventanas (47,7 · «Silencioso») con el aviso «estos 0,0 dB(A) no son una
+   * medición». Ahora una ventana con un tramo de ceros exactos en un extremo no toca nada, y al
+   * avisar la lectura baja a 0,0.
+   * Mide: el mínimo de la fila es el de la señal, 60,97 (calculado arriba), y durante el silencio
+   * la lectura es la que nombra el aviso.
    */
-  test('HALLAZGO (inspector 28/10/2026) — tras un silencio a media sesión el mínimo graba la ventana a medio llenar', async ({
+  test('HALLAZGO 3609 (inspector 28/10/2026, REPARADO) — tras un silencio a media sesión el mínimo no graba la ventana a medio llenar', async ({
     page,
   }) => {
-    test.fail();
     test.setTimeout(90000);
     const s = await medirConSilencioEnMedio(page);
     expect(
       s.guardada.minDb,
       `fila con mín ${s.guardada.minDb.toFixed(1)}; lectura durante el silencio «${s.lecturaDuranteSilencio}»`,
     ).toBeCloseTo(60.97, 0);
+    // El panel dice lo mismo que la fila. Queda un residuo de 0,1 dB en 1 de cada 3 ejecuciones
+    // (60,9: alguna ventana del borde del corte que no llega a 16 ceros seguidos), dentro del
+    // medio decibelio de la medida del hallazgo; antes era 42,3.
+    expect(aNúmero(s.panel.min)).toBeGreaterThanOrEqual(60.5);
+    expect(s.alertaDuranteSilencio).toContain('estos 0,0 dB(A) no son una medición');
+    expect(s.lecturaDuranteSilencio).toBe('0,0');
   });
 
   /*
-   * HALLAZGO (inspector 28/10/2026) · calculo, medio — los segundos de silencio digital a media
-   * sesión cuentan como MEDIDOS. En measureLoop, `tiempoMedidoRef += cubierto` va ANTES de la
-   * guarda de los ceros, así que el fotograma que se salta «sin tocar ninguna estadística» sí toca
-   * la duración. Es la forma del hallazgo 1700 por otra puerta: el LAeq no cubre ese tramo (bien),
-   * pero la fila dice que sí, y no lo avisa como avisa los huecos sin fotogramas («No cuentan…»).
-   * En pantalla la duración se queda quieta durante el silencio y al volver salta de golpe.
-   * Medido el 28/10/2026 (4 s de silencio en 13,45 s de pared): fila de «13 s» (13,50) con un LAeq
-   * que cubre ~9,5 s, y aviso «Medición guardada en el registro de este navegador.» a secas.
+   * HALLAZGO 3610 (inspector 28/10/2026) · calculo, medio — REPARADO el 19/11/2026. Los segundos
+   * de silencio digital a media sesión contaban como MEDIDOS. En measureLoop, `tiempoMedidoRef +=
+   * cubierto` iba ANTES de la guarda de los ceros, así que el fotograma que se salta «sin tocar
+   * ninguna estadística» sí tocaba la duración. Es la forma del hallazgo 1700 por otra puerta: el
+   * LAeq no cubre ese tramo (bien), pero la fila decía que sí. Medido el 28/10/2026 (4 s de
+   * silencio en 13,45 s de pared): fila de «13 s» (13,50) con un LAeq que cubre ~9,5 s. Ahora solo
+   * suma el fotograma con audio de verdad.
    * Mide: de los 6 s de silencio, al menos 4,5 no figuran en la duración anotada.
    */
-  test('HALLAZGO (inspector 28/10/2026) — los segundos de silencio digital a media sesión cuentan como medidos', async ({
+  test('HALLAZGO 3610 (inspector 28/10/2026, REPARADO) — los segundos de silencio digital a media sesión no cuentan como medidos', async ({
     page,
   }) => {
-    test.fail();
     test.setTimeout(90000);
     const s = await medirConSilencioEnMedio(page);
     expect(
@@ -3092,10 +3103,10 @@ test.describe('inspector 28/10/2026', () => {
    * audio» («en uso por otra aplicación»). AbortError cae en el mismo texto.
    * Mide: el aviso no habla de https y sí de que el micrófono está en uso.
    */
-  test('HALLAZGO (inspector 28/10/2026) — con el micrófono ocupado por otra aplicación, el aviso manda a revisar el https', async ({
+  // REPARADO el 19/11/2026 (hallazgo 3611): NotReadableError y AbortError tienen su aviso.
+  test('HALLAZGO 3611 (inspector 28/10/2026, REPARADO) — con el micrófono ocupado por otra aplicación, el aviso lo dice y no manda a revisar el https', async ({
     page,
   }) => {
-    test.fail();
     await page.addInitScript(() => {
       navigator.mediaDevices.getUserMedia = () =>
         Promise.reject(new DOMException('Could not start audio source', 'NotReadableError'));
@@ -3105,8 +3116,8 @@ test.describe('inspector 28/10/2026', () => {
     await page.getByRole('button', { name: /Iniciar medición/i }).click();
     const aviso = page.locator('[class*="meterPanel"] [role="alert"]');
     await expect(aviso).toBeVisible();
-    await expect.soft(aviso).not.toContainText('https://');
-    await expect.soft(aviso).toContainText(/en uso|otra aplicaci[óo]n|ocupado/);
+    await expect(aviso).not.toContainText('https://');
+    await expect(aviso).toContainText('El micrófono está en uso por otra aplicación');
   });
 
   /*
@@ -3118,10 +3129,10 @@ test.describe('inspector 28/10/2026', () => {
    * disposición desde 80 dB(A). La celda de la fila 60–85 los contradice a los tres.
    * Mide: la celda «Exposición segura» de la fila 60–85 no dice «Ilimitada» a secas.
    */
-  test('HALLAZGO (inspector 28/10/2026) — la tabla comparativa da por ilimitada la exposición a 60–85 dB que la página limita', async ({
+  // REPARADO el 19/11/2026 (hallazgo 3612): la celda sigue a la tarjeta y a la regla NIOSH.
+  test('HALLAZGO 3612 (inspector 28/10/2026, REPARADO) — la tabla comparativa no da por ilimitada la exposición a 60–85 dB que la página limita', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     // Control: lo que dice el resto de la página
     const tarjeta = page.locator('[class*="contentCard"]', { hasText: 'Salud auditiva' });
@@ -3132,6 +3143,8 @@ test.describe('inspector 28/10/2026', () => {
       .locator('td')
       .nth(2);
     await expect(exposicion).not.toContainText(/^Ilimitada/);
+    // 8 h a 85 dB y el doble por cada 3 dB menos: 16 h a 82 dB
+    await expect(exposicion).toContainText('16 h a 82 dB y 8 h a 85 dB');
   });
 
   /*

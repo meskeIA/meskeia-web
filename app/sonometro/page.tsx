@@ -175,6 +175,51 @@ const FOTOGRAMAS_SIN_SENAL_AVISO = 120;
 const HUECO_AVISO_MS = 1000;
 
 /**
+ * Muestras nulas seguidas a partir de las cuales un tramo se toma por silencio digital y sale del
+ * cálculo del nivel (ver `measureLoop`, hallazgo 3609). Con 64, una ventana cortada a menos de 64
+ * muestras del borde perdía hasta un 3 % de energía y el mínimo bajaba a 60,8-60,9 con un tono de
+ * 60,97; con 16 la pérdida máxima es de 0,03 dB. Excluir unas pocas muestras casi nulas de un
+ * micrófono real no mueve su nivel.
+ */
+const CEROS_VENTANA_PARCIAL = 16;
+
+/** Muestras con audio que tiene que traer una ventana para dar un nivel (~1,4 ms). */
+const MUESTRAS_MINIMAS_NIVEL = 64;
+
+/**
+ * Por debajo de esto una muestra cuenta como cero (−120 dBFS). El silencio digital llega como
+ * ceros exactos, pero el remuestreo del medio puede dejar una cola de valores ínfimos en el
+ * borde; el ruido de fondo de un micrófono real, incluso de 24 bits, queda muy por encima.
+ */
+const UMBRAL_CERO = 1e-6;
+
+/**
+ * Media de los cuadrados de la ventana SIN sus tramos de silencio digital (CEROS_VENTANA_PARCIAL
+ * muestras nulas seguidas o más), y cuántas muestras quedan. Un tramo así no es sonido de la sala
+ * sino ausencia de audio: el micrófono se silenció o acaba de volver dentro de la ventana, o el
+ * medio cortó un instante. Promediarlo con la señal daba un RMS menor que el de la sala, que a
+ * media sesión entraba en el mínimo (hallazgo 3609: 42,3 con un tono constante de 61,0).
+ */
+function energiaSinSilencioDigital(ventana: Float32Array): { media: number; validas: number } {
+  let suma = 0;
+  let excluidas = 0;
+  let seguidos = 0;
+  for (let i = 0; i < ventana.length; i++) {
+    const v = ventana[i];
+    suma += v * v;
+    if (Math.abs(v) < UMBRAL_CERO) {
+      seguidos += 1;
+    } else {
+      if (seguidos >= CEROS_VENTANA_PARCIAL) excluidas += seguidos;
+      seguidos = 0;
+    }
+  }
+  if (seguidos >= CEROS_VENTANA_PARCIAL) excluidas += seguidos;
+  const validas = ventana.length - excluidas;
+  return { media: validas > 0 ? suma / validas : 0, validas };
+}
+
+/**
  * Ganancia de la ponderación A a una frecuencia, en dB (IEC 61672-1).
  *
  * La app rotula su estadística principal «LAeq» y todo su bloque educativo remite a límites
@@ -265,6 +310,8 @@ export default function SonometroPage() {
   const ventanaSRef = useRef(0);
   // Fotogramas CON AUDIO ya leídos: los primeros no cuentan para las estadísticas
   const fotogramasRef = useRef(0);
+  /** Corrección A de la última ventana sin silencio digital; null hasta la primera (hallazgo 3609) */
+  const correccionLimpiaRef = useRef<number | null>(null);
   // La calibración se lee dentro del bucle sin recrearlo: si viviera en las
   // dependencias de calculateDb, cada ajuste del slider reiniciaría measureLoop.
   const calibracionRef = useRef(CALIBRACION_DEFECTO);
@@ -390,12 +437,9 @@ export default function SonometroPage() {
    * 30 dB» de la OMS para el cuarto de un bebé. Leyendo la MISMA señal del MISMO analizador
    * en float salen los valores exactos, así que el suelo era de la resolución elegida.
    */
-  const calculateDb = useCallback((dataArray: Float32Array): number => {
-    let sum = 0;
-    for (let i = 0; i < dataArray.length; i++) {
-      sum += dataArray[i] * dataArray[i];
-    }
-    const rms = Math.sqrt(sum / dataArray.length);
+  const calculateDb = useCallback((mediaCuadrados: number): number => {
+    // La media llega ya sin los tramos de silencio digital (`energiaSinSilencioDigital`)
+    const rms = Math.sqrt(mediaCuadrados);
 
     // Convertir RMS a dB. El desplazamiento de calibración lo pone el usuario: los
     // micrófonos integrados no tienen sensibilidad conocida, así que sin un punto de
@@ -444,15 +488,6 @@ export default function SonometroPage() {
     ultimoFotogramaRef.current = ahora;
     // Lo que de verdad cubre la ventana leída en este fotograma
     const cubierto = Math.min(dtS, ventanaSRef.current);
-    if (sesionEnMarchaRef.current) {
-      // La duración corre desde el primer fotograma con audio, como antes; lo que cambia es que
-      // cada fotograma aporta solo lo que su ventana cubre, no el reloj de pared.
-      tiempoMedidoRef.current += cubierto;
-      if (dtS * 1000 > HUECO_AVISO_MS) {
-        sinMedirRef.current += dtS - cubierto;
-        setSegundosSinMedir(sinMedirRef.current);
-      }
-    }
 
     /**
      * Los primeros fotogramas no son una medición: son el búfer del analizador antes de que
@@ -481,6 +516,9 @@ export default function SonometroPage() {
        */
       fotogramasSinSenalRef.current += 1;
       if (fotogramasSinSenalRef.current === FOTOGRAMAS_SIN_SENAL_AVISO) {
+        // La lectura grande baja a 0,0, que es lo que el aviso dice que no es una medición: si no,
+        // se quedaba congelada en la última ventana leída (hallazgo 3609).
+        setCurrentDb(0);
         const pista = streamRef.current?.getAudioTracks()[0];
         setAvisoSinSenal(
           pista && (pista.muted || !pista.enabled)
@@ -497,9 +535,46 @@ export default function SonometroPage() {
       setAvisoSinSenal(null);
     }
 
+    /*
+     * Una ventana con un TRAMO de silencio digital está a medio llenar: el audio se cortó (ceros
+     * al final) o acaba de volver (ceros al principio) dentro de los ~46 ms que lee. Su RMS
+     * entero mezclaba señal y ceros y salía menor que el de la sala; es el mismo artefacto que se
+     * descarta al arrancar (FOTOGRAMAS_ESTABILIZACION), pero a media sesión, tras un micrófono
+     * silenciado o una llamada, entraba en el mínimo: 42,3 con un tono constante de 61,0
+     * (hallazgo 3609). Ahora el nivel sale solo de las muestras con audio; si quedan menos que un
+     * tramo, el fotograma no toca nada, igual que el que llega todo a cero.
+     */
+    const { media: mediaCuadrados, validas } = energiaSinSilencioDigital(dataArray);
+    if (validas < MUESTRAS_MINIMAS_NIVEL) {
+      animationRef.current = requestAnimationFrame(measureLoop);
+      return;
+    }
+
+    // Solo cuenta como medido el fotograma con audio de verdad: antes la duración se sumaba ANTES
+    // de saltar los ceros, y los segundos de silencio digital a media sesión figuraban como
+    // medidos sin que el LAeq los cubriera (hallazgo 3610, la forma del 1700 por otra puerta).
+    if (sesionEnMarchaRef.current) {
+      // La duración corre desde el primer fotograma con audio, como antes; lo que cambia es que
+      // cada fotograma aporta solo lo que su ventana cubre, no el reloj de pared.
+      tiempoMedidoRef.current += cubierto;
+      if (dtS * 1000 > HUECO_AVISO_MS) {
+        sinMedirRef.current += dtS - cubierto;
+        setSegundosSinMedir(sinMedirRef.current);
+      }
+    }
+
     // El instrumento entero trabaja en dB(A): es la magnitud que rotula («LAeq») y la que
     // usan los límites que su propio bloque educativo manda comparar.
-    const db = Math.max(0, Math.min(130, calculateDb(dataArray) + correccionPonderacionA()));
+    // La corrección A sale del espectro de la ventana entera, y en una ventana con un tramo de
+    // silencio digital el corte añade un espectro ancho que no es de la sala (bajaba el mínimo
+    // 0,1-0,2 dB tras un silencio). Ahí se usa la de la última ventana limpia, si la hay.
+    const ventanaLimpia = validas === dataArray.length;
+    const correccion =
+      ventanaLimpia || correccionLimpiaRef.current === null
+        ? correccionPonderacionA()
+        : correccionLimpiaRef.current;
+    if (ventanaLimpia) correccionLimpiaRef.current = correccion;
+    const db = Math.max(0, Math.min(130, calculateDb(mediaCuadrados) + correccion));
 
     setCurrentDb(db);
 
@@ -629,6 +704,7 @@ export default function SonometroPage() {
       ultimoFotogramaRef.current = 0;
       ventanaSRef.current = analyser.fftSize / audioContext.sampleRate;
       fotogramasRef.current = 0;
+      correccionLimpiaRef.current = null;
 
       setIsActive(true);
       setHayMedicion(true);
@@ -651,6 +727,14 @@ export default function SonometroPage() {
         setError('Permiso de micrófono denegado. Permite el acceso en la configuración del navegador.');
       } else if (err instanceof Error && err.name === 'NotFoundError') {
         setError('No se encontró ningún micrófono. Conecta uno e intenta de nuevo.');
+      } else if (err instanceof Error && (err.name === 'NotReadableError' || err.name === 'AbortError')) {
+        // El micrófono existe y hay permiso, pero el sistema no deja abrirlo: lo tiene otra
+        // aplicación (una llamada, una videoconferencia, el modo exclusivo de Windows). Antes caía
+        // en el consejo del https, que en meskeia.com no arregla nada (hallazgo 3611).
+        setError(
+          'El micrófono está en uso por otra aplicación (una llamada, una videoconferencia u otra grabación) ' +
+          'o el sistema no deja abrirlo. Ciérrala y vuelve a pulsar «Iniciar medición».'
+        );
       } else {
         // Tercer fallo previsible y el único que salía en crudo: sin `navigator.mediaDevices`
         // (HTTP sin cifrar, WebView antiguo) al usuario le llegaba el TypeError del motor de
@@ -1481,7 +1565,10 @@ export default function SonometroPage() {
                 <tr>
                   <td><strong>60–85 dB</strong></td>
                   <td>Tráfico urbano, restaurante animado, TV alta</td>
-                  <td>Ilimitada (sin daño auditivo), aunque el estrés aumenta</td>
+                  {/* Hallazgo 3612. Decía «Ilimitada (sin daño auditivo)», contra la tarjeta
+                      «Salud auditiva» (<70 dB indefinidamente, 85 dB máx. 8 h) y la regla NIOSH
+                      de la FAQ: 8 h a 85 dB y el doble por cada 3 dB menos → 16 h a 82 dB. */}
+                  <td>Sin límite por debajo de 70 dB; por encima, horas al día: 16 h a 82 dB y 8 h a 85 dB (criterio NIOSH)</td>
                   <td>Estrés, dificultad de concentración, posible aumento de tensión arterial</td>
                   <td>Zonas residenciales exteriores: 55–65 dB (Ley 37/2003)</td>
                 </tr>
