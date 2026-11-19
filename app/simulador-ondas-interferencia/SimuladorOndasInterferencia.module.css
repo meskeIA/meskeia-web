@@ -335,10 +335,14 @@
   border: 1.5px solid #e5e7eb;
 }
 
+/* El lienzo (400 × 267) pinta 12 m × 8 m con la misma escala en los dos ejes; la caja guarda esa
+   proporción para que los frentes circulares no salgan elípticos. Antes una altura fija (480 px en
+   escritorio, 360 px en móvil) estiraba el mapa ×1,10 y ×1,75 en vertical (hallazgo 4376). */
 .canvasInterference {
   width: 100%;
   max-width: 800px;
-  height: 480px;
+  height: auto;
+  aspect-ratio: 400 / 267;
   display: block;
   background: #ffffff;
   border-radius: 10px;
@@ -346,10 +350,80 @@
   image-rendering: pixelated;
 }
 
-@media (max-width: 768px) {
-  .canvasInterference {
-    height: 360px;
-  }
+/* Marcas de los SVG: el color se fija por tema (el atributo fill es el de claro). En oscuro el
+   fondo del SVG pasa a #1a1a1a y los nodos #111827 desaparecían (hallazgo 4373). */
+.marcaNodo {
+  fill: #111827;
+}
+
+line.marcaAntinodo {
+  stroke: #2563eb;
+}
+
+text.marcaAntinodo {
+  fill: #2563eb;
+}
+
+text.marcaLambda {
+  fill: #dc2626;
+}
+
+line.marcaLambda {
+  stroke: #dc2626;
+}
+
+text.marcaAmplitud {
+  fill: #1f7a77;
+}
+
+line.marcaAmplitud {
+  stroke: #1f7a77;
+}
+
+.rotuloExtremo {
+  fill: #6b7280;
+}
+
+[data-theme='dark'] .marcaNodo {
+  fill: #e5e7eb;
+}
+
+[data-theme='dark'] line.marcaAntinodo {
+  stroke: #93c5fd;
+}
+
+[data-theme='dark'] text.marcaAntinodo {
+  fill: #93c5fd;
+}
+
+[data-theme='dark'] text.marcaLambda {
+  fill: #f87171;
+}
+
+[data-theme='dark'] line.marcaLambda {
+  stroke: #f87171;
+}
+
+[data-theme='dark'] text.marcaAmplitud {
+  fill: #48a9a6;
+}
+
+[data-theme='dark'] line.marcaAmplitud {
+  stroke: #48a9a6;
+}
+
+[data-theme='dark'] .rotuloExtremo {
+  fill: #9ca3af;
+}
+
+/* Bajo la tabla de resultados: el tiempo simulado va fuera de la región viva, que si no se
+   relee entera en cada fotograma (hallazgo 4372). */
+.filaTiempo {
+  border-top: 1px solid #dbeafe;
+}
+
+[data-theme='dark'] .filaTiempo {
+  border-color: #1e3a5f;
 }
 
 .waveGraph {
@@ -747,6 +821,14 @@
 [data-theme='dark'] .waveGraph {
   background: #1a1a1a;
   border-color: #374151;
+}
+
+[data-theme='dark'] .legendDotNodo {
+  background: #e5e7eb;
+}
+
+[data-theme='dark'] .legendDotAntinodo {
+  background: #93c5fd;
 }
 
 [data-theme='dark'] .canvasInterference {

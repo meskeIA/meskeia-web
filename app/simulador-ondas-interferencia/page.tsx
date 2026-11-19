@@ -117,6 +117,7 @@ function OndaViajeraSvg({ params, derivados, t }: OndaViajeraSvgProps) {
             y2={H - 30}
             stroke="#dc2626"
             strokeWidth={2}
+            className={styles.marcaLambda}
           />
           <line
             x1={lambdaStartPx}
@@ -125,6 +126,7 @@ function OndaViajeraSvg({ params, derivados, t }: OndaViajeraSvgProps) {
             y2={H - 25}
             stroke="#dc2626"
             strokeWidth={2}
+            className={styles.marcaLambda}
           />
           <line
             x1={lambdaEndPx}
@@ -133,6 +135,7 @@ function OndaViajeraSvg({ params, derivados, t }: OndaViajeraSvgProps) {
             y2={H - 25}
             stroke="#dc2626"
             strokeWidth={2}
+            className={styles.marcaLambda}
           />
           <text
             x={(lambdaStartPx + lambdaEndPx) / 2}
@@ -141,6 +144,7 @@ function OndaViajeraSvg({ params, derivados, t }: OndaViajeraSvgProps) {
             fontSize={12}
             fill="#dc2626"
             fontWeight={700}
+            className={styles.marcaLambda}
           >
             λ = {formatNumber(derivados.lambda, 2)} m
           </text>
@@ -152,10 +156,18 @@ function OndaViajeraSvg({ params, derivados, t }: OndaViajeraSvgProps) {
         y1={yMid - params.A * yScale}
         x2={20}
         y2={yMid + params.A * yScale}
-        stroke="#48A9A6"
+        stroke="#1f7a77"
         strokeWidth={2}
+        className={styles.marcaAmplitud}
       />
-      <text x={26} y={yMid - params.A * yScale + 12} fontSize={11} fill="#48A9A6" fontWeight={700}>
+      <text
+        x={26}
+        y={yMid - params.A * yScale + 12}
+        fontSize={11}
+        fill="#1f7a77"
+        fontWeight={700}
+        className={styles.marcaAmplitud}
+      >
         2A
       </text>
     </svg>
@@ -192,7 +204,8 @@ function InterferenciaCanvas({ params, t, showFuentes }: InterferenciaCanvasProp
     const W = canvas.width;
     const H = canvas.height;
 
-    // Dominio físico mostrado: x en [-6, 6] m, y en [0, 8] m (fuentes en la parte de abajo)
+    // Dominio físico mostrado: x en [-6, 6] m, y en [0, 8] m (fuentes en la parte de abajo). El
+    // lienzo es de 400 × 267 para que 12/(W−1) = 8/(H−1): la misma escala en los dos ejes.
     const xMin = -6;
     const xMax = 6;
     const yMin = 0;
@@ -263,7 +276,7 @@ function InterferenciaCanvas({ params, t, showFuentes }: InterferenciaCanvasProp
       ref={canvasRef}
       className={styles.canvasInterference}
       width={400}
-      height={240}
+      height={267}
       aria-label="Mapa 2D de interferencia"
     />
   );
@@ -398,13 +411,22 @@ function EstacionariaSvg({ params, derivados, t }: EstacionariaSvgProps) {
 
   const nodos: number[] = [];
   const antinodos: number[] = [];
+  // Nodos interiores: un cambio de signo entre dos muestras CONSECUTIVAS, situado por
+  // interpolación lineal. Antes se miraba s[i−1] frente a s[i+1], condición que cumplen las dos
+  // muestras que rodean cada cero: cada nodo salía dos veces y la numeración se inflaba
+  // (hallazgo 4369). Los extremos se añaden aparte, según la frontera.
+  for (let i = 0; i < sampleSpace.length - 1; i++) {
+    const s0 = sampleSpace[i] ?? 0;
+    const s1 = sampleSpace[i + 1] ?? 0;
+    if ((s0 > 0 && s1 <= 0) || (s0 < 0 && s1 >= 0)) {
+      const xRel = (i + s0 / (s0 - s1)) / Nsample;
+      if (xRel > 0.005 && xRel < 0.995) nodos.push(xRel);
+    }
+  }
   for (let i = 1; i < sampleSpace.length - 1; i++) {
     const a = sampleSpace[i - 1] ?? 0;
     const b = sampleSpace[i] ?? 0;
     const c = sampleSpace[i + 1] ?? 0;
-    if ((a > 0 && c < 0) || (a < 0 && c > 0)) {
-      nodos.push(i / Nsample);
-    }
     const absA = Math.abs(a);
     const absB = Math.abs(b);
     const absC = Math.abs(c);
@@ -468,7 +490,7 @@ function EstacionariaSvg({ params, derivados, t }: EstacionariaSvgProps) {
         const xPx = padX + xRel * innerW;
         return (
           <g key={`nodo-${idx}`}>
-            <circle cx={xPx} cy={yMid} r={5} fill="#111827" />
+            <circle cx={xPx} cy={yMid} r={5} fill="#111827" className={styles.marcaNodo} />
             <text
               x={xPx}
               y={yMid + 22}
@@ -476,6 +498,7 @@ function EstacionariaSvg({ params, derivados, t }: EstacionariaSvgProps) {
               fontSize={10}
               fill="#111827"
               fontWeight={700}
+              className={styles.marcaNodo}
             >
               N{idx + 1}
             </text>
@@ -494,6 +517,7 @@ function EstacionariaSvg({ params, derivados, t }: EstacionariaSvgProps) {
               y2={yMid + 6}
               stroke="#2563eb"
               strokeWidth={2}
+              className={styles.marcaAntinodo}
             />
             <line
               x1={xPx - 6}
@@ -502,6 +526,7 @@ function EstacionariaSvg({ params, derivados, t }: EstacionariaSvgProps) {
               y2={yMid - 6}
               stroke="#2563eb"
               strokeWidth={2}
+              className={styles.marcaAntinodo}
             />
             <text
               x={xPx}
@@ -510,6 +535,7 @@ function EstacionariaSvg({ params, derivados, t }: EstacionariaSvgProps) {
               fontSize={10}
               fill="#2563eb"
               fontWeight={700}
+              className={styles.marcaAntinodo}
             >
               A{idx + 1}
             </text>
@@ -538,11 +564,25 @@ function EstacionariaSvg({ params, derivados, t }: EstacionariaSvgProps) {
           strokeWidth={4}
         />
       )}
-      {/* Borde tubo abierto / extremo libre: marcador discreto */}
+      {/* Rótulo de cada extremo del tubo, sobre su extremo: el izquierdo es siempre abierto y el
+          derecho, abierto o cerrado (donde está el tapón y el nodo). Antes «cerrado» se escribía
+          a la izquierda, encima del antinodo del extremo abierto (hallazgo 4371). */}
       {(params.frontera === 'tubo-abierto' || params.frontera === 'tubo-cerrado') && (
-        <text x={padX} y={20} fontSize={10} fill="#6b7280">
-          {params.frontera === 'tubo-cerrado' ? 'cerrado' : 'abierto'}
-        </text>
+        <g>
+          <text x={padX} y={20} fontSize={10} fill="#6b7280" className={styles.rotuloExtremo}>
+            abierto
+          </text>
+          <text
+            x={W - padX}
+            y={20}
+            fontSize={10}
+            textAnchor="end"
+            fill="#6b7280"
+            className={styles.rotuloExtremo}
+          >
+            {params.frontera === 'tubo-cerrado' ? 'cerrado' : 'abierto'}
+          </text>
+        </g>
       )}
     </svg>
   );
@@ -780,7 +820,8 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className={styles.resultBlock} role="status" aria-live="polite" aria-atomic="true">
+              <div className={styles.resultBlock}>
+               <div role="status" aria-live="polite" aria-atomic="true">
                 <h3 className={styles.resultTitle}>Magnitudes derivadas</h3>
                 <div className={styles.resultRow}>
                   <span className={styles.resultLabel}>Longitud de onda λ = v/f</span>
@@ -806,7 +847,9 @@ export default function Page() {
                     {formatNumber(ondaDerivados.omega, 3)} rad/s
                   </span>
                 </div>
-                <div className={styles.resultRow}>
+               </div>
+                {/* Fuera de la región viva: avanza en cada fotograma (hallazgo 4372). */}
+                <div className={`${styles.resultRow} ${styles.filaTiempo}`}>
                   <span className={styles.resultLabel}>Tiempo simulado</span>
                   <span className={styles.resultValue}>{formatNumber(tOnda, 2)} s</span>
                 </div>
@@ -818,8 +861,10 @@ export default function Page() {
           {tab === 'interferencia' && (
             <div>
               <p className={styles.panelSubtitle}>
-                Dos fuentes coherentes S₁ y S₂ emiten ondas con la misma frecuencia. La superposición
-                crea zonas de interferencia constructiva (rojo) y destructiva (azul).
+                Dos fuentes coherentes S₁ y S₂ emiten ondas con la misma frecuencia. El mapa pinta el
+                desplazamiento en cada instante: rojo es cresta, azul es valle y blanco, desplazamiento
+                nulo. Las zonas de interferencia constructiva alternan rojo intenso y azul intenso; las
+                destructivas (líneas nodales) quedan siempre en blanco.
               </p>
 
               <div className={styles.presetsRow}>
@@ -955,7 +1000,8 @@ export default function Page() {
                 </div>
               </div>
 
-              <div className={styles.resultBlock} role="status" aria-live="polite" aria-atomic="true">
+              <div className={styles.resultBlock}>
+               <div role="status" aria-live="polite" aria-atomic="true">
                 <h3 className={styles.resultTitle}>Magnitudes derivadas</h3>
                 <div className={styles.resultRow}>
                   <span className={styles.resultLabel}>Longitud de onda λ</span>
@@ -972,7 +1018,9 @@ export default function Page() {
                     )}
                   </span>
                 </div>
-                <div className={styles.resultRow}>
+               </div>
+                {/* Fuera de la región viva: avanza en cada fotograma (hallazgo 4372). */}
+                <div className={`${styles.resultRow} ${styles.filaTiempo}`}>
                   <span className={styles.resultLabel}>Tiempo simulado</span>
                   <span className={styles.resultValue}>{formatNumber(tInterf, 2)} s</span>
                 </div>

@@ -18,21 +18,21 @@ import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliar
  * fronteras; la posición de nodos y antinodos; en el mapa, el eje central es máximo con Δφ = 0 y
  * línea nodal (blanca) con Δφ = π, y con d = 0 y Δφ = π se anula todo.
  *
- * HALLAZGOS ABIERTOS (test.fail, el test describe lo correcto):
- *   H1 (medio)  · Cada nodo interior se dibuja DOS veces y la numeración se infla: cuerda
- *                 fija-fija modo 3 → N1…N6 (son 4 = n+1, como dice la guía); modo 5 → N1…N10 (6).
- *   H2 (medio)  · La leyenda dice «constructiva (rojo) y destructiva (azul)»; el mapa pinta el
- *                 desplazamiento: el eje de máximo sale azul en el valle y lo destructivo es blanco.
- *   H3 (medio)  · Tubo abierto-cerrado: el rótulo «cerrado» va en el extremo ABIERTO (x = 30, sobre
- *                 el antinodo A1); el tapón y el nodo están en x = 770.
- *   H4 (medio)  · La región viva (role=status, aria-atomic) incluye «Tiempo simulado» y cambia
- *                 ~60 veces por segundo sin tocar nada: un lector de pantalla no calla.
- *   H5 (medio)  · Oscuro: nodos y rótulos N en #111827 sobre #1a1a1a (1,02:1), invisibles; A, λ y
- *                 «cerrado» por debajo de 4,5:1. Claro: «2A» en teal sobre #fafafa, 2,68:1.
+ * HALLAZGOS (test.fail los ABIERTOS; el test describe lo correcto):
+ *   H1 (medio, REPARADO 19/11, 4369) · Cada nodo interior se dibujaba DOS veces y la numeración se
+ *                 inflaba: cuerda fija-fija modo 3 → N1…N6 (son 4 = n+1, como dice la guía).
+ *   H2 (medio, REPARADO 19/11, 4370) · La leyenda decía «constructiva (rojo) y destructiva (azul)»;
+ *                 el mapa pinta el desplazamiento: el eje de máximo sale azul en el valle.
+ *   H3 (medio, REPARADO 19/11, 4371) · Tubo abierto-cerrado: el rótulo «cerrado» iba en el extremo
+ *                 ABIERTO (x = 30, sobre el antinodo A1); el tapón y el nodo están en x = 770.
+ *   H4 (medio, REPARADO 19/11, 4372) · La región viva (role=status, aria-atomic) incluía «Tiempo
+ *                 simulado» y cambiaba ~60 veces por segundo sin tocar nada.
+ *   H5 (medio, REPARADO 19/11, 4373) · Oscuro: nodos y rótulos N en #111827 sobre #1a1a1a (1,02:1),
+ *                 invisibles; A, λ y «cerrado» por debajo de 4,5:1. Claro: «2A» teal, 2,68:1.
  *   H6 (bajo)   · Pestañas sin aria-pressed ni role=tab/aria-selected; lienzo con aria-label sin
  *                 role=img; emojis de «Mejores prácticas» sin aria-hidden.
  *   H7 (bajo)   · Con A = 2 la onda viajera se sale del viewBox (y de −30 a 250 en 0-220) y se corta.
- *   H8 (medio)  · El mapa de interferencia deforma las distancias: 12 m × 8 m en un lienzo 5:3
+ *   H8 (medio, REPARADO 19/11, 4376) · El mapa de interferencia deforma las distancias: 12 m × 8 m en un lienzo 5:3
  *                 (escritorio, 11 %) que en móvil se estira a 308 × 360 px (×1,75 en vertical).
  *   H9 (bajo)   · Móvil 390 px: los rótulos del SVG (λ, N, A) quedan a 5-6 px de alto.
  *   H10 (bajo)  · FAQ escrita dos veces: el FAQPage y la FAQ visible preguntan lo mismo con
@@ -61,6 +61,11 @@ function valor(page: Page, rotulo: string): Locator {
     .locator('[role="status"]')
     .getByText(rotulo, { exact: true })
     .locator('xpath=following-sibling::span[1]');
+}
+
+/** «Tiempo simulado» va FUERA de la región viva (hallazgo 4372): se lee por su rótulo. */
+function tiempo(page: Page): Locator {
+  return page.getByText('Tiempo simulado', { exact: true }).locator('xpath=following-sibling::span[1]');
 }
 
 async function armonicos(page: Page): Promise<string[]> {
@@ -118,7 +123,6 @@ function casi(obtenido: number[], esperado: number[], tolerancia = 2): boolean {
 /** Contraste WCAG entre el fill (hex) de cada marca y el fondo pintado del SVG. */
 async function contrastesSvg(page: Page, selector: string): Promise<Record<string, number>> {
   return page.locator(selector).evaluate((svg) => {
-    const hex = (h: string): number[] => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
     const rgb = (c: string): number[] => (c.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
     const lum = ([r, g, b]: number[]): number => {
       const f = (c: number): number => {
@@ -132,17 +136,19 @@ async function contrastesSvg(page: Page, selector: string): Promise<Record<strin
       const y = lum(b);
       return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
     };
+    // El color PINTADO (getComputedStyle), no el atributo: desde la reparación del 4373 el
+    // atributo fill es el de claro y el tema oscuro lo cambia por CSS.
     const fondo = rgb(getComputedStyle(svg).backgroundColor);
     const res: Record<string, number> = {};
     for (const t of Array.from(svg.querySelectorAll('text'))) {
-      const fill = t.getAttribute('fill') ?? '';
-      if (!fill.startsWith('#')) continue;
+      const fill = getComputedStyle(t).fill;
+      if (!fill.startsWith('rgb')) continue;
       const clave = `texto «${(t.textContent ?? '').replace(/\d+$/, '#')}» ${fill}`;
-      if (!(clave in res)) res[clave] = ratio(hex(fill), fondo);
+      if (!(clave in res)) res[clave] = ratio(rgb(fill), fondo);
     }
     const c = svg.querySelector('circle');
-    const fillC = c?.getAttribute('fill') ?? '';
-    if (fillC.startsWith('#')) res[`círculo de nodo ${fillC}`] = ratio(hex(fillC), fondo);
+    const fillC = c ? getComputedStyle(c).fill : '';
+    if (fillC.startsWith('rgb')) res[`círculo de nodo ${fillC}`] = ratio(rgb(fillC), fondo);
     return res;
   });
 }
@@ -275,12 +281,16 @@ test.describe('Onda viajera', () => {
     await expect(page.locator('[role="status"]').filter({ hasText: /∞|No definido|NaN/ })).toHaveCount(0);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H4 · la región viva no debe cambiar sola: «Tiempo simulado» la hace hablar ~60 veces por segundo', async ({
+  test('HALLAZGO 4372 (09/11/2026, REPARADO) H4 · la región viva no cambia sola: «Tiempo simulado» va fuera de ella', async ({
     page,
   }) => {
-    // El bloque de resultados es role=status + aria-live=polite + aria-atomic=true y lleva dentro
-    // «Tiempo simulado», que avanza en cada fotograma. Medido: 59 cambios en 1 s sin tocar nada.
-    test.fail();
+    // El bloque de resultados era role=status + aria-live=polite + aria-atomic=true y llevaba dentro
+    // «Tiempo simulado», que avanza en cada fotograma: 59 cambios en 1 s sin tocar nada. Ahora el
+    // tiempo sigue en pantalla (y avanza) pero fuera de la región viva, en las dos pestañas.
+    const t0 = await tiempo(page).textContent();
+    expect(await cambiosDeRegionesVivasEn1s(page)).toBe(0);
+    await expect(tiempo(page)).not.toHaveText(t0 ?? '');
+    await pestana(page, 'Interferencia 2 fuentes', '#if-d');
     expect(await cambiosDeRegionesVivasEn1s(page)).toBe(0);
   });
 
@@ -338,14 +348,16 @@ test.describe('Interferencia de dos fuentes', () => {
     page,
   }) => {
     // d = 3, f = 1,5, v = 4 → λ = 8/3, k = 2,3562 rad/m; fuentes en (±1,5; 0,5) m; t = 0.
-    // Píxel (200, 185) → (x, y) = (0,015; 1,8075) m: r₁ ≈ r₂ ≈ 1,99 m, k·r ≈ 3π/2 → suma
-    // A·(sin kr₁/√r₁ + sin kr₂/√r₂) = −1,417 → norma −0,708 → rgb(74, 74, 255), valle.
-    // Píxel (200, 130) → y = 3,6485 m: suma +1,0008 → norma 0,500 → rgb(255, 127, 127), cresta.
+    // Lienzo 400 × 267 desde el 4376 (12 m × 8 m a la misma escala): x = −6 + px·12/399,
+    // y = (266 − py)·8/266.
+    // Píxel (200, 206) → (x, y) = (0,015; 1,8045) m: r₁ = 1,9993, r₂ = 1,9766 m, k·r ≈ 3π/2 → suma
+    // A·(sin kr₁/√r₁ + sin kr₂/√r₂) = −0,7072 − 0,7102 = −1,417 → norma −0,709 → rgb(74, 74, 255), valle.
+    // Píxel (200, 145) → y = 3,6391 m: suma +1,0095 → norma 0,505 → rgb(255, 126, 126), cresta.
     await page.getByRole('button', { name: 'Pausar' }).click();
     await page.getByRole('button', { name: 'Reiniciar tiempo' }).click();
-    await expect(valor(page, 'Tiempo simulado')).toHaveText('0,00 s');
-    await expect.poll(async () => casi(await pixel(page, 200, 185), [74, 74, 255])).toBe(true);
-    await expect.poll(async () => casi(await pixel(page, 200, 130), [255, 127, 127])).toBe(true);
+    await expect(tiempo(page)).toHaveText('0,00 s');
+    await expect.poll(async () => casi(await pixel(page, 200, 206), [74, 74, 255])).toBe(true);
+    await expect.poll(async () => casi(await pixel(page, 200, 145), [255, 126, 126])).toBe(true);
     // Δφ = π: en el eje r₁ = r₂ y las dos ondas llegan en oposición → 0 → blanco (≥ 250)
     await page.getByRole('button', { name: /Fuentes opuestas/ }).click();
     await expect(page.locator('label[for="if-dphi"]')).toContainText('3,14 rad');
@@ -366,27 +378,28 @@ test.describe('Interferencia de dos fuentes', () => {
     await expect(valor(page, 'Longitud de onda λ')).toHaveText('0,800 m'); // 4/5
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H2 · la leyenda no llama «destructiva» al azul, que es el valle de una zona constructiva', async ({
+  test('HALLAZGO 4370 (09/11/2026, REPARADO) H2 · la leyenda no llama «destructiva» al azul, que es el valle de una zona constructiva', async ({
     page,
   }) => {
     // El mapa pinta el desplazamiento (rojo cresta, azul valle, blanco 0: lo dice la escala
     // «Valle–Cresta» y el consejo de la FAQ «las líneas blancas son nodos»). El CASO 2 mide el eje
-    // de máximo en azul. Hoy el subtítulo dice «constructiva (rojo) y destructiva (azul)».
-    test.fail();
+    // de máximo en azul. El subtítulo decía «constructiva (rojo) y destructiva (azul)»; ahora
+    // describe lo que se pinta y dónde quedan lo constructivo y lo destructivo.
     await expect(page.getByText(/destructiva \(azul\)/)).toHaveCount(0);
+    await expect(page.getByText(/rojo es cresta, azul es valle y blanco, desplazamiento\s+nulo/)).toBeVisible();
+    await expect(page.getByText(/destructivas \(líneas nodales\) quedan siempre en blanco/)).toBeVisible();
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H8 · el mapa no deforma: un frente circular mide lo mismo en horizontal y en vertical', async ({
+  test('HALLAZGO 4376 (09/11/2026, REPARADO) H8 · el mapa no deforma: un frente circular mide lo mismo en horizontal y en vertical', async ({
     page,
   }) => {
     // Dominio 12 m × 8 m (3:2) en un lienzo 400 × 240 (5:3) pintado a 800 × 480: 66,7 px/m en x
-    // frente a 60 px/m en y. Con d = 0 el segundo anillo blanco (r = λ) queda ~11 % más ancho
-    // que alto.
-    test.fail();
+    // frente a 60 px/m en y. Con d = 0 el segundo anillo blanco (r = λ) quedaba ~11 % más ancho
+    // que alto. Ahora el lienzo es 400 × 267 y su caja guarda esa proporción.
     await page.getByRole('button', { name: /Mismo punto/ }).click();
     await page.getByRole('button', { name: 'Pausar' }).click();
     await page.getByRole('button', { name: 'Reiniciar tiempo' }).click();
-    await expect(valor(page, 'Tiempo simulado')).toHaveText('0,00 s');
+    await expect(tiempo(page)).toHaveText('0,00 s');
     const relacion = await anilloHorizontalEntreVertical(page);
     expect(relacion).toBeGreaterThan(0.94);
     expect(relacion).toBeLessThan(1.06);
@@ -476,38 +489,48 @@ test.describe('Ondas estacionarias', () => {
     await expect(valor(page, 'Longitud de onda λ')).toHaveText('1,333 m');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H1 · cada nodo se dibuja una vez: fija-fija modo 3 tiene 4 nodos (N1…N4)', async ({
+  test('HALLAZGO 4369 (09/11/2026, REPARADO) H1 · cada nodo se dibuja una vez: fija-fija modo 3 tiene 4 nodos (N1…N4)', async ({
     page,
   }) => {
-    // La guía: «Cada modo n tiene n+1 nodos». El detector marca nodo en i si s[i−1] y s[i+1]
-    // tienen signo opuesto, y eso se cumple en las DOS muestras que rodean cada cero: hoy N1…N6
+    // La guía: «Cada modo n tiene n+1 nodos». El detector marcaba nodo en i si s[i−1] y s[i+1]
+    // tenían signo opuesto, y eso se cumple en las DOS muestras que rodean cada cero: N1…N6
     // (modo 3), N1…N10 (modo 5), dos nodos en el tubo abierto modo 1 (es uno).
-    test.fail();
+    // Fija-fija modo 3, L = 1: nodos en x = 0, 1/3, 2/3 y 1 → cx = 30 + x·740 = 30; 276,67; 523,33; 770.
     await page.getByRole('button', { name: '3', exact: true }).click();
     const m = await marcas(page);
     expect(m.nodos).toHaveLength(4);
     expect(m.rotulosN).toEqual(['N1', 'N2', 'N3', 'N4']);
+    [30, 276.67, 523.33, 770].forEach((x, j) => expect(Math.abs(m.nodos[j] - x)).toBeLessThanOrEqual(1));
+    // Modo 5: n + 1 = 6 nodos.
+    await page.getByRole('button', { name: '5', exact: true }).click();
+    expect((await marcas(page)).rotulosN).toEqual(['N1', 'N2', 'N3', 'N4', 'N5', 'N6']);
+    // Tubo abierto-abierto modo 1: un solo nodo, en el centro (x = L/2 → cx = 400).
     await page.getByRole('button', { name: 'Tubo abierto-abierto' }).click();
     await page.getByRole('button', { name: '1', exact: true }).click();
-    expect((await marcas(page)).nodos).toHaveLength(1);
+    const abierto = await marcas(page);
+    expect(abierto.nodos).toHaveLength(1);
+    expect(Math.abs(abierto.nodos[0] - 400)).toBeLessThanOrEqual(1);
+    // Tubo abierto-cerrado modo 2: dos nodos (L/3 y el extremo cerrado).
+    await page.getByRole('button', { name: 'Tubo abierto-cerrado' }).click();
+    await page.getByRole('button', { name: '2', exact: true }).click();
+    expect((await marcas(page)).rotulosN).toEqual(['N1', 'N2']);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H3 · en el tubo abierto-cerrado, «cerrado» rotula el extremo cerrado (derecha)', async ({
+  test('HALLAZGO 4371 (09/11/2026, REPARADO) H3 · en el tubo abierto-cerrado, «cerrado» rotula el extremo cerrado (derecha)', async ({
     page,
   }) => {
-    // El tapón y el nodo están en x = 770 (extremo cerrado); el rótulo «cerrado» va en x = 30,
-    // sobre el antinodo A1 del extremo abierto.
-    test.fail();
+    // El tapón y el nodo están en x = 770 (extremo cerrado); el rótulo «cerrado» iba en x = 30,
+    // sobre el antinodo A1 del extremo abierto. Ahora cada extremo lleva su rótulo encima.
     await page.getByRole('button', { name: 'Tubo abierto-cerrado' }).click();
-    const x = Number(
-      await page.locator(SVG_ESTACIONARIA).locator('text', { hasText: /^cerrado$/ }).getAttribute('x'),
-    );
+    const svg = page.locator(SVG_ESTACIONARIA);
+    const x = Number(await svg.locator('text', { hasText: /^cerrado$/ }).getAttribute('x'));
     expect(x).toBeGreaterThan(400);
+    const xAbierto = Number(await svg.locator('text', { hasText: /^abierto$/ }).getAttribute('x'));
+    expect(xAbierto).toBeLessThan(400);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H5 · en oscuro los nodos se ven y los rótulos llegan a 4,5:1', async ({ page }) => {
+  test('HALLAZGO 4373 (09/11/2026, REPARADO) H5 · en oscuro los nodos se ven y los rótulos llegan a 4,5:1', async ({ page }) => {
     // #111827 sobre #1a1a1a = 1,02:1 (círculo y N); A #2563eb 3,3:1; «cerrado» #6b7280 3,5:1.
-    test.fail();
     await page.getByRole('button', { name: 'Tubo abierto-cerrado' }).click();
     await page.getByRole('button', { name: '2', exact: true }).click();
     await activarTema(page, 'dark');
@@ -518,13 +541,17 @@ test.describe('Ondas estacionarias', () => {
     }
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H5 · en claro el rótulo «2A» de la onda viajera llega a 4,5:1', async ({ page }) => {
-    // #48A9A6 (teal) a 11 px sobre #fafafa = 2,68:1
-    test.fail();
+  test('HALLAZGO 4373 (09/11/2026, REPARADO) H5 · en claro el rótulo «2A» de la onda viajera llega a 4,5:1, y en oscuro λ también', async ({ page }) => {
+    // #48A9A6 (teal) a 11 px sobre #fafafa = 2,68:1; en oscuro, λ #dc2626 sobre #1a1a1a = 3,6:1.
     await pestana(page, 'Onda viajera', '#ov-a');
     await prepararParaMedir(page);
     const c = await contrastesSvg(page, SVG_VIAJERA);
+    expect(Object.keys(c).some((k) => k.includes('«2A»')), 'mide el rótulo 2A').toBe(true);
     for (const [marca, ratio] of Object.entries(c)) expect(ratio, marca).toBeGreaterThanOrEqual(4.5);
+    await activarTema(page, 'dark');
+    await prepararParaMedir(page);
+    const o = await contrastesSvg(page, SVG_VIAJERA);
+    for (const [marca, ratio] of Object.entries(o)) expect(ratio, `oscuro: ${marca}`).toBeGreaterThanOrEqual(4.5);
   });
 });
 
@@ -610,15 +637,14 @@ test.describe('Móvil 390 px', () => {
     expect(altoN).toBeGreaterThanOrEqual(9);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H8 · en móvil el mapa de interferencia no se estira en vertical', async ({ page }) => {
+  test('HALLAZGO 4376 (09/11/2026, REPARADO) H8 · en móvil el mapa de interferencia no se estira en vertical', async ({ page }) => {
     // 12 m × 8 m pintados en 308 × 360 px: 25,7 px/m en x y 45 px/m en y (×1,75).
-    test.fail();
     await page.getByRole('button', { name: 'Interferencia 2 fuentes', exact: true }).tap();
     await esperarHidratacion(page, ['#if-d']);
     await page.getByRole('button', { name: /Mismo punto/ }).tap();
     await page.getByRole('button', { name: 'Pausar' }).tap();
     await page.getByRole('button', { name: 'Reiniciar tiempo' }).tap();
-    await expect(valor(page, 'Tiempo simulado')).toHaveText('0,00 s');
+    await expect(tiempo(page)).toHaveText('0,00 s');
     const relacion = await anilloHorizontalEntreVertical(page);
     expect(relacion).toBeGreaterThan(0.94);
     expect(relacion).toBeLessThan(1.06);
