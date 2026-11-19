@@ -312,6 +312,13 @@ export default function SonometroPage() {
   const fotogramasRef = useRef(0);
   /** Corrección A de la última ventana sin silencio digital; null hasta la primera (hallazgo 3609) */
   const correccionLimpiaRef = useRef<number | null>(null);
+  /**
+   * Mínimo y máximo de la sesión, en refs como la energía del LAeq: al detener, la fila se anota
+   * con ellos y no con el estado del último render, que podía ir un fotograma por detrás del
+   * panel (fila 78,0 con el panel en 78,1; CASO 13, visto el 19/11/2026).
+   */
+  const minRef = useRef(Infinity);
+  const maxRef = useRef(0);
   // La calibración se lee dentro del bucle sin recrearlo: si viviera en las
   // dependencias de calculateDb, cada ajuste del slider reiniciaría measureLoop.
   const calibracionRef = useRef(CALIBRACION_DEFECTO);
@@ -596,8 +603,10 @@ export default function SonometroPage() {
       return;
     }
 
-    setMinDb(prev => Math.min(prev, db));
-    setMaxDb(prev => Math.max(prev, db));
+    minRef.current = Math.min(minRef.current, db);
+    maxRef.current = Math.max(maxRef.current, db);
+    setMinDb(minRef.current);
+    setMaxDb(maxRef.current);
 
     // LAeq — nivel continuo equivalente. Es un promedio ENERGÉTICO, no aritmético:
     // hay que pasar cada lectura a energía (10^(dB/10)), promediar esas energías y
@@ -691,6 +700,8 @@ export default function SonometroPage() {
       setMinDb(Infinity);
       setMaxDb(0);
       setLaeq(0);
+      minRef.current = Infinity;
+      maxRef.current = 0;
       setDuracion(0);
       setSegundosSinMedir(0);
       energiaMediaRef.current = 0;
@@ -796,12 +807,19 @@ export default function SonometroPage() {
       return;
     }
 
+    // Las cifras de la fila salen de las refs del bucle, y el panel se iguala a ellas: el estado
+    // del último render podía ir un fotograma por detrás (ver `minRef`)
+    const laeqFinal = 10 * Math.log10(Math.max(energiaMediaRef.current, 1e-10));
+    setLaeq(laeqFinal);
+    setMinDb(minRef.current);
+    setMaxDb(maxRef.current);
+    setDuracion(segundos);
     const sesion: SesionRegistrada = {
       id: new Date().toISOString(),
       duracionSegundos: segundos,
-      laeq,
-      minDb: minDb === Infinity ? 0 : minDb,
-      maxDb,
+      laeq: laeqFinal,
+      minDb: minRef.current === Infinity ? 0 : minRef.current,
+      maxDb: maxRef.current,
       calibracion,
       nota: '',
     };
@@ -921,6 +939,8 @@ export default function SonometroPage() {
     setMinDb(Infinity);
     setMaxDb(0);
     setLaeq(0);
+    minRef.current = Infinity;
+    maxRef.current = 0;
     setDuracion(0);
     setSegundosSinMedir(0);
     energiaMediaRef.current = 0;
