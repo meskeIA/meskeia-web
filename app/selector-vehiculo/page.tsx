@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorVehiculo.module.css';
 import {
   MeskeiaLogo,
@@ -11,7 +11,8 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { formatCurrency } from '@/lib';
+import { formatCurrency, enfocarALaVista } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 import {
   PREGUNTAS,
@@ -42,7 +43,20 @@ export default function SelectorVehiculo() {
     setRespuestas((prev) => ({ ...prev, [paso]: valor }));
   }
 
+  /**
+   * Doble clic (hallazgo 5244): el 2.º clic de «Empezar el test» caía sobre «Más de 35.000 km» y lo
+   * dejaba marcado (42.000 km/año en el cálculo) sin que nadie lo eligiera. Receta de la familia:
+   * useGuardaRafaga, en cada manejador que cambia de pantalla.
+   */
+  const marcarCambioPantalla = useGuardaRafaga();
+
+  function empezar() {
+    marcarCambioPantalla();
+    setPaso(1);
+  }
+
   function siguiente() {
+    marcarCambioPantalla();
     if (paso < TOTAL) {
       setPaso((p) => p + 1);
     } else {
@@ -52,14 +66,36 @@ export default function SelectorVehiculo() {
   }
 
   function anterior() {
+    marcarCambioPantalla();
     setPaso((p) => Math.max(0, p - 1));
   }
 
   function reiniciar() {
+    marcarCambioPantalla();
     setPaso(0);
     setRespuestas({});
     setResultado(null);
   }
+
+  /**
+   * Foco (hallazgo 5243): «Empezar», «Siguiente» (deshabilitado en la pregunta nueva, aún sin
+   * respuesta), «Ver mi recomendación» y «Repetir el test» se desmontan o se apagan al pulsarlos, y
+   * el foco caía a <body>: el siguiente Tab volvía al logo sin oír la pregunta nueva. Ahora va al
+   * enunciado de cada pregunta, al título del resultado y, al volver al principio, a «Empezar».
+   * En la carga no se mueve (vistaRef empieza en null).
+   */
+  const preguntaRef = useRef<HTMLHeadingElement>(null);
+  const resultadoRef = useRef<HTMLHeadingElement>(null);
+  const empezarRef = useRef<HTMLButtonElement>(null);
+  const vistaRef = useRef<number | null>(null);
+  useEffect(() => {
+    const venia = vistaRef.current;
+    vistaRef.current = paso;
+    if (venia === null || venia === paso) return;
+    if (paso === 0) enfocarALaVista(empezarRef.current);
+    else if (paso <= TOTAL) enfocarALaVista(preguntaRef.current);
+    else enfocarALaVista(resultadoRef.current);
+  }, [paso]);
 
   // ── Intro ──────────────────────────────────
 
@@ -99,7 +135,7 @@ export default function SelectorVehiculo() {
               <li><span aria-hidden="true">💶</span> Comparativa de costes anuales y a 5 años</li>
               <li><span aria-hidden="true">⏱️</span> Solo 3 minutos</li>
             </ul>
-            <button type="button" className={styles.btnStart} onClick={() => setPaso(1)}>
+            <button type="button" className={styles.btnStart} onClick={empezar} ref={empezarRef}>
               Empezar el test
             </button>
           </div>
@@ -146,7 +182,9 @@ export default function SelectorVehiculo() {
             <div className={styles.preguntaIcon} aria-hidden="true">
               {preguntaActual.icon}
             </div>
-            <h2 className={styles.preguntaTexto}>{preguntaActual.pregunta}</h2>
+            <h2 className={styles.preguntaTexto} ref={preguntaRef} tabIndex={-1}>
+              {preguntaActual.pregunta}
+            </h2>
 
             <div className={styles.opcionesGrid}>
               {preguntaActual.opciones.map((opcion) => (
@@ -210,7 +248,9 @@ export default function SelectorVehiculo() {
         <MeskeiaLogo />
 
         <header className={styles.heroResultados}>
-          <h1 className={styles.heroTitleSm}>Tu recomendación personalizada</h1>
+          <h1 className={styles.heroTitleSm} ref={resultadoRef} tabIndex={-1}>
+            Tu recomendación personalizada
+          </h1>
           <p className={styles.heroSubtitleSm}>
             Basada en tu perfil de {resultado.kmAnuales.toLocaleString('es-ES')} km/año
           </p>

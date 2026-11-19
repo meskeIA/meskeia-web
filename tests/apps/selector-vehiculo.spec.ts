@@ -398,31 +398,46 @@ test.describe('selector-vehiculo — hallazgos (inspector 19/11/2026)', () => {
     expect(calcularRecomendacion(perfil(kmMedios)).segmentoKey).toBe('suv-familiar');
   });
 
-  test('HALLAZGO · tras «Empezar» y «Siguiente» el foco no se pierde en el body', async ({ page }) => {
-    // ABIERTO: el botón de inicio se desmonta y «Siguiente» queda deshabilitado en la pregunta nueva
-    // (aún sin responder): el foco cae a <body> y el siguiente Tab va al logo. Igual al ver el
-    // resultado y al repetir el test.
-    test.fail();
+  test('HALLAZGO 5243 · tras «Empezar», «Siguiente», el resultado y «Repetir» el foco no se pierde en el body', async ({ page }) => {
+    // REPARADO 19/11/2026: el botón de inicio se desmontaba y «Siguiente» quedaba deshabilitado en la
+    // pregunta nueva (aún sin responder): el foco caía a <body> y el siguiente Tab iba al logo. Igual
+    // al ver el resultado y al repetir el test. Ahora va al enunciado, al título del resultado y,
+    // de vuelta al principio, a «Empezar el test».
     await abrir(page);
     await page.getByRole('button', { name: 'Empezar el test' }).focus();
     await page.keyboard.press('Enter');
     await expect(page.getByText('Pregunta 1 de 13')).toBeVisible();
-    expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
+    const enunciado = page.getByRole('heading', { level: 2, name: PREGUNTAS[0].pregunta });
+    await expect(enunciado).toBeFocused();
+    // El siguiente Tab entra en las opciones, no vuelve al logo
+    await page.keyboard.press('Tab');
+    await expect(opciones(page).first()).toBeFocused();
     await opciones(page).nth(1).click();
     await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
     await page.keyboard.press('Enter');
     await expect(page.getByText('Pregunta 2 de 13')).toBeVisible();
-    expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
+    await expect(page.getByRole('heading', { level: 2, name: PREGUNTAS[1].pregunta })).toBeFocused();
+    // Resultado y «Repetir el test»
+    await responder(page, DIESEL_SIN_CARGA);
+    await expect(page.getByRole('heading', { level: 1, name: 'Tu recomendación personalizada' })).toBeFocused();
+    await page.getByRole('button', { name: 'Repetir el test' }).focus();
+    await page.keyboard.press('Enter');
+    const empezar = page.getByRole('button', { name: 'Empezar el test' });
+    await expect(empezar).toBeFocused();
+    await expect(empezar).toBeInViewport();
   });
 
-  test('HALLAZGO · un doble clic en «Empezar el test» no contesta la pregunta 1', async ({ page }) => {
-    // ABIERTO: el segundo clic cae sobre «Más de 35.000 km» y lo deja marcado (42.000 km/año en el
-    // cálculo) sin que el usuario lo haya elegido.
-    test.fail();
+  test('HALLAZGO 5244 · un doble clic en «Empezar el test» no contesta la pregunta 1', async ({ page }) => {
+    // REPARADO 19/11/2026: el segundo clic caía sobre «Más de 35.000 km» y lo dejaba marcado
+    // (42.000 km/año en el cálculo) sin que el usuario lo hubiera elegido. Ahora useGuardaRafaga.
     await abrir(page);
     await page.getByRole('button', { name: 'Empezar el test' }).dblclick();
     await expect(page.getByText('Pregunta 1 de 13')).toBeVisible();
     await expect(opciones(page).and(page.locator('[aria-pressed="true"]'))).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Siguiente pregunta' })).toBeDisabled();
+    // Un clic suelto sobre una opción sigue contestando
+    await opciones(page).nth(2).click();
+    await expect(opciones(page).nth(2)).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('HALLAZGO 5245 · los metadatos dicen las mismas 13 preguntas que la página', async ({ page }) => {
