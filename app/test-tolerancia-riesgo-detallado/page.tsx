@@ -832,8 +832,10 @@ export default function TestToleranciaRiesgoDetallado() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <div>
-                <strong>Adapta el perfil a tu edad</strong>
-                <p>Regla clásica: porcentaje en renta fija ≈ tu edad. Con 30 años: 30% RF. Con 60: 60% RF. Es una simplificación, pero útil como guía.</p>
+                {/* Hallazgo 5210 (decidido por el usuario en el cabo C0835): aquí iba la «regla clásica:
+                    % en renta fija ≈ tu edad», sin fuente y contra los repartos de la propia app. */}
+                <strong>Revisa el perfil cuando cambie tu horizonte</strong>
+                <p>El horizonte suele acortarse con la edad, y eso pesa en el perfil: repite el test cuando se acerque la fecha en que necesitarás el dinero.</p>
               </div>
             </div>
             <div className={styles.tipCard}>

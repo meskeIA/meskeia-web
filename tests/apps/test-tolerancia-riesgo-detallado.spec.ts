@@ -442,9 +442,10 @@ test.describe('hallazgos 18/11/2026', () => {
     expect(app.d).not.toMatch(/activos re$/);
   });
 
-  test('ABIERTO (medio) — la guía da la regla «% en renta fija ≈ tu edad» sin fuente ni origen', async ({ page }) => {
-    test.fail();
+  test('REPARADO 5210 (19/11/2026) — la guía da la regla «% en renta fija ≈ tu edad» sin fuente ni origen', async ({ page }) => {
+    // Retirada por decisión del usuario (cabo C0835): en su lugar, una frase sin regla numérica.
     await cargar(page);
+    await expect(page.getByText(/Regla clásica/)).toHaveCount(0);
     // CLAUDE.md §1.quinquies, señales 1 y 5: es la «regla 100-edad» del asesoramiento anglosajón,
     // presentada como «Regla clásica […] útil como guía».
     await expect(page.getByText(/porcentaje en renta fija ≈ tu edad/)).toHaveCount(0);
