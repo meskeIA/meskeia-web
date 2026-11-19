@@ -414,9 +414,9 @@ export default function TestZaritCuidadorPage() {
               que es crónico y acumulativo.
             </p>
             <p>
-              En España, se estima que hay más de 1,5 millones de cuidadores no profesionales,
-              mayoritariamente mujeres (83%), con una dedicación media superior a 10 horas diarias.
-              La sobrecarga del cuidador es un problema de salud pública reconocido.
+              Buena parte de los cuidados de larga duración los prestan familiares, mayoritariamente
+              mujeres, sin formación ni remuneración y durante muchas horas al día. La sobrecarga del
+              cuidador es un problema de salud pública reconocido.
             </p>
           </section>
 

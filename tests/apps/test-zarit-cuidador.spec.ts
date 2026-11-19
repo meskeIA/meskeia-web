@@ -346,8 +346,10 @@ test.describe('Test de Zarit — la puntuación y su nivel', () => {
     // discapacidad que viven en hogares) y «El 49,7% de las personas que recibían cuidados
     // señalaron ser atendidos durante ocho o más horas diarias»; ningún total de cuidadores.
     // Esperado: el párrafo que lleve esas cifras cita fuente y año, o las cifras se retiran.
-    test.fail();
+    // REPARADO (hallazgo 5262): se retiran las tres cifras; el párrafo queda sin números.
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    await expect(page.getByText(/La sobrecarga del\s+cuidador es un problema de salud pública reconocido/)).toHaveCount(1);
+    await expect(page.locator('p').filter({ hasText: /1,5 millones|83\s?%|10 horas diarias/ })).toHaveCount(0);
     const parrafos = page.locator('p').filter({ hasText: /1,5 millones|83\s?%|10 horas diarias/ });
     for (const texto of await parrafos.allTextContents()) {
       expect(texto, 'la cifra de cuidadores cita fuente y año').toMatch(
