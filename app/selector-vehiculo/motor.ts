@@ -20,6 +20,8 @@
  *   fijos: seguro 650 + ITV 35 + impuesto de circulación 120 = 805
  */
 
+import { formatCurrency, formatNumber } from '@/lib/formatters';
+
 // ─────────────────────────────────────────────
 // Tipos
 // ─────────────────────────────────────────────
@@ -63,6 +65,9 @@ export interface Resultado {
   descripcionMotor: string;
   costes: Record<TipoMotor, CostesMotorizacion>;
   kmAnuales: number;
+  /** Precio del kWh que usa la cifra del eléctrico, y de dónde sale: lo dice la nota (5240). */
+  precioKwh: number;
+  origenKwh: string;
   alertas: string[];
   razones: string[];
   mostrarSegundaMano: boolean;
@@ -267,6 +272,9 @@ export const MODELOS_REF: Record<SegmentoKey, Partial<Record<TipoMotor, string[]
     diesel: ['VW Touran TDI', 'Ford S-Max TDCi'],
   },
 };
+
+const SEGMENTOS_SUV: SegmentoKey[] = ['suv-compacto', 'suv-familiar', 'suv-mediano'];
+const SEGMENTOS_PEQUENOS: SegmentoKey[] = ['urbano', 'compacto-bc', 'compacto-c'];
 
 /** Ejemplos del mercado del motor recomendado, o ninguno si su segmento no tiene lista. */
 export function modelosDe(segmento: SegmentoKey, motor: TipoMotor): string[] {
@@ -524,8 +532,9 @@ export function calcularRecomendacion(r: Record<number, string>): Resultado {
       segmentoKey = 'suv-compacto';
     }
   } else if (viajeros === '3-4' && (esCarretera || conduccion === 'mixto')) {
-    // Familia + carretera → SUV familiar o berlina
-    segmentoKey = accesoImportante ? 'suv-familiar' : 'suv-familiar';
+    // Familia + carretera → SUV familiar o berlina, con la regla de los km altos de más abajo: hasta
+    // el 19/11/2026 las dos salidas eran 'suv-familiar' y la berlina no salía nunca (hallazgo 5249)
+    segmentoKey = kmAltos && esCarretera && !accesoImportante ? 'berlina-familiar' : 'suv-familiar';
   } else if (viajeros === '3-4' && esCiudad) {
     // Familia ciudad → compacto C si aparca en calle, SUV si garaje y acceso importa
     segmentoKey = aparcaCalle ? 'compacto-c' : accesoImportante ? 'suv-familiar' : 'compacto-c';
@@ -565,10 +574,13 @@ export function calcularRecomendacion(r: Record<number, string>): Resultado {
     motorPrincipal = 'phev';
     descripcionMotor =
       'Un Híbrido Enchufable (PHEV) es tu mejor opción: modo eléctrico en el día a día (50-80 km sin emitir) y motor térmico cuando se agota la batería o en los viajes largos, sin ansiedad de autonomía. Combina la etiqueta CERO con la flexibilidad total.';
-  } else if (kmAltos && esCarretera && anyos !== 'corto' && presupuesto !== 'bajo') {
+  } else if (kmAltos && esCarretera && anyos !== 'corto' && presupuesto !== 'bajo' && prioridad !== 'ahorro') {
+    // Con los consumos de la tabla el diésel no alcanza nunca al HEV (gasta 0,055 € menos cada
+    // 100 km y paga 100 € más de mantenimiento: empatarían a 181.818 km/año), así que a quien
+    // prioriza el coste de uso no se le recomienda, ni se dice que sea el más barato (hallazgo 5235)
     motorPrincipal = 'diesel';
     descripcionMotor =
-      'Con muchos kilómetros en carretera y varios años de uso, el diésel tiene el menor coste por km en autovía (4,5-6 L/100km), mayor autonomía y se amortiza bien a largo plazo.';
+      'Con muchos kilómetros en carretera y varios años de uso, el diésel gasta bastante menos combustible que la gasolina (5,5 L/100 km frente a 7,5 en la tabla) y tiene mucha autonomía. Si lo que más te importa es el coste de uso, mira la fila del híbrido: con estos consumos sale algo más barato.';
   } else if ((esCiudad || conduccion === 'mixto') && kmBajos && (sinCarga || soloPublico)) {
     motorPrincipal = 'hibrido';
     descripcionMotor =
@@ -589,6 +601,11 @@ export function calcularRecomendacion(r: Record<number, string>): Resultado {
     km === 'bajo' ? 8000 : km === 'medio' ? 15000 : km === 'alto' ? 27500 : 42000;
 
   const precioKwh = tieneCargaComoda ? 0.22 : soloPublico ? 0.38 : 0.45;
+  const origenKwh = tieneCargaComoda
+    ? 'carga en casa o en el trabajo'
+    : soloPublico
+      ? 'solo en cargadores públicos'
+      : 'sin punto de carga propio, toda la recarga en cargadores rápidos';
   const costes = calcularCostes(kmAnuales, precioKwh);
 
   // ── ALERTAS CONTEXTUALES ──────────────────────
@@ -611,8 +628,12 @@ export function calcularRecomendacion(r: Record<number, string>): Resultado {
     );
   }
   if (kmAltos && motorPrincipal === 'gasolina') {
+    // Las cifras salen de la tabla de al lado: hasta el 19/11/2026 era un rango fijo de 500-900 €
+    // que se quedaba por debajo de lo que la tabla calculaba (1093 € a 27.500 km; hallazgo 5239)
+    const ahorroHev = costes.gasolina.total - costes.hibrido.total;
+    const ahorroDiesel = costes.gasolina.total - costes.diesel.total;
     alertas.push(
-      '⛽ Con tus km anuales, la diferencia entre gasolina e híbrido/diésel puede suponer 500-900 € de ahorro al año. Compara el extra del precio inicial con el ahorro acumulado.'
+      `⛽ Con tus km anuales, según la tabla, un híbrido te ahorraría unos ${formatCurrency(ahorroHev)} al año de uso frente a la gasolina, y un diésel unos ${formatCurrency(ahorroDiesel)}. Compara ese ahorro con lo que cuestan de más al comprarlos.`
     );
   }
   if (anyos === 'largo' && motorPrincipal === 'diesel' && (zona === 'gran-ciudad' || zona === 'ciudad')) {
@@ -656,20 +677,24 @@ export function calcularRecomendacion(r: Record<number, string>): Resultado {
   }
   if (motorPrincipal === 'diesel' && kmAltos && esCarretera) {
     razones.push(
-      `${kmAnuales.toLocaleString('es-ES')} km/año en carretera → el diésel amortiza su coste inicial en 2-3 años`
+      `${kmAnuales.toLocaleString('es-ES')} km/año en carretera → el diésel gasta menos combustible que la gasolina (${formatCurrency(costes.diesel.combustible)} frente a ${formatCurrency(costes.gasolina.combustible)} al año en la tabla)`
     );
   }
   if (motorPrincipal === 'hibrido' && (sinCarga || soloPublico)) {
     razones.push('Sin punto de carga propio → el híbrido convencional es la opción más eficiente disponible');
   }
-  if (accesoMuyImportante) {
+  // Las razones de acceso, aparcamiento y medio ambiente solo salen si el resultado las cumple:
+  // hasta el 19/11/2026 se añadían por la respuesta, y a un urbano se le decía que se priorizaba
+  // el SUV, a un monovolumen que era compacto y a un diésel que maximizaba las cero emisiones (5238)
+  const esSuv = SEGMENTOS_SUV.includes(segmentoKey);
+  if (accesoMuyImportante && (esSuv || segmentoKey === 'monovolumen')) {
     razones.push(
       'Facilidad de entrada/salida muy importante → los SUV/crossover tienen 8-12 cm más de altura que los compactos'
     );
-  } else if (acceso === 'algo') {
+  } else if (acceso === 'algo' && esSuv) {
     razones.push('Facilidad de acceso relevante → se prioriza la altura de acceso del SUV frente al compacto');
   }
-  if (aparcaCalle) {
+  if (aparcaCalle && SEGMENTOS_PEQUENOS.includes(segmentoKey)) {
     razones.push('Aparcar habitualmente en calle → tamaño compacto más manejable para maniobrar');
   }
   if (viajeros === '5+') {
@@ -679,7 +704,13 @@ export function calcularRecomendacion(r: Record<number, string>): Resultado {
     razones.push('Zona rural → mayor altura al suelo mejora el paso por carreteras secundarias y accesos');
   }
   if (prioridad === 'planeta') {
-    razones.push('Prioridad medioambiental → se maximiza la eficiencia y/o cero emisiones en el uso cotidiano');
+    const porMotor: Partial<Record<TipoMotor, string>> = {
+      electrico: 'el eléctrico no emite gases por el tubo de escape',
+      phev: 'el PHEV circula sin emisiones mientras le dura la batería',
+      hibrido: 'el híbrido consume menos combustible que la gasolina y el diésel de la tabla',
+    };
+    const motivo = porMotor[motorPrincipal];
+    if (motivo) razones.push(`Prioridad medioambiental → ${motivo}`);
   }
 
   return {
@@ -688,10 +719,21 @@ export function calcularRecomendacion(r: Record<number, string>): Resultado {
     descripcionMotor,
     costes,
     kmAnuales,
+    precioKwh,
+    origenKwh,
     alertas,
     razones,
     mostrarSegundaMano: nuevoUsado === 'reciente' || nuevoUsado === 'indiferente',
   };
+}
+
+/**
+ * Los precios de la nota de la tabla, con el del kWh que de verdad usa la cifra del eléctrico:
+ * hasta el 19/11/2026 decía siempre «electricidad doméstica 0,22 €/kWh» aunque sin carga se
+ * calculara con 0,45 y con solo carga pública con 0,38 (hallazgo 5240).
+ */
+export function textoPrecios(r: Pick<Resultado, 'precioKwh' | 'origenKwh'>): string {
+  return `gasolina ${formatNumber(PRECIO_GASOLINA, 2)} €/L · diésel ${formatNumber(PRECIO_DIESEL, 2)} €/L · electricidad ${formatNumber(r.precioKwh, 2)} €/kWh (${r.origenKwh})`;
 }
 
 /** Motores de la tabla de costes: el PHEV solo cuando es el recomendado, junto al eléctrico. */

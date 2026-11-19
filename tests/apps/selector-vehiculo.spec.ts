@@ -1,6 +1,13 @@
 import { test, expect, type Page } from '@playwright/test';
 import { parseSpanishNumber } from '../../lib/formatters';
-import { calcularCostes, modelosDe, SEGMENTOS } from '../../app/selector-vehiculo/motor';
+import {
+  calcularCostes,
+  calcularRecomendacion,
+  modelosDe,
+  PREGUNTAS,
+  SEGMENTOS,
+  textoPrecios,
+} from '../../app/selector-vehiculo/motor';
 
 /**
  * Inspector — selector-vehiculo (segmento CÁLCULO, riesgo 2)
@@ -44,6 +51,9 @@ import { calcularCostes, modelosDe, SEGMENTOS } from '../../app/selector-vehicul
  *       que el HEV de su propia tabla, y la tarjeta dice que tiene «el menor coste por km en
  *       autovía». En el modelo de la app el diésel no alcanza nunca al HEV: por 100 km gasta
  *       0,055 € menos y paga 100 € más de mantenimiento → empate a 181.818 km/año.
+ *     REPARADO 19/11/2026: con «Bajo coste de uso» la regla del diésel ya no se aplica y sale
+ *     «Híbrido (HEV)» (rama final); la tabla no cambia. El diésel sigue saliendo con otras
+ *     prioridades, sin decir que sea el más barato.
  *
  *   CASO 2 (límite: el punto en que cambia la motorización, 10-20.000 km frente a 20-35.000 km)
  *     Mismo perfil salvo el km: ciudad, viajes nunca, solo/pareja, carga en casa, 25-40.000 €,
@@ -91,6 +101,11 @@ const GASOLINA_KM_ALTOS = [2, 3, 1, 0, 3, 0, 1, 0, 2, 2, 0, 1, 1] as const;
 // Más de 35.000 km, autopista, algún viaje, FAMILIA 3-4, sin carga, 15-25.000, ciudad, garaje,
 // nunca, indiferente, nuevo, ahorro, 3-7 años.
 const FAMILIA_AUTOPISTA = [3, 3, 1, 1, 3, 1, 1, 0, 2, 2, 0, 1, 1] as const;
+
+/** Las respuestas del motor (id de pregunta → valor) para unos índices de opción. */
+function perfil(indices: readonly number[]): Record<number, string> {
+  return Object.fromEntries(PREGUNTAS.map((p, i) => [p.id, p.opciones[indices[i]].valor]));
+}
 
 async function abrir(page: Page): Promise<void> {
   await page.goto(RUTA);
@@ -141,20 +156,22 @@ async function jsonLd(page: Page, tipo: string): Promise<Record<string, unknown>
 }
 
 test.describe('selector-vehiculo — los tres casos resueltos a mano', () => {
-  test('caso 1 · 27.500 km por autopista sin carga → Berlina o Familiar diésel, y la tabla sale de la fórmula', async ({ page }) => {
+  test('caso 1 · 27.500 km por autopista sin carga y «Bajo coste de uso» → Berlina o Familiar híbrida, y la tabla sale de la fórmula', async ({ page }) => {
+    // REPARADO 19/11/2026 (5235): salía «Diésel», 3599 €/año, al lado de un HEV de 3515 €. Con la
+    // prioridad «Bajo coste de uso» la regla del diésel ya no se aplica y cae a la rama final (HEV).
     await responder(page, DIESEL_SIN_CARGA);
     await expect(page.getByText('Basada en tu perfil de 27.500 km/año')).toBeVisible();
     await expect(page.getByText('Berlina o Familiar', { exact: true })).toBeVisible();
-    await expect(page.getByText('Diésel', { exact: true })).toBeVisible();
-    await expect(page.getByText('C', { exact: true })).toBeVisible();
+    await expect(page.getByText('Híbrido (HEV)', { exact: true })).toBeVisible();
+    await expect(page.getByText('ECO', { exact: true })).toBeVisible();
     // Esperados del comentario de cabecera (caso 1)
     expect(await fila(page, '100% Eléctrico')).toEqual(['1980,00 €', '200,00 €', '805,00 €', '2985,00 €', '14.925,00 €']);
     expect(await fila(page, 'Híbrido (HEV)')).toEqual(['2360,00 €', '350,00 €', '805,00 €', '3515,00 €', '17.575,00 €']);
     expect(await fila(page, 'Gasolina')).toEqual(['3403,00 €', '400,00 €', '805,00 €', '4608,00 €', '23.040,00 €']);
     expect(await fila(page, 'Diésel')).toEqual(['2344,00 €', '450,00 €', '805,00 €', '3599,00 €', '17.995,00 €']);
-    await expect(page.getByRole('row').filter({ hasText: 'Diésel' })).toContainText('Recomendado');
+    await expect(page.getByRole('row').filter({ hasText: 'Híbrido (HEV)' })).toContainText('Recomendado');
     await expect(page.getByRole('row').filter({ hasText: '100% Eléctrico' })).toContainText('Más barato');
-    await expect(razones(page)).toHaveText([/27\.500 km\/año en carretera → el diésel amortiza su coste inicial en 2-3 años$/]);
+    await expect(razones(page)).toHaveText([/Sin punto de carga propio → el híbrido convencional es la opción más eficiente disponible$/]);
     await expect(avisoApp(page)).toHaveCount(0);
   });
 
@@ -212,15 +229,28 @@ test.describe('selector-vehiculo — los tres casos resueltos a mano', () => {
 });
 
 test.describe('selector-vehiculo — hallazgos (inspector 19/11/2026)', () => {
-  test('HALLAZGO · a quien prioriza el bajo coste de uso no se le recomienda un motor más caro que el HEV de su propia tabla', async ({ page }) => {
-    // ABIERTO: caso 1 → «Diésel ✓ Recomendado» 3599,00 €/año frente a «Híbrido (HEV)» 3515,00 €
-    // (y «100% Eléctrico — Más barato» 2985,00 €), con la tarjeta diciendo que el diésel «tiene el
-    // menor coste por km en autovía». Con estos consumos el diésel no alcanza nunca al HEV.
-    test.fail();
+  test('HALLAZGO 5235 · a quien prioriza el bajo coste de uso no se le recomienda un motor más caro que el HEV de su propia tabla', async ({ page }) => {
+    // REPARADO 19/11/2026: caso 1 → «Diésel ✓ Recomendado» 3599,00 €/año frente a «Híbrido (HEV)»
+    // 3515,00 €, con la tarjeta diciendo que el diésel «tiene el menor coste por km en autovía».
+    // Con estos consumos el diésel no alcanza nunca al HEV (empate a 181.818 km/año).
     await responder(page, DIESEL_SIN_CARGA);
     const recomendado = await page.getByRole('row').filter({ hasText: 'Recomendado' }).getByRole('cell').nth(4).innerText();
     const hev = (await fila(page, 'Híbrido (HEV)'))[3];
     expect(euros(recomendado)).toBeLessThanOrEqual(euros(hev));
+  });
+
+  test('HALLAZGO 5235 · cuando sale el diésel, la tarjeta no lo llama el de menor coste ni la razón dice que se amortiza', async ({ page }) => {
+    // Con otra prioridad el diésel sigue saliendo (PLANETA_DIESEL): su texto dice lo que la tabla
+    // sostiene, que gasta menos que la gasolina (2344 € frente a 3403 € a 27.500 km).
+    await responder(page, PLANETA_DIESEL);
+    await expect(page.getByText('Diésel', { exact: true })).toBeVisible();
+    // La tarjeta del motor y las razones (la guía dice, con razón, que el ELÉCTRICO tiene el menor
+    // coste por km: no se mira)
+    const tarjeta = page.getByText('Motorización recomendada', { exact: true }).locator('..');
+    await expect(tarjeta).not.toContainText('menor coste por km');
+    await expect(tarjeta).toContainText('mira la fila del híbrido');
+    await expect(razones(page).filter({ hasText: 'amortiza' })).toHaveCount(0);
+    await expect(razones(page).first()).toHaveText(/27\.500 km\/año en carretera → el diésel gasta menos combustible que la gasolina \(2344,00\s€ frente a 3403,00\s€ al año en la tabla\)$/);
   });
 
   test('HALLAZGO 5234 · el coste del PHEV incluye la gasolina de sus kilómetros en térmico', async ({ page }) => {
@@ -267,58 +297,77 @@ test.describe('selector-vehiculo — hallazgos (inspector 19/11/2026)', () => {
     ]);
   });
 
-  test('HALLAZGO · «Por qué esta recomendación» no da razones contrarias al segmento recomendado (urbano)', async ({ page }) => {
-    // ABIERTO: acceso «Algo importante» + calle → «Urbano o Compacto B» con «se prioriza la altura de
-    // acceso del SUV frente al compacto» y, a la vez, «tamaño compacto más manejable».
-    test.fail();
+  test('HALLAZGO 5238 · «Por qué esta recomendación» no da razones contrarias al segmento recomendado (urbano)', async ({ page }) => {
+    // REPARADO 19/11/2026: acceso «Algo importante» + calle → «Urbano o Compacto B» con «se prioriza
+    // la altura de acceso del SUV frente al compacto» y, a la vez, «tamaño compacto más manejable».
     await responder(page, URBANO_ACCESO_ALGO);
     await expect(page.getByText('Urbano o Compacto B', { exact: true })).toBeVisible();
     await expect(razones(page).filter({ hasText: 'se prioriza la altura de acceso del SUV' })).toHaveCount(0);
+    await expect(razones(page).filter({ hasText: 'tamaño compacto más manejable' })).toHaveCount(1);
+    // Cuando el segmento SÍ es un SUV, la razón del acceso sigue saliendo: «Algo importante» en
+    // una ciudad media aparcando en la calle → SUV compacto (rama «ciudad + calle»).
+    const suv = calcularRecomendacion(perfil([0, 0, 2, 0, 3, 1, 1, 1, 2, 1, 1, 0, 1]));
+    expect(suv.segmentoKey).toBe('suv-compacto');
+    expect(suv.razones).toContain('Facilidad de acceso relevante → se prioriza la altura de acceso del SUV frente al compacto');
   });
 
-  test('HALLAZGO · a un monovolumen de 7 plazas no se le da la razón «tamaño compacto»', async ({ page }) => {
-    // ABIERTO: 5 o más personas + calle → «Monovolumen o SUV Grande 7 plazas» con «Aparcar
-    // habitualmente en calle → tamaño compacto más manejable para maniobrar».
-    test.fail();
+  test('HALLAZGO 5238 · a un monovolumen de 7 plazas no se le da la razón «tamaño compacto»', async ({ page }) => {
+    // REPARADO 19/11/2026: 5 o más personas + calle → «Monovolumen o SUV Grande 7 plazas» con
+    // «Aparcar habitualmente en calle → tamaño compacto más manejable para maniobrar».
     await responder(page, MONOVOLUMEN_CALLE);
     await expect(page.getByText('Monovolumen o SUV Grande 7 plazas', { exact: true })).toBeVisible();
     await expect(razones(page).filter({ hasText: 'tamaño compacto' })).toHaveCount(0);
+    await expect(razones(page).filter({ hasText: '5 o más ocupantes habituales' })).toHaveCount(1);
   });
 
-  test('HALLAZGO · con prioridad medioambiental y diésel no se dice que se maximizan las cero emisiones', async ({ page }) => {
-    // ABIERTO: «Impacto medioambiental» + 27.500 km por carretera → «Diésel» (C) con la razón
-    // «Prioridad medioambiental → se maximiza la eficiencia y/o cero emisiones en el uso cotidiano».
-    test.fail();
+  test('HALLAZGO 5238 · con prioridad medioambiental y diésel no se dice que se maximizan las cero emisiones', async ({ page }) => {
+    // REPARADO 19/11/2026: «Impacto medioambiental» + 27.500 km por carretera → «Diésel» (C) con la
+    // razón «Prioridad medioambiental → se maximiza la eficiencia y/o cero emisiones en el uso
+    // cotidiano». Ahora la razón depende del motor recomendado, y con diésel o gasolina no sale.
     await responder(page, PLANETA_DIESEL);
     await expect(page.getByText('Diésel', { exact: true })).toBeVisible();
     await expect(razones(page).filter({ hasText: 'Prioridad medioambiental' })).toHaveCount(0);
+    // El mismo «Impacto medioambiental» con 15.000 km sale HEV, y su razón dice lo que la tabla
+    // sostiene (5,2 L/100 km frente a 7,5 y 5,5).
+    const hev = calcularRecomendacion(perfil([1, 2, 1, 0, 3, 1, 1, 0, 0, 2, 0, 3, 1]));
+    expect(hev.motorPrincipal).toBe('hibrido');
+    expect(hev.razones).toContain('Prioridad medioambiental → el híbrido consume menos combustible que la gasolina y el diésel de la tabla');
   });
 
-  test('HALLAZGO · el aviso de ahorro gasolina/HEV cuadra con la tabla de al lado', async ({ page }) => {
-    // ABIERTO: 27.500 km y presupuesto «Hasta 15.000 €» → gasolina; el aviso dice «puede suponer
-    // 500-900 € de ahorro al año» y la tabla da 4608 − 3515 = 1093 € (HEV) y 4608 − 3599 = 1009 €
-    // (diésel). Con más de 35.000 km: 1644 € y 1567 €.
-    test.fail();
+  test('HALLAZGO 5239 · el aviso de ahorro gasolina/HEV cuadra con la tabla de al lado', async ({ page }) => {
+    // REPARADO 19/11/2026: 27.500 km y presupuesto «Hasta 15.000 €» → gasolina; el aviso decía
+    // «puede suponer 500-900 € de ahorro al año» y la tabla da 4608 − 3515 = 1093 € (HEV) y
+    // 4608 − 3599 = 1009 € (diésel). Ahora el aviso lee esas dos restas.
     await responder(page, GASOLINA_KM_ALTOS);
     const aviso = limpiar(await avisoApp(page).innerText());
-    const rango = aviso.match(/(\d+)-(\d+) € de ahorro/);
-    expect(rango).not.toBeNull();
     const ahorroHev = euros((await fila(page, 'Gasolina'))[3]) - euros((await fila(page, 'Híbrido (HEV)'))[3]);
+    const ahorroDiesel = euros((await fila(page, 'Gasolina'))[3]) - euros((await fila(page, 'Diésel'))[3]);
     expect(ahorroHev).toBe(1093);
-    expect(Number(rango![2])).toBeGreaterThanOrEqual(ahorroHev);
+    expect(ahorroDiesel).toBe(1009);
+    expect(aviso).not.toContain('500-900');
+    expect(aviso).toContain('un híbrido te ahorraría unos 1093,00 € al año de uso frente a la gasolina, y un diésel unos 1009,00 €');
+    // Con más de 35.000 km (42.000 en el cálculo): 1644 € y 1567 €
+    const mucho = calcularRecomendacion(perfil([3, 3, 1, 0, 3, 0, 1, 0, 2, 2, 0, 1, 1]));
+    expect(mucho.motorPrincipal).toBe('gasolina');
+    expect(limpiar(mucho.alertas.join(' '))).toContain('unos 1644,00 € al año de uso frente a la gasolina, y un diésel unos 1567,00 €');
   });
 
-  test('HALLAZGO · el precio de la electricidad de la nota es el que usa la cifra', async ({ page }) => {
-    // ABIERTO: sin carga, 15.000 km → «100% Eléctrico» 1080,00 € = 150 × 16 × 0,45 €/kWh; la nota
-    // dice «electricidad doméstica 0,22 €/kWh», con la que saldrían 528 €. Con solo carga pública
-    // usa 0,38 €/kWh, que tampoco se dice.
-    test.fail();
+  test('HALLAZGO 5240 · el precio de la electricidad de la nota es el que usa la cifra', async ({ page }) => {
+    // REPARADO 19/11/2026: sin carga, 15.000 km → «100% Eléctrico» 1080,00 € = 150 × 16 × 0,45 €/kWh;
+    // la nota decía «electricidad doméstica 0,22 €/kWh», con la que saldrían 528 €. Con solo carga
+    // pública usa 0,38 €/kWh, que tampoco se decía.
     await responder(page, HEV_SUV_MEDIANO);
     const nota = limpiar(await page.getByText(/Fijos: seguro medio 650/).innerText());
-    const precio = parseSpanishNumber(nota.match(/electricidad doméstica ([\d,]+) €\/kWh/)![1]);
+    const precio = parseSpanishNumber(nota.match(/electricidad ([\d,]+) €\/kWh/)![1]);
     const electricidad = euros((await fila(page, '100% Eléctrico'))[0]);
     expect(electricidad).toBe(1080);
+    expect(precio).toBe(0.45);
     expect(electricidad).toBe(Math.round(150 * 16 * precio));
+    expect(nota).toContain('electricidad 0,45 €/kWh (sin punto de carga propio, toda la recarga en cargadores rápidos)');
+    // Solo carga pública: 0,38 €/kWh, y lo dice
+    const publica = calcularRecomendacion(perfil([2, 2, 1, 0, 2, 1, 2, 0, 2, 2, 0, 3, 2]));
+    expect(publica.costes.electrico.combustible).toBe(Math.round(275 * 16 * 0.38));
+    expect(textoPrecios(publica)).toContain('electricidad 0,38 €/kWh (solo en cargadores públicos)');
   });
 
   test('HALLAZGO 5247 · bajo «Híbrido (HEV)» con etiqueta ECO no salen híbridos enchufables', async ({ page }) => {
@@ -333,14 +382,20 @@ test.describe('selector-vehiculo — hallazgos (inspector 19/11/2026)', () => {
     }
   });
 
-  test('HALLAZGO · una familia con 42.000 km por autopista y acceso indiferente puede salir en berlina', async ({ page }) => {
-    // ABIERTO: la rama «familia + carretera» es `accesoImportante ? 'suv-familiar' : 'suv-familiar'`
-    // (el comentario dice «SUV familiar o berlina»). La misma persona sola sale «Berlina o
-    // Familiar», cuya tarjeta dice ser «la opción más rentable para conductores que acumulan muchos
-    // kilómetros en carretera y autovía».
-    test.fail();
+  test('HALLAZGO 5249 · una familia con 42.000 km por autopista y acceso indiferente puede salir en berlina', async ({ page }) => {
+    // REPARADO 19/11/2026: la rama «familia + carretera» era `accesoImportante ? 'suv-familiar' :
+    // 'suv-familiar'` (el comentario decía «SUV familiar o berlina»). La misma persona sola salía
+    // «Berlina o Familiar». Ahora la familia sigue la regla de la línea de «km altos + carretera».
     await responder(page, FAMILIA_AUTOPISTA);
     await expect(page.getByText('Berlina o Familiar', { exact: true })).toBeVisible({ timeout: 2_000 });
+    // Con acceso «Algo importante» sigue en SUV, y con 15.000 km mixtos también
+    const conAcceso = [...FAMILIA_AUTOPISTA];
+    conAcceso[9] = 1;
+    expect(calcularRecomendacion(perfil(conAcceso)).segmentoKey).toBe('suv-familiar');
+    const kmMedios = [...FAMILIA_AUTOPISTA];
+    kmMedios[0] = 1;
+    kmMedios[1] = 1;
+    expect(calcularRecomendacion(perfil(kmMedios)).segmentoKey).toBe('suv-familiar');
   });
 
   test('HALLAZGO · tras «Empezar» y «Siguiente» el foco no se pierde en el body', async ({ page }) => {

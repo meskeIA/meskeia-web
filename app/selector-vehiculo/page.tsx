@@ -21,6 +21,7 @@ import {
   calcularRecomendacion,
   modelosDe,
   motoresDeLaTabla,
+  textoPrecios,
   type Resultado,
 } from './motor';
 
@@ -358,9 +359,9 @@ export default function SelectorVehiculo() {
             </div>
             <p className={styles.tablaNota}>
               * Fijos: seguro medio 650 € + ITV amortizada 35 € + impuesto circulación 120 €. El
-              seguro varía según perfil y zona. Precios: gasolina 1,65 €/L · diésel 1,55 €/L ·
-              electricidad doméstica 0,22 €/kWh. La columna «5 años» proyecta el coste operativo
-              acumulado sin incluir el precio de compra del vehículo.
+              seguro varía según perfil y zona. Precios: {textoPrecios(resultado)}. La columna
+              «5 años» proyecta el coste operativo acumulado sin incluir el precio de compra del
+              vehículo.
               <span>
                 {resultado.motorPrincipal === 'phev'
                   ? ' PHEV: supone la mitad de los km en eléctrico y la otra mitad con el consumo del híbrido, con su mantenimiento, porque lleva motor de combustión.'
