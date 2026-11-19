@@ -79,7 +79,7 @@ export const faqJsonLd = {
         '@type': 'Answer',
         // Bajado a lo que la app hace (hallazgo 5208): el perfil sale de la suma de las 20
         // respuestas, la pantalla no avisa de contradicciones y la cifra de los bancos no tenía fuente
-        text: 'Este test hace 20 preguntas agrupadas en cinco bloques (horizonte temporal, capacidad financiera, reacción emocional, experiencia inversora y objetivos). El perfil sale de la puntuación total, y además enseña el desglose por bloque, para que veas en cuál puntúas más bajo: por ejemplo, si toleras el riesgo emocionalmente pero tu capacidad financiera es baja.',
+        text: 'Este test hace 20 preguntas agrupadas en cinco bloques (horizonte temporal, capacidad financiera, reacción emocional, experiencia inversora y objetivos). El perfil sale de la puntuación total, con dos topes: el plazo (si necesitas el dinero en menos de 1 año, no pasa de conservador; entre 1 y 3 años, de moderado-conservador; entre 3 y 10, de moderado-agresivo) y la capacidad de asumir pérdidas (si perder un 30 % sería un problema grave o solo asumes caídas de hasta un 5 %, no pasa de moderado). Además enseña el desglose por bloque, para que veas en cuál puntúas más bajo: por ejemplo, si toleras el riesgo emocionalmente pero tu capacidad financiera es baja.',
       },
     },
     {

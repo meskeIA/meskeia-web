@@ -20,17 +20,22 @@ test.describe.configure({ mode: 'parallel' });
  *     20–32 Conservador (85/15) · 33–44 Moderado-Conservador (65/35) · 45–56 Moderado (40/60)
  *     57–68 Moderado-Agresivo (20/80) · 69–80 Agresivo (5/95)            [RF/RV de `PERFILES`]
  *   Contiguos, disjuntos y cubren 20..80. Cada reparto RF + RV suma 100.
- *   Dimensiones: 4 preguntas cada una (1-4 Horizonte, 5-8 Capacidad, 9-12 Reacción, 13-16
- *   Conocimiento, 17-20 Objetivos) → suma sobre 16; nivel por `nivelDimension(pct)`:
- *   pct < 40 Bajo · < 70 Medio · resto Alto. Con 4-16 puntos: 4-6 Bajo, 7-11 Medio, 12-16 Alto.
- *   La barra mide suma/16 (por eso su mínimo es 25 %).
+ *   Dimensiones (desde el 19/11/2026, hallazgo 5202): Horizonte = solo la 1 (sobre 4) · Capacidad =
+ *   3, 4, 5, 6, 7, 8 (sobre 24) · Reacción = 2, 9, 10, 11, 12 (sobre 20) · Conocimiento = 13-16 y
+ *   Objetivos = 17-20 (sobre 16). Nivel por `nivelDimension(pct)`: pct < 40 Bajo · < 70 Medio ·
+ *   resto Alto. La barra mide suma/máximo (por eso su mínimo es 25 %).
+ *   TOPES (desde el 19/11/2026, hallazgo 5201): la 1 en «menos de 1 año» → como mucho Conservador,
+ *   «1-3 años» → como mucho Moderado-Conservador, «3-10 años» → como mucho Moderado-Agresivo; la 8 o
+ *   la 18 en su primera opción → como mucho Moderado. Los casos de los cortes llevan la 1 en «Más de
+ *   10 años» y la 8 y la 18 por encima de 1, para que ningún tope actúe.
  *
  * LOS CASOS
- *   normal  → 4,2,3,3 · 3,3,2,3 · 3,3,2,2 · 2,2,1,1 · 3,2,2,3 = 12 + 11 + 10 + 6 + 10 = 49 → Moderado,
- *             40/60; Horizonte Alto (12/16), Capacidad Medio (11/16), Reacción Medio (10/16),
- *             Conocimiento Bajo (6/16), Objetivos Medio (10/16); barras 75 / 68,75 / 62,5 / 37,5 / 62,5 %.
- *   límite  → todo 1 = 20 (Conservador, 85/15, cinco «Bajo (4/16)») · todo 4 = 80 (Agresivo, 5/95,
- *             cinco «Alto (16/16)») · los cuatro cortes: 32/33, 44/45, 56/57 y 68/69.
+ *   normal  → 4,2,3,3 · 3,3,2,3 · 3,3,2,2 · 2,2,1,1 · 3,2,2,3 = 49 → Moderado, 40/60 (sin tope: la 1
+ *             en 4, la 8 en 3, la 18 en 2). Horizonte 4/4 Alto · Capacidad 3+3+3+3+2+3 = 17/24
+ *             (70,83 %) Alto · Reacción 2+3+3+2+2 = 12/20 (60 %) Medio · Conocimiento 6/16 Bajo ·
+ *             Objetivos 10/16 Medio; barras 100 / 70,83 / 60 / 37,5 / 62,5 %.
+ *   límite  → todo 1 = 20 (Conservador, 85/15, todo «Bajo») · todo 4 = 80 (Agresivo, 5/95, todo
+ *             «Alto») · los cuatro cortes: 32/33, 44/45, 56/57 y 68/69.
  *   rechazo → 19 de 20 (falta la 20): no hay resultado · 0 de 20: «Faltan 20 preguntas…» · doble
  *             clic en «Comenzar el test» no marca ninguna respuesta. El doble clic en «Ver mi perfil»
  *             SÍ rompe: es un hallazgo (abajo).
@@ -101,16 +106,18 @@ test.describe('Caso normal', () => {
     await expect(perfilNombre(page)).toHaveText('Moderado');
     await expect(puntuacion(page)).toHaveText(/Puntuación:\s*49\s*\/\s*80/);
     await expect(nivelesDimension(page)).toHaveText([
-      'Alto (12/16)', // 4+2+3+3 = 12 → 75 %
-      'Medio (11/16)', // 3+3+2+3 = 11 → 68,75 %
-      'Medio (10/16)', // 3+3+2+2 = 10 → 62,5 %
+      'Alto (4/4)', // solo la 1 = 4 → 100 %
+      'Alto (17/24)', // 3, 4, 5, 6, 7, 8 = 3+3+3+3+2+3 = 17 → 70,83 %
+      'Medio (12/20)', // 2, 9, 10, 11, 12 = 2+3+3+2+2 = 12 → 60 %
       'Bajo (6/16)', // 2+2+1+1 = 6 → 37,5 %
       'Medio (10/16)', // 3+2+2+3 = 10 → 62,5 %
     ]);
     const anchos = await page
       .locator('[class*="dimBarFill"]')
       .evaluateAll((els) => els.map((e) => parseFloat((e as HTMLElement).style.width)));
-    expect(anchos).toEqual([75, 68.75, 62.5, 37.5, 62.5]);
+    const esperados = [100, (17 / 24) * 100, 60, 37.5, 62.5];
+    expect(anchos).toHaveLength(esperados.length);
+    esperados.forEach((v, i) => expect(anchos[i]).toBeCloseTo(v, 2));
     // PERFILES[2] = { rf: 40, rv: 60 }, y el reparto suma 100
     expect(await reparto(page)).toEqual([40, 60]);
     await expect(porcentajes(page).nth(0)).toHaveText(/^40\s?%$/);
@@ -141,7 +148,9 @@ test.describe('Caso límite', () => {
     await verPerfil(page);
     await expect(perfilNombre(page)).toHaveText('Conservador');
     await expect(puntuacion(page)).toHaveText(/20\s*\/\s*80/);
-    await expect(nivelesDimension(page)).toHaveText(rep(0, 5).map(() => 'Bajo (4/16)'));
+    // La 1 en «menos de 1 año» pone el tope en Conservador, que ya es el perfil: no hay aviso
+    await expect(nivelesDimension(page)).toHaveText(['Bajo (1/4)', 'Bajo (6/24)', 'Bajo (5/20)', 'Bajo (4/16)', 'Bajo (4/16)']);
+    await expect(resultado(page)).not.toContainText('se limita');
     expect(await reparto(page)).toEqual([85, 15]);
 
     await empezar(page);
@@ -149,27 +158,38 @@ test.describe('Caso límite', () => {
     await verPerfil(page);
     await expect(perfilNombre(page)).toHaveText('Agresivo');
     await expect(puntuacion(page)).toHaveText(/80\s*\/\s*80/);
-    await expect(nivelesDimension(page)).toHaveText(rep(0, 5).map(() => 'Alto (16/16)'));
+    await expect(nivelesDimension(page)).toHaveText(['Alto (4/4)', 'Alto (24/24)', 'Alto (20/20)', 'Alto (16/16)', 'Alto (16/16)']);
     expect(await reparto(page)).toEqual([5, 95]);
   });
 
   test('los cuatro cortes: 32/33, 44/45, 56/57 y 68/69', async ({ page }) => {
     test.setTimeout(90_000);
-    // Sumas hechas a mano:
-    //   32 = 2×12 + 1×8 · 33 = 2×13 + 1×7 · 44 = 3×4 + 2×16 · 45 = 3×5 + 2×15
-    //   56 = 2×4 + 3×16 · 57 = 2×3 + 3×17 · 68 = 4×8 + 3×12 · 69 = 4×9 + 3×11
+    // Sin topes: la 1 en 4 («Más de 10 años»), y la 8 y la 18 (posiciones 8 y 18) por encima de 1.
+    // Sumas hechas a mano (la 1 + las posiciones 2-20):
+    //   32 = 4 + 2×9 + 1×10 · 33 = 4 + 2×10 + 1×9 · 44 = 4 + 3×2 + 2×17 · 45 = 4 + 3×3 + 2×16
+    //   56 = 4 + 3×14 + 2×5 · 57 = 4 + 3×15 + 2×4 · 68 = 4 + 4×7 + 3×12 · 69 = 4 + 4×8 + 3×11
+    // Los valores altos van primero a la 8 y la 18 y luego a las demás, en orden: como en todos los
+    // casos nAlto ≥ 2, la 8 y la 18 nunca quedan en 1 (y el `expect` de la suma lo vigila).
+    const sinTope = (alto: number, nAlto: number, bajo: number): number[] => {
+      const orden = [8, 18, ...Array.from({ length: 19 }, (_, i) => i + 2).filter((n) => n !== 8 && n !== 18)];
+      const v = rep(bajo, 20);
+      v[0] = 4;
+      orden.slice(0, nAlto).forEach((n) => (v[n - 1] = alto));
+      return v;
+    };
     const cortes: { valores: number[]; puntos: number; perfil: string; rf: number; rv: number }[] = [
-      { valores: [...rep(2, 12), ...rep(1, 8)], puntos: 32, perfil: 'Conservador', rf: 85, rv: 15 },
-      { valores: [...rep(2, 13), ...rep(1, 7)], puntos: 33, perfil: 'Moderado-Conservador', rf: 65, rv: 35 },
-      { valores: [...rep(3, 4), ...rep(2, 16)], puntos: 44, perfil: 'Moderado-Conservador', rf: 65, rv: 35 },
-      { valores: [...rep(3, 5), ...rep(2, 15)], puntos: 45, perfil: 'Moderado', rf: 40, rv: 60 },
-      { valores: [...rep(2, 4), ...rep(3, 16)], puntos: 56, perfil: 'Moderado', rf: 40, rv: 60 },
-      { valores: [...rep(2, 3), ...rep(3, 17)], puntos: 57, perfil: 'Moderado-Agresivo', rf: 20, rv: 80 },
-      { valores: [...rep(4, 8), ...rep(3, 12)], puntos: 68, perfil: 'Moderado-Agresivo', rf: 20, rv: 80 },
-      { valores: [...rep(4, 9), ...rep(3, 11)], puntos: 69, perfil: 'Agresivo', rf: 5, rv: 95 },
+      { valores: sinTope(2, 9, 1), puntos: 32, perfil: 'Conservador', rf: 85, rv: 15 },
+      { valores: sinTope(2, 10, 1), puntos: 33, perfil: 'Moderado-Conservador', rf: 65, rv: 35 },
+      { valores: sinTope(3, 2, 2), puntos: 44, perfil: 'Moderado-Conservador', rf: 65, rv: 35 },
+      { valores: sinTope(3, 3, 2), puntos: 45, perfil: 'Moderado', rf: 40, rv: 60 },
+      { valores: sinTope(3, 14, 2), puntos: 56, perfil: 'Moderado', rf: 40, rv: 60 },
+      { valores: sinTope(3, 15, 2), puntos: 57, perfil: 'Moderado-Agresivo', rf: 20, rv: 80 },
+      { valores: sinTope(4, 7, 3), puntos: 68, perfil: 'Moderado-Agresivo', rf: 20, rv: 80 },
+      { valores: sinTope(4, 8, 3), puntos: 69, perfil: 'Agresivo', rf: 5, rv: 95 },
     ];
     for (const c of cortes) {
       expect(c.valores.reduce((a, b) => a + b, 0)).toBe(c.puntos);
+      expect([c.valores[0], c.valores[7] > 1, c.valores[17] > 1]).toEqual([4, true, true]); // sin topes
       await empezar(page);
       await responder(page, c.valores);
       await verPerfil(page);
@@ -213,10 +233,9 @@ test.describe('Caso a rechazar', () => {
 // HALLAZGOS de la primera inspección (18/11/2026) — ABIERTOS
 // ============================================================
 test.describe('hallazgos 18/11/2026', () => {
-  test('ABIERTO (alto) — el perfil contradice las respuestas que lo limitan: plazo, capacidad y caída máxima', async ({
+  test('REPARADO 5201 (19/11/2026) — el perfil contradice las respuestas que lo limitan: plazo, capacidad y caída máxima', async ({
     page,
   }) => {
-    test.fail();
     test.setTimeout(60_000);
     // El perfil es la suma pura: 19 respuestas al máximo compensan cualquier restricción declarada.
     // La propia página lo contradice: la tabla da al Agresivo «Horizonte recomendado 10+ años» y
@@ -265,17 +284,48 @@ test.describe('hallazgos 18/11/2026', () => {
     expect(problemas).toEqual([]);
   });
 
-  test('ABIERTO (medio) — «Horizonte Temporal: Alto» para quien necesita el dinero en menos de 1 año', async ({
+  test('REPARADO 5201 (19/11/2026) — cada tope da su perfil, su reparto y su aviso', async ({ page }) => {
+    test.setTimeout(90_000);
+    // Decidido por el usuario (cabo C0834): la 1 fija el perfil máximo (menos de 1 año → Conservador,
+    // 1-3 → Moderado-Conservador, 3-10 → Moderado-Agresivo, porque la tabla de la página pide 10+
+    // años al Agresivo) y la 8 o la 18 en su primera opción → como mucho Moderado. El resto al máximo.
+    const casos: { valores: number[]; puntos: number; porPuntos: string; perfil: string; rf: number; motivo: RegExp }[] = [
+      { valores: [1, ...rep(4, 19)], puntos: 77, porPuntos: 'Agresivo', perfil: 'Conservador', rf: 85, motivo: /menos de 1 año/ },
+      { valores: [2, ...rep(4, 19)], puntos: 78, porPuntos: 'Agresivo', perfil: 'Moderado-Conservador', rf: 65, motivo: /1 a 3 años/ },
+      { valores: [3, ...rep(4, 19)], puntos: 79, porPuntos: 'Agresivo', perfil: 'Moderado-Agresivo', rf: 20, motivo: /3 a 10 años/ },
+      { valores: rep(4, 20).map((v, i) => (i === 7 ? 1 : v)), puntos: 77, porPuntos: 'Agresivo', perfil: 'Moderado', rf: 40, motivo: /problema grave/ },
+      { valores: rep(4, 20).map((v, i) => (i === 17 ? 1 : v)), puntos: 77, porPuntos: 'Agresivo', perfil: 'Moderado', rf: 40, motivo: /hasta un 5/ },
+    ];
+    for (const c of casos) {
+      expect(c.valores.reduce((a, b) => a + b, 0)).toBe(c.puntos);
+      await empezar(page);
+      await responder(page, c.valores);
+      await verPerfil(page);
+      await expect(perfilNombre(page)).toHaveText(c.perfil);
+      await expect(puntuacion(page)).toHaveText(new RegExp(`Puntuación:\\s*${c.puntos}\\s*/\\s*80`));
+      expect(await reparto(page)).toEqual([c.rf, 100 - c.rf]);
+      const texto = await resultado(page).innerText();
+      expect(texto).toMatch(new RegExp(`apuntaba a ${c.porPuntos}, pero el perfil se limita a ${c.perfil}`));
+      expect(texto).toMatch(c.motivo);
+    }
+    // Un tope que no rebaja nada no se anuncia: la 1 en «1-3 años» con 40 puntos ya es Moderado-Conservador
+    await empezar(page);
+    await responder(page, [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    await verPerfil(page);
+    await expect(perfilNombre(page)).toHaveText('Moderado-Conservador');
+    await expect(resultado(page)).not.toContainText('se limita');
+  });
+
+  test('REPARADO 5202 (19/11/2026) — «Horizonte Temporal: Alto» para quien necesita el dinero en menos de 1 año', async ({
     page,
   }) => {
-    test.fail();
-    // La dimensión suma la 1 (plazo) con la 2 (qué harías si cae un 20 %: reacción), la 3 (fondo de
-    // emergencia: capacidad) y la 4 (etapa vital). Con la 1 en «En menos de 1 año» y las otras tres
-    // al máximo: 1 + 4 + 4 + 4 = 13/16 = 81,25 % → «Alto».
+    // Antes la dimensión sumaba la 1 (plazo) con la 2 (reacción), la 3 (fondo de emergencia) y la 4
+    // (etapa vital): 1 + 4 + 4 + 4 = 13/16 = 81,25 % → «Alto». Ahora es solo la 1 (cabo C0834):
+    // 1/4 = 25 % → «Bajo».
     await empezar(page);
     await responder(page, [1, ...rep(4, 19)]);
     await verPerfil(page);
-    await expect(nivelesDimension(page).nth(0)).not.toHaveText(/^Alto/);
+    await expect(nivelesDimension(page).nth(0)).toHaveText('Bajo (1/4)');
   });
 
   test('REPARADO 5203 (19/11/2026) — un doble clic en «Ver mi perfil de riesgo» pulsa «Repetir el test» y borra las 20 respuestas', async ({

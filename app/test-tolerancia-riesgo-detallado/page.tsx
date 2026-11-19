@@ -45,7 +45,15 @@ const DIMENSIONES = [
   { icono: '🎯', nombre: 'Objetivos y Expectativas' },
 ];
 
-const PREGUNTAS: Pregunta[] = [
+/*
+ * ⚠️ 19/11/2026 (hallazgo 5202, decidido por el usuario en el cabo C0834) — la dimensión
+ * «Horizonte Temporal» es SOLO la pregunta 1. Antes sumaba la 2 (qué harías si cae un 20 %), la 3
+ * (fondo de emergencia) y la 4 (etapa vital), y quien necesitaba el dinero en menos de un año veía
+ * su horizonte «Alto» (1 + 4 + 4 + 4 = 13/16). La 2 pasa a Reacción Emocional y la 3 y la 4 a
+ * Capacidad Financiera. Los `id` no cambian (los usan los topes y el nombre de cada input); el
+ * número que ve el usuario es la posición en PREGUNTAS, que se ordena por dimensión.
+ */
+const PREGUNTAS_POR_ID: Pregunta[] = [
   // Dimensión 0 — Horizonte Temporal
   {
     id: 1, dimension: 0,
@@ -57,8 +65,9 @@ const PREGUNTAS: Pregunta[] = [
       { texto: 'Más de 10 años, o no lo sé aún', valor: 4 },
     ],
   },
+  // Dimensión 2 — Reacción Emocional (se muestra con las 9-12)
   {
-    id: 2, dimension: 0,
+    id: 2, dimension: 2,
     texto: 'Si tu inversión cayera un 20% el primer año, ¿qué harías?',
     opciones: [
       { texto: 'Vendería para evitar más pérdidas', valor: 1 },
@@ -67,8 +76,9 @@ const PREGUNTAS: Pregunta[] = [
       { texto: 'Podría esperar todo el tiempo necesario', valor: 4 },
     ],
   },
+  // Dimensión 1 — Capacidad Financiera (la 3 y la 4 se muestran con las 5-8)
   {
-    id: 3, dimension: 0,
+    id: 3, dimension: 1,
     texto: '¿Tienes un fondo de emergencia separado del dinero que vas a invertir?',
     opciones: [
       { texto: 'No tengo nada reservado', valor: 1 },
@@ -78,7 +88,7 @@ const PREGUNTAS: Pregunta[] = [
     ],
   },
   {
-    id: 4, dimension: 0,
+    id: 4, dimension: 1,
     texto: '¿En qué etapa de vida te encuentras?',
     opciones: [
       { texto: 'Cerca de la jubilación (menos de 10 años)', valor: 1 },
@@ -257,6 +267,16 @@ const PREGUNTAS: Pregunta[] = [
   },
 ];
 
+/** Las preguntas en el orden en que se muestran: por dimensión y, dentro de cada una, por `id`. */
+const PREGUNTAS: Pregunta[] = [...PREGUNTAS_POR_ID].sort(
+  (a, b) => a.dimension - b.dimension || a.id - b.id,
+);
+
+/** «1 pregunta», «6 preguntas»: el texto entero, para no montar y desmontar una «s» suelta. */
+function textoNumeroPreguntas(n: number): string {
+  return n === 1 ? '1 pregunta' : `${n} preguntas`;
+}
+
 const PERFILES: Perfil[] = [
   {
     nombre: 'Conservador',
@@ -330,6 +350,47 @@ function obtenerPerfil(puntuacion: number): Perfil {
   return PERFILES[4];
 }
 
+/*
+ * ⚠️ 19/11/2026 (hallazgo 5201, decidido por el usuario en el cabo C0834, como en la hermana
+ * test-perfil-inversor con el hallazgo 3312) — TOPES del perfil. La suma pura dejaba que 19
+ * respuestas al máximo compensaran un plazo de menos de 1 año, una pérdida del 30 % que sería «un
+ * problema grave» o una caída asumible de solo un 5 %: salía Agresivo, 95 % en renta variable, contra
+ * la tabla de la propia página (Agresivo: horizonte 10+ años) y su guía (no invertir lo que se
+ * necesite en menos de 12 meses).
+ *   Pregunta 1: menos de 1 año → como mucho Conservador · 1-3 años → como mucho Moderado-Conservador
+ *               · 3-10 años → como mucho Moderado-Agresivo (la tabla pide 10+ años al Agresivo).
+ *   Preguntas 8 y 18 en su primera opción → como mucho Moderado.
+ * Cuando un tope actúa, el resultado lo dice.
+ */
+interface Tope {
+  /** Índice en PERFILES del perfil más alto que admite la respuesta. */
+  maximo: number;
+  motivo: string;
+}
+
+function topesDeRespuestas(r: Record<number, number>): Tope[] {
+  const topes: Tope[] = [];
+  if (r[1] === 1) topes.push({ maximo: 0, motivo: 'necesitarás el dinero en menos de 1 año' });
+  else if (r[1] === 2) topes.push({ maximo: 1, motivo: 'necesitarás el dinero en 1 a 3 años' });
+  else if (r[1] === 3) topes.push({ maximo: 3, motivo: 'necesitarás el dinero en 3 a 10 años' });
+  if (r[8] === 1) topes.push({ maximo: 2, motivo: 'perder el 30 % sería un problema grave para tu economía' });
+  if (r[18] === 1) topes.push({ maximo: 2, motivo: 'la caída anual máxima que asumes es de hasta un 5 %' });
+  return topes;
+}
+
+/** El perfil de la puntuación, rebajado al tope más bajo que lo limite, y los motivos de ese tope. */
+function perfilConTopes(
+  puntuacion: number,
+  r: Record<number, number>,
+): { perfil: Perfil; porPuntos: Perfil; motivos: string[] } {
+  const porPuntos = obtenerPerfil(puntuacion);
+  const indicePuntos = PERFILES.indexOf(porPuntos);
+  const topes = topesDeRespuestas(r);
+  const indice = Math.min(indicePuntos, ...topes.map(t => t.maximo));
+  const motivos = indice < indicePuntos ? topes.filter(t => t.maximo === indice).map(t => t.motivo) : [];
+  return { perfil: PERFILES[indice], porPuntos, motivos };
+}
+
 function nivelDimension(pct: number): string {
   if (pct < 40) return 'Bajo';
   if (pct < 70) return 'Medio';
@@ -397,7 +458,7 @@ export default function TestToleranciaRiesgoDetallado() {
   }
 
   const puntuacionTotal = Object.values(respuestas).reduce((a, b) => a + b, 0);
-  const perfil = obtenerPerfil(puntuacionTotal);
+  const { perfil, porPuntos, motivos: motivosTope } = perfilConTopes(puntuacionTotal, respuestas);
 
   const puntuacionesDimension = DIMENSIONES.map((_, di) => {
     const pregsDim = PREGUNTAS.filter(p => p.dimension === di);
@@ -440,7 +501,7 @@ export default function TestToleranciaRiesgoDetallado() {
               {DIMENSIONES.map((d, i) => (
                 <div key={i} className={styles.dimensionPill}>
                   <strong><span aria-hidden="true">{d.icono}</span> {d.nombre}</strong>
-                  4 preguntas
+                  {textoNumeroPreguntas(PREGUNTAS.filter(p => p.dimension === i).length)}
                 </div>
               ))}
             </div>
@@ -473,7 +534,7 @@ export default function TestToleranciaRiesgoDetallado() {
                 </div>
                 {PREGUNTAS.filter(p => p.dimension === di).map(p => (
                   <div key={p.id} className={styles.preguntaCard}>
-                    <p className={styles.preguntaNumero}>Pregunta {p.id} de {totalPreguntas}</p>
+                    <p className={styles.preguntaNumero}>Pregunta {PREGUNTAS.indexOf(p) + 1} de {totalPreguntas}</p>
                     <p className={styles.preguntaTexto}>{p.texto}</p>
                     <div className={styles.opcionesGrid} role="radiogroup" aria-label={p.texto}>
                       {p.opciones.map((op, oi) => (
@@ -516,6 +577,12 @@ export default function TestToleranciaRiesgoDetallado() {
               <div className={styles.perfilBadge}>Tu perfil</div>
               <h2 className={styles.perfilNombre} ref={tituloPerfilRef} tabIndex={-1}>{perfil.nombre}</h2>
               <p className={styles.perfilDescripcion}>{perfil.descripcion}</p>
+              {motivosTope.length > 0 && (
+                <p className={styles.avisoTope}>
+                  Tu puntuación apuntaba a {porPuntos.nombre}, pero el perfil se limita a {perfil.nombre}{' '}
+                  porque {motivosTope.join(' y ')}.
+                </p>
+              )}
               <p className={styles.puntuacionTotal}>
                 Puntuación: <strong>{puntuacionTotal}</strong> / 80
               </p>
