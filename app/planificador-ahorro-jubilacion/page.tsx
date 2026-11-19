@@ -16,8 +16,10 @@ import {
 } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
+  ESPERANZA_VIDA_65,
   FISCAL_ESPERANZA_VIDA_META,
   FISCAL_PENSIONES_META,
+  aniosCobroEstimados,
   FISCAL_PLAN_PENSIONES_META,
   LIMITES_PLAN_PENSIONES_2025,
   tipoMarginalDesdeRendimientosBrutos,
@@ -54,6 +56,15 @@ interface ResultadoPlanPensiones {
   costeNetoMensual: number;
   superaLimite: boolean;
 }
+
+// Cifras de longevidad que se citan en el formulario y en la FAQ. Salen del módulo del INE,
+// no se escriben: hasta el 19/11/2026 decían «INE 2024» a mano y había que retocarlas cada año.
+const EV_ANIO = FISCAL_ESPERANZA_VIDA_META.vigencia;
+const EV_HOMBRES = formatNumber(ESPERANZA_VIDA_65.hombres, 1);
+const EV_MUJERES = formatNumber(ESPERANZA_VIDA_65.mujeres, 1);
+const ANIOS_67 = formatNumber(aniosCobroEstimados(67), 0);
+const ANIOS_67_HOMBRES = formatNumber(aniosCobroEstimados(67, 'hombres'), 0);
+const ANIOS_67_MUJERES = formatNumber(aniosCobroEstimados(67, 'mujeres'), 0);
 
 // ──────────────────────────────────────────────────────────────────────────────
 // LÓGICA
@@ -308,7 +319,7 @@ export default function PlanificadorAhorroJubilacionPage() {
             onChange={setAnosJubilado}
             label="Años de jubilación previstos"
             placeholder="20"
-            helperText="Esperanza de vida - edad jubilación. Según el INE (2024), a los 65 años quedan 19,9 años de media en hombres y 23,6 en mujeres: jubilándote a los 67, entre 18 y 22 años."
+            helperText={`Esperanza de vida - edad jubilación. Según el INE (${EV_ANIO}), a los 65 años quedan ${EV_HOMBRES} años de media en hombres y ${EV_MUJERES} en mujeres: jubilándote a los 67, entre ${ANIOS_67_HOMBRES} y ${ANIOS_67_MUJERES} años.`}
             min={1}
             max={40}
           />
@@ -621,7 +632,7 @@ export default function PlanificadorAhorroJubilacionPage() {
             <li className={styles.faqItem}>
               <strong>¿El interés compuesto importa tanto?</strong>
               <p>Sí. Ahorrar 200 €/mes durante 30 años al 4% genera más capital que 400 €/mes durante 15 años. Cuanto antes empieces, menor el esfuerzo.</p>
-              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Jubilarse a los 67 supone financiar unos 20 años de media (18 en hombres, 22 en mujeres, según el INE 2024). Planificar por encima de esa media da margen frente a la longevidad, pero conviene saber sobre qué cifra se está añadiendo el margen.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Jubilarse a los 67 supone financiar unos {ANIOS_67} años de media ({ANIOS_67_HOMBRES} en hombres, {ANIOS_67_MUJERES} en mujeres, según el INE {EV_ANIO}). Planificar por encima de esa media da margen frente a la longevidad, pero conviene saber sobre qué cifra se está añadiendo el margen.</p>
             </li>
           </ul>
 

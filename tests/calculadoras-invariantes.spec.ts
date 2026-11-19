@@ -2817,22 +2817,23 @@ test.describe('Golden — calcularPensionPublica (Capa 1 · LGSS / Ley 21/2021)'
 
 test.describe('Golden — calcularBrechaJubilacion (Capa 1 · cálculo financiero propio)', () => {
 
-  test('GOLDEN-BO: sueldo neto 2.400 €, pensión 1.500 €, 47 años → brecha 900 €/mes, capital 213.840 €, ahorro 583,03 €/mes', () => {
+  test('GOLDEN-BO: sueldo neto 2.400 €, pensión 1.500 €, 47 años → brecha 900 €/mes, capital 214.920 €, ahorro 585,97 €/mes', () => {
     // Brecha mensual = 2.400 − 1.500 = 900 €. Brecha anual = 10.800 €.
-    // Años de jubilación por defecto = 65 + 21,76 (esperanza de vida a los 65, INE 2024) − 67 = 19,8.
-    // Capital = 10.800 × 19,8 = 213.840 €.
+    // Años de jubilación por defecto = 65 + 21,86 (esperanza de vida a los 65, ambos sexos, INE 2025) − 67 = 19,86 → 19,9.
+    // Capital = 10.800 × 19,9 = 214.920 €.
     // % pensión/sueldo = 1.500/2.400 × 100 = 62,5%. Años hasta jubilación (67−47) = 20 → n = 240 meses, r_mes = 4%/12.
-    // PMT = 213.840 × r_mes / ((1+r_mes)^240 − 1) = 583,03 €/mes.
+    // PMT = 214.920 × r_mes / ((1+r_mes)^240 − 1) = 585,97 €/mes
+    // (con los datos de 2024 y la media aritmética, 21,76: 19,8 años, 213.840 € y 583,03 €/mes; el PMT es proporcional al capital).
     const b = calcularBrechaJubilacion({ sueldoNetoMensual: 2400, pensionEstimadaMensual: 1500, edadActual: 47 });
     expect(b.brechaMensual).toBeCloseTo(900, 2);
     expect(b.brechaAnual).toBeCloseTo(10800, 2);
-    expect(b.capitalNecesario).toBeCloseTo(213840, 2);
+    expect(b.capitalNecesario).toBeCloseTo(214920, 2);
     expect(b.porcentajePensionSobreSueldo).toBeCloseTo(62.5, 2);
     expect(b.anosHastaJubilacion).toBe(20);
-    expect(b.ahorroMensualNecesario).toBeCloseTo(583.03, 2);
+    expect(b.ahorroMensualNecesario).toBeCloseTo(585.97, 2);
     expect(b.tieneBrecha).toBe(true);
     expect(b.edadJubilacion).toBe(67);
-    expect(b.anosJubilado).toBe(19.8);
+    expect(b.anosJubilado).toBe(19.9);
   });
 
   test('GOLDEN-BO2: el supuesto de longevidad es el mismo en brecha y en pensión complementaria', () => {

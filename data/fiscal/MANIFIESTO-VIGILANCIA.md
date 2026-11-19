@@ -573,7 +573,7 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 
 #### `esperanza-vida.ts` — Esperanza de vida a los 65 años
 
-- **Contiene**: la esperanza de vida a los 65 años en España por sexo (2024) y la función que traduce
+- **Contiene**: la esperanza de vida a los 65 años en España por sexo y para ambos sexos (2025) y la función que traduce
   una edad de jubilación en años de pensión a cubrir. **No es una tabla de mortalidad**: solo el dato
   a los 65, que es el que necesitan las calculadoras de jubilación.
 - **Fuente**: INE — Movimiento Natural de la Población / Indicadores Demográficos Básicos.
@@ -590,7 +590,10 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
   distintos y **ninguna fuente** (20 años en `brechaJubilacion`, esperanza de vida 85 en
   `pensionComplementaria`, «20-25» en el formulario de `planificador-ahorro-jubilacion` y «25-30» en
   la FAQ de esa misma página). El candado que lo impide reaparecer es el test GOLDEN-BO2.
-- **Verificado**: 2026-08-13.
+- **Ambos sexos**: desde el 19/11/2026 es la cifra que publica el INE en la tabla de la nota
+  («A los 65 años · Ambos sexos»), no la media de hombres y mujeres, que se quedaba una décima corta.
+  Cambiarla mueve el golden GOLDEN-BO.
+- **Verificado**: 2026-11-19 (nota MNP2025 del 18/11/2026).
 
 #### `vivienda-joven.ts` — Ayudas jóvenes del Plan Estatal de Vivienda 2026-2030
 

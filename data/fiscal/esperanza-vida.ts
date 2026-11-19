@@ -14,37 +14,42 @@
  * falta la tabla completa por edad y sexo, es otro módulo.
  *
  * Fuente: INE — Movimiento Natural de la Población / Indicadores Demográficos
- * Básicos, año 2024 (nota de prensa de 19/11/2025)
- * Verificado: 2026-08-13 (ambas cifras leídas en la nota de prensa del INE)
+ * Básicos, año 2025 (nota de prensa de 18/11/2026)
+ * Verificado: 2026-11-19. Hombres y mujeres, en el texto de la nota («19,88 años
+ * más si era hombre y 23,62 años más si era mujer»); ambos sexos, en su tabla
+ * «Esperanza de Vida de la población residente en España (2015-2025)», columna
+ * «A los 65 años · Ambos sexos». La tabla da las tres cifras y coincide con el texto.
  *
- * ⚠️ El INE republica estas cifras cada año, hacia noviembre. Al re-sellar,
- * comprobar si el año de referencia sigue siendo el último publicado.
+ * Hasta el 19/11/2026 `referencia` era la media aritmética de hombres y mujeres
+ * (21,76 con los datos de 2024), con un comentario que decía que el INE no
+ * publicaba el valor conjunto. Sí lo publicaba, en la misma tabla (21,87 en 2024):
+ * la media se quedaba una décima corta porque a los 65 hay más mujeres que hombres.
+ *
+ * ⚠️ El INE republica estas cifras cada año, hacia noviembre (nota MNP<año>.htm).
+ * Al re-sellar: las tres cifras de la tabla, y que el año de referencia sea el
+ * último publicado. Cambiar `referencia` mueve el golden GOLDEN-BO.
  */
 
 export const FISCAL_ESPERANZA_VIDA_META = {
-  fuente: 'INE — Movimiento Natural de la Población / Indicadores Demográficos Básicos, año 2024',
-  verificado: '2026-08-13',
-  vigencia: '2024',
-  urlOficial: 'https://www.ine.es/dyngs/Prensa/MNP2024.htm',
+  fuente: 'INE — Movimiento Natural de la Población / Indicadores Demográficos Básicos, año 2025',
+  verificado: '2026-11-19',
+  vigencia: '2025',
+  urlOficial: 'https://www.ine.es/dyngs/Prensa/MNP2025.htm',
   nota: 'Esperanza de vida a los 65 años. Es una media poblacional del momento, no una previsión individual: no incorpora estado de salud, profesión ni antecedentes.',
 };
 
-/** Años que, de media, se viven a partir de los 65 (España, 2024) */
+/** Años que, de media, se viven a partir de los 65 (España, 2025) */
 export const ESPERANZA_VIDA_65 = {
-  hombres: 19.87,
-  mujeres: 23.64,
-  /**
-   * Media aritmética de ambos sexos. Es una aproximación: el INE no publica el
-   * valor conjunto en esta nota, y la media real estaría algo por encima porque
-   * entre quienes llegan a los 65 hay más mujeres que hombres.
-   */
-  referencia: 21.76,
+  hombres: 19.88,
+  mujeres: 23.62,
+  /** Ambos sexos, tal como lo publica el INE (no la media de las dos cifras de arriba) */
+  referencia: 21.86,
 } as const;
 
 export type SexoEsperanzaVida = keyof typeof ESPERANZA_VIDA_65;
 
 /** Edad hasta la que hay que financiar la jubilación, según el supuesto de referencia */
-export const EDAD_FINAL_ESTIMADA = 65 + ESPERANZA_VIDA_65.referencia; // 86,76
+export const EDAD_FINAL_ESTIMADA = 65 + ESPERANZA_VIDA_65.referencia; // 86,86
 
 /**
  * Años de pensión a cubrir según la edad a la que se acceda a la jubilación.
