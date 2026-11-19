@@ -192,13 +192,13 @@ test.describe('test-competencias-digitales · inspector 09/11/2026', () => {
     );
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el área 2 se rotula «Avanzado · obj: Avanzado» y su barra no se marca como cumplida', async ({
+  test('HALLAZGO 4401 (09/11/2026, REPARADO 19/11/2026) · el área 2 se rotula «Avanzado · obj: Avanzado» y su barra no se marca como cumplida', async ({
     page,
   }) => {
-    // Área 2 del CASO 1: media 15/6 = 2,5. El rótulo redondea (Math.round(2,5) = 3, Avanzado) y el
-    // color compara la media sin redondear (2,5 < 3). En la misma fila, el texto dice que llega al
-    // objetivo y la barra que no; el plan lista además 2.4, 2.5 y 2.6 como lagunas de esa área.
-    test.fail();
+    // Área 2 del CASO 1: media 15/6 = 2,5. El rótulo redondeaba (Math.round(2,5) = 3, Avanzado) y
+    // el color comparaba la media sin redondear (2,5 < 3). Ahora los dos salen de nivelDeMedia
+    // (digcomp.ts): 2,5 → 3, «Avanzado», y cumple el objetivo Avanzado. Las competencias 2.4-2.6
+    // siguen en el plan: son lagunas de competencia, no del área.
     await hacerCaso1(page);
     const RANGO: Record<string, number> = { Fundamental: 1, Intermedio: 2, Avanzado: 3, 'Altamente especializado': 4 };
     const filas = await leerFilas(page);
@@ -242,20 +242,23 @@ test.describe('test-competencias-digitales · inspector 09/11/2026', () => {
     expect(plan[7]).toEqual(['Comportamiento en la red (netiqueta)', 'Todavía no → Intermedio']);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · un área contestada entera con «Todavía no» sale sin nivel, y el .md dice «sin evaluar»', async ({
+  test('HALLAZGO 4400 (09/11/2026, REPARADO 19/11/2026) · un área contestada entera con «Todavía no» sale sin nivel, y el .md dice «sin evaluar»', async ({
     page,
   }) => {
-    // valorATramo(0) = null y la fila hace nombreTramo(null as TramoId) = '': el rótulo queda
-    // en «· obj: Intermedio» a secas. El Markdown convierte ese null en «sin evaluar», lo mismo
-    // que un área sin responder, aunque debajo lista sus competencias «Todavía no».
-    test.fail();
+    // valorATramo(0) = null y la fila hacía nombreTramo(null as TramoId) = '': el rótulo quedaba
+    // en «· obj: Intermedio» a secas, el global en «—» y el Markdown en «sin evaluar», lo mismo
+    // que un área sin responder. Ahora media 0 es «Todavía no» (la etiqueta de la opción 0, la
+    // misma de las tarjetas del plan) en la fila, en el global y en el .md.
     await responderTodo(page, todas(0));
     await botonVerResultados(page).click();
     await expect(resultados(page)).toBeVisible();
+    await expect(resultados(page).locator('[class*="_nivelGlobalValor"]')).toHaveText('Todavía no');
     const filas = await leerFilas(page);
-    for (const [i, f] of filas.entries()) expect(f.nivel, `nivel del área ${i + 1}`).not.toBe('');
+    for (const [i, f] of filas.entries()) expect(f.nivel, `nivel del área ${i + 1}`).toBe('Todavía no');
     const md = await descargarMarkdown(page);
     expect(md).not.toContain('Nivel: sin evaluar');
+    expect(md).toContain('**Nivel global aproximado:** Todavía no');
+    expect(md.match(/- Nivel: Todavía no · Objetivo: Intermedio/g)).toHaveLength(5);
   });
 
   test('CASO 2b (límite) · todo «Altamente especializado»: nivel máximo y sin lagunas', async ({ page }) => {
@@ -298,19 +301,35 @@ test.describe('test-competencias-digitales · inspector 09/11/2026', () => {
     expect(filas[4].cumple).toBe(false);
   });
 
-  test('CASO 2d (límite) · 20 «Todavía no» y un Fundamental: el suelo de valorATramo da Fundamental', async ({ page }) => {
-    // Global 1/21 = 0,048 → Math.round = 0 → suelo 1 → Fundamental. Área 1: (1+0+0)/3 = 0,33 →
-    // Fundamental, barra 8,33 %. Es la regla escrita en digcomp.ts (tramo «>= 1»); con media
-    // exactamente 0 no hay nivel (ver el HALLAZGO del área sin nivel).
+  test('CASO 2d (límite) · 20 «Todavía no» y un Fundamental: redondean a «Todavía no», sin salto desde la media 0', async ({ page }) => {
+    // Reescrito el 19/11/2026 (hallazgos 4400 y 4401). Antes: Math.round con suelo 1, así que
+    // 0,048 salía «Fundamental» y 0 salía sin nivel (el salto del 4400), y con objetivo
+    // Fundamental la barra no cumplía (0,33 < 1) bajo un rótulo que sí. Ahora una sola regla, el
+    // entero más cercano (nivelDeMedia): global 1/21 = 0,048 → 0 → «Todavía no»; área 1
+    // (1+0+0)/3 = 0,33 → 0 → «Todavía no», barra 8,33 % sin cumplir el Intermedio.
     const r = todas(0);
     r['1.1'] = 1;
     await responderTodo(page, r);
     await botonVerResultados(page).click();
     await expect(resultados(page)).toBeVisible();
-    await expect(resultados(page).locator('[class*="_nivelGlobalValor"]')).toHaveText('Fundamental');
+    await expect(resultados(page).locator('[class*="_nivelGlobalValor"]')).toHaveText('Todavía no');
+    const filas = await leerFilas(page);
+    expect(filas[0].nivel).toBe('Todavía no');
+    expect(filas[0].ancho).toBeCloseTo(8.33, 1);
+    expect(filas[0].cumple).toBe(false);
+  });
+
+  test('CASO 2e (límite) · área 1 con media 0,67 redondea a Fundamental y cumple el objetivo Fundamental', async ({ page }) => {
+    // «Iniciación digital» (objetivo Fundamental = 1): área 1 = (1+1+0)/3 = 0,67 → round 1 →
+    // «Fundamental», y 1 >= 1 → barra cumplida. Rótulo y color con la misma regla (hallazgo 4401).
+    await page.getByRole('button', { name: /Iniciación digital/ }).click();
+    await responderTodo(page, { '1.1': 1, '1.2': 1, '1.3': 0 });
+    await botonVerResultados(page).click();
+    await expect(resultados(page)).toBeVisible();
     const filas = await leerFilas(page);
     expect(filas[0].nivel).toBe('Fundamental');
-    expect(filas[0].ancho).toBeCloseTo(8.33, 1);
+    expect(filas[0].cumple).toBe(true);
+    expect(filas[0].ancho).toBeCloseTo(16.67, 1);
   });
 
   test('HALLAZGO (09/11/2026, ABIERTO) · el progreso entre mediciones sale con punto decimal: «+0.2»', async ({ page }) => {
@@ -354,23 +373,25 @@ test.describe('test-competencias-digitales · inspector 09/11/2026', () => {
     await expect(resultados(page)).toHaveCount(0);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · las pestañas de área se llaman «0/3», «0/6» y tres veces «0/4»', async ({
+  test('HALLAZGO 4402 (09/11/2026, REPARADO 19/11/2026) · las pestañas de área se llamaban «0/3», «0/6» y tres veces «0/4»', async ({
     page,
   }) => {
-    // El icono es aria-hidden y lo único con nombre es el contador: un lector de pantalla oye
-    // «0/4, botón» en Creación de contenidos, Seguridad y Resolución de problemas.
-    test.fail();
+    // El icono es aria-hidden y lo único con nombre era el contador: un lector de pantalla oía
+    // «0/4, botón» en Creación de contenidos, Seguridad y Resolución de problemas. Ahora cada
+    // pestaña enseña «Área N» y lleva el nombre del área en texto solo para lectores.
     const pestanas = grupoAreas(page).getByRole('button');
     await expect(pestanas).toHaveCount(5);
     for (const area of ['Información', 'Comunicación', 'Creación', 'Seguridad', 'Resolución']) {
       await expect(grupoAreas(page).getByRole('button', { name: new RegExp(area) })).toHaveCount(1);
     }
+    await expect(pestanas.nth(3)).toHaveAccessibleName(/^Área 4\s*:\s*Seguridad,\s*0\/4$/);
+    await expect(pestanas.nth(3)).toContainText('Área 4');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · features y la guía prometen un «radar» y la app pinta barras', async ({ page }) => {
+  test('HALLAZGO 4403 (09/11/2026, REPARADO 19/11/2026) · features y la guía prometían un «radar» y la app pinta barras', async ({ page }) => {
     // jsonLd.features: «Nivel por competencia y por área con radar de resultados»; paso 3 de la
-    // guía: «Revisa tu radar por áreas». Los resultados son barras horizontales por área.
-    test.fail();
+    // guía: «Revisa tu radar por áreas». Los resultados son barras horizontales por área: ahora
+    // features y la guía dicen «barras».
     const features = await page.evaluate(() => {
       for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
         const j = JSON.parse(s.textContent ?? '{}') as { featureList?: string[] | string };

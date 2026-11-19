@@ -464,11 +464,26 @@ export function tramoDesdeValor(valor: number): TramoId | null {
   return ORDEN_TRAMOS[valor - 1] ?? null;
 }
 
-/** Redondea la media de un área al tramo más cercano (>=1). */
+/**
+ * Nivel 0-4 de una media: el entero más cercano (2,5 → 3, 0,33 → 0). Es la ÚNICA regla del
+ * resultado: de ella salen el rótulo y el «cumple» de la barra, para que en una misma fila el
+ * texto y el color no digan cosas distintas (hallazgo 4401). El 0 es «Todavía no», no «sin
+ * evaluar» (hallazgo 4400).
+ */
+export function nivelDeMedia(media: number): number {
+  return Math.min(4, Math.max(0, Math.round(media)));
+}
+
+/** Tramo de una media (null si redondea a 0, «Todavía no»). */
 export function valorATramo(valor: number): TramoId | null {
-  if (valor <= 0) return null;
-  const idx = Math.min(4, Math.max(1, Math.round(valor)));
-  return ORDEN_TRAMOS[idx - 1];
+  const nivel = nivelDeMedia(valor);
+  return nivel === 0 ? null : ORDEN_TRAMOS[nivel - 1];
+}
+
+/** Rótulo de una media evaluada: el nombre de su tramo o «Todavía no». */
+export function rotuloNivel(media: number): string {
+  const t = valorATramo(media);
+  return t ? nombreTramo(t) : 'Todavía no';
 }
 
 export function competenciasDeArea(areaId: string): Competencia[] {

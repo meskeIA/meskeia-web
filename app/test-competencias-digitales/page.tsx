@@ -21,7 +21,8 @@ import {
   ORDEN_TRAMOS,
   competenciasDeArea,
   tramoDesdeValor,
-  valorATramo,
+  nivelDeMedia,
+  rotuloNivel,
   nombreTramo,
   type TramoId,
 } from './digcomp';
@@ -182,13 +183,11 @@ export default function TestCompetenciasDigitalesPage() {
     let md = '# Mi perfil de competencias digitales (DigComp)\n\n';
     md += `_Perfil objetivo: ${perfil.nombre} · ${respondidas}/${total} competencias evaluadas_\n\n`;
     if (mediaGlobal !== null) {
-      const t = valorATramo(mediaGlobal);
-      md += `**Nivel global aproximado:** ${t ? nombreTramo(t) : '—'}\n\n`;
+      md += `**Nivel global aproximado:** ${rotuloNivel(mediaGlobal)}\n\n`;
     }
     areaStats.forEach((s) => {
-      const t = s.media !== null ? valorATramo(s.media) : null;
       md += `## ${s.area.nombre}\n\n`;
-      md += `- Nivel: ${t ? nombreTramo(t) : 'sin evaluar'} · Objetivo: ${nombreTramo(s.objetivo)}\n`;
+      md += `- Nivel: ${s.media !== null ? rotuloNivel(s.media) : 'sin evaluar'} · Objetivo: ${nombreTramo(s.objetivo)}\n`;
       s.comps.forEach((c) => {
         const v = respuestas[c.id];
         if (v === undefined) return;
@@ -319,6 +318,10 @@ export default function TestCompetenciasDigitalesPage() {
               onClick={() => setAreaActiva(i)}
             >
               <span aria-hidden="true">{s.area.icono}</span>
+              <span className={styles.areaTabNombre}>
+                Área {s.area.id}
+                <span className="sr-only">: {s.area.nombre}, </span>
+              </span>
               <span className={styles.areaTabNum}>
                 {s.answeredLen}/{s.comps.length}
               </span>
@@ -443,7 +446,7 @@ export default function TestCompetenciasDigitalesPage() {
           <div className={styles.nivelGlobal}>
             <span className={styles.nivelGlobalLabel}>Nivel global aproximado</span>
             <span className={styles.nivelGlobalValor}>
-              {valorATramo(mediaGlobal) ? nombreTramo(valorATramo(mediaGlobal) as TramoId) : '—'}
+              {rotuloNivel(mediaGlobal)}
             </span>
             <span className={styles.nivelGlobalNota}>
               Media de {respondidas} de {total} competencias · perfil {perfil.nombre}
@@ -458,7 +461,9 @@ export default function TestCompetenciasDigitalesPage() {
             {areaStats.map((s) => {
               const pct = s.media !== null ? (s.media / 4) * 100 : 0;
               const objPct = (s.objetivoValor / 4) * 100;
-              const cumple = s.media !== null && s.media >= s.objetivoValor;
+              // Misma regla que el rótulo (nivelDeMedia): 2,5 se rotula «Avanzado» y cumple un
+              // objetivo Avanzado (hallazgo 4401)
+              const cumple = s.media !== null && nivelDeMedia(s.media) >= s.objetivoValor;
               return (
                 <div key={s.area.id} className={styles.barraFila}>
                   <div className={styles.barraLabel}>
@@ -472,7 +477,7 @@ export default function TestCompetenciasDigitalesPage() {
                     <div className={styles.barraObjetivo} style={{ left: `${objPct}%` }} aria-hidden="true" />
                   </div>
                   <div className={styles.barraValor}>
-                    {s.media !== null ? nombreTramo(valorATramo(s.media) as TramoId) : 'sin evaluar'}
+                    {s.media !== null ? rotuloNivel(s.media) : 'sin evaluar'}
                     <span className={styles.barraObjetivoTxt}>· obj: {nombreTramo(s.objetivo)}</span>
                   </div>
                 </div>
@@ -538,11 +543,10 @@ export default function TestCompetenciasDigitalesPage() {
                   .map((m, i, arr) => {
                     const anterior = arr[i + 1];
                     const delta = anterior ? m.media - anterior.media : null;
-                    const t = valorATramo(m.media);
                     return (
                       <li key={m.fecha} className={styles.historialItem}>
                         <span>{formatDate(new Date(m.fecha))}</span>
-                        <span>{t ? nombreTramo(t) : '—'}</span>
+                        <span>{rotuloNivel(m.media)}</span>
                         {delta !== null && (
                           <span
                             className={
@@ -777,7 +781,7 @@ export default function TestCompetenciasDigitalesPage() {
             <div className={styles.step}>
               <div className={styles.stepNumber}>3</div>
               <div className={styles.stepContent}>
-                <h4>Revisa tu radar por áreas</h4>
+                <h4>Revisa tus barras por áreas</h4>
                 <p>
                   Observa dónde superas tu objetivo y dónde te quedas corto. Las áreas por debajo del
                   objetivo son tus focos de mejora.
