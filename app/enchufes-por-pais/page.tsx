@@ -26,11 +26,11 @@ const BASE_PAISES: DatosPais[] = [
   { pais: 'España', bandera: '🇪🇸', continente: 'Europa', tipos: ['C', 'F'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'Referencia de origen. Los enchufes tipo C y F son estándar en casi toda Europa continental.' },
   { pais: 'Francia', bandera: '🇫🇷', continente: 'Europa', tipos: ['C', 'E'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'Necesitas adaptador para enchufes UK o americanos.' },
   { pais: 'Alemania', bandera: '🇩🇪', continente: 'Europa', tipos: ['C', 'F'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'Compatible con la mayoría de enchufes europeos. Sin adaptador necesario desde España.' },
-  { pais: 'Italia', bandera: '🇮🇹', continente: 'Europa', tipos: ['C', 'F', 'L'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'El tipo L (tres clavijas en línea) es exclusivo de Italia. Lleva adaptador por si acaso.' },
+  { pais: 'Italia', bandera: '🇮🇹', continente: 'Europa', tipos: ['C', 'F', 'L'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'El tipo L (tres clavijas en línea) es el característico de Italia. Lleva adaptador por si acaso.' },
   { pais: 'Portugal', bandera: '🇵🇹', continente: 'Europa', tipos: ['C', 'F'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'Compatible con los enchufes españoles. Sin adaptador necesario.' },
-  { pais: 'Reino Unido', bandera: '🇬🇧', continente: 'Europa', tipos: ['G'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'El tipo G (tres clavijas rectangulares) es exclusivo de UK. Necesitas adaptador desde Europa continental.' },
+  { pais: 'Reino Unido', bandera: '🇬🇧', continente: 'Europa', tipos: ['G'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'El tipo G (tres clavijas rectangulares) es el estándar británico, compartido con Irlanda, Malasia, Singapur o Kenia. Necesitas adaptador desde Europa continental.' },
   { pais: 'Irlanda', bandera: '🇮🇪', continente: 'Europa', tipos: ['G'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'Igual que Reino Unido. Necesitas adaptador tipo G si vienes desde España.' },
-  { pais: 'Suiza', bandera: '🇨🇭', continente: 'Europa', tipos: ['C', 'J'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'El tipo J (tres clavijas) es exclusivo de Suiza. El tipo C funciona en muchas tomas.' },
+  { pais: 'Suiza', bandera: '🇨🇭', continente: 'Europa', tipos: ['C', 'J'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'El tipo J (tres clavijas) es el estándar suizo. El tipo C funciona en muchas tomas.' },
   { pais: 'Austria', bandera: '🇦🇹', continente: 'Europa', tipos: ['C', 'F'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'Compatible con enchufes españoles. Sin adaptador necesario.' },
   { pais: 'Bélgica', bandera: '🇧🇪', continente: 'Europa', tipos: ['C', 'E'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'Similar a Francia. Adaptador necesario para UK y EE.UU.' },
   { pais: 'Países Bajos', bandera: '🇳🇱', continente: 'Europa', tipos: ['C', 'F'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'Compatible con enchufes españoles. Sin adaptador necesario.' },
@@ -47,12 +47,12 @@ const BASE_PAISES: DatosPais[] = [
   { pais: 'Rusia', bandera: '🇷🇺', continente: 'Europa/Asia', tipos: ['C', 'F'], voltaje: '220 V', frecuencia: '50 Hz', notaAdaptador: 'Compatible con enchufes europeos tipo C/F.' },
 
   // AMÉRICAS
-  { pais: 'Estados Unidos', bandera: '🇺🇸', continente: 'América', tipos: ['A', 'B'], voltaje: '120 V', frecuencia: '60 Hz', notaAdaptador: 'Voltaje diferente (120V vs 230V). Muchos cargadores modernos son universales (100-240V): comprueba la etiqueta del dispositivo.' },
-  { pais: 'Canadá', bandera: '🇨🇦', continente: 'América', tipos: ['A', 'B'], voltaje: '120 V', frecuencia: '60 Hz', notaAdaptador: 'Igual que EE.UU. Comprueba si tu cargador soporta 100-240V.' },
-  { pais: 'México', bandera: '🇲🇽', continente: 'América', tipos: ['A', 'B'], voltaje: '127 V', frecuencia: '60 Hz', notaAdaptador: 'Voltaje intermedio (127V). Verifica que tus dispositivos sean universales.' },
+  { pais: 'Estados Unidos', bandera: '🇺🇸', continente: 'América', tipos: ['A', 'B'], voltaje: '120 V', frecuencia: '60 Hz', notaAdaptador: 'Voltaje diferente (120 V frente a los 230 V de España). Muchos cargadores modernos son universales (100-240 V): comprueba la etiqueta del dispositivo.' },
+  { pais: 'Canadá', bandera: '🇨🇦', continente: 'América', tipos: ['A', 'B'], voltaje: '120 V', frecuencia: '60 Hz', notaAdaptador: 'Igual que EE.UU. Comprueba si tu cargador soporta 100-240 V.' },
+  { pais: 'México', bandera: '🇲🇽', continente: 'América', tipos: ['A', 'B'], voltaje: '127 V', frecuencia: '60 Hz', notaAdaptador: 'Voltaje intermedio (127 V). Verifica que tus dispositivos sean universales.' },
   { pais: 'Argentina', bandera: '🇦🇷', continente: 'América', tipos: ['C', 'I'], voltaje: '220 V', frecuencia: '50 Hz', notaAdaptador: 'El tipo I (tres clavijas en Y) es el estándar argentino. Muchos hoteles tienen adaptadores disponibles.' },
   { pais: 'Brasil', bandera: '🇧🇷', continente: 'América', tipos: ['C', 'N'], voltaje: '127-220 V', frecuencia: '60 Hz', notaAdaptador: 'Voltaje variable según ciudad. El tipo N (NBR 14136) es el estándar desde 2010, pero aún hay tipo C y A.' },
-  { pais: 'Colombia', bandera: '🇨🇴', continente: 'América', tipos: ['A', 'B'], voltaje: '110 V', frecuencia: '60 Hz', notaAdaptador: 'Igual formato que EE.UU. pero voltaje 110V. Verifica compatibilidad de tus dispositivos.' },
+  { pais: 'Colombia', bandera: '🇨🇴', continente: 'América', tipos: ['A', 'B'], voltaje: '110 V', frecuencia: '60 Hz', notaAdaptador: 'Igual formato que EE.UU. pero voltaje 110 V. Verifica compatibilidad de tus dispositivos.' },
   { pais: 'Chile', bandera: '🇨🇱', continente: 'América', tipos: ['C', 'L'], voltaje: '220 V', frecuencia: '50 Hz', notaAdaptador: 'Principalmente tipo L (italiano). Lleva adaptador universal.' },
   { pais: 'Perú', bandera: '🇵🇪', continente: 'América', tipos: ['A', 'B', 'C'], voltaje: '220 V', frecuencia: '60 Hz', notaAdaptador: 'Mezcla de tipos. El adaptador universal es muy recomendable.' },
   { pais: 'Ecuador', bandera: '🇪🇨', continente: 'América', tipos: ['A', 'B'], voltaje: '120 V', frecuencia: '60 Hz', notaAdaptador: 'Igual que EE.UU. Adaptador tipo A/B necesario.' },
@@ -60,9 +60,9 @@ const BASE_PAISES: DatosPais[] = [
   { pais: 'República Dominicana', bandera: '🇩🇴', continente: 'América', tipos: ['A', 'B'], voltaje: '120 V', frecuencia: '60 Hz', notaAdaptador: 'Igual que EE.UU. Adaptador tipo A/B necesario.' },
 
   // ASIA
-  { pais: 'Japón', bandera: '🇯🇵', continente: 'Asia', tipos: ['A', 'B'], voltaje: '100 V', frecuencia: '50-60 Hz', notaAdaptador: 'Voltaje único en el mundo (100V). La mayoría de dispositivos europeos soporta 100-240V, pero verifica siempre la etiqueta.' },
+  { pais: 'Japón', bandera: '🇯🇵', continente: 'Asia', tipos: ['A', 'B'], voltaje: '100 V', frecuencia: '50 o 60 Hz', notaAdaptador: 'Voltaje único en el mundo (100 V), y la frecuencia es de 50 o 60 Hz según la zona del país. La mayoría de dispositivos europeos soporta 100-240 V, pero verifica siempre la etiqueta.' },
   { pais: 'China', bandera: '🇨🇳', continente: 'Asia', tipos: ['A', 'C', 'I'], voltaje: '220 V', frecuencia: '50 Hz', notaAdaptador: 'Variedad de tomas. El adaptador universal es muy recomendable.' },
-  { pais: 'India', bandera: '🇮🇳', continente: 'Asia', tipos: ['C', 'D', 'M'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'El tipo D (tres clavijas circulares grandes) es exclusivo de India. Lleva adaptador. La calidad eléctrica puede variar.' },
+  { pais: 'India', bandera: '🇮🇳', continente: 'Asia', tipos: ['C', 'D', 'M'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'El tipo D (tres clavijas circulares en triángulo) es el característico de India. Lleva adaptador. La calidad eléctrica puede variar.' },
   { pais: 'Tailandia', bandera: '🇹🇭', continente: 'Asia', tipos: ['A', 'B', 'C'], voltaje: '220 V', frecuencia: '50 Hz', notaAdaptador: 'Aceptan tipos mixtos. El adaptador tipo C español suele funcionar.' },
   { pais: 'Indonesia', bandera: '🇮🇩', continente: 'Asia', tipos: ['C', 'F'], voltaje: '220 V', frecuencia: '50 Hz', notaAdaptador: 'Compatible con enchufes europeos tipo C/F.' },
   { pais: 'Vietnam', bandera: '🇻🇳', continente: 'Asia', tipos: ['A', 'C', 'G'], voltaje: '220 V', frecuencia: '50 Hz', notaAdaptador: 'Mezcla de estándares en hoteles. Adaptador universal muy útil.' },
@@ -80,7 +80,7 @@ const BASE_PAISES: DatosPais[] = [
 
   // AFRICA
   { pais: 'Marruecos', bandera: '🇲🇦', continente: 'África', tipos: ['C', 'E'], voltaje: '220 V', frecuencia: '50 Hz', notaAdaptador: 'Compatible con enchufes europeos tipo C. Sin problemas desde España.' },
-  { pais: 'Sudáfrica', bandera: '🇿🇦', continente: 'África', tipos: ['C', 'M', 'N'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'El tipo M (tres clavijas grandes) es exclusivo de Sudáfrica. Necesitas adaptador.' },
+  { pais: 'Sudáfrica', bandera: '🇿🇦', continente: 'África', tipos: ['C', 'M', 'N'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'El tipo M (tres clavijas circulares grandes) es el característico de Sudáfrica. Necesitas adaptador.' },
   { pais: 'Egipto', bandera: '🇪🇬', continente: 'África', tipos: ['C', 'F'], voltaje: '220 V', frecuencia: '50 Hz', notaAdaptador: 'Compatible con enchufes europeos tipo C/F.' },
   { pais: 'Kenia', bandera: '🇰🇪', continente: 'África', tipos: ['G'], voltaje: '240 V', frecuencia: '50 Hz', notaAdaptador: 'Igual que Reino Unido. Adaptador tipo G necesario.' },
   { pais: 'Tanzania', bandera: '🇹🇿', continente: 'África', tipos: ['D', 'G'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'Principalmente tipo G. Adaptador necesario.' },
@@ -90,7 +90,7 @@ const BASE_PAISES: DatosPais[] = [
   { pais: 'Madagascar', bandera: '🇲🇬', continente: 'África', tipos: ['C', 'E'], voltaje: '220 V', frecuencia: '50 Hz', notaAdaptador: 'Compatible con tipo C español.' },
 
   // OCEANÍA
-  { pais: 'Australia', bandera: '🇦🇺', continente: 'Oceanía', tipos: ['I'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'El tipo I (tres clavijas en Y inclinadas) es exclusivo de Australia/NZ. Adaptador específico necesario.' },
+  { pais: 'Australia', bandera: '🇦🇺', continente: 'Oceanía', tipos: ['I'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'El tipo I (tres clavijas en Y inclinadas) es el estándar de Australia y Nueva Zelanda. Adaptador específico necesario.' },
   { pais: 'Nueva Zelanda', bandera: '🇳🇿', continente: 'Oceanía', tipos: ['I'], voltaje: '230 V', frecuencia: '50 Hz', notaAdaptador: 'Igual que Australia. Adaptador tipo I necesario.' },
   { pais: 'Fiyi', bandera: '🇫🇯', continente: 'Oceanía', tipos: ['I'], voltaje: '240 V', frecuencia: '50 Hz', notaAdaptador: 'Igual que Australia. Adaptador tipo I necesario.' },
 ];
@@ -112,8 +112,13 @@ const TIPOS_ENCHUFE: Record<string, string> = {
   N: 'Tres clavijas redondas IEC — Brasil',
 };
 
-// Agrupamos países por continente para el <optgroup>
-const CONTINENTES = Array.from(new Set(BASE_PAISES.map(p => p.continente))).sort();
+// Agrupamos países por continente para el <optgroup>, en orden alfabético español
+// (`.sort()` a secas dejaba «África» al final: la Á va detrás de la Z en código)
+const ordenEs = (a: string, b: string): number => a.localeCompare(b, 'es');
+const CONTINENTES = Array.from(new Set(BASE_PAISES.map(p => p.continente))).sort(ordenEs);
+const PAISES_DE: Record<string, DatosPais[]> = Object.fromEntries(
+  CONTINENTES.map(c => [c, BASE_PAISES.filter(p => p.continente === c).sort((a, b) => ordenEs(a.pais, b.pais))]),
+);
 
 export default function EnchufesPais() {
   const [paisSeleccionado, setPaisSeleccionado] = useState<string>('');
@@ -150,22 +155,23 @@ export default function EnchufesPais() {
               className={styles.selectPais}
               value={paisSeleccionado}
               onChange={e => setPaisSeleccionado(e.target.value)}
-              aria-label="País de destino"
             >
               <option value="">— Elige un país —</option>
               {CONTINENTES.map(continente => (
                 <optgroup key={continente} label={continente}>
-                  {BASE_PAISES
-                    .filter(p => p.continente === continente)
-                    .map(p => (
-                      <option key={p.pais} value={p.pais}>
-                        {p.bandera} {p.pais}
-                      </option>
-                    ))}
+                  {/* Sin bandera delante: la búsqueda por letra del <select> mira el primer carácter */}
+                  {PAISES_DE[continente].map(p => (
+                    <option key={p.pais} value={p.pais}>
+                      {p.pais}
+                    </option>
+                  ))}
                 </optgroup>
               ))}
             </select>
           </div>
+          <p className={styles.selectorOrigen}>
+            Las notas de adaptador suponen que viajas desde España (230 V · tipos C y F).
+          </p>
 
           {/* Ficha del país seleccionado */}
           {datos ? (
@@ -260,7 +266,7 @@ export default function EnchufesPais() {
 
           <h3>Los 5 adaptadores más útiles para viajeros españoles</h3>
           <ol>
-            <li><strong>Tipo G</strong> para Reino Unido, Irlanda, India, Hong Kong, Malasia, Singapur</li>
+            <li><strong>Tipo G</strong> para Reino Unido, Irlanda, Hong Kong, Malasia, Singapur</li>
             <li><strong>Tipo A/B</strong> para Estados Unidos, Canadá, México, Japón</li>
             <li><strong>Tipo I</strong> para Australia, Nueva Zelanda, Argentina</li>
             <li><strong>Tipo L</strong> para Italia y Chile</li>
@@ -271,7 +277,7 @@ export default function EnchufesPais() {
           <p>
             Si viajas frecuentemente, invierte en un <strong>adaptador universal de calidad</strong> con
             puertos USB incorporados. Son compactos, cubren 150+ países y permiten cargar varios dispositivos
-            simultáneamente. Presupuesto: entre 10€ y 30€.
+            simultáneamente. Presupuesto: entre 10 € y 30 €.
           </p>
 
           {/* ── SECCIÓN 1: Tabla comparativa ── */}
@@ -294,7 +300,7 @@ export default function EnchufesPais() {
                   <td><strong>Tipo A</strong></td>
                   <td>EE.UU., Canadá, México, Japón</td>
                   <td>100-127 V</td>
-                  <td>60 Hz</td>
+                  <td>60 Hz (Japón: 50 o 60 Hz según la zona)</td>
                   <td>2 clavijas planas paralelas</td>
                   <td>Sí, obligatorio</td>
                   <td>Solo si el dispositivo es 100-240V</td>
@@ -490,7 +496,7 @@ export default function EnchufesPais() {
               <span className={styles.stepNumber}>6</span>
               <div className={styles.stepContent}>
                 <strong>Compra el adaptador adecuado (o uno universal)</strong>
-                <p>Si son varios países con tipos distintos, un adaptador universal es más económico que comprar uno por tipo. Presupuesto: 10-30€ en tiendas de viaje o Amazon.</p>
+                <p>Si son varios países con tipos distintos, un adaptador universal es más económico que comprar uno por tipo. Presupuesto: 10-30 € en tiendas de viaje o Amazon.</p>
               </div>
             </div>
             <div className={styles.step}>

@@ -51,6 +51,13 @@ import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliar
  *
  * Los test con test.fail() son HALLAZGOS ABIERTOS: el día que se reparen, fallarán por pasar y habrá
  * que quitarles el test.fail() (y cambiar ABIERTO por REPARADO). Cada uno afirma lo CORRECTO.
+ *
+ * REPARADOS (/reparar, 19/11/2026): los trece. La IEC no se pudo consultar tampoco al reparar, así que
+ * ninguna ficha cambió de voltaje ni de tipos: se alineó el resto de la página con las fichas
+ * (FAQPage sin Perú en el grupo de 110-120 V, guía del G sin India), Japón dice «50 o 60 Hz según la
+ * zona» como ya decía el FAQPage, las notas dejan de llamar «exclusivo» a un tipo que el catálogo
+ * comparte (queda el H de Israel), el combo va sin banderas y en orden alfabético, sin aria-label,
+ * con el foco visible en oscuro, la promesa baja a «Más de 60 países» y el origen España se dice.
  */
 
 const RUTA = '/enchufes-por-pais/';
@@ -201,20 +208,18 @@ test.describe('enchufes-por-pais · escritorio', () => {
     await expect(page.locator('#control-sin-bandera')).toHaveValue('Japón');
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · con el combo enfocado, «J» no lleva a Japón: cada opción empieza por la bandera', async ({
+  test('HALLAZGO (19/11/2026, REPARADO) · con el combo enfocado, «J» lleva a Japón: las opciones ya no empiezan por la bandera', async ({
     page,
   }) => {
-    test.fail();
     await page.locator(SELECTOR).focus();
     await page.keyboard.press('J');
     // Primer país que empieza por J en el orden del combo; hoy el valor se queda en «»
     await expect(page.locator(SELECTOR)).toHaveValue('Japón');
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · continentes y países no van en orden alfabético (África sale la última)', async ({
+  test('HALLAZGO (19/11/2026, REPARADO) · continentes y países van en orden alfabético (África, la primera)', async ({
     page,
   }) => {
-    test.fail();
     const grupos = await page.locator(`${SELECTOR} optgroup`).evaluateAll((gs) =>
       gs.map((g) => ({
         etiqueta: (g as HTMLOptGroupElement).label,
@@ -229,24 +234,22 @@ test.describe('enchufes-por-pais · escritorio', () => {
     }
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · el nombre accesible del combo no contiene su etiqueta visible', async ({
+  test('HALLAZGO (19/11/2026, REPARADO) · el nombre accesible del combo contiene su etiqueta visible', async ({
     page,
   }) => {
-    test.fail();
     // Etiqueta visible «Selecciona tu destino»; el aria-label la sustituye por «País de destino» (WCAG 2.5.3)
     await expect(page.getByRole('combobox', { name: /Selecciona tu destino/i })).toHaveCount(1);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · la guía manda el adaptador G a India y la ficha de India no tiene G', async ({
+  test('HALLAZGO (19/11/2026, REPARADO) · cada país al que la guía manda el adaptador G tiene G en su ficha', async ({
     page,
   }) => {
-    test.fail();
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const item = page.getByRole('listitem').filter({ hasText: /^Tipo G para / });
     const texto = (await item.innerText()).trim();
-    // «Tipo G para Reino Unido, Irlanda, India, Hong Kong, Malasia, Singapur»
+    // Antes «Tipo G para Reino Unido, Irlanda, India, Hong Kong, Malasia, Singapur»; India (C / D / M) sale
     const paisesGuia = texto.replace(/^Tipo G para\s*/, '').split(/,\s*/);
-    expect(paisesGuia).toContain('India');
+    expect(paisesGuia.length).toBeGreaterThan(0);
     const sinG: string[] = [];
     for (const pais of paisesGuia) {
       await elegir(page, pais);
@@ -257,10 +260,9 @@ test.describe('enchufes-por-pais · escritorio', () => {
     expect(sinG).toEqual([]);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · las notas «exclusivo de…» las desmiente el propio catálogo', async ({
+  test('HALLAZGO (19/11/2026, REPARADO) · ninguna nota «exclusivo de…» la desmiente el propio catálogo', async ({
     page,
   }) => {
-    test.fail();
     test.setTimeout(90000);
     const ALIAS: Record<string, string[]> = { UK: ['Reino Unido'], 'Australia/NZ': ['Australia', 'Nueva Zelanda'] };
     const tiposDe = new Map<string, string[]>();
@@ -282,20 +284,18 @@ test.describe('enchufes-por-pais · escritorio', () => {
     expect(desmentidos).toEqual([]);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · Japón da «50-60 Hz» sin decir que la frecuencia va por zonas', async ({
+  test('HALLAZGO (19/11/2026, REPARADO) · Japón dice que la frecuencia va por zonas', async ({
     page,
   }) => {
-    test.fail();
     await elegir(page, 'Japón');
     const texto = `${await dato(page, 'Frecuencia')} ${await nota(page)}`;
     // El FAQPage de la propia app: «Japón tiene 100 V a 50/60 Hz según la zona»
     expect(texto).toMatch(/\b(este|oeste|región|regiones|zona|zonas)\b/i);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · la nota compara con España sin decir que el origen es España', async ({
+  test('HALLAZGO (19/11/2026, REPARADO) · la ficha dice que el origen de la comparación es España', async ({
     page,
   }) => {
-    test.fail();
     await elegir(page, 'Estados Unidos');
     // La ficha (sin el combo) debe decir desde dónde se compara: hoy «Voltaje diferente (120V vs 230V)…»
     const textoFicha = await tarjeta(page).evaluate((s) => {
@@ -306,20 +306,20 @@ test.describe('enchufes-por-pais · escritorio', () => {
     expect(textoFicha).toMatch(/España|español/i);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · la metadata promete «Más de 100 países» y el combo tiene 62', async ({
+  test('HALLAZGO (19/11/2026, REPARADO) · la metadata no promete más países de los que tiene el combo', async ({
     page,
   }) => {
-    test.fail();
     const descripcion = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
     const total = (await paisesDelCombo(page)).length;
     const promesa = descripcion.match(/más de (\d+) países/i);
     if (promesa) expect(total).toBeGreaterThan(Number(promesa[1]));
+    // Antes «Más de 100 países» con 62; ahora «Más de 60 países»
+    expect(descripcion).not.toMatch(/más de 100 países/i);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · el FAQPage contradice a la página (14 tipos, el tipo B y Perú)', async ({
+  test('HALLAZGO (19/11/2026, REPARADO) · el FAQPage dice lo mismo que la página (14 tipos, el tipo B, Perú y EE. UU.)', async ({
     page,
   }) => {
-    test.fail();
     const faq = (await bloquesLd(page)).find((b) => b['@type'] === 'FAQPage');
     expect(faq?.mainEntity?.length).toBeGreaterThan(0);
     const respuestas = faq!.mainEntity!.map((e) => e.acceptedAnswer.text).join(' ');
@@ -336,19 +336,21 @@ test.describe('enchufes-por-pais · escritorio', () => {
     await elegir(page, 'Perú');
     expect(await dato(page, 'Voltaje')).toBe('220 V');
     expect(respuestas).not.toMatch(/Perú usan 110-120 V/i);
+
+    // EE. UU. en la ficha: «A / B»; el FAQPage decía solo «usa el Tipo A»
+    expect(respuestas).not.toMatch(/Estados Unidos \(y Canadá\) usa el Tipo A \(/);
+    expect(respuestas).toMatch(/Tipos A \(dos clavijas planas paralelas\) y B/);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · el JSON-LD WebApplication no declara características', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (19/11/2026, REPARADO) · el JSON-LD WebApplication declara sus características', async ({ page }) => {
     const app = (await bloquesLd(page)).find((b) => b['@type'] === 'WebApplication');
     const lista = app?.featureList ?? app?.features;
     expect(Array.isArray(lista) ? lista.length : 0).toBeGreaterThanOrEqual(4);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · formato: «10€» y «30€» sin espacio en la guía, «95%» pegado en el FAQPage', async ({
+  test('HALLAZGO (19/11/2026, REPARADO) · formato: «10 €» y «30 €» con espacio en la guía, «95 %» separado en el FAQPage', async ({
     page,
   }) => {
-    test.fail();
     // CLAUDE.md §2: «1.234,56 €» con espacio antes del símbolo y «15 %» separado (U+00A0)
     const consejo = page.getByText(/^Si viajas frecuentemente, invierte/);
     const paso6 = page.getByText(/^Si son varios países con tipos distintos/);
@@ -357,8 +359,12 @@ test.describe('enchufes-por-pais · escritorio', () => {
     expect(textos).not.toMatch(/\d€/);
     const faq = (await bloquesLd(page)).find((b) => b['@type'] === 'FAQPage');
     const respuestas = (faq?.mainEntity ?? []).map((e) => e.acceptedAnswer.text).join(' ');
-    // Hoy: «más del 95% de los países»
+    // Antes: «más del 95% de los países»; ahora con espacio duro (U+00A0)
     expect(respuestas).not.toMatch(/\d%/);
+    expect(respuestas).toContain('95 %');
+    // Las notas: «120 V» separado, como la ficha (antes «120V vs 230V»)
+    await elegir(page, 'Estados Unidos');
+    expect(await nota(page)).not.toMatch(/\dV\b/);
   });
 });
 
@@ -420,13 +426,12 @@ test.describe('enchufes-por-pais · foco del combo en los dos temas', () => {
     expect(await contrasteDelFoco(page)).toBeGreaterThanOrEqual(3);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · en oscuro el foco de teclado del combo no se ve (borde, contorno y anillo por debajo de 3:1)', async ({
+  test('HALLAZGO (19/11/2026, REPARADO) · en oscuro el foco de teclado del combo se ve (3:1 o más)', async ({
     page,
   }) => {
-    test.fail();
     await cargar(page);
     await activarTema(page, 'dark');
-    // Hoy: borde #3a3a3a (lo fija [data-theme='dark'] .selectPais, que pisa a .selectPais:focus),
+    // Antes: borde #3a3a3a (lo fija [data-theme='dark'] .selectPais, que pisa a .selectPais:focus),
     // contorno «none» y anillo rgba(63,165,209,0,15): el mejor da ~1,26:1 sobre #2d2d2d
     expect(await contrasteDelFoco(page)).toBeGreaterThanOrEqual(3);
   });
