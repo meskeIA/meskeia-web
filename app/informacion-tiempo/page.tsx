@@ -8,7 +8,9 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber, formatPercentage } from '@/lib';
 import {
+  cieloDeIcono,
   repartirPronostico,
+  type Cielo,
   type DiaPronostico,
   type FranjaPronostico,
   type TramoPronostico,
@@ -72,6 +74,14 @@ const fechaDelDia = (dia: DiaPronostico, opciones: Intl.DateTimeFormatOptions): 
 
 const rangoTemperatura = (f: FranjaPronostico): string =>
   f.tempMin === f.tempMax ? `${f.tempMax}°` : `${f.tempMin}° / ${f.tempMax}°`;
+
+// Fondo de la tarjeta del tiempo actual según el cielo (contraste del blanco medido en los cuatro)
+const CLASE_CIELO: Record<Cielo, string> = {
+  despejado: styles.cieloDespejado,
+  nubes: styles.cieloNubes,
+  lluvia: styles.cieloLluvia,
+  noche: styles.cieloNoche,
+};
 
 // Ciudades populares para acceso rápido
 const CIUDADES_POPULARES = [
@@ -414,7 +424,11 @@ export default function InformacionTiempoPage() {
         {/* Resultado del tiempo actual */}
         {weather && !loading && (
           <>
-            <section className={styles.actual} aria-labelledby="tiempo-ciudad">
+            <section
+              className={`${styles.actual} ${CLASE_CIELO[cieloDeIcono(weather.weather[0].icon)]}`}
+              data-cielo={cieloDeIcono(weather.weather[0].icon)}
+              aria-labelledby="tiempo-ciudad"
+            >
               <div className={styles.actualCabecera}>
                 <h2 id="tiempo-ciudad" className={styles.actualCiudad}>
                   {weather.name}, {weather.sys.country}

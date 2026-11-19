@@ -38,6 +38,7 @@
 import { test, expect } from '@playwright/test';
 import {
   agruparPronostico,
+  cieloDeIcono,
   fechaHoraLocal,
   repartirPronostico,
   pesoCondicion,
@@ -219,5 +220,14 @@ test.describe('Franjas del pronóstico — motor', () => {
     expect(r.siguientes.map(d => d.clave)).toEqual([
       '2026-11-19', '2026-11-20', '2026-11-21', '2026-11-22', '2026-11-23',
     ]);
+  });
+
+  test('fondo de la tarjeta: de noche manda la noche, pocas nubes es despejado y la niebla, nubes', () => {
+    const casos: Array<[string, string]> = [
+      ['01d', 'despejado'], ['02d', 'despejado'], ['03d', 'nubes'], ['04d', 'nubes'],
+      ['50d', 'nubes'], ['09d', 'lluvia'], ['10d', 'lluvia'], ['11d', 'lluvia'],
+      ['13d', 'lluvia'], ['01n', 'noche'], ['10n', 'noche'], ['', 'nubes'],
+    ];
+    expect(casos.map(([icono]) => cieloDeIcono(icono))).toEqual(casos.map(([, cielo]) => cielo));
   });
 });

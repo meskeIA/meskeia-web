@@ -265,3 +265,18 @@ export function repartirPronostico(
   }
   return { hoy, siguientes, extremosHoy };
 }
+
+export type Cielo = 'despejado' | 'nubes' | 'lluvia' | 'noche';
+
+/**
+ * Fondo de la tarjeta del tiempo actual según el cielo (19/11/2026): el color dice algo, en lugar
+ * de un degradado fijo. Sale del código de icono de OpenWeatherMap: de noche manda la noche,
+ * sea cual sea el cielo; «pocas nubes» (02) cuenta como despejado; la niebla (50), como nubes.
+ */
+export function cieloDeIcono(icon: string): Cielo {
+  if (icon.endsWith('n')) return 'noche';
+  const grupo = icon.slice(0, 2);
+  if (grupo === '01' || grupo === '02') return 'despejado';
+  if (grupo === '09' || grupo === '10' || grupo === '11' || grupo === '13') return 'lluvia';
+  return 'nubes';
+}

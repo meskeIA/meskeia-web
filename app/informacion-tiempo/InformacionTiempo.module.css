@@ -194,12 +194,32 @@
   to { transform: rotate(360deg); }
 }
 
-/* Tiempo actual + lo que queda de hoy */
+/* Tiempo actual + lo que queda de hoy. El fondo depende del cielo (19/11/2026): degradado
+   vertical de un solo tono, igual en los dos temas. Blanco medido sobre el color de arriba, que es
+   el más claro, y sobre él más el 10 % de blanco de las cajas de las franjas (el peor caso):
+     despejado #1a63b3  6,04:1 · caja 4,88:1     nubes  #4a6580  6,06:1 · caja 4,84:1
+     lluvia    #4b5664  7,46:1 · caja 5,74:1     noche  #1d3a5f 11,52:1 · caja 8,52:1 */
 .actual {
-  background: linear-gradient(160deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
+  background: linear-gradient(180deg, #1a63b3 0%, #123f78 100%);
   color: white;
   border-radius: 20px;
   padding: 20px 18px 16px;
+}
+
+.cieloDespejado {
+  background: linear-gradient(180deg, #1a63b3 0%, #123f78 100%);
+}
+
+.cieloNubes {
+  background: linear-gradient(180deg, #4a6580 0%, #33465a 100%);
+}
+
+.cieloLluvia {
+  background: linear-gradient(180deg, #4b5664 0%, #2c343e 100%);
+}
+
+.cieloNoche {
+  background: linear-gradient(180deg, #1d3a5f 0%, #0b1626 100%);
 }
 
 .actualCabecera {
@@ -345,7 +365,7 @@
 }
 
 .franjasTarjeta .franja {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
   border-color: transparent;
 }
 

@@ -95,6 +95,11 @@ test.describe('informacion-tiempo — tiempo actual, hoy por franjas y próximos
     await expect(tarjeta).not.toContainText('18°');
   });
 
+  test('el fondo de la tarjeta sigue al cielo: nubes de día', async ({ page }) => {
+    await abrirCon(page, 3600);
+    await expect(tarjetaActual(page)).toHaveAttribute('data-cielo', 'nubes');
+  });
+
   test('Madrid: lo que queda de hoy va por franjas dentro de la tarjeta', async ({ page }) => {
     await abrirCon(page, 3600);
     const hoy = franjasDeHoy(page);
