@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { calcular1RM } from '@/lib/calculadoras/deporte';
+import { calcular1RM, errorEntrada1RM } from '@/lib/calculadoras/deporte';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
 
 const ALLOWED_ORIGINS = ['https://chat.openai.com', 'https://chatgpt.com'];
@@ -32,6 +32,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Fuera de 1-12 repeticiones Brzycki se dispara (hallazgo 5250): se rechaza con el motivo
+    const errorEntrada = errorEntrada1RM(peso_kg, repeticiones);
+    if (errorEntrada) {
+      return NextResponse.json(
+        { error: errorEntrada },
+        { status: 400, headers: corsHeaders(origin) },
+      );
+    }
+
     const r = calcular1RM(peso_kg, repeticiones);
 
     try {
@@ -54,7 +63,6 @@ export async function POST(req: NextRequest) {
         peso_kg: t.peso_kg,
         repeticiones_aproximadas: t.repsAproximadas,
       })),
-      advertencia: r.advertencia,
     }, { headers: corsHeaders(origin) });
 
   } catch {

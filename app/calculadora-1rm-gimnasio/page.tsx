@@ -13,22 +13,30 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { formatNumber } from '@/lib';
-import { calcular1RM, Resultado1RM } from '@/lib/calculadoras/deporte';
+import { formatNumber, parseSpanishNumber } from '@/lib';
+import { calcular1RM, errorEntrada1RM, REPS_MAX_1RM, Resultado1RM } from '@/lib/calculadoras/deporte';
 
 export default function Calculadora1RMGimnasioPage() {
   const [peso, setPeso] = useState('100');
   const [repeticiones, setRepeticiones] = useState('5');
   const [resultado, setResultado] = useState<Resultado1RM | null>(null);
+  const [error, setError] = useState('');
 
   const calcular = () => {
-    const pesoNum = parseFloat(peso.replace(',', '.'));
-    const repsNum = parseInt(repeticiones, 10);
+    const pesoNum = parseSpanishNumber(peso);
+    const repsNum = parseSpanishNumber(repeticiones);
 
-    if (isNaN(pesoNum) || pesoNum <= 0 || isNaN(repsNum) || repsNum < 1) return;
+    // Una entrada que no vale se dice y borra el resultado anterior, que ya no es el de estos
+    // datos (hallazgo 5251); fuera de 1-12 repeticiones Brzycki se dispara (hallazgo 5250).
+    const motivo = errorEntrada1RM(pesoNum, repsNum);
+    if (motivo) {
+      setError(motivo);
+      setResultado(null);
+      return;
+    }
 
-    const res = calcular1RM(pesoNum, repsNum);
-    setResultado(res);
+    setError('');
+    setResultado(calcular1RM(pesoNum, repsNum));
   };
 
   return (
@@ -64,7 +72,7 @@ export default function Calculadora1RMGimnasioPage() {
             <NumberInput
               value={repeticiones}
               onChange={setRepeticiones}
-              label="Número de repeticiones (1–12)"
+              label={`Número de repeticiones (1–${REPS_MAX_1RM})`}
               placeholder="5"
             />
           </div>
@@ -77,19 +85,21 @@ export default function Calculadora1RMGimnasioPage() {
           >
             Calcular 1RM
           </button>
+
+          {/* Siempre montada: una región viva que nace con el aviso dentro no se anuncia */}
+          <div role="alert" className={styles.errorRegion}>
+            {error && (
+              <p className={styles.warningBox}>
+                <span aria-hidden="true">⚠️</span> {error}
+              </p>
+            )}
+          </div>
         </div>
 
         <div className={styles.resultsPanel}>
           {resultado ? (
             <>
               <h2 className={styles.panelTitle}>Resultados</h2>
-
-              {/* Advertencia si procede */}
-              {resultado.advertencia && (
-                <div className={styles.warningBox} role="alert" aria-live="polite">
-                  <span aria-hidden="true">⚠️</span> {resultado.advertencia}
-                </div>
-              )}
 
               <div className={styles.resultCards}>
                 {/* Fórmula Epley */}

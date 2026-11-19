@@ -38,7 +38,7 @@ import { calcularEstadisticas } from '@/lib/calculadoras/estadisticas';
 // ── Fotografía:
 import { calcularProfundidadCampo, calcularAstrofoto, calcularExposicionEquivalente, type TipoSensor, type ParametroFijo } from '@/lib/calculadoras/fotografia';
 // ── Deporte:
-import { calcularPrediccionRunning, calcularZonasCardiacas, calcular1RM, calcularPotenciaCiclismo, calcularPaceRunning, calcularSWOLF } from '@/lib/calculadoras/deporte';
+import { calcularPrediccionRunning, calcularZonasCardiacas, calcular1RM, REPS_MAX_1RM, calcularPotenciaCiclismo, calcularPaceRunning, calcularSWOLF } from '@/lib/calculadoras/deporte';
 // ── Videografía:
 import { calcularRegla180, calcularCamaraLenta, calcularFiltroNDVideo, calcularBitrateVideo, calcularFOVVideo, type TipoResolucionVideo, type TipoCodecVideo } from '@/lib/calculadoras/videografia';
 // ── Cocina Técnica:
@@ -1592,8 +1592,8 @@ function crearServidorMCP(): McpServer {
     {
       peso_kg: z.number().positive()
         .describe('Peso levantado en kilogramos'),
-      repeticiones: z.number().int().positive()
-        .describe('Número de repeticiones completadas con ese peso (idealmente 1-12 para mayor precisión)'),
+      repeticiones: z.number().int().min(1).max(REPS_MAX_1RM)
+        .describe(`Número de repeticiones completadas con ese peso, de 1 a ${REPS_MAX_1RM} (con más, las fórmulas se disparan)`),
     },
     { title: 'Calcula la repetición máxima (1RM) en cualquier ejercicio de', readOnlyHint: true },
     async ({ peso_kg, repeticiones }, extra) => {
@@ -1615,7 +1615,6 @@ function crearServidorMCP(): McpServer {
           `   ${t.porcentaje}% → **${t.peso_kg} kg** (~${t.repsAproximadas} reps)`
         ),
       ];
-      if (r.advertencia) lineas.push(``, `⚠️ ${r.advertencia}`);
 
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }

@@ -125,6 +125,11 @@
   line-height: 1.5;
 }
 
+/* Región del aviso de entrada (siempre montada, vacía sin aviso) */
+.errorRegion .warningBox {
+  margin: var(--spacing-md) 0 0;
+}
+
 /* Result Cards */
 .resultCards {
   display: flex;

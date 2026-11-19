@@ -148,10 +148,61 @@ export interface Resultado1RM {
   brzycki: number;
   media: number;
   tablaPorcentajes: EntradaPercentaje1RM[];
-  advertencia: string | null;
+}
+
+/**
+ * Máximo de repeticiones que se admite (hallazgo 5250, 19/11/2026). El denominador de Brzycki,
+ * 1,0278 − 0,0278·r, se anula en r = 36,97: con 36 daba 37 veces el peso y con 37, kilos
+ * negativos que entraban en la media y en toda la tabla. Más allá de 10-12 repeticiones las dos
+ * fórmulas pierden precisión, así que el rango es el que ya prometía el rótulo de la app.
+ */
+export const REPS_MAX_1RM = 12;
+
+/**
+ * Bandas de % del 1RM por objetivo: UNA sola fuente para la columna «Uso habitual» de la tabla,
+ * la guía y el FAQPage de calculadora-1rm-gimnasio (hallazgo 5255: daban tres versiones). Son las
+ * de la NSCA (Essentials of Strength Training and Conditioning, asignación de carga y
+ * repeticiones por objetivo), que la guía de la app ya usaba: fuerza ≥ 85 % y ≤ 6 repeticiones,
+ * hipertrofia 67-85 % y 6-12, resistencia muscular ≤ 67 % y ≥ 12. Orientativas.
+ */
+export interface Banda1RM {
+  objetivo: string;
+  pctMin: number;
+  pctMax: number;
+  reps: string;
+}
+
+export const BANDAS_1RM: readonly Banda1RM[] = [
+  { objetivo: 'Fuerza máxima',        pctMin: 85, pctMax: 100, reps: '1–6' },
+  { objetivo: 'Hipertrofia',          pctMin: 67, pctMax: 85,  reps: '6–12' },
+  { objetivo: 'Resistencia muscular', pctMin: 50, pctMax: 67,  reps: 'más de 12' },
+];
+
+/** Banda a la que pertenece un % del 1RM (el límite compartido va a la banda superior). */
+export function banda1RM(porcentaje: number): Banda1RM {
+  return BANDAS_1RM.find(b => porcentaje >= b.pctMin) ?? BANDAS_1RM[BANDAS_1RM.length - 1];
+}
+
+/**
+ * Por qué no se puede calcular con estos datos, o null si se puede. La usan la página, la
+ * herramienta MCP y /api/chatgpt/1rm-gimnasio antes de llamar a calcular1RM.
+ */
+export function errorEntrada1RM(peso_kg: number, repeticiones: number): string | null {
+  if (!Number.isFinite(peso_kg) || peso_kg <= 0)
+    return 'Introduce el peso levantado: un número mayor que 0 (admite decimales con coma, como 102,5).';
+  if (!Number.isFinite(repeticiones) || repeticiones < 1)
+    return 'Las repeticiones deben ser al menos 1.';
+  if (!Number.isInteger(repeticiones))
+    return 'Las repeticiones deben ser un número entero, sin decimales.';
+  if (repeticiones > REPS_MAX_1RM)
+    return `Las fórmulas solo valen de 1 a ${REPS_MAX_1RM} repeticiones: con más, la estimación se dispara (Brzycki llega a dar kilos negativos). Usa un peso con el que completes de 1 a ${REPS_MAX_1RM}.`;
+  return null;
 }
 
 export function calcular1RM(peso_kg: number, repeticiones: number): Resultado1RM {
+  const error = errorEntrada1RM(peso_kg, repeticiones);
+  if (error) throw new RangeError(error);
+
   const epley   = repeticiones === 1 ? peso_kg : peso_kg * (1 + repeticiones / 30);
   const brzycki = repeticiones === 1 ? peso_kg : peso_kg / (1.0278 - 0.0278 * repeticiones);
   const media   = (epley + brzycki) / 2;
@@ -174,18 +225,11 @@ export function calcular1RM(peso_kg: number, repeticiones: number): Resultado1RM
     repsAproximadas: reps,
   }));
 
-  let advertencia: string | null = null;
-  if (repeticiones > 12)
-    advertencia = 'Las fórmulas de 1RM son menos precisas con más de 12 repeticiones. Realiza un test directo para mayor exactitud.';
-  if (repeticiones < 1)
-    advertencia = 'El número de repeticiones debe ser al menos 1.';
-
   return {
     epley:  Math.round(epley * 10) / 10,
     brzycki: Math.round(brzycki * 10) / 10,
     media:  Math.round(media * 10) / 10,
     tablaPorcentajes,
-    advertencia,
   };
 }
 

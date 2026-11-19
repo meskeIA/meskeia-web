@@ -85,6 +85,9 @@ const valor = (page: Page, titulo: string) =>
     .locator('p > span')
     .first();
 
+/** La región viva del aviso de entrada, justo detrás del botón (siempre montada; vacía sin aviso). */
+const avisoEntrada = (page: Page) => boton(page).locator('xpath=following-sibling::*[@role="alert"][1]');
+
 const tabla = (page: Page) =>
   page.getByRole('table', { name: 'Tabla de cargas por porcentaje del 1RM' });
 
@@ -166,49 +169,51 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
     ]);
   });
 
-  test('CASO 2b · 12 repeticiones (máximo del rótulo) → 140,0 · 144,1 · 142,0, sin aviso; con 13 sale el aviso', async ({ page }) => {
+  test('CASO 2b · 12 repeticiones (máximo del rótulo) → 140,0 · 144,1 · 142,0, sin aviso; con 13 se rechaza', async ({ page }) => {
     await calcular(page, '100', '12');
     await expect(valor(page, 'Fórmula Epley')).toHaveText('140,0 kg');
     await expect(valor(page, 'Fórmula Brzycki')).toHaveText('144,1 kg');
     await expect(valor(page, 'Media (más fiable)')).toHaveText('142,0 kg');
-    await expect(page.getByText('menos precisas con más de 12 repeticiones')).toHaveCount(0);
+    await expect(avisoEntrada(page)).toHaveText('');
 
+    // REPARADO (hallazgo 5250): el rótulo promete 1–12 y con 13 ya no se calcula. Antes salía
+    // Epley 143,3 con un aviso de «menos precisas»; ahora, el aviso del rango y ninguna cifra.
     await calcular(page, '100', '13');
-    await expect(valor(page, 'Fórmula Epley')).toHaveText('143,3 kg');
-    await expect(page.getByText('menos precisas con más de 12 repeticiones')).toBeVisible();
+    await expect(avisoEntrada(page)).toContainText('de 1 a 12 repeticiones');
+    await expect(page.getByText('142,0 kg')).toHaveCount(0);
   });
 
   test('HALLAZGO · 100 kg × 37 repeticiones no da kilos negativos', async ({ page }) => {
-    // ABIERTO: el rótulo dice 1–12 pero se acepta cualquier entero ≥ 1 con solo un aviso. El
-    // denominador de Brzycki (1,0278 − 0,0278 r) se anula en r = 36,97: con 37 sale Brzycki
-    // «-125.000,0 kg», «Media (más fiable) -62.388,3 kg» y la tabla entera en negativo. Mismo
-    // motor en la herramienta MCP y en /api/chatgpt/1rm-gimnasio.
-    test.fail();
+    // REPARADO (5250): el rótulo dice 1–12 pero se aceptaba cualquier entero ≥ 1 con solo un
+    // aviso. El denominador de Brzycki (1,0278 − 0,0278 r) se anula en r = 36,97: con 37 salía
+    // Brzycki «-125.000,0 kg», «Media (más fiable) -62.388,3 kg» y la tabla entera en negativo.
+    // Ahora errorEntrada1RM rechaza r > 12 en la página, en la herramienta MCP (zod .max) y en
+    // /api/chatgpt/1rm-gimnasio (400 con el motivo).
     // Se parte de un cálculo válido para saber cuándo ha re-renderizado (la cifra de 100 × 5 se va)
     await calcular(page, '100', '5');
     await expect(valor(page, 'Media (más fiable)')).toHaveText('114,6 kg');
     await calcular(page, '100', '37');
     await expect(page.getByText('114,6 kg')).toHaveCount(0);
+    await expect(avisoEntrada(page)).toContainText('de 1 a 12 repeticiones');
     const kilos = await kilosPintados(page);
     expect(kilos.filter((k) => k <= 0)).toEqual([]);
   });
 
   test('HALLAZGO · 100 kg × 36 repeticiones no da un 1RM de casi dos toneladas', async ({ page }) => {
-    // ABIERTO: 100 / (1,0278 − 1,0008) = 3703,7 kg de Brzycki y «Media (más fiable) 1961,9 kg».
-    // Epley da 220,0: ninguna cifra razonable pasa de ~3 veces el peso levantado.
-    test.fail();
+    // REPARADO (5250): 100 / (1,0278 − 1,0008) = 3703,7 kg de Brzycki y «Media (más fiable)
+    // 1961,9 kg». Epley da 220,0: ninguna cifra razonable pasa de ~3 veces el peso levantado.
     await calcular(page, '100', '5');
     await expect(valor(page, 'Media (más fiable)')).toHaveText('114,6 kg');
     await calcular(page, '100', '36');
     await expect(page.getByText('114,6 kg')).toHaveCount(0);
+    await expect(avisoEntrada(page)).toContainText('de 1 a 12 repeticiones');
     const kilos = await kilosPintados(page);
     expect(Math.max(0, ...kilos)).toBeLessThanOrEqual(300);
   });
 
   test('HALLAZGO · 0 repeticiones tras un cálculo no deja la cifra anterior en pantalla', async ({ page }) => {
-    // ABIERTO: con 100 × 5 calculado, 0 repeticiones y «Calcular» → la página hace `return` en
-    // silencio: siguen «Media (más fiable) 114,6 kg» y la tabla, sin ningún aviso.
-    test.fail();
+    // REPARADO (5251): con 100 × 5 calculado, 0 repeticiones y «Calcular» → la página hacía
+    // `return` en silencio: seguían «Media (más fiable) 114,6 kg» y la tabla, sin ningún aviso.
     await calcular(page, '100', '5');
     await expect(valor(page, 'Media (más fiable)')).toHaveText('114,6 kg');
     await calcular(page, '100', '0');
@@ -219,12 +224,13 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
   });
 
   test('HALLAZGO · peso negativo, cero o ilegible se rechazan con un aviso', async ({ page }) => {
-    // ABIERTO: −50, 0 y «abc» pegado se descartan en silencio (y la cifra de antes se queda).
-    test.fail();
+    // REPARADO (5251): −50, 0 y «abc» pegado se descartaban en silencio (y la cifra de antes se
+    // quedaba). Ahora parseSpanishNumber + errorEntrada1RM: aviso en la región viva y sin cifra.
     await calcular(page, '100', '5');
     for (const peso of ['-50', '0']) {
       await calcular(page, peso, '5');
       await expect(page.getByText('114,6 kg')).toHaveCount(0);
+      await expect(avisoEntrada(page)).toContainText('peso levantado');
     }
     await sembrarValor(page, SEL_PESO, 'abc');
     await boton(page).click();
@@ -234,15 +240,15 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
   });
 
   test('HALLAZGO · 5,5 repeticiones no se leen en silencio como 5', async ({ page }) => {
-    // ABIERTO: parseInt('5,5') = 5 → mismo resultado que 100 × 5 sin decir nada.
+    // REPARADO (5251): parseInt('5,5') = 5 daba el mismo resultado que 100 × 5 sin decir nada.
     // Se parte de 100 × 4 (Epley 113,333 · Brzycki 100 / 0,9166 = 109,099 · Media 111,216 → 111,2)
     // para saber cuándo ha re-renderizado.
-    test.fail();
     await calcular(page, '100', '4');
     await expect(valor(page, 'Media (más fiable)')).toHaveText('111,2 kg');
     await calcular(page, '100', '5,5');
     await expect(page.getByText('111,2 kg')).toHaveCount(0);
     await expect(page.getByText('114,6 kg')).toHaveCount(0);
+    await expect(avisoEntrada(page)).toContainText('número entero');
   });
 
   test('el motor: Epley queda por ENCIMA de Brzycki por debajo de 10 repeticiones y por DEBAJO por encima', async ({ page }) => {
