@@ -311,8 +311,10 @@ test.describe('tablero-comunicacion — escritorio', () => {
   test('favoritos: «Agua» marcada sigue en Favoritos al recargar, y la frase no se guarda', async ({ page }) => {
     await abrir(page);
     await celda(page, 'Hambre').click();
-    await page.getByRole('button', { name: 'Añadir Agua a favoritos' }).click();
-    await expect(page.getByRole('button', { name: 'Quitar Agua de favoritos' })).toHaveAttribute('aria-pressed', 'true');
+    // Nombre fijo con aria-pressed desde el hallazgo 4085 (antes «Añadir…»/«Quitar…»)
+    await expect(page.getByRole('button', { name: 'Agua en favoritos' })).toHaveAttribute('aria-pressed', 'false');
+    await page.getByRole('button', { name: 'Agua en favoritos' }).click();
+    await expect(page.getByRole('button', { name: 'Agua en favoritos' })).toHaveAttribute('aria-pressed', 'true');
     await expect(pestana(page, 'Favoritos')).toHaveText(/Favoritos \(1\)/);
 
     await page.reload();
@@ -327,17 +329,19 @@ test.describe('tablero-comunicacion — escritorio', () => {
     await expect(page.getByRole('tabpanel').getByRole('button', { name: 'Agua', exact: true })).toBeVisible();
   });
 
-  // ABIERTO (inspector 04/11/2026): la estrella de favoritos tiene `opacity: 0` salvo con :hover
-  // del ratón, así que con teclado cada segundo Tab cae en un control invisible (y su anillo de
-  // foco también: WCAG 2.4.7). Esperado: el control con foco se ve.
-  test('la estrella de favoritos se ve cuando recibe el foco con Tab', async ({ page }) => {
-    test.fail();
+  // REPARADO el 19/11/2026 (hallazgo 4085): la estrella de favoritos tenía `opacity: 0` salvo con
+  // :hover del ratón, así que con teclado cada segundo Tab caía en un control invisible (y su
+  // anillo de foco también: WCAG 2.4.7). Ahora se ve siempre y su nombre no cambia con el estado.
+  test('HALLAZGO 4085 (REPARADO) · la estrella de favoritos se ve cuando recibe el foco con Tab', async ({ page }) => {
     await abrir(page);
     await celda(page, 'Sí').focus();
     await page.keyboard.press('Tab');
-    const estrella = page.getByRole('button', { name: 'Añadir Sí a favoritos' });
+    const estrella = page.getByRole('button', { name: 'Sí en favoritos' });
     await expect(estrella).toBeFocused();
     await expect(estrella).toHaveCSS('opacity', '1', { timeout: 1000 });
+    await page.keyboard.press('Enter');
+    await expect(estrella).toHaveAttribute('aria-pressed', 'true');
+    await expect(estrella).toHaveCSS('opacity', '1');
   });
 
   // ABIERTO (inspector 04/11/2026): role="tablist" sin flechas (todas las pestañas con
@@ -358,40 +362,42 @@ test.describe('tablero-comunicacion — escritorio', () => {
     });
   });
 
-  // ABIERTO (inspector 04/11/2026): blanco sobre #16A34A en «Leer» (3,30:1), blanco sobre #F59E0B
-  // en «⌫» (2,15:1) y el color de categoría como texto de la pestaña activa (en claro: Favoritos
-  // y Emociones 2,81, Comida 2,91, Lugares 3,31, Acciones 3,63, Necesidades 4,27).
-  test('contraste en claro: «Leer», «⌫» y la pestaña activa llegan a su umbral', async ({ page }) => {
-    test.fail();
+  // REPARADO el 19/11/2026 (hallazgo 4086): blanco sobre #16A34A en «Leer» (3,30:1), blanco sobre
+  // #F59E0B en «⌫» (2,15:1) y el color de categoría como texto de la pestaña activa (en claro:
+  // Favoritos y Emociones 2,81, Comida 2,91, Lugares 3,31, Acciones 3,63, Necesidades 4,27).
+  test('HALLAZGO 4086 (REPARADO) · contraste en claro: «Leer», «⌫» y la pestaña activa llegan a su umbral', async ({ page }) => {
     expect(await contrastesQueNoCumplen(page, 'light')).toEqual([]);
   });
 
-  // ABIERTO (inspector 04/11/2026): en oscuro, Personas 2,84, Necesidades 3,35, Acciones 3,94 y
-  // Lugares 4,32, además de «Leer» y «⌫», que no cambian de color con el tema.
-  test('contraste en oscuro: «Leer», «⌫» y la pestaña activa llegan a su umbral', async ({ page }) => {
-    test.fail();
+  // REPARADO el 19/11/2026 (hallazgo 4086): en oscuro, Personas 2,84, Necesidades 3,35, Acciones
+  // 3,94 y Lugares 4,32, además de «Leer» y «⌫», que no cambian de color con el tema.
+  test('HALLAZGO 4086 (REPARADO) · contraste en oscuro: «Leer», «⌫» y la pestaña activa llegan a su umbral', async ({ page }) => {
     expect(await contrastesQueNoCumplen(page, 'dark')).toEqual([]);
   });
 
-  // ABIERTO (inspector 04/11/2026): sin `speechSynthesis` leerTexto sale en silencio. Esperado:
-  // un aviso de que la voz no está disponible (el subtítulo promete que «la leerá en voz alta»).
-  test('sin síntesis de voz en el navegador, la app avisa de que no puede hablar', async ({ page }) => {
-    test.fail();
+  // REPARADO el 19/11/2026 (hallazgo 4087): sin `speechSynthesis` leerTexto salía en silencio.
+  // Ahora el aviso sale al cargar, antes del primer toque.
+  test('HALLAZGO 4087 (REPARADO) · sin síntesis de voz en el navegador, la app avisa de que no puede hablar', async ({ page }) => {
     await abrir(page, { voces: [], sinSoporte: true });
+    const aviso = page.locator('[role="alert"], [role="status"]').filter({ hasText: /voz/i });
+    await expect(aviso).toBeVisible({ timeout: 2000 });
+    await expect(aviso).toContainText('Este navegador no tiene síntesis de voz');
     await celda(page, 'Agua').click();
     await botonLeer(page).click();
     await expect(frase(page)).toHaveAttribute('aria-label', 'Frase: Agua');
-    await expect(page.locator('[role="alert"], [role="status"]').filter({ hasText: /voz/i })).toBeVisible({ timeout: 2000 });
+    await expect(aviso).toBeVisible();
   });
 
-  // ABIERTO (inspector 04/11/2026): leerTexto no escucha el `error` de la locución.
-  test('si la locución falla (evento error), la app lo dice', async ({ page }) => {
-    test.fail();
+  // REPARADO el 19/11/2026 (hallazgo 4087): leerTexto no escuchaba el `error` de la locución.
+  test('HALLAZGO 4087 (REPARADO) · si la locución falla (evento error), la app lo dice', async ({ page }) => {
     await abrir(page, { voces: VOCES_ES, falla: true });
+    const aviso = page.locator('[role="alert"], [role="status"]').filter({ hasText: /voz/i });
+    await expect(aviso, 'sin fallo todavía, no hay aviso').toHaveCount(0);
     await celda(page, 'Agua').click();
     await botonLeer(page).click();
     expect((await llamadas(page)).filter((l) => l.f === 'speak')).toHaveLength(2);
-    await expect(page.locator('[role="alert"], [role="status"]').filter({ hasText: /voz/i })).toBeVisible({ timeout: 2000 });
+    await expect(aviso).toBeVisible({ timeout: 2000 });
+    await expect(aviso).toContainText('La voz no ha podido sonar');
   });
 
   // ABIERTO (inspector 04/11/2026): el FAQPage dice que la voz «genera habla natural» y que
@@ -439,42 +445,38 @@ test.describe('tablero-comunicacion — móvil (Pixel 7)', () => {
     expect((await llamadas(page)).filter((l) => l.f === 'speak')).toEqual([locucion('Agua')]);
   });
 
-  // ABIERTO (inspector 04/11/2026): con la barra de frase a la vista, la 6.ª ficha abre una segunda
-  // fila, la barra crece y la rejilla baja: el 6.º toque en el mismo punto cae en la pestaña
-  // «Favoritos» (vacía) y la frase se queda en cinco «Sí». Esperado: seis «Sí».
-  test('seis toques en el mismo punto de «Sí» dan seis «Sí»', async ({ page }) => {
-    test.fail();
+  // REPARADO el 19/11/2026 (hallazgo 4084): con la barra de frase a la vista, la 6.ª ficha abría
+  // una segunda fila, la barra crecía y la rejilla bajaba: el 6.º toque en el mismo punto caía en
+  // la pestaña «Favoritos» (vacía). Ahora la barra tiene altura fija y desplaza las fichas por
+  // dentro. Se piden doce toques y que la celda no se mueva ni un píxel.
+  test('HALLAZGO 4084 (REPARADO) · doce toques en el mismo punto de «Sí» dan doce «Sí» y la celda no se mueve', async ({ page }) => {
     await abrir(page);
     await page.evaluate(() => {
       const r = document.querySelector('[aria-label="Frase construida"]')!.getBoundingClientRect();
       window.scrollBy(0, r.top - 8);
     });
     const caja = (await celda(page, 'Sí').boundingBox())!;
+    const panelAntes = (await page.getByRole('tabpanel').boundingBox())!;
     const x = caja.x + caja.width / 2;
     const y = caja.y + caja.height / 2;
     const esperadas: string[] = [];
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 12; i++) {
       await page.touchscreen.tap(x, y);
       esperadas.push('Sí');
       await expect(frase(page)).toHaveAttribute('aria-label', `Frase: ${esperadas.join(', ')}`, { timeout: 1500 });
     }
+    // Se mide el PANEL, no la celda: la celda tocada se queda con el :hover pegajoso del toque
+    // (translateY −3 px) y encoge 300 ms al pulsarla, que no es la maquetación moviéndose.
+    expect(Math.abs(((await page.getByRole('tabpanel').boundingBox())?.y ?? -999) - panelAntes.y), 'el panel sigue donde estaba').toBeLessThanOrEqual(1);
   });
 
-  // ABIERTO (inspector 04/11/2026): en táctil no hay :hover, así que al cargar las 12 estrellas
-  // están en opacity 0 y el aviso de Favoritos («Pulsa la estrella ☆ en cualquier símbolo») no se
-  // puede seguir. Solo aparece la de una celda tras TOCARLA (el :hover pegajoso del toque), que
-  // ya ha añadido esa palabra a la frase y la ha dicho en voz alta.
-  test('la estrella de favoritos se ve en un dispositivo táctil sin tener que tocar antes la celda', async ({ page }) => {
-    test.fail();
+  // REPARADO el 19/11/2026 (hallazgo 4085): en táctil no hay :hover, así que al cargar las 12
+  // estrellas estaban en opacity 0 y el aviso de Favoritos («Pulsa la estrella ☆ en cualquier
+  // símbolo») no se podía seguir. Ahora se ven al cargar.
+  test('HALLAZGO 4085 (REPARADO) · la estrella de favoritos se ve en un dispositivo táctil sin tener que tocar antes la celda', async ({ page }) => {
     await abrir(page);
-    await expect(page.getByRole('button', { name: 'Añadir Sí a favoritos' })).toHaveCSS('opacity', '1', { timeout: 1000 });
-  });
-
-  test('tocar una celda revela su estrella, pero a costa de añadir la palabra a la frase', async ({ page }) => {
-    await abrir(page);
-    await celda(page, 'Sí').tap();
-    await expect(page.getByRole('button', { name: 'Añadir Sí a favoritos' })).toHaveCSS('opacity', '1');
-    await expect(frase(page)).toHaveAttribute('aria-label', 'Frase: Sí');
+    await expect(page.getByRole('button', { name: 'Sí en favoritos' })).toHaveCSS('opacity', '1', { timeout: 1000 });
+    await expect(frase(page)).toHaveAttribute('aria-label', 'Frase vacía');
   });
 
   // ABIERTO (inspector 04/11/2026): «Personas» (402-472 px) y «Lugares» (478-548 px) quedan fuera

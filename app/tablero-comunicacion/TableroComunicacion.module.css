@@ -76,13 +76,19 @@
   min-height: 90px;
 }
 
+/* Altura FIJA con desplazamiento horizontal por dentro: antes las fichas pasaban a otra fila,
+   la barra crecía ~60 px y empujaba pestañas y rejilla, y un toque repetido en el mismo sitio
+   caía en la pestaña Favoritos (hallazgo 4084). En un tablero AAC cada símbolo no se mueve. */
 .fraseContenido {
   flex: 1;
+  min-width: 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.5rem;
   align-items: center;
-  min-height: 56px;
+  height: 76px;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .frasePlaceholder {
@@ -100,6 +106,7 @@
   border-radius: var(--radius);
   padding: 0.4rem 0.65rem;
   gap: 0.1rem;
+  flex-shrink: 0;
   animation: entrar 0.15s ease;
 }
 
@@ -143,8 +150,10 @@
   transition: all 0.18s ease;
 }
 
+/* Verde y ámbar 700: blanco sobre #16A34A daba 3,30:1 y sobre #F59E0B 2,15:1 (hallazgo 4086).
+   Iguales en los dos temas: el texto es blanco sobre un fondo fijo. */
 .btnLeer {
-  background: #16A34A;
+  background: #15803D;
   color: white;
   font-size: 0.95rem;
   padding: 0 1rem;
@@ -152,7 +161,7 @@
 }
 
 .btnLeer:hover:not(:disabled) {
-  background: #15803D;
+  background: #166534;
   transform: translateY(-2px);
 }
 
@@ -162,13 +171,13 @@
 }
 
 .btnBorrar {
-  background: #F59E0B;
+  background: #B45309;
   color: white;
   font-size: 1.3rem;
 }
 
 .btnBorrar:hover:not(:disabled) {
-  background: #D97706;
+  background: #92400E;
   transform: translateY(-1px);
 }
 
@@ -250,6 +259,56 @@
   outline-offset: 2px;
 }
 
+/* Rótulo de la pestaña activa, un tono de texto por categoría y tema (hallazgo 4086): el color
+   de la categoría como texto no llegaba a 4,5:1. El color de la categoría queda en el borde. */
+.categoriaTab.textoRojo {
+  color: var(--rojo-texto, #B91C1C);
+}
+
+.categoriaTab.textoAmbar {
+  color: var(--ambar-texto, #92400E);
+}
+
+.categoriaTab.textoVerde {
+  color: var(--verde-texto, #166534);
+}
+
+.categoriaTab.textoAzul {
+  color: var(--primary-texto);
+}
+
+.categoriaTab.textoRosa {
+  color: #BE185D;
+}
+
+.categoriaTab.textoTeal {
+  color: #0F766E;
+}
+
+[data-theme='dark'] .categoriaTab.textoRosa {
+  color: #F9A8D4;
+}
+
+[data-theme='dark'] .categoriaTab.textoTeal {
+  color: #5EEAD4;
+}
+
+/* Aviso de que no hay voz (hallazgo 4087): siempre montado, sin caja mientras está vacío */
+.avisoVozVacio {
+  margin: 0;
+}
+
+.avisoVoz {
+  margin: 0 0 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid #B45309;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
 /* ============================================
    PANEL DE SÍMBOLOS
    ============================================ */
@@ -291,13 +350,18 @@
   align-items: center;
   justify-content: center;
   z-index: 1;
-  opacity: 0;
-  transition: opacity 0.15s ease;
 }
 
-.simboloWrapper:hover .btnEstrella,
+/* La estrella se ve siempre (hallazgo 4085): con opacity 0 salvo en :hover, con teclado el foco
+   caía en un control invisible y en táctil no había forma de verla sin tocar antes la celda,
+   que ya añadía la palabra a la frase. */
+.btnEstrella:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .btnEstrellaActiva {
-  opacity: 1;
+  border-color: #B45309;
 }
 
 [data-theme='dark'] .btnEstrella {
@@ -424,6 +488,11 @@
   .barraFrase {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  /* En columna, `flex: 1` haría de la altura una base 0 y la caja volvería a medir su contenido */
+  .fraseContenido {
+    flex: 0 0 auto;
   }
 
   .fraseAcciones {

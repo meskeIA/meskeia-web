@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './TableroComunicacion.module.css';
 import {
   MeskeiaLogo,
@@ -46,7 +46,8 @@ const CATEGORIAS: Categoria[] = [
   { id: 'emociones',  nombre: 'Emociones',  icono: '😊', color: '#D97706', colorFondo: '#FFFBEB' },
   { id: 'comida',     nombre: 'Comida',      icono: '🍎', color: '#16A34A', colorFondo: '#F0FDF4' },
   { id: 'acciones',   nombre: 'Acciones',    icono: '👋', color: '#2E86AB', colorFondo: '#EFF6FF' },
-  { id: 'personas',   nombre: 'Personas',    icono: '👨‍👩‍👧', color: '#7C3AED', colorFondo: '#F5F3FF' },
+  // Rosa: el violeta que llevaba no es de la marca (CLAUDE.md, colores prohibidos; hallazgo 4086)
+  { id: 'personas',   nombre: 'Personas',    icono: '👨‍👩‍👧', color: '#DB2777', colorFondo: '#FDF2F8' },
   { id: 'lugares',    nombre: 'Lugares',     icono: '🏠', color: '#0D9488', colorFondo: '#F0FDFA' },
 ];
 
@@ -137,15 +138,48 @@ const SIMBOLOS: Simbolo[] = [
   { id: 'farmacia', emoji: '💊', texto: 'Farmacia',  categoria: 'lugares' },
 ];
 
-// Leer texto con Web Speech API
-function leerTexto(texto: string) {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return;
+/**
+ * Texto del rótulo de la pestaña activa, por categoría: el color de la categoría como texto no
+ * llegaba a 4,5:1 (2,81 Favoritos y Emociones en claro, 2,84 Personas en oscuro; hallazgo 4086).
+ * Las clases dan un tono de texto por tema; el color de la categoría queda en el borde.
+ */
+const CLASE_TEXTO_PESTANA: Record<CategoriaId, string> = {
+  favoritos: styles.textoAmbar,
+  necesidades: styles.textoRojo,
+  emociones: styles.textoAmbar,
+  comida: styles.textoVerde,
+  acciones: styles.textoAzul,
+  personas: styles.textoRosa,
+  lugares: styles.textoTeal,
+};
+
+const AVISO_SIN_VOZ =
+  'Este navegador no tiene síntesis de voz: el tablero no puede hablar aquí. Enseña la pantalla para comunicar la frase, o ábrelo en otro navegador.';
+const AVISO_VOZ_FALLA =
+  'La voz no ha podido sonar (el dispositivo no tiene voz para el español o la voz necesita conexión). Enseña la pantalla para comunicar la frase.';
+
+/**
+ * Leer texto con Web Speech API. La voz es la salida del tablero: si el navegador no la tiene o
+ * la locución falla, se avisa con `alFallar` en vez de salir en silencio (hallazgo 4087, la receta
+ * de analizador-espectro). Los errores «interrupted» y «canceled» son del cancel() que precede a
+ * cada locución, no un fallo.
+ */
+function leerTexto(texto: string, alFallar: (aviso: string) => void) {
+  if (typeof window === 'undefined') return;
+  if (!window.speechSynthesis) {
+    alFallar(AVISO_SIN_VOZ);
+    return;
+  }
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(texto);
   utt.rate = 0.9;
   utt.pitch = 1.1;
   // Una voz española que sintetice en el dispositivo antes que una en línea (cabo C0738)
   ponerVoz(utt, 'es-ES');
+  utt.onerror = (e: SpeechSynthesisErrorEvent) => {
+    if (e.error === 'interrupted' || e.error === 'canceled') return;
+    alFallar(AVISO_VOZ_FALLA);
+  };
   window.speechSynthesis.speak(utt);
 }
 
@@ -154,12 +188,26 @@ export default function TableroComunicacionPage() {
   const [frase, setFrase] = useState<Simbolo[]>([]);
   const [ultimoClick, setUltimoClick] = useState('');
   const [favoritos, setFavoritos] = useState<string[]>([]);
+  /** Aviso de que la voz no está disponible o ha fallado (hallazgo 4087) */
+  const [avisoVoz, setAvisoVoz] = useState('');
+  const fraseRef = useRef<HTMLDivElement | null>(null);
+
+  // La barra de frase tiene altura fija y desplaza las fichas por dentro (hallazgo 4084): la
+  // última ficha queda a la vista.
+  useEffect(() => {
+    const el = fraseRef.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, [frase.length]);
 
   // Cargar voces y favoritos al montar
   useEffect(() => {
     if (typeof window !== 'undefined' && window.speechSynthesis) {
       window.speechSynthesis.getVoices();
       window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    } else {
+      // Sin voz se dice desde el principio, antes del primer toque: así el aviso no aparece a
+      // media frase empujando la rejilla
+      setAvisoVoz(AVISO_SIN_VOZ);
     }
     try {
       const raw = localStorage.getItem(FAVORITOS_KEY);
@@ -188,7 +236,7 @@ export default function TableroComunicacionPage() {
     setFrase(prev => [...prev, simbolo]);
     setUltimoClick(simbolo.id);
     // Leer el símbolo al pulsarlo
-    leerTexto(simbolo.texto);
+    leerTexto(simbolo.texto, setAvisoVoz);
     setTimeout(() => setUltimoClick(''), 300);
   }, []);
 
@@ -197,7 +245,7 @@ export default function TableroComunicacionPage() {
 
   const leerFrase = () => {
     if (frase.length === 0) return;
-    leerTexto(frase.map(s => s.texto).join('. '));
+    leerTexto(frase.map(s => s.texto).join('. '), setAvisoVoz);
   };
 
   return (
@@ -224,9 +272,15 @@ export default function TableroComunicacionPage() {
         Para un programa de comunicación adaptado, consulta con un especialista.
       </DisclaimerCard>
 
+      {/* Aviso de voz: siempre montado y vacío mientras la voz funciona (hallazgo 4087) */}
+      <p className={avisoVoz ? styles.avisoVoz : styles.avisoVozVacio} role="status">
+        {avisoVoz}
+      </p>
+
       {/* ---- BARRA DE FRASE ---- */}
       <section className={styles.barraFrase} aria-label="Frase construida">
         <div
+          ref={fraseRef}
           className={styles.fraseContenido}
           role="region"
           aria-live="polite"
@@ -292,12 +346,12 @@ export default function TableroComunicacionPage() {
         {/* Tab Favoritos */}
         <button
           type="button"
-          className={`${styles.categoriaTab} ${styles.categoriaTabFavoritos} ${categoriaActiva === 'favoritos' ? styles.categoriaActiva : ''}`}
+          className={`${styles.categoriaTab} ${styles.categoriaTabFavoritos} ${categoriaActiva === 'favoritos' ? `${styles.categoriaActiva} ${CLASE_TEXTO_PESTANA.favoritos}` : ''}`}
           onClick={() => setCategoriaActiva('favoritos')}
           role="tab"
           aria-selected={categoriaActiva === 'favoritos'}
           aria-controls={`panel-${categoriaActiva}`}
-          style={categoriaActiva === 'favoritos' ? { borderBottomColor: '#D97706', color: '#D97706' } : {}}
+          style={categoriaActiva === 'favoritos' ? { borderBottomColor: FAVORITOS_CATEGORIA.color } : {}}
         >
           <span aria-hidden="true">⭐</span>
           <span>Favoritos<span>{favoritos.length > 0 ? ` (${favoritos.length})` : ''}</span></span>
@@ -306,13 +360,13 @@ export default function TableroComunicacionPage() {
           <button
             key={cat.id}
             type="button"
-            className={`${styles.categoriaTab} ${categoriaActiva === cat.id ? styles.categoriaActiva : ''}`}
+            className={`${styles.categoriaTab} ${categoriaActiva === cat.id ? `${styles.categoriaActiva} ${CLASE_TEXTO_PESTANA[cat.id]}` : ''}`}
             onClick={() => setCategoriaActiva(cat.id)}
             role="tab"
             aria-selected={categoriaActiva === cat.id}
             aria-controls={`panel-${cat.id}`}
             style={categoriaActiva === cat.id
-              ? { borderBottomColor: cat.color, color: cat.color }
+              ? { borderBottomColor: cat.color }
               : {}}
           >
             <span aria-hidden="true">{cat.icono}</span>
@@ -356,7 +410,9 @@ export default function TableroComunicacionPage() {
                 type="button"
                 className={`${styles.btnEstrella} ${favoritos.includes(simbolo.id) ? styles.btnEstrellaActiva : ''}`}
                 onClick={(e) => toggleFavorito(simbolo.id, e)}
-                aria-label={favoritos.includes(simbolo.id) ? `Quitar ${simbolo.texto} de favoritos` : `Añadir ${simbolo.texto} a favoritos`}
+                /* Nombre fijo con aria-pressed: un nombre que cambia («Añadir…»/«Quitar…») junto al
+                   estado se leía «Quitar Agua de favoritos, pulsado» (hallazgo 4085) */
+                aria-label={`${simbolo.texto} en favoritos`}
                 aria-pressed={favoritos.includes(simbolo.id)}
               >
                 {favoritos.includes(simbolo.id) ? '⭐' : '☆'}
