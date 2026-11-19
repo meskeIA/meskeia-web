@@ -14,7 +14,17 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber, traerALaVista } from '@/lib';
-import { calcular1RM, errorEntrada1RM, REPS_MAX_1RM, Resultado1RM } from '@/lib/calculadoras/deporte';
+import {
+  BANDAS_1RM,
+  banda1RM,
+  calcular1RM,
+  errorEntrada1RM,
+  rangoBanda1RM,
+  REPS_MAX_1RM,
+  Resultado1RM,
+} from '@/lib/calculadoras/deporte';
+
+const BANDA_HIPERTROFIA = BANDAS_1RM[1];
 
 export default function Calculadora1RMGimnasioPage() {
   const [peso, setPeso] = useState('100');
@@ -131,7 +141,7 @@ export default function Calculadora1RMGimnasioPage() {
                 {/* Media — resultado principal destacado */}
                 <div className={styles.resultCardMediaWrapper} ref={mediaRef}>
                   <ResultCard
-                    title="Media (más fiable)"
+                    title="Media de las dos fórmulas"
                     value={`${formatNumber(resultado.media, 1)} kg`}
                     variant="highlight"
                     icon="🎯"
@@ -174,10 +184,10 @@ export default function Calculadora1RMGimnasioPage() {
                     key={fila.porcentaje}
                     className={fila.porcentaje === 100 ? styles.rowMax : undefined}
                   >
-                    <td className={styles.tdPct}>{fila.porcentaje}%</td>
+                    <td className={styles.tdPct}>{`${fila.porcentaje} %`}</td>
                     <td className={styles.tdPeso}>{formatNumber(fila.peso_kg, 1)} kg</td>
                     <td>{fila.repsAproximadas}</td>
-                    <td className={styles.tdUso}>{getUsoHabitual(fila.porcentaje)}</td>
+                    <td className={styles.tdUso}>{banda1RM(fila.porcentaje).objetivo}</td>
                   </tr>
                 ))}
               </tbody>
@@ -214,19 +224,23 @@ export default function Calculadora1RMGimnasioPage() {
           <ul>
             <li>
               <strong>Fórmula de Epley (1985):</strong>{' '}
-              <code>1RM = peso × (1 + reps / 30)</code>. Tiende a sobreestimar ligeramente el 1RM
-              cuando se realizan muchas repeticiones.
+              <code>1RM = peso × (1 + reps / 30)</code>. Crece en línea recta con las repeticiones.
             </li>
             <li>
               <strong>Fórmula de Brzycki (1993):</strong>{' '}
-              <code>1RM = peso / (1,0278 − 0,0278 × reps)</code>. Suele ser más conservadora y
-              precisa para rangos de 3 a 10 repeticiones.
+              <code>1RM = peso / (1,0278 − 0,0278 × reps)</code>. Crece cada vez más deprisa: su
+              denominador se acerca a cero a medida que suben las repeticiones (se anula hacia las 37).
             </li>
           </ul>
           <p>
-            La <strong>media de ambas</strong> ofrece una estimación equilibrada y es la que utilizamos
-            como valor principal. Para mayor exactitud, realiza el test siempre con ejercicios bien
-            dominados y en condiciones de descanso adecuadas.
+            Las dos dan lo mismo con 10 repeticiones. Por debajo de 10, Epley da una cifra algo mayor;
+            por encima, la mayor es Brzycki. Por eso la calculadora solo admite de 1 a {REPS_MAX_1RM}{' '}
+            repeticiones.
+          </p>
+          <p>
+            La <strong>media aritmética de las dos</strong> queda entre ambas y es la que utilizamos
+            como valor de referencia para la tabla. Para mayor exactitud, realiza el test siempre con
+            ejercicios bien dominados y en condiciones de descanso adecuadas.
           </p>
         </section>
 
@@ -237,13 +251,18 @@ export default function Calculadora1RMGimnasioPage() {
             sesión según tu objetivo de entrenamiento:
           </p>
           <ul>
-            <li><strong>85–100%:</strong> Entrenamiento de fuerza máxima (1–6 repeticiones).</li>
-            <li><strong>67–85%:</strong> Hipertrofia muscular (6–12 repeticiones).</li>
-            <li><strong>50–67%:</strong> Resistencia muscular y técnica (más de 12 repeticiones).</li>
+            {BANDAS_1RM.map((b) => (
+              <li key={b.objetivo}>
+                <strong>{rangoBanda1RM(b)}:</strong> {b.objetivo} ({b.reps} repeticiones).
+              </li>
+            ))}
           </ul>
           <p>
-            Por ejemplo, si tu 1RM en press de banca es 100 kg y quieres trabajar hipertrofia, deberías
-            usar entre 67 y 85 kg (67–85% del 1RM) para 6–12 repeticiones.
+            Son las bandas orientativas de la NSCA (<em>Essentials of Strength Training and
+            Conditioning</em>), las mismas que rotulan la columna «Uso habitual» de la tabla. Por
+            ejemplo, si tu 1RM en press de banca es 100 kg y quieres trabajar hipertrofia, usarías
+            entre {BANDA_HIPERTROFIA.pctMin} y {BANDA_HIPERTROFIA.pctMax} kg ({rangoBanda1RM(BANDA_HIPERTROFIA)}{' '}
+            del 1RM) para {BANDA_HIPERTROFIA.reps} repeticiones.
           </p>
         </section>
 
@@ -255,13 +274,15 @@ export default function Calculadora1RMGimnasioPage() {
           </p>
           <ul>
             <li>
-              <strong>Bloque de fuerza:</strong> 4–6 semanas trabajando al 80–90% del 1RM con 3–5 repeticiones.
+              <strong>Bloque de fuerza:</strong> 4–6 semanas en la banda de fuerza máxima
+              ({rangoBanda1RM(BANDAS_1RM[0])} del 1RM, {BANDAS_1RM[0].reps} repeticiones).
             </li>
             <li>
-              <strong>Bloque de hipertrofia:</strong> 4–8 semanas al 65–80% con 6–12 repeticiones.
+              <strong>Bloque de hipertrofia:</strong> 4–8 semanas en la banda de hipertrofia
+              ({rangoBanda1RM(BANDA_HIPERTROFIA)}, {BANDA_HIPERTROFIA.reps} repeticiones).
             </li>
             <li>
-              <strong>Semana de descarga:</strong> Cada 4–6 semanas, reducir la carga al 50–60% para
+              <strong>Semana de descarga:</strong> Cada 4–6 semanas, reducir la carga al 50–60{' '}% para
               facilitar la recuperación y consolidar las adaptaciones.
             </li>
           </ul>
@@ -271,8 +292,9 @@ export default function Calculadora1RMGimnasioPage() {
           <h2>Errores comunes al calcular el 1RM</h2>
           <ul>
             <li>
-              <strong>Usar demasiadas repeticiones:</strong> Las fórmulas son menos precisas con más de
-              10–12 repeticiones. Idealmente, realiza el test con 3–6 repeticiones al máximo esfuerzo.
+              <strong>Usar demasiadas repeticiones:</strong> Las fórmulas pierden precisión a partir de
+              10–12 repeticiones, y la calculadora no admite más de {REPS_MAX_1RM}. Idealmente, realiza
+              el test con 3–6 repeticiones al máximo esfuerzo.
             </li>
             <li>
               <strong>No descansar lo suficiente:</strong> El 1RM debe medirse con el sistema nervioso
@@ -304,14 +326,4 @@ export default function Calculadora1RMGimnasioPage() {
       <Footer appName="calculadora-1rm-gimnasio" />
     </div>
   );
-}
-
-// Helper local: descriptor de uso habitual por porcentaje
-function getUsoHabitual(porcentaje: number): string {
-  if (porcentaje === 100) return 'Test de fuerza máxima';
-  if (porcentaje >= 90)  return 'Fuerza máxima';
-  if (porcentaje >= 80)  return 'Fuerza + hipertrofia';
-  if (porcentaje >= 70)  return 'Hipertrofia';
-  if (porcentaje >= 65)  return 'Hipertrofia + resistencia';
-  return 'Resistencia muscular';
 }

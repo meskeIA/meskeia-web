@@ -175,8 +175,14 @@ export interface Banda1RM {
 export const BANDAS_1RM: readonly Banda1RM[] = [
   { objetivo: 'Fuerza máxima',        pctMin: 85, pctMax: 100, reps: '1–6' },
   { objetivo: 'Hipertrofia',          pctMin: 67, pctMax: 85,  reps: '6–12' },
-  { objetivo: 'Resistencia muscular', pctMin: 50, pctMax: 67,  reps: 'más de 12' },
+  { objetivo: 'Resistencia muscular', pctMin: 0,  pctMax: 67,  reps: 'más de 12' },
 ];
+
+/** «85–100 %», o «menos del 67 %» para la última banda; el % con espacio duro (U+00A0). */
+export function rangoBanda1RM(b: Banda1RM): string {
+  const ultima = b === BANDAS_1RM[BANDAS_1RM.length - 1];
+  return ultima ? `menos del ${b.pctMax} %` : `${b.pctMin}–${b.pctMax} %`;
+}
 
 /** Banda a la que pertenece un % del 1RM (el límite compartido va a la banda superior). */
 export function banda1RM(porcentaje: number): Banda1RM {

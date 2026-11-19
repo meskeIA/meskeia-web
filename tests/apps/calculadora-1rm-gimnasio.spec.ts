@@ -100,7 +100,7 @@ async function filas(page: Page): Promise<string[][]> {
     );
 }
 
-const TITULOS = ['Fórmula Epley', 'Fórmula Brzycki', 'Media (más fiable)'];
+const TITULOS = ['Fórmula Epley', 'Fórmula Brzycki', 'Media de las dos fórmulas'];
 
 /** Todas las cifras en kg que pintan las tarjetas y la tabla, ya convertidas a número. */
 async function kilosPintados(page: Page): Promise<number[]> {
@@ -142,7 +142,7 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
     await calcular(page, '100', '5');
     await expect(valor(page, 'Fórmula Epley')).toHaveText('116,7 kg');
     await expect(valor(page, 'Fórmula Brzycki')).toHaveText('112,5 kg');
-    await expect(valor(page, 'Media (más fiable)')).toHaveText('114,6 kg');
+    await expect(valor(page, 'Media de las dos fórmulas')).toHaveText('114,6 kg');
     const f = await filas(page);
     expect(f.map((r) => r[1])).toEqual([
       '114,6 kg', '108,9 kg', '103,1 kg', '97,4 kg', '91,7 kg', '85,9 kg', '80,2 kg', '74,5 kg', '68,8 kg',
@@ -157,12 +157,12 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
     await calcular(page, '102,5', '3');
     await expect(valor(page, 'Fórmula Epley')).toHaveText('112,8 kg');
     await expect(valor(page, 'Fórmula Brzycki')).toHaveText('108,5 kg');
-    await expect(valor(page, 'Media (más fiable)')).toHaveText('110,6 kg');
+    await expect(valor(page, 'Media de las dos fórmulas')).toHaveText('110,6 kg');
   });
 
   test('CASO 2a · 1 repetición da el propio peso en las tres y la tabla son los porcentajes de 100', async ({ page }) => {
     await calcular(page, '100', '1');
-    for (const t of ['Fórmula Epley', 'Fórmula Brzycki', 'Media (más fiable)']) {
+    for (const t of ['Fórmula Epley', 'Fórmula Brzycki', 'Media de las dos fórmulas']) {
       await expect(valor(page, t)).toHaveText('100,0 kg');
     }
     expect((await filas(page)).map((r) => r[1])).toEqual([
@@ -174,7 +174,7 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
     await calcular(page, '100', '12');
     await expect(valor(page, 'Fórmula Epley')).toHaveText('140,0 kg');
     await expect(valor(page, 'Fórmula Brzycki')).toHaveText('144,1 kg');
-    await expect(valor(page, 'Media (más fiable)')).toHaveText('142,0 kg');
+    await expect(valor(page, 'Media de las dos fórmulas')).toHaveText('142,0 kg');
     await expect(avisoEntrada(page)).toHaveText('');
 
     // REPARADO (hallazgo 5250): el rótulo promete 1–12 y con 13 ya no se calcula. Antes salía
@@ -192,7 +192,7 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
     // /api/chatgpt/1rm-gimnasio (400 con el motivo).
     // Se parte de un cálculo válido para saber cuándo ha re-renderizado (la cifra de 100 × 5 se va)
     await calcular(page, '100', '5');
-    await expect(valor(page, 'Media (más fiable)')).toHaveText('114,6 kg');
+    await expect(valor(page, 'Media de las dos fórmulas')).toHaveText('114,6 kg');
     await calcular(page, '100', '37');
     await expect(page.getByText('114,6 kg')).toHaveCount(0);
     await expect(avisoEntrada(page)).toContainText('de 1 a 12 repeticiones');
@@ -204,7 +204,7 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
     // REPARADO (5250): 100 / (1,0278 − 1,0008) = 3703,7 kg de Brzycki y «Media (más fiable)
     // 1961,9 kg». Epley da 220,0: ninguna cifra razonable pasa de ~3 veces el peso levantado.
     await calcular(page, '100', '5');
-    await expect(valor(page, 'Media (más fiable)')).toHaveText('114,6 kg');
+    await expect(valor(page, 'Media de las dos fórmulas')).toHaveText('114,6 kg');
     await calcular(page, '100', '36');
     await expect(page.getByText('114,6 kg')).toHaveCount(0);
     await expect(avisoEntrada(page)).toContainText('de 1 a 12 repeticiones');
@@ -216,7 +216,7 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
     // REPARADO (5251): con 100 × 5 calculado, 0 repeticiones y «Calcular» → la página hacía
     // `return` en silencio: seguían «Media (más fiable) 114,6 kg» y la tabla, sin ningún aviso.
     await calcular(page, '100', '5');
-    await expect(valor(page, 'Media (más fiable)')).toHaveText('114,6 kg');
+    await expect(valor(page, 'Media de las dos fórmulas')).toHaveText('114,6 kg');
     await calcular(page, '100', '0');
     await expect(page.getByText('114,6 kg')).toHaveCount(0);
     await expect(
@@ -245,7 +245,7 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
     // Se parte de 100 × 4 (Epley 113,333 · Brzycki 100 / 0,9166 = 109,099 · Media 111,216 → 111,2)
     // para saber cuándo ha re-renderizado.
     await calcular(page, '100', '4');
-    await expect(valor(page, 'Media (más fiable)')).toHaveText('111,2 kg');
+    await expect(valor(page, 'Media de las dos fórmulas')).toHaveText('111,2 kg');
     await calcular(page, '100', '5,5');
     await expect(page.getByText('111,2 kg')).toHaveCount(0);
     await expect(page.getByText('114,6 kg')).toHaveCount(0);
@@ -263,37 +263,51 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
   });
 
   test('HALLAZGO · ni la guía ni el FAQPage dicen que Epley es la generosa en repeticiones altas', async ({ page }) => {
-    // ABIERTO: FAQPage «Epley … tiende a ser ligeramente más generosa en repeticiones altas»; guía
-    // «Epley … tiende a sobreestimar ligeramente el 1RM cuando se realizan muchas repeticiones» y
-    // Brzycki «suele ser más conservadora». El motor (caso de arriba): por encima de 10 la mayor
-    // es Brzycki (144,1 frente a 140,0 con 12); Epley solo es mayor por debajo de 10.
-    test.fail();
-    expect(await faqTexto(page)).not.toMatch(/Epley[^.]*m[aá]s generosa en repeticiones altas/);
+    // REPARADO (5254): FAQPage «Epley … tiende a ser ligeramente más generosa en repeticiones
+    // altas»; guía «Epley … tiende a sobreestimar ligeramente el 1RM cuando se realizan muchas
+    // repeticiones» y Brzycki «suele ser más conservadora». El motor (caso de arriba): por encima
+    // de 10 la mayor es Brzycki (144,1 frente a 140,0 con 12); Epley solo es mayor por debajo de 10.
+    // Ahora las dos dicen eso.
+    const faq = await faqTexto(page);
+    expect(faq).not.toMatch(/Epley[^.]*m[aá]s generosa en repeticiones altas/);
+    expect(faq).toContain('por encima la mayor es Brzycki');
     const guia = (await page.locator('[data-guia-educativa]').textContent()) ?? '';
     expect(guia).not.toMatch(/sobreestimar ligeramente el 1RM cuando se realizan muchas repeticiones/);
+    expect(guia).not.toMatch(/Brzycki[^.]*más conservadora/);
+    expect(guia).toContain('por encima, la mayor es Brzycki');
   });
 
   test('HALLAZGO · las bandas de % del 1RM son las mismas en la tabla, la guía y el FAQPage', async ({ page }) => {
-    // ABIERTO: tabla 80 % → «7–8» reps y 85 % → «Fuerza + hipertrofia»; guía «85–100%: fuerza
-    // máxima (1–6 repeticiones)»; FAQPage «el 80-90%, para fuerza (4-6 reps)» y, en otra respuesta,
-    // «85-95% para fuerza máxima».
-    test.fail();
+    // REPARADO (5255): tabla 80 % → «7–8» reps y 85 % → «Fuerza + hipertrofia»; guía «85–100%:
+    // fuerza máxima (1–6 repeticiones)»; FAQPage «el 80-90%, para fuerza (4-6 reps)» y, en otra
+    // respuesta, «85-95% para fuerza máxima». Ahora las tres salen de BANDAS_1RM (las de la NSCA
+    // que ya usaba la guía): 85–100 % fuerza máxima, 67–85 % hipertrofia, menos del 67 %
+    // resistencia muscular.
     await calcular(page, '100', '5');
     const f = await filas(page);
-    const fila85 = f.find((r) => r[0].startsWith('85'));
+    const uso = (pct: string) => f.find((r) => r[0].startsWith(pct))?.[3];
+    expect(uso('100')).toBe('Fuerza máxima');
+    expect(uso('85')).toBe('Fuerza máxima');
+    expect(uso('80')).toBe('Hipertrofia');
+    expect(uso('70')).toBe('Hipertrofia');
+    expect(uso('65')).toBe('Resistencia muscular');
     const guia = (await page.locator('[data-guia-educativa]').textContent()) ?? '';
-    const guiaFuerzaMaxDesde85 = /85[–-]100\s*%[^.]*fuerza máxima/i.test(guia);
-    expect(guiaFuerzaMaxDesde85 ? /fuerza máxima/i.test(fila85?.[3] ?? '') : true).toBe(true);
-    expect(await faqTexto(page)).not.toMatch(/80-90%, para fuerza \(4-6 reps\)/);
+    expect(guia).toMatch(/85[–-]100\s*%[^.]*fuerza máxima/i);
+    const faq = await faqTexto(page);
+    expect(faq).not.toMatch(/80-90%, para fuerza \(4-6 reps\)/);
+    expect(faq).not.toMatch(/85-95%/);
+    expect(faq).toMatch(/85–100\s%[^.]*fuerza máxima/);
   });
 
   test('HALLAZGO · features no promete una «media ponderada» que el motor no hace', async ({ page }) => {
-    // ABIERTO: el motor hace (Epley + Brzycki) / 2: con 100 × 5, (116,667 + 112,511) / 2 = 114,6.
-    test.fail();
+    // REPARADO (5257): el motor hace (Epley + Brzycki) / 2: con 100 × 5, (116,667 + 112,511) / 2
+    // = 114,6. Features decía «media ponderada» y la tarjeta se titulaba «Media (más fiable)», sin
+    // fuente; ahora «Media aritmética…» y la tarjeta «Media de las dos fórmulas».
     const app = (await bloquesJsonLd(page)).find((b) => b['@type'] === 'WebApplication');
     const lista = app?.featureList ?? [];
     expect(lista.length).toBeGreaterThanOrEqual(4);
     expect(lista.join(' ')).not.toMatch(/ponderada/i);
+    expect(lista.join(' ')).toMatch(/Media aritmética/);
   });
 
   test('HALLAZGO · la app de la suite salud monta su DisclaimerCard', async ({ page }) => {
@@ -331,9 +345,12 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
   });
 
   test('HALLAZGO · el porcentaje lleva espacio duro (100 %)', async ({ page }) => {
-    // ABIERTO: la tabla pinta «100%», «95%»… (regla de formato del 25/09/2026: «15 %» con U+00A0).
-    test.fail();
+    // REPARADO (5260): la tabla pintaba «100%», «95%»… (regla de formato del 25/09/2026: «15 %»
+    // con U+00A0). También la guía, el FAQPage y features.
     await calcular(page, '100', '5');
+    const guia = (await page.locator('[data-guia-educativa]').textContent()) ?? '';
+    expect(guia).not.toMatch(/\d%/);
+    expect(await faqTexto(page)).not.toMatch(/\d%/);
     expect((await filas(page))[0][0]).toBe('100 %');
   });
 });
@@ -354,7 +371,7 @@ test.describe('calculadora-1rm-gimnasio · móvil (Pixel 7)', () => {
   test('el cálculo es el mismo tocando el botón', async ({ page }) => {
     await rellenar(page, '100', '5');
     await boton(page).tap();
-    await expect(valor(page, 'Media (más fiable)')).toHaveText('114,6 kg');
+    await expect(valor(page, 'Media de las dos fórmulas')).toHaveText('114,6 kg');
   });
 
   test('HALLAZGO · tras tocar «Calcular 1RM» la cifra queda a la vista', async ({ page }) => {
@@ -364,7 +381,7 @@ test.describe('calculadora-1rm-gimnasio · móvil (Pixel 7)', () => {
     await rellenar(page, '100', '5');
     await boton(page).scrollIntoViewIfNeeded();
     await boton(page).tap();
-    await expect(valor(page, 'Media (más fiable)')).toBeInViewport();
+    await expect(valor(page, 'Media de las dos fórmulas')).toBeInViewport();
   });
 
   test('HALLAZGO · la cabecera «Uso habitual» no queda sobre una columna vacía', async ({ page }) => {
