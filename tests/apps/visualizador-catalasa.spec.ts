@@ -239,11 +239,11 @@ test.describe('Coherencia de las cifras del texto', () => {
     expect(faq).toContain('40 millones de reacciones por segundo');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · «6 millones de moléculas por minuto» contradice los 40.000.000 por segundo', async ({ page }) => {
+  test('HALLAZGO 4380 (09/11/2026, REPARADO 19/11/2026) · «6 millones de moléculas por minuto» contradecía los 40.000.000 por segundo', async ({ page }) => {
     // 40.000.000 /s × 60 s = 2.400.000.000 por minuto; «6 millones por minuto» son 100.000 /s,
     // 400 veces menos que la cifra del hero, del contador y del FAQPage. Pasa si la tarjeta
-    // da una cifra que equivale a 40.000.000 por segundo, o si deja de dar una.
-    test.fail();
+    // da una cifra que equivale a 40.000.000 por segundo, o si deja de dar una. Ahora dice «unos
+    // 40 millones de moléculas de H₂O₂ por segundo».
     await abrir(page);
     const tarjeta = page.getByRole('heading', { name: 'La solución: catalasa', level: 3 }).locator('xpath=..');
     const texto = ((await tarjeta.textContent()) ?? '').replace(/\s+/g, ' ');
@@ -253,6 +253,7 @@ test.describe('Coherencia de las cifras del texto', () => {
       const porSegundo = (millones * 1_000_000) / (m[2] === 'minuto' ? 60 : 1);
       expect(porSegundo).toBe(40_000_000);
     }
+    expect(texto).not.toContain('6 millones');
   });
 });
 
@@ -261,30 +262,30 @@ test.describe('Hallazgos de contenido y aviso', () => {
     await abrir(page);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · la nota de seguridad del experimento se ve sin desplegar y pide no tocar los ojos', async ({ page }) => {
+  test('HALLAZGO 4381 (09/11/2026, REPARADO 19/11/2026) · la nota de seguridad del experimento se ve sin desplegar y pide no tocar los ojos', async ({ page }) => {
     // La app invita a hacer el experimento («uno de los más famosos de biología escolar») y su
-    // única nota de seguridad vive DENTRO de <EducationalSection>, que nace plegada (CLAUDE.md,
+    // única nota de seguridad vivía DENTRO de <EducationalSection>, que nace plegada (CLAUDE.md,
     // «Estructura estándar»: nunca ocultar ahí una advertencia de responsabilidad). Además la
-    // da por «segura» sin las precauciones de la ficha técnica del agua oxigenada al 3 % (CIMA
-    // 40859, 4.4: «NO TRAGAR. Se debe evitar el contacto con los ojos.»).
-    test.fail();
+    // daba por «segura» sin las precauciones de la ficha técnica del agua oxigenada al 3 % (CIMA
+    // 40859, 4.4: «NO TRAGAR. Se debe evitar el contacto con los ojos.»). Ahora va en el bloque
+    // del experimento, a la vista, con las dos precauciones.
     const textos = await page
       .locator('[role="note"], [class*="isclaimer"]')
       .filter({ hasText: /agua oxigenada/i })
       .evaluateAll((els) => els.filter((e) => e.checkVisibility()).map((e) => e.textContent ?? ''));
     expect(textos.length, 'una nota visible sin desplegar la guía').toBeGreaterThan(0);
     expect(textos.join(' ')).toMatch(/ojos/i);
+    expect(textos.join(' ')).toMatch(/no la tragues/i);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · «Cosmética» no da por probado que la catalasa frene las canas', async ({ page }) => {
-    // La tarjeta afirma «La catalasa reduce el H₂O₂ que blanquea el cabello con la edad» como
+  test('HALLAZGO 4382 (09/11/2026, REPARADO 19/11/2026) · «Cosmética» no da por probado que la catalasa frene las canas', async ({ page }) => {
+    // La tarjeta afirmaba «La catalasa reduce el H₂O₂ que blanquea el cabello con la edad» como
     // efecto de productos anti-envejecimiento, y la guía de la propia app dice que el estudio
-    // de 2009 solo «ha impulsado la investigación en tratamientos tópicos». Pasa si la tarjeta
-    // lo presenta como línea de investigación, o si desaparece.
-    test.fail();
+    // de 2009 solo «ha impulsado la investigación en tratamientos tópicos». Ahora lo dice igual.
     const tarjeta = page.getByRole('heading', { name: 'Cosmética', level: 3 }).locator('xpath=..');
     if ((await tarjeta.count()) > 0) {
       await expect(tarjeta).toContainText(/investig|en estudio|no demostrad|sin eficacia/i);
+      await expect(tarjeta).not.toContainText('reduce el H₂O₂ que blanquea');
     }
   });
 

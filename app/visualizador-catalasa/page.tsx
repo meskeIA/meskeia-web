@@ -94,7 +94,9 @@ const APLICACIONES_INDUSTRIALES = [
   {
     icono: '💄',
     titulo: 'Cosmética',
-    descripcion: 'Productos anti-envejecimiento con enzimas antioxidantes. La catalasa reduce el H₂O₂ que blanquea el cabello con la edad.',
+    // Hallazgo 4382 (19/11/2026): daba como efecto que «La catalasa reduce el H₂O₂ que blanquea el
+    // cabello», sin fuente. Ahora dice lo mismo que la guía de la app: es una línea de investigación.
+    descripcion: 'Productos con enzimas antioxidantes. El hallazgo de que el pelo blanco acumula H₂O₂ (FASEB Journal, 2009) ha impulsado la investigación en tratamientos tópicos con catalasa.',
   },
 ];
 
@@ -308,7 +310,7 @@ export default function VisualizadorCatalasa() {
             <p className={styles.danoTexto}>
               Localizada en los peroxisomas (orgánulo especializado en oxidaciones),
               la catalasa convierte el H₂O₂ en agua y oxígeno inofensivos.
-              Una sola molécula puede procesar <strong>6 millones de moléculas de H₂O₂ por minuto</strong>.
+              Una sola molécula puede procesar <strong>unos 40 millones de moléculas de H₂O₂ por segundo</strong>.
             </p>
           </div>
         </div>
@@ -420,6 +422,17 @@ export default function VisualizadorCatalasa() {
             La cocción (&gt;80°C) la inactiva completamente al desnaturalizar su estructura proteica.
           </p>
         </div>
+
+        {/* Hallazgo 4381 (19/11/2026): la nota de seguridad vivía dentro de la guía, que nace
+            plegada, y no hablaba de los ojos ni de la ingestión. Precauciones de la ficha técnica del
+            agua oxigenada al 3 % (CIMA de la AEMPS, Agua oxigenada Foret 3 %, n.º 40859, sección 4.4,
+            consultada el 19/11/2026). */}
+        <div className={styles.warningBox} role="note">
+          <strong>Seguridad:</strong> el agua oxigenada de uso doméstico (3-6&nbsp;%) es de baja
+          concentración, pero es solo para uso externo: <strong>no la tragues y evita el contacto con
+          los ojos</strong> (si salpica, lava con abundante agua). Haz el experimento con la supervisión
+          de un adulto y, en el laboratorio, sigue sus protocolos de seguridad.
+        </div>
       </section>
 
       {/* ── BLOQUE 4: Usos industriales ── */}
@@ -486,12 +499,6 @@ export default function VisualizadorCatalasa() {
             demostró que el pelo blanco acumula concentraciones muy superiores de H₂O₂ que el pelo pigmentado.
             Este hallazgo ha impulsado la investigación en tratamientos tópicos con catalasa.
           </p>
-
-          <div className={styles.warningBox} role="note">
-            <strong>Nota:</strong> Contenido educativo de bioquímica. La reacción del experimento
-            es segura en contexto educativo supervisado — el agua oxigenada doméstica (3-6%)
-            es de baja concentración. Para usos de laboratorio, seguir los protocolos de seguridad apropiados.
-          </div>
         </div>
       </EducationalSection>
 
