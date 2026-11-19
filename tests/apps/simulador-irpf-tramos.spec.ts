@@ -127,9 +127,11 @@ test.describe('simulador-irpf-tramos', () => {
 
     await page.getByRole('tab', { name: 'Comparativa' }).click();
     const comparativa = panel(page, '¿Qué pasa si tu base cambia?');
-    // escala(400.000) = 172.901,50 € y escala(410.000) = 177.601,50 € (cabecera, CASO 2)
-    await expect.poll(() => texto(comparativa)).toContain('Cuota íntegra: 172.901,50 €');
-    expect(await texto(comparativa)).toContain('Cuota íntegra: 177.601,50 €');
+    // escala(400.000) = 172.901,50 € y escala(410.000) = 177.601,50 € (cabecera, CASO 2), menos la
+    // cuota del mínimo por defecto, escala(5.550) = 1.054,50 € (hallazgo 5157, reparado el 19/11/2026):
+    // 171.847,00 € y 176.547,00 €. La diferencia no cambia: el mínimo resta lo mismo a las dos.
+    await expect.poll(() => texto(comparativa)).toContain('Cuota íntegra: 171.847,00 €');
+    expect(await texto(comparativa)).toContain('Cuota íntegra: 176.547,00 €');
     expect(await texto(comparativa.getByRole('status'))).toContain('+4700,00 € de cuota IRPF(47,0% del incremento');
   });
 
@@ -161,31 +163,59 @@ test.describe('simulador-irpf-tramos', () => {
   });
 
   test('la escala a 24.000 € da 5365,50 € (4.225,50 + 3.800 × 30 %)', async ({ page }) => {
+    // Con el mínimo en 0, la cuota íntegra es la escala pura: así se comprueba la escala sola
+    await sembrarValor(page, '#minimoSlider', 0);
     await sembrarValor(page, '#baseSlider', 24000);
     await expect.poll(() => texto(valorResumen(page, 'Cuota íntegra'))).toBe('5365,50 €');
     expect(await texto(valorResumen(page, 'Tipo medio efectivo'))).toBe('22,36%');
+    // Y con el del jubilado, 6.700 € → escala(6.700) = 1.273,00 €: 5.365,50 − 1.273,00 = 4.092,50 €
+    await sembrarValor(page, '#minimoSlider', 6700);
+    await expect.poll(() => texto(valorResumen(page, 'Cuota íntegra'))).toBe('4092,50 €');
   });
 
   // ═══════════════════════════════════════════════════════════════════════════
   // Inspección del 18/11/2026 — hallazgos ABIERTOS (test.fail hasta que se reparen)
   // ═══════════════════════════════════════════════════════════════════════════
 
-  test('ABIERTO · la «Cuota íntegra» olvida el mínimo personal: 45.000 € → 11.297,00 €, no 12.351,50 €', async ({ page }) => {
+  test('REPARADO (5157, 19/11/2026) · la «Cuota íntegra» olvida el mínimo personal: 45.000 € → 11.297,00 €, no 12.351,50 €', async ({ page }) => {
     // Todo contribuyente tiene al menos el mínimo de 5.550 € (art. 57.1), que se grava a tipo cero
     // (art. 63.1.2.º; calcularCuotaIntegraGeneral(45.000, 5.550) = 11.297,00 €, CASO 1). La app
-    // muestra escala(45.000) = 12.351,50 € como «Cuota íntegra», con tipo medio 27,45 % y renta neta
-    // 32.648,50 €: 1.054,50 € de cuota de más para cualquier base que supere el mínimo.
-    test.fail();
+    // mostraba escala(45.000) = 12.351,50 € como «Cuota íntegra». Decidido por el usuario (cabo
+    // C0833): un campo de mínimo, 5.550 € por defecto, y la cuota de data/fiscal.
+    await expect(page.locator('#minimoSlider')).toHaveValue('5550');
     await sembrarValor(page, '#baseSlider', 45000);
     await expect.poll(() => texto(valorResumen(page, 'Cuota íntegra')), { timeout: 3000 }).toBe('11.297,00 €');
     expect(await texto(valorResumen(page, 'Tipo medio efectivo'))).toBe('25,10%');
     expect(await texto(valorResumen(page, 'Renta neta tras IRPF'))).toBe('33.703,00 €');
+    // La vista por tramos enseña la resta: 12.351,50 − 1.054,50 (5.550 × 19 %) = 11.297,00
+    const tramos = texto(panel(page, 'Cómo se reparte tu base entre los 6 tramos'));
+    expect(await tramos).toContain('Escala sobre la base12.351,50 €');
+    expect(await tramos).toContain('(5550,00 €), que tributa a tipo cero1054,50 €');
+    expect(await tramos).toContain('= Cuota íntegra11.297,00 €');
+    // Una base por debajo del mínimo no paga nada, y su marginal es 0
+    await sembrarValor(page, '#baseSlider', 5000);
+    await expect.poll(() => texto(valorResumen(page, 'Cuota íntegra'))).toBe('0,00 €');
+    expect(await texto(valorResumen(page, 'Tipo marginal'))).toBe('0%');
+  });
+
+  test('REPARADO (5157) · los casos «Asalariado tipo» y «Autónomo en RETA» dan la cuota íntegra, no la escala', async ({ page }) => {
+    // 30.000 €: escala 7.165,50 − 1.054,50 = 6.111,00 € (20,37 %) · 45.000 €: 11.297,00 € (25,10 %)
+    const caso = (titulo: string) => page.locator('h4', { hasText: titulo }).locator('xpath=..');
+    const asalariado = await texto(caso('Asalariado tipo'));
+    expect(asalariado).toContain('7165,50 € de escala');
+    expect(asalariado).toContain('la cuota íntegra queda en 6111,00 €: tipo medio 20,37%');
+    const autonomo = await texto(caso('Autónomo en RETA'));
+    expect(autonomo).toContain('la escala da 12.351,50 €');
+    expect(autonomo).toContain('la cuota íntegra es de 11.297,00 € (tipo medio 25,10%');
   });
 
   test('ABIERTO · base 5.000 y −10.000: el porcentaje se mide sobre la bajada real (19,0 %), no sobre 10.000 (9,5 %)', async ({ page }) => {
     // La base final se acota a 0, así que solo bajó 5.000 € y la cuota bajó 950,00 € (CASO 3). La
     // app dice «Si bajas 10.000,00 € … −950,00 € (9,5% del incremento se va en impuestos)».
     test.fail();
+    // Mínimo en 0: con el de 5.550 € por defecto (desde el 19/11/2026) una base de 5.000 no paga
+    // cuota y la bajada no movería nada; el caso mide la escala sola
+    await sembrarValor(page, '#minimoSlider', 0);
     await sembrarValor(page, '#baseSlider', 5000);
     await sembrarValorAcotado(page, '#incSlider', -10000);
     await page.getByRole('tab', { name: 'Comparativa' }).click();

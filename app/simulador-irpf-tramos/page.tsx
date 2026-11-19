@@ -19,6 +19,7 @@ import {
   MINIMOS_IRPF_2025,
   cuotaEscalaGeneral,
   calcularCuotaIntegraGeneral,
+  desglosarEscalaGeneral,
 } from '@/data/fiscal';
 import styles from './SimuladorIrpfTramos.module.css';
 import { FAQ_BASE_LIQUIDABLE, FAQ_TIPO_MEDIO, FAQ_SUBIR_TRAMO } from './faq';
@@ -36,6 +37,13 @@ const MINIMO_HIJOS_2 = MINIMOS_IRPF_2025.hijo_1 + MINIMOS_IRPF_2025.hijo_2;
 const MINIMO_FAMILIA = MINIMOS_IRPF_2025.personal + MINIMO_HIJOS_2;
 // Ahorro frente al soltero de la misma base, que también tiene su mínimo personal
 const AHORRO_FAMILIA = cuotaEscalaGeneral(MINIMO_FAMILIA) - cuotaEscalaGeneral(MINIMOS_IRPF_2025.personal);
+// Asalariado y autónomo con el mínimo personal (hallazgo 5157): la cuota íntegra, no la escala
+const ASALARIADO_BASE = 30000;
+const ASALARIADO_ESCALA = cuotaEscalaGeneral(ASALARIADO_BASE);
+const ASALARIADO_CUOTA = calcularCuotaIntegraGeneral(ASALARIADO_BASE, MINIMOS_IRPF_2025.personal);
+const AUTONOMO_BASE = 45000;
+const AUTONOMO_ESCALA = cuotaEscalaGeneral(AUTONOMO_BASE);
+const AUTONOMO_CUOTA = calcularCuotaIntegraGeneral(AUTONOMO_BASE, MINIMOS_IRPF_2025.personal);
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -50,7 +58,14 @@ interface DesgloseTramo {
 }
 
 interface ResultadoCuota {
+  /** Cuota íntegra: la escala sobre la base menos la escala sobre el mínimo (art. 63.1.2.º LIRPF). */
   cuota: number;
+  /** La escala aplicada a la base entera (la suma de la leyenda de tramos). */
+  cuotaEscala: number;
+  /** La escala aplicada a la parte de la base que corresponde al mínimo (tipo cero). */
+  cuotaDelMinimo: number;
+  /** El mínimo que cabe en la base: el que no cabe no llega a gravarse. */
+  minimoAplicado: number;
   desglose: DesgloseTramo[];
   tipoMedio: number;
   tipoMarginal: number;
@@ -59,49 +74,40 @@ interface ResultadoCuota {
 // ─── Lógica ────────────────────────────────────────────────────────────────────
 
 const TOPE_VISUAL = 320000; // tope visualización para tramo abierto
+const MINIMO_MAXIMO = 30000; // tope del deslizador del mínimo personal y familiar
 
-function calcularCuotaTramos(base: number): ResultadoCuota {
-  let cuota = 0;
-  let baseRestante = Math.max(0, base);
-  let limiteAnterior = 0;
-  let tipoMarginal = 0;
-  const desglose: DesgloseTramo[] = [];
-
-  for (const tramo of TRAMOS_IRPF_2025) {
-    const limiteSuperior = tramo.hasta === Infinity ? Math.max(TOPE_VISUAL, base + 50000) : tramo.hasta;
-    const anchoTramo = limiteSuperior - limiteAnterior;
-    const baseAplicada = Math.min(baseRestante, anchoTramo);
-
-    if (baseAplicada > 0) {
-      const cuotaTramo = baseAplicada * (tramo.tipo / 100);
-      cuota += cuotaTramo;
-      tipoMarginal = tramo.tipo;
-      desglose.push({
-        desde: limiteAnterior,
-        hasta: limiteSuperior,
-        tipo: tramo.tipo,
-        baseAplicada,
-        cuota: cuotaTramo,
-      });
-      baseRestante -= baseAplicada;
-    } else {
-      desglose.push({
-        desde: limiteAnterior,
-        hasta: limiteSuperior,
-        tipo: tramo.tipo,
-        baseAplicada: 0,
-        cuota: 0,
-      });
-    }
-
-    limiteAnterior = limiteSuperior;
-    if (baseRestante <= 0 && desglose.length >= TRAMOS_IRPF_2025.length) break;
-  }
+/*
+ * ⚠️ 19/11/2026 (hallazgo 5157, decidido por el usuario en el cabo C0833) — la «Cuota íntegra» era
+ * la escala aplicada a la base, sin restar la cuota del mínimo personal y familiar: con 45.000 €
+ * daba 12.351,50 € en vez de 11.297,00 € (1.054,50 € de más con cualquier base que supere 5.550 €).
+ * Ahora la cuota sale de `calcularCuotaIntegraGeneral` y la leyenda de tramos, de
+ * `desglosarEscalaGeneral`, las dos de data/fiscal.
+ */
+function calcularCuotaTramos(base: number, minimo: number): ResultadoCuota {
+  const b = Math.max(0, base);
+  const { cuota: cuotaEscala, tramos } = desglosarEscalaGeneral(b);
+  const desglose: DesgloseTramo[] = TRAMOS_IRPF_2025.map((tramo, i) => {
+    const aplicado = tramos[i];
+    return {
+      desde: i === 0 ? 0 : TRAMOS_IRPF_2025[i - 1].hasta,
+      hasta: tramo.hasta === Infinity ? Math.max(TOPE_VISUAL, b + 50000) : tramo.hasta,
+      tipo: tramo.tipo,
+      baseAplicada: aplicado?.base ?? 0,
+      cuota: aplicado?.cuota ?? 0,
+    };
+  });
+  const minimoAplicado = Math.min(Math.max(0, minimo), b);
+  const cuota = calcularCuotaIntegraGeneral(b, minimo);
+  // Mientras la base no supera el mínimo, un euro más no paga nada: el marginal es 0
+  const tipoMarginal = b > minimoAplicado && tramos.length > 0 ? tramos[tramos.length - 1].tipo : 0;
 
   return {
     cuota,
+    cuotaEscala,
+    cuotaDelMinimo: cuotaEscalaGeneral(minimoAplicado),
+    minimoAplicado,
     desglose,
-    tipoMedio: base > 0 ? (cuota / base) * 100 : 0,
+    tipoMedio: b > 0 ? (cuota / b) * 100 : 0,
     tipoMarginal,
   };
 }
@@ -121,12 +127,13 @@ const EJEMPLOS = [
 export default function SimuladorIrpfTramosPage() {
   const [base, setBase] = useState<number>(30000);
   const [incremento, setIncremento] = useState<number>(0);
+  const [minimo, setMinimo] = useState<number>(MINIMOS_IRPF_2025.personal);
   const [vista, setVista] = useState<Vista>('tramos');
 
   const baseFinal = Math.max(0, base + incremento);
 
-  const resultadoBase = useMemo(() => calcularCuotaTramos(base), [base]);
-  const resultadoFinal = useMemo(() => calcularCuotaTramos(baseFinal), [baseFinal]);
+  const resultadoBase = useMemo(() => calcularCuotaTramos(base, minimo), [base, minimo]);
+  const resultadoFinal = useMemo(() => calcularCuotaTramos(baseFinal, minimo), [baseFinal, minimo]);
 
   const diferenciaCuota = resultadoFinal.cuota - resultadoBase.cuota;
 
@@ -185,6 +192,24 @@ export default function SimuladorIrpfTramosPage() {
             </div>
           ))}
         </div>
+
+        {/* De la escala a la cuota íntegra: el mínimo se grava a tipo cero (hallazgo 5157) */}
+        <dl className={styles.cuotaDesdeEscala}>
+          <div>
+            <dt>Escala sobre la base</dt>
+            <dd>{formatCurrency(resultadoFinal.cuotaEscala)}</dd>
+          </div>
+          <div>
+            <dt>
+              − Escala sobre tu mínimo personal y familiar ({formatCurrency(resultadoFinal.minimoAplicado)}), que tributa a tipo cero
+            </dt>
+            <dd>{formatCurrency(resultadoFinal.cuotaDelMinimo)}</dd>
+          </div>
+          <div className={styles.cuotaDesdeEscalaTotal}>
+            <dt>= Cuota íntegra</dt>
+            <dd>{formatCurrency(resultadoFinal.cuota)}</dd>
+          </div>
+        </dl>
       </div>
     );
   };
@@ -524,6 +549,29 @@ export default function SimuladorIrpfTramosPage() {
             </p>
           </div>
 
+          <div className={styles.sliderGroup}>
+            <label className={styles.sliderLabel} htmlFor="minimoSlider">
+              Mínimo personal y familiar: <span className={styles.sliderValue}>{formatCurrency(minimo)}</span>
+            </label>
+            <input
+              id="minimoSlider"
+              type="range"
+              min={0}
+              max={MINIMO_MAXIMO}
+              step={50}
+              value={minimo}
+              onChange={e => setMinimo(Number(e.target.value))}
+              className={styles.slider}
+            />
+            <div className={styles.sliderRange}>
+              <span>0 €</span>
+              <span>{formatCurrency(MINIMO_MAXIMO)}</span>
+            </div>
+            <p className={styles.sliderHint}>
+              {`El personal es de ${formatCurrency(MINIMOS_IRPF_2025.personal)} (${formatCurrency(MINIMOS_IRPF_2025.personal_65)} desde los 65 años y ${formatCurrency(MINIMOS_IRPF_2025.personal_75)} desde los 75). Súmale los de hijos, ascendientes o discapacidad (paso 2 de la guía). No se resta de la base: se grava a tipo cero.`}
+            </p>
+          </div>
+
           <div className={styles.ejemplosGrid}>
             {EJEMPLOS.map(ej => (
               <button
@@ -559,7 +607,7 @@ export default function SimuladorIrpfTramosPage() {
             <div className={styles.resumenCard}>
               <span className={styles.resumenLabel}>Cuota íntegra</span>
               <strong className={styles.resumenValor}>{formatCurrency(resultadoFinal.cuota)}</strong>
-              <span className={styles.muted}>Sin restar deducciones</span>
+              <span className={styles.muted}>Con el mínimo a tipo cero; sin deducciones</span>
             </div>
             <div className={styles.resumenCard}>
               <span className={styles.resumenLabel}>Tipo medio efectivo</span>
@@ -651,13 +699,13 @@ export default function SimuladorIrpfTramosPage() {
           <div className={styles.escenarioCard}>
             <h4>Asalariado tipo (30.000 € base liquidable)</h4>
             <p>
-              Reparto: 12.450 al 19% + 7.750 al 24% + 9.800 al 30% = 7.165,50 € de cuota. Tipo medio ~23,9%, marginal 30%. Si su empresa le sube 1.000 €, 300 € se van al IRPF.
+              {`Reparto: 12.450 al 19 % + 7.750 al 24 % + 9.800 al 30 % =${fmtEur(ASALARIADO_ESCALA)} de escala. Restando la cuota de su mínimo personal (${fmtEur(MINIMOS_IRPF_2025.personal)} a tipo cero), la cuota íntegra queda en ${fmtEur(ASALARIADO_CUOTA)}: tipo medio ${fmtPct((ASALARIADO_CUOTA / ASALARIADO_BASE) * 100)}, marginal 30 %. Si su empresa le sube 1.000 €, 300 € se van al IRPF.`}
             </p>
           </div>
           <div className={styles.escenarioCard}>
             <h4>Autónomo en RETA (45.000 € base liquidable)</h4>
             <p>
-              Tres tramos llenos + parte del 4º. Cuota ~12.352 €. Tipo medio ~27,4%, marginal 37%. Importante: el autónomo factura IVA aparte; el IRPF aplica solo sobre el rendimiento neto tras gastos deducibles.
+              {`Tres tramos llenos + parte del 4º: la escala da ${fmtEur(AUTONOMO_ESCALA)} y, restando la cuota de su mínimo personal, la cuota íntegra es de ${fmtEur(AUTONOMO_CUOTA)} (tipo medio ${fmtPct((AUTONOMO_CUOTA / AUTONOMO_BASE) * 100)}, marginal 37 %). Importante: el autónomo factura IVA aparte; el IRPF aplica solo sobre el rendimiento neto tras gastos deducibles.`}
             </p>
           </div>
           <div className={styles.escenarioCard}>

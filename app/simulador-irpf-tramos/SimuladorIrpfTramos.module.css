@@ -267,6 +267,48 @@
   border: 1px solid #e5e7eb;
 }
 
+/* De la escala a la cuota íntegra (hallazgo 5157) */
+.cuotaDesdeEscala {
+  margin: 1rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-primary);
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.cuotaDesdeEscala > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.3rem 0;
+}
+
+.cuotaDesdeEscala dt {
+  margin: 0;
+}
+
+.cuotaDesdeEscala dd {
+  margin: 0;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cuotaDesdeEscalaTotal {
+  border-top: 1px solid #e5e7eb;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .cuotaDesdeEscala {
+  background: #1a1a1a;
+  border-color: #374151;
+}
+
+[data-theme='dark'] .cuotaDesdeEscalaTotal {
+  border-color: #374151;
+}
+
 .tramosLeyendaSwatch {
   width: 14px;
   height: 14px;

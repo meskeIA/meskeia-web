@@ -62,6 +62,7 @@ export const jsonLd = generateWebAppSchema({
     'Slider "qué pasa si subo X €"',
     '3 modos: por tramos, escalera de tipos, comparativa',
     'Cálculo de tipo marginal y tipo medio efectivo',
+    'Cuota íntegra con el mínimo personal y familiar gravado a tipo cero',
     'Escala estatal + autonómica media de la Ley 35/2006',
     'Solo orientativo — verifica con la AEAT',
     'En español',
