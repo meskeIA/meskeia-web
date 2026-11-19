@@ -308,4 +308,49 @@ test.describe('Test de Zarit — la puntuación y su nivel', () => {
     const ref = page.getByText('Escala Zarit — Dependencia y cuidadores').first().locator('xpath=..');
     await expect(ref).not.toContainText('RD 1051/2013');
   });
+
+  test('CABO C0832 (1) · el resultado pinta los teléfonos de RECURSOS_CUIDADORES, cada uno con su organismo (SIN ANCLAR)', async ({ page }) => {
+    // SIN ANCLAR (19/11/2026): 901 109 899 y 900 123 700 salen de RECURSOS_CUIDADORES
+    // (data/fiscal/dependencia.ts), que no lleva fuente ni fecha de verificación propias; la fuente
+    // del META del módulo son normas (Ley 39/2006, LPGE 2025, RD 1051/2013…) y ninguna da teléfonos.
+    // imserso.es no está en la red de fuentes y el buscador del BOE no admitió la consulta por
+    // WebFetch: los números los comprueba el usuario a mano. Este caso NO los da por buenos: fija lo
+    // que pinta la app y a quién se lo atribuye, para que un cambio de número o de organismo
+    // obligue a volver a cotejarlo. Esperado literal: los valores del módulo.
+    test.setTimeout(TIEMPO_RECORRIDO);
+    await responder(page, CICLICO);
+    await verResultado(page);
+    const recursos = page
+      .locator('#resultados')
+      .getByRole('heading', { name: 'Recursos de ayuda' })
+      .locator('xpath=..');
+    const tarjeta = (organismo: string) =>
+      recursos.locator('strong', { hasText: organismo }).locator('xpath=..');
+    await expect(tarjeta('IMSERSO')).toContainText('901 109 899');
+    await expect(tarjeta('Atención a la Dependencia')).toContainText('900 123 700');
+    // Con 63 puntos (sobrecarga intensa) la recomendación repite el 900 con otro nombre de servicio
+    await expect(page.locator('#resultados li', { hasText: '900 123 700' })).toHaveText(
+      'Teléfono de atención al cuidador: 900 123 700 (Línea de Atención a la Dependencia)',
+    );
+  });
+
+  test('CABO C0832 (2) · la cifra de cuidadores de la guía cita fuente y año, o no está', async ({ page }) => {
+    // ABIERTO: la guía dice «En España, se estima que hay más de 1,5 millones de cuidadores no
+    // profesionales, mayoritariamente mujeres (83%), con una dedicación media superior a 10 horas
+    // diarias.» sin fuente ni año (CLAUDE.md §1.quinquies, señal 1). Ni metadata.ts ni la FAQ visible
+    // la repiten. La encuesta oficial de la red que trata a los cuidadores, la EDAD 2020 del INE
+    // (nota de prensa del 19/04/2022, p. 11), no da ninguna de las tres: «El 63,7% de estos
+    // cuidadores eran mujeres» (cuidadores principales de las personas de seis y más años con
+    // discapacidad que viven en hogares) y «El 49,7% de las personas que recibían cuidados
+    // señalaron ser atendidos durante ocho o más horas diarias»; ningún total de cuidadores.
+    // Esperado: el párrafo que lleve esas cifras cita fuente y año, o las cifras se retiran.
+    test.fail();
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    const parrafos = page.locator('p').filter({ hasText: /1,5 millones|83\s?%|10 horas diarias/ });
+    for (const texto of await parrafos.allTextContents()) {
+      expect(texto, 'la cifra de cuidadores cita fuente y año').toMatch(
+        /(INE|IMSERSO|Encuesta|EDAD|Ministerio|[Ff]uente|[Ss]egún)[^.]*\b(19|20)\d{2}\b|\b(19|20)\d{2}\b[^.]*(INE|IMSERSO|Encuesta|EDAD)/,
+      );
+    }
+  });
 });

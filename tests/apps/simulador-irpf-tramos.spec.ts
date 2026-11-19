@@ -278,4 +278,26 @@ test.describe('simulador-irpf-tramos', () => {
     await expect(page.locator('[role="tabpanel"]')).toHaveCount(1, { timeout: 2000 });
     await expect(page.getByRole('tab').first()).toHaveAttribute('aria-controls', /.+/, { timeout: 2000 });
   });
+
+  test('ABIERTO (cabo C0831, 19/11/2026) · «Mejores prácticas» no pone las donaciones entre lo que reduce la base liquidable', async ({ page }) => {
+    // La tarjeta «Planifica antes de fin de año» dice: «Aportaciones a planes de pensiones (hasta
+    // 1.500 €/año), donaciones, gastos deducibles… reducen tu base liquidable.» Los planes de
+    // pensiones sí reducen la base (arts. 51-52 LIRPF; tope de 1.500 € en data/fiscal/pensiones.ts),
+    // pero los donativos a entidades de la Ley 49/2002 se restan de la CUOTA: art. 19.1 de esa ley
+    // (BOE-A-2002-25039, texto consolidado de 20/12/2023), literal: «Los contribuyentes del Impuesto
+    // sobre la Renta de las Personas Físicas tendrán derecho a deducir de la cuota íntegra», con la
+    // escala «250 euros. | 80» y «Resto base de deducción. | 40». Con 100 € donados son 80 € menos
+    // de cuota; como reducción de base, a un marginal del 30 %, serían 30 €. Contradice además el
+    // paso 4 de la guía de la propia app: «Cada deducción reduce directamente la cuota, no la base».
+    // Se mira cada párrafo de las tarjetas: ninguno puede poner donaciones o donativos delante de
+    // «reduce(n) tu/la base liquidable/imponible».
+    test.fail();
+    const tarjetas = page.locator('h3', { hasText: 'Mejores Prácticas' }).locator('xpath=following-sibling::div[1]');
+    const parrafos = (await tarjetas.locator('p').allTextContents()).map(normalizar);
+    expect(parrafos.length).toBeGreaterThan(0);
+    const queMezclan = parrafos.filter((p) =>
+      /(donaci|donativ)[^.]*reduc\w*\s+(tu|la)\s+base\s+(liquidable|imponible)/i.test(p),
+    );
+    expect(queMezclan).toEqual([]);
+  });
 });

@@ -996,3 +996,92 @@ test.describe('Péndulo · stemum.com · re-inspección 02/10/2026', () => {
     }
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * INSPECCIÓN DE CAMBIO 19/11/2026 — único commit en app/simulador-pendulo/ desde la validación
+ * del 08/10/2026 (ac046fdc): 68e83c8a5, lote 8 de «texto semántico del claro a 4,5:1» (C0296).
+ * Una línea de SimuladorPendulo.module.css: la marca «✗» (`.warningList li::before`) de la caja
+ * «Errores Frecuentes» del bloque educativo pasa de `#f59e0b` a `var(--ambar-texto, #f59e0b)`.
+ *
+ * A MANO, antes de abrir el navegador (WCAG 2.x, luminancia relativa sRGB):
+ *   Fondo de la caja en claro: #fef3c7 (`.warningBox`), L = 0,8891.
+ *   · Antes, #f59e0b: L = 0,4389 → (0,8891 + 0,05)/(0,4389 + 0,05) = 1,92:1.
+ *   · Ahora, --ambar-texto en claro = #8A5A00 (globals.css): L = 0,1271 → 5,30:1.
+ *   En oscuro la caja es #2d1b00 (L = 0,0134), redeclarada en el módulo, y --ambar-texto vale
+ *   #FCD34D (L = 0,6782) → 11,48:1. La trampa de la receta —un tono claro sobre una caja que
+ *   SIGUE clara en oscuro— no se da aquí: la caja también cambia de tema.
+ * Medido en el navegador: 5,32:1 en claro y 11,48:1 en oscuro, en las seis viñetas, igual bajo
+ * meskeia.com y bajo stemum.com (data-brand="stemum" no redeclara el token). Reinyectando el
+ * color de antes (--ambar-texto: #f59e0b) la misma medida da 1,93:1: el caso sí lo detecta.
+ *
+ * Umbral: 4,5:1. check:semanticos-claro admite 3:1 en un ::before, pero el «✗» va a 13,6 px y
+ * dice «esto es un error»: es texto de tamaño normal. El defecto que vigila era de 1,92:1.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Contraste del `::before` de cada elemento contra el primer fondo opaco de sus antecesores,
+ * con los colores medidos para que el mensaje de un fallo diga qué se pintó sobre qué.
+ */
+async function contrastesMarca(elementos: Locator): Promise<Array<{ ratio: number; marca: string; color: string; fondo: string }>> {
+  return elementos.evaluateAll((lis) => {
+    interface Rgba { r: number; g: number; b: number; a: number }
+    const leer = (css: string): Rgba => {
+      const p = (css.match(/[\d.]+/g) ?? []).map(Number);
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    };
+    const canal = (c: number): number => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    const lum = (c: Rgba): number => 0.2126 * canal(c.r) + 0.7152 * canal(c.g) + 0.0722 * canal(c.b);
+    return lis.map((li) => {
+      const antes = getComputedStyle(li, '::before');
+      let fondo = getComputedStyle(document.body).backgroundColor;
+      for (let n: Element | null = li; n; n = n.parentElement) {
+        const bg = getComputedStyle(n).backgroundColor;
+        if (leer(bg).a >= 1) {
+          fondo = bg;
+          break;
+        }
+      }
+      const x = lum(leer(antes.color));
+      const y = lum(leer(fondo));
+      return {
+        ratio: +((Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05)).toFixed(2),
+        marca: antes.content,
+        color: antes.color,
+        fondo,
+      };
+    });
+  });
+}
+
+test.describe('Péndulo · cambio 68e83c8a5 · inspección 19/11/2026', () => {
+  test('la marca «✗» de «Errores Frecuentes» llega a 4,5:1 en claro y en oscuro', async ({ page }) => {
+    // Sin transiciones: globals.css anima el background-color 0,3 s, y medir nada más cambiar de
+    // tema lee el fondo a medio camino (el falso verde del 02/10/2026, hallazgo 2648).
+    await page.addStyleTag({ content: SIN_TRANSICIONES });
+    // La caja vive en el bloque educativo, que nace colapsado (se oculta por CSS).
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    await expect(page.getByRole('button', { name: /Ocultar guía educativa/ })).toBeVisible();
+
+    // Por texto, no por clase del módulo (check:specs-produccion): la lista de la caja es la que
+    // contiene la primera viñeta.
+    const primera = page.locator('li', { hasText: 'Confundir frecuencia f (Hz) con frecuencia angular' });
+    await expect(primera).toBeVisible();
+    const vinetas = page.locator('ul').filter({ has: primera }).locator('li');
+    await expect(vinetas).toHaveCount(6);
+
+    for (const tema of ['claro', 'oscuro']) {
+      if (tema === 'oscuro') await aOscuro(page);
+      const medidas = await contrastesMarca(vinetas);
+      expect(medidas).toHaveLength(6);
+      for (const m of medidas) {
+        expect(m.marca, `${tema}: la viñeta sigue siendo la «✗»`).toBe('"✗"');
+        // Claro: rgb(138, 90, 0) sobre rgb(254, 243, 199) → 5,32:1 (antes 1,92:1 con #f59e0b).
+        // Oscuro: rgb(252, 211, 77) sobre rgb(45, 27, 0) → 11,48:1.
+        expect(m.ratio, `${tema}: «✗» ${m.color} sobre ${m.fondo}`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+});

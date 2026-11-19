@@ -975,3 +975,127 @@ test.describe('«No lo sé»: qué tamaños encajan · en la página', () => {
     expect(ancho, 'la página desborda en horizontal').toBeLessThanOrEqual(visible);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// Inspector 19/11/2026 — RE-inspección tras 040330e9f («No lo sé», S0283). Casos resueltos a mano
+// ANTES de ejecutar la app, con las curvas de razas.ts (interpolación lineal) y los rangos
+// derivados (mini 1,5-4 · pequeño 4-15 · mediano 8-20 · grande 16-40 · gigante 35-90 kg).
+// Se queda cada tamaño cuya proyección (peso ÷ fracción de su curva) cae en su propio rango.
+//
+//   T1  4 kg a las 8 semanas — TRES tamaños (los rangos se solapan de tres en tres a esta edad):
+//       mini 4/0,35 = 11,43 ✗ · pequeño 4/0,30 = 13,33 ✓ · mediano 4/0,25 = 16,0 ✓ ·
+//       grande 4/0,20 = 20,0 ✓ · gigante 4/0,15 = 26,67 ✗ → «13,3-20,0 kg», «pequeño, mediano o
+//       grande». Con «Ver su curva como grande»: 20,0 kg · ±15 % = 17,0 - 23,0 kg · 20 % · 18-24
+//       meses · ración NRC con p = 0,20: 4^0,75 = 2,828427 · e^(−0,174) = 0,840297 →
+//       416 × 0,740297 = 307,96 × 2,828427 = 871,06 kcal → «≈ 870 kcal».
+//   T2  15 kg a las 30 semanas (edad interpolada, mitad entre 28 y 32): mini 0,965 → 15,54 ✗ ·
+//       pequeño 0,91 → 16,48 ✗ (> 15) · mediano 0,815 → 18,40 ✓ · grande 0,65 → 23,08 ✓ ·
+//       gigante 0,525 → 28,57 ✗ → «18,4-23,1 kg», «mediano o grande».
+//   T3  15,5 kg a las 100 semanas: pequeño 15,5 ✗ (> 15) · mediano 15,5 ✓ (curva al 100 % desde la
+//       60) · grande 15,5 ✗ (< 16) · gigante 0,95 + 0,05 × 4/48 = 0,954167 → 16,24 ✗ → solo
+//       mediano: «15,5 kg», 13,2 - 17,8 kg, 100 % y ración de adulto.
+//   T4  20 kg a las 8 semanas — por ENCIMA de todos: gigante 20/0,15 = 133,33 > 90 es el que menos
+//       se pasa (ln 1,48 = 0,39 frente a ln 2,5 = 0,92 del grande) → «133,3 kg», 113,3 - 153,3 kg,
+//       nota y aviso de «más cercano», sin el aviso de «categoría elegida».
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+
+test.describe('Inspector 19/11/2026 — «No lo sé»', () => {
+  const panelResultados = (page: Page) => page.locator('[class*="resultsPanel"]').first();
+  const filasVarios = (page: Page) => page.locator('[class*="variosFila"]');
+  const conNoLoSe = async (page: Page, peso: string, edad: string) => {
+    await page.locator('#peso-actual').fill(peso);
+    await page.locator('#edad-cachorro').fill(edad);
+    await page.getByRole('button', { name: /^No lo sé/ }).click();
+    await page.getByRole('button', { name: 'Calcular Peso Adulto' }).click();
+  };
+
+  test('T1 — 4 kg a las 8 semanas encaja con TRES tamaños, y «Ver su curva como grande» da 20,0 kg y ≈ 870 kcal', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await conNoLoSe(page, '4', '8');
+    await expect(valorPrincipal(page)).toHaveText('13,3-20,0 kg');
+    await expect(panelResultados(page).getByText('Puede ser de tamaño pequeño, mediano o grande', { exact: true })).toBeVisible();
+    expect((await filasVarios(page).allInnerTexts()).map((t) => t.split('\n')[0].trim())).toEqual([
+      'Pequeño ≈ 13,3 kg de adulto · deja de crecer a los 10-12 meses',
+      'Mediano ≈ 16,0 kg de adulto · deja de crecer a los 12-15 meses',
+      'Grande ≈ 20,0 kg de adulto · deja de crecer a los 18-24 meses',
+    ]);
+
+    await page.getByRole('button', { name: 'Ver su curva como grande' }).click();
+    await expect(valorPrincipal(page)).toHaveText('20,0 kg');
+    await expect(rangoProbable(page)).toHaveText('17,0 - 23,0 kg');
+    expect(await detalle(page, 0).textContent()).toBe(`20${NBSP}%`);
+    await expect(detalle(page, 1)).toHaveText('18-24 meses');
+    await expect(page.getByRole('button', { name: /^Grande \d/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: /^No lo sé/ })).toHaveAttribute('aria-pressed', 'false');
+    // Elegido desde la horquilla, encaja por construcción: sin nota de «deducido» ni aviso
+    await expect(okCoherencia(page)).toContainText('encaja con la categoría grande, cuyo peso adulto habitual es 16-40 kg');
+    await expect(avisoCoherencia(page)).toHaveCount(0);
+    await expect(page.locator('[class*="inferidoNota"]')).toHaveCount(0);
+    await expect(racionNumero(page)).toHaveText('≈ 870 kcal');
+  });
+
+  test('T2 — 15 kg a las 30 semanas (edad interpolada): mediano o grande, 18,4-23,1 kg', async ({ page }) => {
+    await abrir(page);
+    await conNoLoSe(page, '15', '30');
+    await expect(valorPrincipal(page)).toHaveText('18,4-23,1 kg');
+    await expect(panelResultados(page).getByText('Puede ser de tamaño mediano o grande', { exact: true })).toBeVisible();
+    expect((await filasVarios(page).allInnerTexts()).map((t) => t.split('\n')[0].trim())).toEqual([
+      'Mediano ≈ 18,4 kg de adulto · deja de crecer a los 12-15 meses',
+      'Grande ≈ 23,1 kg de adulto · deja de crecer a los 18-24 meses',
+    ]);
+    await expect(page.getByRole('heading', { name: /Cuánto pesará por el camino/ })).toHaveCount(0);
+    await expect(seccionRacion(page)).toHaveCount(0);
+  });
+
+  test('T3 — 15,5 kg a las 100 semanas: solo encaja el mediano, con su nota y ración de adulto', async ({ page }) => {
+    await abrir(page);
+    await conNoLoSe(page, '15,5', '100');
+    await expect(valorPrincipal(page)).toHaveText('15,5 kg');
+    await expect(page.locator('[class*="inferidoNota"]')).toHaveText(
+      'Por su peso a esta edad, encaja con un perro de tamaño mediano (8-20 kg de adulto), y es el único que encaja.',
+    );
+    await expect(rangoProbable(page)).toHaveText('13,2 - 17,8 kg');
+    expect(await detalle(page, 0).textContent()).toBe(`100${NBSP}%`);
+    await expect(racionNumero(page)).toHaveCount(0);
+    await expect(seccionRacion(page)).toContainText('con 100 semanas ya ha terminado de crecer');
+  });
+
+  test('T4 — 20 kg a las 8 semanas: no encaja ninguno, el más cercano es el gigante (133,3 kg)', async ({ page }) => {
+    await abrir(page);
+    await conNoLoSe(page, '20', '8');
+    await expect(valorPrincipal(page)).toHaveText('133,3 kg');
+    await expect(rangoProbable(page)).toHaveText('113,3 - 153,3 kg');
+    await expect(page.locator('[class*="inferidoNota"]')).toContainText('El más cercano es el gigante');
+    await expect(avisoCoherencia(page)).toContainText('la curva es la del tamaño más cercano, gigante (35-90 kg)');
+    await expect(page.getByText(/la categoría elegida no es la que corresponde/)).toHaveCount(0);
+  });
+
+  // ABIERTO: el botón «Ver su curva como…» se desmonta al pulsarlo (varios → null) y nada recoge el
+  // foco: document.activeElement queda en <body> (WCAG 2.4.3). Medido el 19/11/2026.
+  test('ABIERTO — tras «Ver su curva como grande» el foco no cae a body', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    await conNoLoSe(page, '4', '8');
+    await page.getByRole('button', { name: 'Ver su curva como grande' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(valorPrincipal(page)).toHaveText('20,0 kg');
+    const enBody = await page.evaluate(() => !document.activeElement || document.activeElement === document.body);
+    expect(enBody, 'el foco cae a body al desmontarse el botón activado').toBe(false);
+  });
+
+  // ABIERTO: a partir de la edad en que dos curvas llegan al 100 % (48 semanas mini y pequeño, 60
+  // pequeño y mediano), las dos proyecciones son el peso actual y la «horquilla» sale con los dos
+  // extremos iguales. Esperado, una sola cifra: 10 kg a las 60 semanas → 10/1 (pequeño) = 10/1
+  // (mediano) = 10,0 kg; 4 kg a las 48 semanas → 4/1 (mini) = 4/1 (pequeño) = 4,0 kg.
+  test('ABIERTO — con dos curvas ya al 100 % no presenta como horquilla «10,0-10,0 kg»', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    await conNoLoSe(page, '10', '60');
+    // Hoy: «10,0-10,0 kg» y «Puede ser de tamaño pequeño o mediano»
+    await expect(valorPrincipal(page)).toHaveText('10,0 kg');
+    await conNoLoSe(page, '4', '48');
+    await expect(valorPrincipal(page)).toHaveText('4,0 kg');
+  });
+});
