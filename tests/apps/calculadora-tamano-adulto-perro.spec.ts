@@ -1072,10 +1072,9 @@ test.describe('Inspector 19/11/2026 — «No lo sé»', () => {
     await expect(page.getByText(/la categoría elegida no es la que corresponde/)).toHaveCount(0);
   });
 
-  // ABIERTO: el botón «Ver su curva como…» se desmonta al pulsarlo (varios → null) y nada recoge el
-  // foco: document.activeElement queda en <body> (WCAG 2.4.3). Medido el 19/11/2026.
-  test('ABIERTO — tras «Ver su curva como grande» el foco no cae a body', async ({ page }) => {
-    test.fail();
+  // REPARADO (5220): el botón «Ver su curva como…» se desmonta al pulsarlo (varios → null) y nada
+  // recogía el foco: document.activeElement quedaba en <body> (WCAG 2.4.3). Ahora va al resultado.
+  test('REPARADO — tras «Ver su curva como grande» el foco no cae a body', async ({ page }) => {
     await abrir(page);
     await conNoLoSe(page, '4', '8');
     await page.getByRole('button', { name: 'Ver su curva como grande' }).focus();
@@ -1083,18 +1082,24 @@ test.describe('Inspector 19/11/2026 — «No lo sé»', () => {
     await expect(valorPrincipal(page)).toHaveText('20,0 kg');
     const enBody = await page.evaluate(() => !document.activeElement || document.activeElement === document.body);
     expect(enBody, 'el foco cae a body al desmontarse el botón activado').toBe(false);
+    const enResultado = await page.evaluate(() => Boolean(document.activeElement?.textContent?.includes('Peso adulto estimado')));
+    expect(enResultado, 'el foco está en el resultado').toBe(true);
   });
 
-  // ABIERTO: a partir de la edad en que dos curvas llegan al 100 % (48 semanas mini y pequeño, 60
-  // pequeño y mediano), las dos proyecciones son el peso actual y la «horquilla» sale con los dos
-  // extremos iguales. Esperado, una sola cifra: 10 kg a las 60 semanas → 10/1 (pequeño) = 10/1
-  // (mediano) = 10,0 kg; 4 kg a las 48 semanas → 4/1 (mini) = 4/1 (pequeño) = 4,0 kg.
-  test('ABIERTO — con dos curvas ya al 100 % no presenta como horquilla «10,0-10,0 kg»', async ({ page }) => {
-    test.fail();
+  // REPARADO (5221): a partir de la edad en que dos curvas llegan al 100 % (48 semanas mini y
+  // pequeño, 60 pequeño y mediano), las dos proyecciones son el peso actual y la «horquilla» salía
+  // con los dos extremos iguales. Ahora, una sola cifra: 10 kg a las 60 semanas → 10/1 (pequeño) =
+  // 10/1 (mediano) = 10,0 kg; 4 kg a las 48 semanas → 4/1 (mini) = 4/1 (pequeño) = 4,0 kg. Y cada
+  // fila dice que con su curva ya ha terminado de crecer, en vez de «deja de crecer a los…».
+  test('REPARADO — con dos curvas ya al 100 % no presenta como horquilla «10,0-10,0 kg»', async ({ page }) => {
     await abrir(page);
     await conNoLoSe(page, '10', '60');
-    // Hoy: «10,0-10,0 kg» y «Puede ser de tamaño pequeño o mediano»
     await expect(valorPrincipal(page)).toHaveText('10,0 kg');
+    await expect(panelResultados(page)).toContainText('Ya ha terminado de crecer');
+    expect((await filasVarios(page).allInnerTexts()).map((t) => t.split('\n')[0].trim())).toEqual([
+      'Pequeño ≈ 10,0 kg de adulto · con su curva ya ha terminado de crecer',
+      'Mediano ≈ 10,0 kg de adulto · con su curva ya ha terminado de crecer',
+    ]);
     await conNoLoSe(page, '4', '48');
     await expect(valorPrincipal(page)).toHaveText('4,0 kg');
   });

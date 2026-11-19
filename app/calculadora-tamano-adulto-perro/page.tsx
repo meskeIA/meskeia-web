@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './CalculadoraTamanoAdultoPerro.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, DataReference, LegalNotice, ShareCard } from '@/components';
-import { formatNumber, parseSpanishNumber } from '@/lib';
+import { enfocarALaVista, formatNumber, parseSpanishNumber } from '@/lib';
 import {
   energiaCrecimientoKcal,
   gramosDePienso,
@@ -71,6 +71,13 @@ const edadesMaduracion: Record<TamanoRaza, string> = {
 const listaTamanos = (tamanos: TamanoRaza[]): string => {
   const nombres = tamanos.map((t) => etiquetasTamano[t].toLowerCase());
   return nombres.length <= 1 ? nombres.join('') : `${nombres.slice(0, -1).join(', ')} o ${nombres[nombres.length - 1]}`;
+};
+
+/** «18,4-23,1 kg», o una sola cifra si los dos extremos se escriben igual («10,0 kg»). */
+const textoHorquilla = (pesos: number[]): string => {
+  const min = formatNumber(Math.min(...pesos), 1);
+  const max = formatNumber(Math.max(...pesos), 1);
+  return min === max ? `${min} kg` : `${min}-${max} kg`;
 };
 
 const obtenerPorcentajeCrecimiento = (edad: number, tamano: TamanoRaza): number => {
@@ -149,7 +156,18 @@ export default function CalculadoraTamanoAdultoPerroPage() {
    * peso adulto que dar, ni una curva ni una ración, y la vista enseña la horquilla con un botón
    * por tamaño para ver la curva de ese. Con uno solo, el resultado es el normal de ese tamaño.
    */
-  const [varios, setVarios] = useState<TamanoQueEncaja<TamanoRaza>[] | null>(null);
+  const [varios, setVarios] = useState<(TamanoQueEncaja<TamanoRaza> & { terminado: boolean })[] | null>(null);
+  /**
+   * Tras «Ver su curva como…» el botón pulsado se desmonta y el foco caía a <body> (hallazgo
+   * 5220): se lleva al resultado, que ya se anuncia por su región viva.
+   */
+  const resultadoPrincipalRef = useRef<HTMLDivElement>(null);
+  const [enfocarResultado, setEnfocarResultado] = useState(false);
+  useEffect(() => {
+    if (!enfocarResultado) return;
+    enfocarALaVista(resultadoPrincipalRef.current);
+    setEnfocarResultado(false);
+  }, [enfocarResultado]);
   const [filtroRaza, setFiltroRaza] = useState<TamanoRaza | 'todas'>('todas');
   const [error, setError] = useState<string | null>(null);
   /** Energía del pienso en kcal/kg, tal como la escribe el usuario. Opcional: sin ella sale solo la energía. */
@@ -221,7 +239,9 @@ export default function CalculadoraTamanoAdultoPerroPage() {
       );
       if (encajan.length > 1) {
         setResultado(null);
-        setVarios(encajan);
+        // `terminado`: su curva ya está al 100 % a esta edad, así que su proyección es el peso
+        // actual y la fila lo dice (hallazgo 5221)
+        setVarios(encajan.map((e) => ({ ...e, terminado: obtenerPorcentajeCrecimiento(edad, e.tamano) >= 1 })));
         return;
       }
       tamano = encajan[0].tamano;
@@ -257,6 +277,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
   const verComoTamano = (t: TamanoRaza) => {
     setTamanoRaza(t);
     calcular(t);
+    setEnfocarResultado(true);
   };
 
   const limpiar = () => {
@@ -458,7 +479,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
         <div className={styles.resultsPanel} role="status" aria-live="polite">
           {resultado ? (
             <>
-              <div className={styles.resultadoPrincipal}>
+              <div className={styles.resultadoPrincipal} ref={resultadoPrincipalRef} tabIndex={-1}>
                 <span className={styles.resultadoIcon} aria-hidden="true">🐕</span>
                 <div className={styles.resultadoValor}>
                   {formatNumber(resultado.pesoAdultoEstimado, 1)} kg
@@ -527,11 +548,15 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                 <span className={styles.resultadoIcon} aria-hidden="true">🐕</span>
                 {/* Cada texto variable, hijo único de su elemento: con la página traducida, un nodo
                     suelto entre textos fijos se queda con el valor viejo al recalcular. */}
+                {/* Si los extremos coinciden (todas las curvas ya al 100 %), una sola cifra: una
+                    «horquilla» de 10,0-10,0 kg no es una horquilla (hallazgo 5221) */}
                 <div className={styles.resultadoValor}>
-                  {`${formatNumber(Math.min(...varios.map((v) => v.pesoAdulto)), 1)}-${formatNumber(Math.max(...varios.map((v) => v.pesoAdulto)), 1)} kg`}
+                  {textoHorquilla(varios.map((v) => v.pesoAdulto))}
                 </div>
                 <div className={styles.resultadoLabel}>
-                  {`Puede ser de tamaño ${listaTamanos(varios.map((v) => v.tamano))}`}
+                  {varios.every((v) => v.terminado)
+                    ? `Ya ha terminado de crecer: pesa lo que pesará de adulto. Puede ser de tamaño ${listaTamanos(varios.map((v) => v.tamano))}`
+                    : `Puede ser de tamaño ${listaTamanos(varios.map((v) => v.tamano))}`}
                 </div>
               </div>
 
@@ -540,7 +565,11 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                   <li key={v.tamano} className={styles.variosFila}>
                     <span className={styles.variosTexto}>
                       <strong>{etiquetasTamano[v.tamano]}</strong>{' '}
-                      <span>{`≈ ${formatNumber(v.pesoAdulto, 1)} kg de adulto · deja de crecer a los ${edadesMaduracion[v.tamano]}`}</span>
+                      <span>
+                        {v.terminado
+                          ? `≈ ${formatNumber(v.pesoAdulto, 1)} kg de adulto · con su curva ya ha terminado de crecer`
+                          : `≈ ${formatNumber(v.pesoAdulto, 1)} kg de adulto · deja de crecer a los ${edadesMaduracion[v.tamano]}`}
+                      </span>
                     </span>
                     <button
                       type="button"
