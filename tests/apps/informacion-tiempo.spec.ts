@@ -1,20 +1,26 @@
 import { test, expect, type Page } from '@playwright/test';
 
 /**
- * informacion-tiempo: el pronóstico de 5 días se despliega por franjas (mañana, tarde, noche).
+ * informacion-tiempo: tiempo actual con lo que queda de hoy por franjas, y los días siguientes en
+ * lista desplegable (rediseño del 19/11/2026).
  *
  * OpenWeatherMap se sirve simulado con `page.route`: el test no depende de la clave ni de la red.
- * El reparto en franjas y la hora local los prueban los goldens del motor
- * (tests/franjas-tiempo-motor.spec.ts); aquí se mide lo que el usuario ve:
- *   · cada día es un botón con aria-expanded y solo hay un día abierto a la vez
- *   · las fechas y las franjas van en la hora de la CIUDAD, no en la del navegador
+ * El reparto en franjas, la hora local y el reparto hoy / días siguientes los prueban los goldens
+ * del motor (tests/franjas-tiempo-motor.spec.ts); aquí se mide lo que el usuario ve.
  *
  * ── Casos resueltos a mano ──
- *   Madrid (+1 h), 40 tramos desde UTC 18/11/2026 09:00 → local 10:00 del miércoles 18
- *     día 18: Mañana [10] · Tarde [13, 16] · Noche [19, 22, 01, 04] — sin Madrugada
+ *   Madrid (+1 h), 40 tramos desde UTC 18/11/2026 09:00 → local 10:00 del miércoles 18; la
+ *   observación actual es de ese instante, con 15 °C (temp_max / temp_min de /weather: 18 / 12)
+ *     hoy (18): Mañana [10] · Tarde [13, 16] · Noche [19, 22, 01, 04] — sin Madrugada
+ *       temperaturas 10 + (i % 8): mañana 10 · tarde 11, 12 · noche 13, 14, 15, 16
+ *       → máx. 16° (la noche) · mín. 10° — NO los 18 / 12 de /weather
  *     la tarde: pop 0,2 y 0,7 → «70 %» · lluvia 0,5 + 1,25 = 1,75 → «1,8 mm» · 5 m/s → «18 km/h»
+ *     días siguientes: 19, 20, 21 y 22 (8 tramos cada uno); el 23 trae 3 → fuera
+ *     humedad 70 → «70 %» · visibilidad 10000 m → «10 km» · presión «1010 hPa»
+ *     viento 3 m/s a 90° → 10,8 → «11 km/h E»
  *   Nueva York (−5 h), mismos tramos → local 04:00 del miércoles 18
- *     día 18: Madrugada [04] · Mañana [07, 10] · Tarde [13, 16] · Noche [19, 22, 01 del 19]
+ *     hoy: Madrugada [04] · Mañana [07, 10] · Tarde [13, 16] · Noche [19, 22, 01 del 19]
+ *     primer día siguiente: jueves 19
  */
 
 const INICIO = Date.UTC(2026, 10, 18, 9) / 1000;
@@ -68,36 +74,58 @@ async function abrirCon(page: Page, desfase: number): Promise<void> {
   await page.goto('/informacion-tiempo/');
   // Los botones de día solo existen tras la respuesta simulada, que pide un efecto: si están,
   // React ya hidrató y los clics no se pierden
-  await expect(diasDelPronostico(page)).toHaveCount(5, { timeout: 20000 });
+  await expect(diasDelPronostico(page)).toHaveCount(4, { timeout: 20000 });
 }
 
-// Los botones de día se reconocen por su «máx° / mín°»: hay otros botones con aria-expanded
-// en la página (la sección educativa)
-const diasDelPronostico = (page: Page) => page.getByRole('button', { name: /-?\d+° \/ -?\d+°/ });
+const diasDelPronostico = (page: Page) =>
+  page.getByRole('list', { name: 'Próximos días' }).getByRole('button');
 
+const tarjetaActual = (page: Page) => page.getByRole('region', { name: 'Ciudad de prueba, ES' });
+const franjasDeHoy = (page: Page) => page.getByRole('region', { name: 'Lo que queda de hoy' });
 const panelFranjas = (page: Page) => page.getByRole('region', { name: /^Franjas del / });
 
 test.use({ geolocation: { latitude: 40.4168, longitude: -3.7038 }, permissions: ['geolocation'] });
 
-test.describe('informacion-tiempo — franjas desplegables', () => {
-  test('Madrid: el día se despliega en mañana, tarde y noche con los datos de cada franja', async ({ page }) => {
+test.describe('informacion-tiempo — tiempo actual, hoy por franjas y próximos días', () => {
+  test('Madrid: máxima y mínima de lo que queda de hoy, no las de /weather', async ({ page }) => {
     await abrirCon(page, 3600);
-    const dias = diasDelPronostico(page);
-    await expect(dias.first()).toContainText('mié, 18 nov');
-    await expect(panelFranjas(page)).toHaveCount(0);
+    const tarjeta = tarjetaActual(page);
+    await expect(tarjeta).toContainText('15°');
+    await expect(tarjeta).toContainText('máx. 16° · mín. 10°');
+    await expect(tarjeta).not.toContainText('18°');
+  });
 
-    await dias.first().click();
-    await expect(dias.first()).toHaveAttribute('aria-expanded', 'true');
-    const panel = panelFranjas(page);
-    await expect(panel.getByRole('heading')).toHaveText('miércoles, 18 de noviembre');
-    await expect(panel.getByText('Madrugada', { exact: true })).toHaveCount(0);
+  test('Madrid: lo que queda de hoy va por franjas dentro de la tarjeta', async ({ page }) => {
+    await abrirCon(page, 3600);
+    const hoy = franjasDeHoy(page);
+    await expect(hoy.getByText('Madrugada', { exact: true })).toHaveCount(0);
     for (const franja of ['Mañana', 'Tarde', 'Noche']) {
-      await expect(panel.getByText(franja, { exact: true })).toBeVisible();
+      await expect(hoy.getByText(franja, { exact: true })).toBeVisible();
     }
-    await expect(panel).toContainText(/70\s%/);
-    await expect(panel).toContainText('1,8 mm');
-    await expect(panel).toContainText('18 km/h');
-    await expect(panel).toContainText('lluvia ligera');
+    await expect(hoy).toContainText(/70\s%/);
+    await expect(hoy).toContainText('1,8 mm');
+    await expect(hoy).toContainText('18 km/h');
+    await expect(hoy).toContainText('lluvia ligera');
+  });
+
+  test('Madrid: hoy no se repite en la lista, que trae solo los 4 días completos', async ({ page }) => {
+    await abrirCon(page, 3600);
+    const lista = page.getByRole('list', { name: 'Próximos días' });
+    const dias = diasDelPronostico(page);
+    await expect(dias.first()).toContainText('jue, 19 nov');
+    await expect(dias.last()).toContainText('dom, 22 nov');
+    await expect(lista).not.toContainText('mié, 18 nov');
+    await expect(lista).not.toContainText('lun, 23 nov');
+  });
+
+  test('los datos del momento salen en formato español', async ({ page }) => {
+    await abrirCon(page, 3600);
+    const cuerpo = page.locator('body');
+    await expect(cuerpo).toContainText(/Humedad\s*70\s%/);
+    await expect(cuerpo).toContainText(/Visibilidad\s*10 km/);
+    await expect(cuerpo).not.toContainText('10.0 km');
+    await expect(cuerpo).toContainText(/Presión\s*1010 hPa/);
+    await expect(cuerpo).toContainText(/Viento\s*11 km\/h E/);
   });
 
   test('solo un día abierto a la vez, y se cierra al volver a tocarlo', async ({ page }) => {
@@ -105,10 +133,14 @@ test.describe('informacion-tiempo — franjas desplegables', () => {
     const dias = diasDelPronostico(page);
 
     await dias.nth(0).click();
+    await expect(dias.nth(0)).toHaveAttribute('aria-expanded', 'true');
+    await expect(panelFranjas(page)).toHaveAttribute('aria-label', 'Franjas del jueves, 19 de noviembre');
+    await expect(panelFranjas(page).getByText('Noche', { exact: true })).toBeVisible();
+
     await dias.nth(1).click();
     await expect(dias.nth(0)).toHaveAttribute('aria-expanded', 'false');
     await expect(dias.nth(1)).toHaveAttribute('aria-expanded', 'true');
-    await expect(panelFranjas(page).getByRole('heading')).toHaveText('jueves, 19 de noviembre');
+    await expect(panelFranjas(page)).toHaveAttribute('aria-label', 'Franjas del viernes, 20 de noviembre');
 
     await dias.nth(1).click();
     await expect(dias.nth(1)).toHaveAttribute('aria-expanded', 'false');
@@ -117,14 +149,11 @@ test.describe('informacion-tiempo — franjas desplegables', () => {
 
   test('Nueva York: las franjas van en la hora de la ciudad, no en la del navegador', async ({ page }) => {
     await abrirCon(page, -18000);
-    const dias = diasDelPronostico(page);
-    await expect(dias.first()).toContainText('mié, 18 nov');
-
-    await dias.first().click();
-    const panel = panelFranjas(page);
-    await expect(panel).toContainText('Horas locales de Ciudad de prueba');
+    await expect(page.getByText(/Horas locales de Ciudad de prueba/)).toBeVisible();
+    const hoy = franjasDeHoy(page);
     for (const franja of ['Madrugada', 'Mañana', 'Tarde', 'Noche']) {
-      await expect(panel.getByText(franja, { exact: true })).toBeVisible();
+      await expect(hoy.getByText(franja, { exact: true })).toBeVisible();
     }
+    await expect(diasDelPronostico(page).first()).toContainText('jue, 19 nov');
   });
 });

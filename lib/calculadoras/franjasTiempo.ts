@@ -55,6 +55,7 @@ export interface DiaPronostico {
   icon: string;
   desc: string;
   franjas: FranjaPronostico[]; // en orden; las que no tienen tramos no aparecen
+  numTramos: number; // tramos del día natural: 8 = día completo
 }
 
 const DEFINICION_FRANJAS: Record<ClaveFranja, { nombre: string; horas: string }> = {
@@ -216,6 +217,51 @@ export function agruparPronostico(
       icon: mediodia.weather[0]?.icon ?? '',
       desc: mediodia.weather[0]?.description ?? '',
       franjas,
+      numTramos: delDia.length,
     };
   });
+}
+
+export interface PronosticoRepartido {
+  hoy: DiaPronostico | null; // lo que queda de hoy; null si el pronóstico ya empieza mañana
+  siguientes: DiaPronostico[]; // días posteriores COMPLETOS (8 tramos), hasta `maxSiguientes`
+  extremosHoy: { min: number; max: number } | null;
+}
+
+/**
+ * Reparte el pronóstico en «hoy» (que va en la tarjeta del tiempo actual) y los días siguientes.
+ *
+ * Por qué existe (19/11/2026): la tarjeta del tiempo actual pintaba como máxima y mínima los
+ * `temp_max` / `temp_min` de /weather, que NO son los del día: son la dispersión entre estaciones
+ * de la zona en ese instante (Mataró a las 7:51: «↑20° ↓18°» con una mínima prevista de 10°).
+ * Aquí salen de las franjas que quedan de hoy —la noche incluida, hasta las 6 del día siguiente,
+ * que es lo que se ve debajo— más la temperatura actual. El endpoint gratuito no da las horas ya
+ * pasadas: es la máxima y la mínima de lo que queda, no del día entero.
+ *
+ * El último día de los 40 tramos suele venir a medias (sus mín./máx. serían falsos): solo pasan
+ * los días con sus 8 tramos.
+ */
+export function repartirPronostico(
+  tramos: TramoPronostico[],
+  desfaseSegundos: number,
+  dtActual: number,
+  tempActual: number,
+  maxSiguientes = 5
+): PronosticoRepartido {
+  const claveHoy = fechaHoraLocal(dtActual, desfaseSegundos).clave;
+  const dias = agruparPronostico(tramos, desfaseSegundos, 6);
+  const hoy = dias.find(d => d.clave === claveHoy) ?? null;
+  const siguientes = dias
+    .filter(d => d.clave > claveHoy && d.numTramos >= 8)
+    .slice(0, maxSiguientes);
+
+  let extremosHoy: PronosticoRepartido['extremosHoy'] = null;
+  if (hoy && hoy.franjas.length > 0) {
+    const actual = Math.round(tempActual);
+    extremosHoy = {
+      min: Math.min(actual, ...hoy.franjas.map(f => f.tempMin)),
+      max: Math.max(actual, ...hoy.franjas.map(f => f.tempMax)),
+    };
+  }
+  return { hoy, siguientes, extremosHoy };
 }

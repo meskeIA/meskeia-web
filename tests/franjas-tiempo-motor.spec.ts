@@ -24,12 +24,22 @@
  *     primer día consultado antes de las 6: madrugada [05:30] · mañana [08:30] · noche [02:30 del 19]
  *   40 tramos desde UTC 18/11 09:00, Madrid: el último es UTC 23/11 06:00 = 07:00 del 23
  *     → 6 días locales, se devuelven 5 · noche del 22: 19, 22 del 22 + 01, 04 del 23 = 4 tramos
+ *
+ * ── Reparto hoy / días siguientes (repartirPronostico) ──
+ *   Madrid, consulta a las 10:00 locales del 18 (UTC 09:00) con 13 °C:
+ *     franjas de hoy: mañana 12 · tarde 17–18 · noche 8–14 → mín 8, máx 18 (los 13 actuales
+ *     no cambian nada) · con 20 °C actuales → máx 20 · el 19 trae 5 tramos: no es día completo
+ *   40 tramos desde UTC 18/11 09:00, consulta a esa hora: hoy = 18 (5 tramos) · siguientes 19,
+ *     20, 21 y 22 (8 tramos) · el 23 trae 3 → fuera
+ *   40 tramos desde UTC 18/11 23:00 (00:00 del 19 en Madrid), consulta a las 22:30 del 18:
+ *     no hay tramos de hoy → hoy null, sin extremos · 19 a 23 completos → 5 días
  */
 
 import { test, expect } from '@playwright/test';
 import {
   agruparPronostico,
   fechaHoraLocal,
+  repartirPronostico,
   pesoCondicion,
   type TramoPronostico,
 } from '@/lib/calculadoras/franjasTiempo';
@@ -173,5 +183,41 @@ test.describe('Franjas del pronóstico — motor', () => {
     const pesos = [211, 601, 500, 300, 741, 804, 801, 800].map(pesoCondicion);
     expect([...pesos].sort((a, b) => b - a)).toEqual(pesos);
     expect(new Set(pesos).size).toBe(pesos.length);
+  });
+
+  test('hoy: extremos de las franjas que quedan más la temperatura actual', () => {
+    const ahora = Date.UTC(2026, 10, 18, 9) / 1000;
+    const r = repartirPronostico(tramosMadrid, MADRID, ahora, 13);
+    expect(r.hoy?.clave).toBe('2026-11-18');
+    expect(r.extremosHoy).toEqual({ min: 8, max: 18 });
+    expect(r.siguientes).toEqual([]);
+    expect(repartirPronostico(tramosMadrid, MADRID, ahora, 20).extremosHoy).toEqual({ min: 8, max: 20 });
+  });
+
+  test('40 tramos: hoy aparte y solo los días siguientes completos', () => {
+    const inicio = Date.UTC(2026, 10, 18, 9) / 1000;
+    const tramos: TramoPronostico[] = Array.from({ length: 40 }, (_, i) => ({
+      dt: inicio + i * 3 * 3600,
+      main: { temp: 10 },
+      weather: [NUBES],
+    }));
+    const r = repartirPronostico(tramos, MADRID, inicio, 10);
+    expect(r.hoy?.numTramos).toBe(5);
+    expect(r.siguientes.map(d => d.clave)).toEqual(['2026-11-19', '2026-11-20', '2026-11-21', '2026-11-22']);
+  });
+
+  test('consulta a última hora: sin tramos de hoy no hay extremos inventados', () => {
+    const inicio = Date.UTC(2026, 10, 18, 23) / 1000;
+    const tramos: TramoPronostico[] = Array.from({ length: 40 }, (_, i) => ({
+      dt: inicio + i * 3 * 3600,
+      main: { temp: 10 },
+      weather: [NUBES],
+    }));
+    const r = repartirPronostico(tramos, MADRID, Date.UTC(2026, 10, 18, 21, 30) / 1000, 10);
+    expect(r.hoy).toBeNull();
+    expect(r.extremosHoy).toBeNull();
+    expect(r.siguientes.map(d => d.clave)).toEqual([
+      '2026-11-19', '2026-11-20', '2026-11-21', '2026-11-22', '2026-11-23',
+    ]);
   });
 });

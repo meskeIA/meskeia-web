@@ -8,11 +8,12 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber, formatPercentage } from '@/lib';
 import {
-  agruparPronostico,
+  repartirPronostico,
   type DiaPronostico,
   type FranjaPronostico,
   type TramoPronostico,
 } from '@/lib/calculadoras/franjasTiempo';
+import { IconoTiempo, IconoDato, IconoBuscar, IconoUbicacion, type TipoDato } from './IconosTiempo';
 
 // API Key de OpenWeatherMap (límite gratuito: 1000 calls/día)
 const OPENWEATHER_API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
@@ -30,8 +31,8 @@ interface WeatherData {
     feels_like: number;
     humidity: number;
     pressure: number;
-    temp_min: number;
-    temp_max: number;
+    // temp_min / temp_max de /weather NO son los del día (dispersión entre estaciones en ese
+    // instante): la máxima y la mínima salen del pronóstico, en repartirPronostico
   };
   weather: Array<{
     id: number;
@@ -62,8 +63,6 @@ interface ForecastData {
   };
 }
 
-const ID_PANEL_FRANJAS = 'franjas-dia';
-
 // Fecha de un día local de la ciudad (no del navegador): se construye en UTC y se formatea en UTC
 const fechaDelDia = (dia: DiaPronostico, opciones: Intl.DateTimeFormatOptions): string =>
   new Date(Date.UTC(dia.anio, dia.mes - 1, dia.dia, 12)).toLocaleDateString('es-ES', {
@@ -72,7 +71,7 @@ const fechaDelDia = (dia: DiaPronostico, opciones: Intl.DateTimeFormatOptions): 
   });
 
 const rangoTemperatura = (f: FranjaPronostico): string =>
-  f.tempMin === f.tempMax ? `${f.tempMax}°` : `${f.tempMin}° – ${f.tempMax}°`;
+  f.tempMin === f.tempMax ? `${f.tempMax}°` : `${f.tempMin}° / ${f.tempMax}°`;
 
 // Ciudades populares para acceso rápido
 const CIUDADES_POPULARES = [
@@ -85,22 +84,6 @@ const CIUDADES_POPULARES = [
   { nombre: 'París', pais: 'FR' },
   { nombre: 'Nueva York', pais: 'US' },
 ];
-
-// Mapeo de iconos de OpenWeatherMap a emojis
-const getWeatherEmoji = (iconCode: string): string => {
-  const emojiMap: { [key: string]: string } = {
-    '01d': '☀️', '01n': '🌙',
-    '02d': '⛅', '02n': '☁️',
-    '03d': '☁️', '03n': '☁️',
-    '04d': '☁️', '04n': '☁️',
-    '09d': '🌧️', '09n': '🌧️',
-    '10d': '🌦️', '10n': '🌧️',
-    '11d': '⛈️', '11n': '⛈️',
-    '13d': '❄️', '13n': '❄️',
-    '50d': '🌫️', '50n': '🌫️',
-  };
-  return emojiMap[iconCode] || '🌡️';
-};
 
 // Obtener dirección del viento
 const getWindDirection = (deg: number): string => {
@@ -118,6 +101,48 @@ const formatTime = (timestamp: number, timezone: number): string => {
     timeZone: 'UTC'
   });
 };
+
+// Visibilidad en km: «10 km», «2,5 km» (antes «10.0 km», con toFixed)
+const formatVisibilidad = (metros: number): string => {
+  const km = metros / 1000;
+  return `${formatNumber(km, Number.isInteger(km) ? 0 : 1)} km`;
+};
+
+/**
+ * Franjas (mañana, tarde, noche) en columnas. La usan la tarjeta de hoy y el día desplegado
+ * del pronóstico; en la tarjeta de hoy la descripción va solo para el lector de pantalla.
+ */
+function FilaFranjas({ franjas, enTarjeta }: { franjas: FranjaPronostico[]; enTarjeta: boolean }) {
+  return (
+    <div
+      className={`${styles.franjas} ${enTarjeta ? styles.franjasTarjeta : ''}`}
+      style={{ gridTemplateColumns: `repeat(${franjas.length}, minmax(0, 1fr))` }}
+    >
+      {franjas.map((f) => (
+        <div key={f.clave} className={styles.franja}>
+          <span className={styles.franjaNombre}>{f.nombre}</span>
+          <span className={styles.franjaHoras}>{f.horas}</span>
+          <IconoTiempo codigo={f.icon} className={styles.franjaIcono} />
+          <span className={styles.franjaTemp}>{rangoTemperatura(f)}</span>
+          <span className={enTarjeta ? 'sr-only' : styles.franjaDesc}>{f.desc}</span>
+          <span className={styles.franjaDato}>
+            <IconoDato tipo="gota" className={styles.franjaDatoIcono} />
+            <span className="sr-only">Probabilidad de lluvia </span>
+            {formatPercentage(f.probLluvia, 0)}
+          </span>
+          <span className={styles.franjaDato}>
+            {f.precipitacionMm > 0 ? `${formatNumber(f.precipitacionMm, 1)} mm` : ''}
+          </span>
+          <span className={styles.franjaDato}>
+            <IconoDato tipo="viento" className={styles.franjaDatoIcono} />
+            <span className="sr-only">Viento máximo </span>
+            {f.vientoMaxKmh} km/h
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function InformacionTiempoPage() {
   const [ciudad, setCiudad] = useState('');
@@ -243,17 +268,63 @@ export default function InformacionTiempoPage() {
     }
   };
 
-  // Pronóstico por días y franjas, en la hora local de la ciudad consultada
-  const pronosticoDiario = useMemo(
-    () => (forecast ? agruparPronostico(forecast.list, forecast.city.timezone ?? 0) : []),
-    [forecast]
+  // Hoy (va en la tarjeta del tiempo actual) y los días siguientes completos, en la hora
+  // local de la ciudad consultada
+  const reparto = useMemo(
+    () =>
+      forecast && weather
+        ? repartirPronostico(
+            forecast.list,
+            forecast.city.timezone ?? 0,
+            weather.dt,
+            weather.main.temp
+          )
+        : null,
+    [forecast, weather]
   );
-  const diaSeleccionado = pronosticoDiario.find(d => d.clave === diaAbierto) ?? null;
+  const hoy = reparto?.hoy ?? null;
+  const extremosHoy = reparto?.extremosHoy ?? null;
+  const siguientes = reparto?.siguientes ?? [];
+
+  // Escala común de las barras de temperatura del pronóstico
+  const escalaMin = Math.min(...siguientes.map(d => d.tempMin));
+  const escalaMax = Math.max(...siguientes.map(d => d.tempMax));
+  const escalaRango = Math.max(escalaMax - escalaMin, 1);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     buscarCiudad(ciudad);
   };
+
+  const usarUbicacion = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => buscarPorCoordenadas(pos.coords.latitude, pos.coords.longitude),
+        () => setError('No se pudo obtener tu ubicación')
+      );
+    }
+  };
+
+  // Posición del sol entre el amanecer y el atardecer, en la hora de la observación
+  const fraccionSol = weather
+    ? (weather.dt - weather.sys.sunrise) / Math.max(weather.sys.sunset - weather.sys.sunrise, 1)
+    : 0;
+  const esDeDia = fraccionSol >= 0 && fraccionSol <= 1;
+
+  const datosActuales: Array<{ tipo: TipoDato; etiqueta: string; valor: string }> = weather
+    ? [
+        { tipo: 'sensacion', etiqueta: 'Sensación térmica', valor: `${Math.round(weather.main.feels_like)}°` },
+        { tipo: 'humedad', etiqueta: 'Humedad', valor: formatPercentage(weather.main.humidity / 100, 0) },
+        {
+          tipo: 'viento',
+          etiqueta: 'Viento',
+          valor: `${formatNumber(weather.wind.speed * 3.6, 0)} km/h ${getWindDirection(weather.wind.deg)}`,
+        },
+        { tipo: 'presion', etiqueta: 'Presión', valor: `${formatNumber(weather.main.pressure, 0)} hPa` },
+        { tipo: 'visibilidad', etiqueta: 'Visibilidad', valor: formatVisibilidad(weather.visibility) },
+        { tipo: 'nubes', etiqueta: 'Nubosidad', valor: formatPercentage(weather.clouds.all / 100, 0) },
+      ]
+    : [];
 
   return (
     <div className={styles.container}>
@@ -266,7 +337,9 @@ export default function InformacionTiempoPage() {
         </p>
       </header>
 
-      <LegalNotice />
+      <div className={styles.columna}>
+        <LegalNotice />
+      </div>
 
       <div className={styles.mainContent}>
         {/* Buscador */}
@@ -277,16 +350,39 @@ export default function InformacionTiempoPage() {
               value={ciudad}
               onChange={(e) => setCiudad(e.target.value)}
               placeholder="Buscar ciudad..."
+              aria-label="Ciudad"
               className={styles.searchInput}
             />
             <button type="submit" className={styles.searchBtn} disabled={loading} aria-label={loading ? 'Buscando' : 'Buscar'}>
-              {loading ? '...' : '🔍'}
+              <IconoBuscar className={styles.btnIcono} />
+            </button>
+            <button
+              type="button"
+              onClick={usarUbicacion}
+              className={styles.ubicacionBtn}
+              disabled={loading}
+              aria-label="Usar mi ubicación"
+              title="Usar mi ubicación"
+            >
+              <IconoUbicacion className={styles.btnIcono} />
             </button>
           </form>
 
-          {/* Ciudades populares */}
+          {/* Recientes primero y luego las populares que no estén ya */}
           <div className={styles.ciudadesRapidas}>
-            {CIUDADES_POPULARES.map((c) => (
+            {historial.map((c) => (
+              <button
+                type="button"
+                key={`r-${c}`}
+                onClick={() => buscarCiudad(c)}
+                className={`${styles.ciudadBtn} ${styles.ciudadReciente}`}
+                disabled={loading}
+                title="Reciente"
+              >
+                {c}
+              </button>
+            ))}
+            {CIUDADES_POPULARES.filter((c) => !historial.includes(c.nombre)).map((c) => (
               <button
                 type="button"
                 key={c.nombre}
@@ -298,53 +394,18 @@ export default function InformacionTiempoPage() {
               </button>
             ))}
           </div>
-
-          {/* Historial */}
-          {historial.length > 0 && (
-            <div className={styles.historialSection}>
-              <span className={styles.historialLabel}>Recientes:</span>
-              {historial.map((c) => (
-                <button
-                  type="button"
-                  key={c}
-                  onClick={() => buscarCiudad(c)}
-                  className={styles.historialBtn}
-                  disabled={loading}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Botón ubicación */}
-          <button
-            type="button"
-            onClick={() => {
-              if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                  (pos) => buscarPorCoordenadas(pos.coords.latitude, pos.coords.longitude),
-                  () => setError('No se pudo obtener tu ubicación')
-                );
-              }
-            }}
-            className={styles.ubicacionBtn}
-            disabled={loading}
-          >
-            <span aria-hidden="true">📍</span> Usar mi ubicación
-          </button>
         </div>
 
         {/* Error */}
         {error && (
-          <div className={styles.errorPanel}>
-            <span>⚠️ {error}</span>
+          <div className={styles.errorPanel} role="alert">
+            <span><span aria-hidden="true">⚠️</span> {error}</span>
           </div>
         )}
 
         {/* Loading */}
         {loading && (
-          <div className={styles.loadingPanel}>
+          <div className={styles.loadingPanel} role="status">
             <div className={styles.spinner}></div>
             <span>Cargando...</span>
           </div>
@@ -353,160 +414,126 @@ export default function InformacionTiempoPage() {
         {/* Resultado del tiempo actual */}
         {weather && !loading && (
           <>
-            <div className={styles.weatherPanel}>
-              <div className={styles.weatherMain}>
-                <div className={styles.weatherLocation}>
-                  <h2>{weather.name}, {weather.sys.country}</h2>
-                  <p className={styles.weatherDesc}>
-                    {weather.weather[0].description}
-                  </p>
-                </div>
-
-                <div className={styles.weatherTemp}>
-                  <span className={styles.weatherEmoji}>
-                    {getWeatherEmoji(weather.weather[0].icon)}
-                  </span>
-                  <span className={styles.tempValue}>
-                    {Math.round(weather.main.temp)}°C
-                  </span>
-                </div>
-
-                <div className={styles.weatherFeels}>
-                  Sensación térmica: {Math.round(weather.main.feels_like)}°C
-                </div>
-
-                <div className={styles.tempRange}>
-                  <span>🔺 {Math.round(weather.main.temp_max)}°</span>
-                  <span>🔻 {Math.round(weather.main.temp_min)}°</span>
-                </div>
+            <section className={styles.actual} aria-labelledby="tiempo-ciudad">
+              <div className={styles.actualCabecera}>
+                <h2 id="tiempo-ciudad" className={styles.actualCiudad}>
+                  {weather.name}, {weather.sys.country}
+                </h2>
+                <span className={styles.actualHora}>
+                  Datos de las {formatTime(weather.dt, weather.timezone)}
+                </span>
               </div>
 
-              <div className={styles.weatherDetails}>
-                <div className={styles.detailItem}>
-                  <span className={styles.detailIcon}>💧</span>
-                  <span className={styles.detailLabel}>Humedad</span>
-                  <span className={styles.detailValue}>{weather.main.humidity}%</span>
-                </div>
-                <div className={styles.detailItem}>
-                  <span className={styles.detailIcon}>💨</span>
-                  <span className={styles.detailLabel}>Viento</span>
-                  <span className={styles.detailValue}>
-                    {Math.round(weather.wind.speed * 3.6)} km/h {getWindDirection(weather.wind.deg)}
+              <div className={styles.actualTemp}>
+                <IconoTiempo codigo={weather.weather[0].icon} className={styles.actualIcono} />
+                <span className={styles.actualGrados}>{Math.round(weather.main.temp)}°</span>
+              </div>
+
+              <p className={styles.actualResumen}>
+                <span className={styles.primeraMayuscula}>{weather.weather[0].description}</span>
+                <span>
+                  {extremosHoy ? ` · máx. ${extremosHoy.max}° · mín. ${extremosHoy.min}°` : ''}
+                </span>
+              </p>
+
+              {hoy && hoy.franjas.length > 0 && (
+                <section className={styles.hoy} aria-labelledby="tiempo-hoy">
+                  <h3 id="tiempo-hoy" className={styles.hoyTitulo}>Lo que queda de hoy</h3>
+                  <FilaFranjas franjas={hoy.franjas} enTarjeta />
+                </section>
+              )}
+            </section>
+
+            <div className={styles.datos}>
+              {datosActuales.map((d) => (
+                <div key={d.tipo} className={styles.dato}>
+                  <span className={styles.datoEtiqueta}>
+                    <IconoDato tipo={d.tipo} className={styles.datoIcono} />
+                    {d.etiqueta}
                   </span>
+                  <span className={styles.datoValor}>{d.valor}</span>
                 </div>
-                <div className={styles.detailItem}>
-                  <span className={styles.detailIcon}>🌡️</span>
-                  <span className={styles.detailLabel}>Presión</span>
-                  <span className={styles.detailValue}>{weather.main.pressure} hPa</span>
-                </div>
-                <div className={styles.detailItem}>
-                  <span className={styles.detailIcon}>👁️</span>
-                  <span className={styles.detailLabel}>Visibilidad</span>
-                  <span className={styles.detailValue}>{(weather.visibility / 1000).toFixed(1)} km</span>
-                </div>
-                <div className={styles.detailItem}>
-                  <span className={styles.detailIcon}>☁️</span>
-                  <span className={styles.detailLabel}>Nubes</span>
-                  <span className={styles.detailValue}>{weather.clouds.all}%</span>
-                </div>
-                <div className={styles.detailItem}>
-                  <span className={styles.detailIcon}>🌅</span>
-                  <span className={styles.detailLabel}>Amanecer</span>
-                  <span className={styles.detailValue}>
-                    {formatTime(weather.sys.sunrise, weather.timezone)}
-                  </span>
-                </div>
-                <div className={styles.detailItem}>
-                  <span className={styles.detailIcon}>🌇</span>
-                  <span className={styles.detailLabel}>Atardecer</span>
-                  <span className={styles.detailValue}>
-                    {formatTime(weather.sys.sunset, weather.timezone)}
-                  </span>
-                </div>
+              ))}
+            </div>
+
+            <div className={styles.sol}>
+              <div className={styles.solFila}>
+                <span className={styles.datoEtiqueta}>Amanecer</span>
+                <span className={styles.datoEtiqueta}>Atardecer</span>
+              </div>
+              <div className={styles.solPista} aria-hidden="true">
+                <span
+                  className={`${styles.solPunto} ${esDeDia ? '' : styles.solPuntoNoche}`}
+                  style={{ left: `${Math.min(Math.max(fraccionSol, 0), 1) * 100}%` }}
+                />
+              </div>
+              <div className={styles.solFila}>
+                <span className={styles.solHora}>{formatTime(weather.sys.sunrise, weather.timezone)}</span>
+                <span className={styles.solHora}>{formatTime(weather.sys.sunset, weather.timezone)}</span>
               </div>
             </div>
 
-            {/* Pronóstico 5 días */}
-            {pronosticoDiario.length > 0 && (
-              <div className={styles.forecastPanel}>
-                <h3 className={styles.forecastTitle}>Pronóstico 5 días</h3>
-                <p className={styles.forecastHint}>
-                  Toca un día para verlo por franjas: mañana, tarde y noche.
+            {/* Próximos días */}
+            {siguientes.length > 0 && (
+              <section className={styles.pronostico} aria-labelledby="tiempo-proximos">
+                <h3 id="tiempo-proximos" className={styles.pronosticoTitulo}>Próximos días</h3>
+                <p className={styles.pronosticoNota}>
+                  Toca un día para verlo por franjas. Horas locales de {forecast?.city.name}.
                 </p>
-                <div className={styles.forecastGrid}>
-                  {pronosticoDiario.map((dia) => {
+                <ul className={styles.dias} aria-labelledby="tiempo-proximos">
+                  {siguientes.map((dia) => {
                     const abierto = dia.clave === diaAbierto;
+                    const idPanel = `franjas-${dia.clave}`;
+                    const fechaLarga = fechaDelDia(dia, { weekday: 'long', day: 'numeric', month: 'long' });
+                    const lluvia = Math.max(...dia.franjas.map(f => f.probLluvia));
                     return (
-                      <button
-                        type="button"
-                        key={dia.clave}
-                        className={`${styles.forecastDay} ${abierto ? styles.forecastDayActivo : ''}`}
-                        aria-expanded={abierto}
-                        aria-controls={abierto ? ID_PANEL_FRANJAS : undefined}
-                        onClick={() => setDiaAbierto(abierto ? null : dia.clave)}
-                      >
-                        <span className={styles.forecastDate}>
-                          {fechaDelDia(dia, { weekday: 'short', day: 'numeric', month: 'short' })}
-                        </span>
-                        <span className={styles.forecastEmoji} aria-hidden="true">
-                          {getWeatherEmoji(dia.icon)}
-                        </span>
-                        <span className={styles.forecastTemp}>
-                          {dia.tempMax}° / {dia.tempMin}°
-                        </span>
-                        <span className={styles.forecastDesc}>{dia.desc}</span>
-                        <span className={styles.forecastChevron} aria-hidden="true">
-                          {abierto ? '▴' : '▾'}
-                        </span>
-                      </button>
+                      <li key={dia.clave} className={styles.diaItem}>
+                        <button
+                          type="button"
+                          className={`${styles.dia} ${abierto ? styles.diaAbierto : ''}`}
+                          aria-expanded={abierto}
+                          aria-controls={abierto ? idPanel : undefined}
+                          onClick={() => setDiaAbierto(abierto ? null : dia.clave)}
+                        >
+                          <span className={styles.diaFecha}>
+                            {fechaDelDia(dia, { weekday: 'short', day: 'numeric', month: 'short' })}
+                          </span>
+                          <span className={styles.diaCielo}>
+                            <IconoTiempo codigo={dia.icon} className={styles.diaIcono} />
+                            <span className="sr-only">{dia.desc}</span>
+                          </span>
+                          <span className={styles.diaLluvia}>
+                            {lluvia >= 0.1 ? formatPercentage(lluvia, 0) : ''}
+                          </span>
+                          <span className={styles.diaMin}>
+                            <span className="sr-only">mínima </span>{dia.tempMin}°
+                          </span>
+                          <span className={styles.diaBarra} aria-hidden="true">
+                            <span
+                              className={styles.diaBarraRango}
+                              style={{
+                                left: `${((dia.tempMin - escalaMin) / escalaRango) * 100}%`,
+                                width: `${Math.max(((dia.tempMax - dia.tempMin) / escalaRango) * 100, 4)}%`,
+                              }}
+                            />
+                          </span>
+                          <span className={styles.diaMax}>
+                            <span className="sr-only">máxima </span>{dia.tempMax}°
+                          </span>
+                          <span className={styles.diaChevron} aria-hidden="true">
+                            {abierto ? '▴' : '▾'}
+                          </span>
+                        </button>
+                        {abierto && (
+                          <section id={idPanel} className={styles.diaPanel} aria-label={`Franjas del ${fechaLarga}`}>
+                            <FilaFranjas franjas={dia.franjas} enTarjeta={false} />
+                          </section>
+                        )}
+                      </li>
                     );
                   })}
-                </div>
-
-                {diaSeleccionado && (
-                  <section
-                    id={ID_PANEL_FRANJAS}
-                    className={styles.franjasPanel}
-                    aria-label={`Franjas del ${fechaDelDia(diaSeleccionado, { weekday: 'long', day: 'numeric', month: 'long' })}`}
-                  >
-                    <h4 className={styles.franjasTitulo}>
-                      {fechaDelDia(diaSeleccionado, { weekday: 'long', day: 'numeric', month: 'long' })}
-                    </h4>
-                    <p className={styles.franjasNota}>
-                      Horas locales de {forecast?.city.name}. Solo aparecen las franjas con previsión disponible.
-                    </p>
-                    <div className={styles.franjasGrid}>
-                      {diaSeleccionado.franjas.map((f) => (
-                        <div key={f.clave} className={styles.franja}>
-                          <div className={styles.franjaCabecera}>
-                            <span className={styles.franjaNombre}>{f.nombre}</span>
-                            <span className={styles.franjaHoras}>{f.horas}</span>
-                          </div>
-                          <span className={styles.franjaEmoji} aria-hidden="true">
-                            {getWeatherEmoji(f.icon)}
-                          </span>
-                          <span className={styles.franjaTemp}>{rangoTemperatura(f)}</span>
-                          <span className={styles.franjaDesc}>{f.desc}</span>
-                          <dl className={styles.franjaDatos}>
-                            <div>
-                              <dt>Prob. de lluvia</dt>
-                              <dd>{formatPercentage(f.probLluvia, 0)}</dd>
-                            </div>
-                            <div>
-                              <dt>Precipitación</dt>
-                              <dd>{formatNumber(f.precipitacionMm, 1)} mm</dd>
-                            </div>
-                            <div>
-                              <dt>Viento máx.</dt>
-                              <dd>{f.vientoMaxKmh} km/h</dd>
-                            </div>
-                          </dl>
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                )}
-              </div>
+                </ul>
+              </section>
             )}
           </>
         )}
@@ -515,29 +542,19 @@ export default function InformacionTiempoPage() {
       {/* Panel informativo */}
       <div className={styles.infoPanel}>
         <h3>Sobre esta herramienta</h3>
-        <div className={styles.infoGrid}>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🌍</span>
-            <div>
-              <strong>Cobertura mundial</strong>
-              <p>Datos de cualquier ciudad del mundo con OpenWeatherMap</p>
-            </div>
-          </div>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>🔄</span>
-            <div>
-              <strong>Datos actualizados</strong>
-              <p>OpenWeatherMap actualiza sus datos cada ~10 minutos; vuelve a buscar para ver la información más reciente</p>
-            </div>
-          </div>
-          <div className={styles.infoItem}>
-            <span className={styles.infoIcon}>📱</span>
-            <div>
-              <strong>Geolocalización</strong>
-              <p>Detecta automáticamente tu ubicación actual</p>
-            </div>
-          </div>
-        </div>
+        <ul className={styles.infoLista}>
+          <li>
+            <strong>Cobertura mundial.</strong> Datos de cualquier ciudad del mundo con OpenWeatherMap.
+          </li>
+          <li>
+            <strong>Datos actualizados.</strong> OpenWeatherMap actualiza sus datos cada ~10 minutos;
+            vuelve a buscar para ver la información más reciente.
+          </li>
+          <li>
+            <strong>Lo que queda de hoy.</strong> El pronóstico gratuito no incluye las horas ya pasadas:
+            la máxima y la mínima de hoy son las de lo que queda, noche incluida.
+          </li>
+        </ul>
       </div>
 
       {/* Contenido educativo colapsable */}
