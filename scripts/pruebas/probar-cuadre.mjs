@@ -33,6 +33,7 @@ import {
   dentroDe,
   elegirSesion,
   escriturasQueCuentan,
+  baseDelPreCommit,
   autorizadosVigentes,
   reconciliar,
   esPeticionDelUsuario,
@@ -434,6 +435,56 @@ if (marcador) {
   anotar(
     'S7 · un id sin fichero de sesión no carga las escrituras de la más reciente',
     escriturasQueCuentan('nohay', otraId?.datos, escrituras).length === 0,
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// S8 · EL COMMIT DE UNA TAREA TAMPOCO HEREDA LA BASE DE OTRA CONVERSACIÓN (cabo C0852)
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// Reinyecta el 19/11/2026 17:32: la recogida automática del Inspector (sin id) tomó la sesión del
+// /parte, cerrada a las 17:02 con base de las 06:00, y entre esa base y HEAD estaba el commit de
+// /reparar que retiró el role="alert" de test-zarit-cuidador (entró por ff-only, sin pre-commit).
+// Contado desde esa base, el commit de 5 specs salía con un guardia-a-cero que no era suyo.
+
+{
+  const PARTE = { datos: { sesion: '207d6106', inicio: '2026-11-19T05:00:00Z', base: 'a264541a3', autorizados: [] }, mtime: Date.parse('2026-11-19T16:02:00Z') };
+  const ahora = Date.parse('2026-11-19T16:32:00Z');
+
+  const sinId = elegirSesion(undefined, [PARTE], ahora);
+  anotar(
+    'S8 · CASO DE ORIGEN: el commit de una tarea (sin id) cuenta contra HEAD, no contra la base del /parte',
+    sinId?.datos.sesion === '207d6106' && baseDelPreCommit(undefined, sinId?.datos) === null,
+    `base elegida: ${baseDelPreCommit(undefined, sinId?.datos) ?? 'HEAD'}`,
+  );
+
+  // Lo que esa base habría metido en el commit: el diff del /parte arrastraba el borrado ajeno.
+  const ajeno = {
+    ficheros: [
+      { ruta: 'tests/apps/enchufes-por-pais.spec.ts', estado: 'A' },
+      { ruta: 'app/test-zarit-cuidador/page.tsx', estado: 'M' },
+    ],
+    antes: { 'app/test-zarit-cuidador/page.tsx': '<div className={styles.emergencyBox} role="alert">024</div>' },
+    despues: {
+      'tests/apps/enchufes-por-pais.spec.ts': "test('Perú', () => {});",
+      'app/test-zarit-cuidador/page.tsx': '<div className={styles.emergencyBox}>024</div>',
+    },
+  };
+  anotar(
+    'S8 · la trampa no es vacua: contado desde la base ajena, el commit SÍ saldría con guardia-a-cero',
+    reglasDe(cuadrar(ajeno)).includes('guardia-a-cero'),
+    'si esto falla, el caso de origen ya no reproduce lo que bloqueó',
+  );
+
+  // Con el id de la propia conversación, la base de la sesión sigue mandando.
+  anotar(
+    'S8 · la conversación que commitea SÍ cuenta desde su base',
+    baseDelPreCommit('207d6106', elegirSesion('207d6106', [PARTE], ahora)?.datos) === 'a264541a3',
+    'si esto falla, el Cuadre ha dejado de ver la sesión entera',
+  );
+  anotar(
+    'S8 · un id sin fichero de sesión no adopta la base de la más reciente',
+    baseDelPreCommit('nohay', elegirSesion('nohay', [PARTE], ahora)?.datos) === null,
   );
 }
 

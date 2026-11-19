@@ -474,6 +474,29 @@ export function escriturasQueCuentan(id, sesion, escrituras) {
 }
 
 /**
+ * Contra qué se cuenta un pre-commit: la base de la sesión SOLO si es la de quien commitea; si no,
+ * `null`, y el llamador compara contra HEAD (lo que añade ese commit y nada más).
+ *
+ * C0731 retiró las escrituras ajenas pero dejó la base, con el argumento de que «abarca de más, no
+ * de menos». Abarcar de más ES bloquear en nombre de otro: entre la base de la conversación ajena y
+ * HEAD caben commits que no pasaron por el pre-commit de main (los de /reparar llegan con
+ * `merge --ff-only`), y su sorpresa sin autorizar se le carga al commit de la tarea. Esa sorpresa no
+ * se pierde: la reconciliación del cierre de la sesión que la abarca la nombra («HAY COMMITS SIN
+ * PASAR POR EL PRE-COMMIT»).
+ *
+ * ⚠️ Caso de origen, cabo C0852 (19/11/2026 17:32): la recogida automática del Inspector (5 specs)
+ * tomó la sesión del /parte —cerrada a las 17:02, con base de la mañana— y heredó el `role="alert"`
+ * que /reparar retiró a propósito de test-zarit-cuidador (486173326). El mismo commit, hecho desde
+ * una conversación, pasó sin CUADRE_OK (961f39da2). La encadenada se paró hasta recogerlo a mano.
+ *
+ * @param {string|null|undefined} id  el `CLAUDE_CODE_SESSION_ID` del proceso
+ * @param {object|null} sesion         la sesión que devolvió `elegirSesion` (sus `datos`)
+ */
+export function baseDelPreCommit(id, sesion) {
+  return id && sesion?.sesion === id && sesion.base ? sesion.base : null;
+}
+
+/**
  * Las autorizaciones que cubren la ventana de una sesión: las suyas y las de cualquier sesión
  * que haya escrito algo desde que esta empezó.
  *

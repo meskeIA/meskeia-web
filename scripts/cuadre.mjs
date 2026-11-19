@@ -65,6 +65,7 @@ import {
   dentroDe,
   elegirSesion,
   escriturasQueCuentan,
+  baseDelPreCommit,
   autorizadosVigentes,
   reconciliar,
 } from './cuadre-motor.mjs';
@@ -477,10 +478,14 @@ function avisarSiNoLleganLosEventos(sesion) {
 
 function modoPreCommit() {
   if (!autoverificarOMorir()) return 1;
-  const sesion = sesionActual();
-  avisarSiNoLleganLosEventos(sesion);
-  const base = sesion?.base && gitSilencioso('cat-file', '-e', `${sesion.base}^{commit}`) !== null ? sesion.base : 'HEAD';
-  const peticiones = sesion?.peticiones || [];
+  const id = process.env.CLAUDE_CODE_SESSION_ID;
+  const sesion = sesionActual(id);
+  // Sin id lo commitea una tarea, no Claude Code: no se espera ningún evento (no es avería) y la
+  // base y las peticiones de la sesión elegida son de otra conversación (cabo C0852).
+  if (id) avisarSiNoLleganLosEventos(sesion);
+  const propia = baseDelPreCommit(id, sesion);
+  const base = propia && gitSilencioso('cat-file', '-e', `${propia}^{commit}`) !== null ? propia : 'HEAD';
+  const peticiones = id ? sesion?.peticiones || [] : [];
   // Las de TODAS las sesiones abiertas desde que empezó esta: la base de una sesión larga
   // abarca los commits de las demás, y sin ellas un CUADRE_OK ajeno volvería a bloquear aquí.
   const propios = new Set(sesion?.autorizados || []);
@@ -497,7 +502,7 @@ function modoPreCommit() {
     diff,
     // Solo las de la sesión que commitea: sin id, la elegida es otra conversación (cabo C0731).
     ficherosFuera: escriturasQueCuentan(
-      process.env.CLAUDE_CODE_SESSION_ID,
+      id,
       sesion,
       escriturasFuera(sesion?.transcript),
     ),
