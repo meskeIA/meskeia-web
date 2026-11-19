@@ -55,7 +55,7 @@ export const jsonLd = generateWebAppSchema({
 // (check:faq-unica, cabo C0570). Se juntaron: la documentación y el plazo del JSON-LD y la
 // valoración en el domicilio, que solo decía la visible. Ningún dato cambia.
 export const RESPUESTA_FAQ_SOLICITUD =
-  'La solicitud se presenta ante los servicios sociales de la comunidad autónoma donde reside la persona: presencialmente, por correo o, según cada comunidad, por vía telemática. Es necesario aportar DNI, informe médico actualizado y, en algunos casos, informes sociales. Un trabajador social o un enfermero de la administración realiza después la valoración en el domicilio. El plazo máximo de resolución es de seis meses desde la presentación de la solicitud.';
+  'La solicitud se presenta ante los servicios sociales de la comunidad autónoma donde reside la persona: presencialmente, por correo o, según cada comunidad, por vía telemática. Es necesario aportar DNI, informe médico actualizado y, en algunos casos, informes sociales. Un trabajador social o un enfermero de la administración realiza después la valoración en el domicilio. El plazo máximo hasta la resolución que reconoce la prestación es de tres meses desde la presentación de la solicitud (Ley 39/2006, disposición final primera, apartado 2, desde el 12/11/2026).';
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',

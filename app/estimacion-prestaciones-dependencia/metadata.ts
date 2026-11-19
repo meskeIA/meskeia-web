@@ -92,7 +92,7 @@ export const faqJsonLd = {
       name: '¿Cuánto tiempo tarda en resolverse el expediente de dependencia?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La ley establece un plazo máximo de seis meses desde la presentación de la solicitud para dictar la resolución de reconocimiento del grado. Sin embargo, en la práctica los plazos suelen ser más largos en muchas comunidades autónomas. Una vez reconocido el grado, la comunidad autónoma debe elaborar el Programa Individual de Atención (PIA) que concreta la prestación o servicio asignado.',
+        text: 'La ley establece un plazo máximo de tres meses desde la presentación de la solicitud hasta la resolución que reconoce la prestación, incluido el Programa Individual de Atención (PIA) que la concreta, aunque la comunidad autónoma tramite por separado el grado y la prestación (Ley 39/2006, disposición final primera, apartado 2, desde el 12/11/2026). Sin embargo, en la práctica los plazos suelen ser más largos en muchas comunidades autónomas.',
       },
     },
   ],

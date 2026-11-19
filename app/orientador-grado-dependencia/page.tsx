@@ -62,7 +62,7 @@ const CONTENIDO_GRADO: Record<GradoBVD, ContenidoGrado> = {
     ],
     pasos: [
       { icono: '📋', texto: 'Solicita la valoración oficial en los Servicios Sociales de tu ayuntamiento o comunidad autónoma. Lleva el informe médico actualizado.' },
-      { icono: '⏳', texto: 'El plazo legal de resolución es de 6 meses. En la práctica varía por CCAA (3-18 meses). Solicítalo cuanto antes.' },
+      { icono: '⏳', texto: 'El plazo legal hasta la resolución de la prestación es de 3 meses desde la solicitud. En la práctica varía por CCAA (3-18 meses). Solicítalo cuanto antes.' },
       { icono: '📁', texto: 'Documentos necesarios: DNI, informe médico, informe social (si hay), certificado de empadronamiento.' },
       { icono: '💡', texto: 'El SAD público tiene copago según renta. Consulta con Servicios Sociales el coste estimado en tu caso.' },
     ],
@@ -412,9 +412,11 @@ export default function OrientadorGradoDependencia() {
             de la Ley 4/2026 (BOE-A-2026-20528), vigente desde el 23/10/2026, que suprime el plazo
             suspensivo de hasta dos años del art. 18 que había puesto el RDL 20/2012. Leído en el
             consolidado del BOE (BOE-A-2006-21990) el 22/10/2026 (cabo C0356). Hallazgo 2145: la app
-            decía antes que se cobraba desde la solicitud. */}
-        <p>El plazo máximo entre la solicitud y la resolución que reconoce la prestación es de 6 meses (Ley 39/2006, disposición final primera, apartado 2), pero en la práctica varía mucho por comunidad autónoma.</p>
-        <p>Según la norma estatal (apartado 3 de esa disposición), el derecho a las prestaciones se genera <strong>desde la fecha de la resolución</strong> que las reconoce o, si pasan seis meses desde la solicitud sin resolución dictada y notificada, desde ese momento. Esto vale también para la prestación económica para cuidados en el entorno familiar (art. 18): la Ley 4/2026 suprimió, con efectos del 23/10/2026, el <strong>plazo suspensivo de hasta dos años</strong> que tenía hasta entonces. Si la solicitaste antes de esa fecha, pregunta en Servicios Sociales cómo se aplica a tu caso. Las comunidades autónomas pueden tener normas propias más favorables: pregunta en Servicios Sociales cómo se aplica en la tuya. Solicitarlo cuanto antes importa porque el plazo de seis meses empieza a contar con la solicitud.</p>
+            decía antes que se cobraba desde la solicitud. Los apdos. 2 y 3 pasaron de seis a TRES
+            meses con el RDL 36/2026, de 10 de noviembre, en vigor el 12/11/2026 (consolidado del
+            BOE leído el 19/11/2026; hallazgo 5190 de la hermana checklist-tramites-dependencia). */}
+        <p>El plazo máximo entre la solicitud y la resolución que reconoce la prestación es de 3 meses (Ley 39/2006, disposición final primera, apartado 2, en la redacción vigente desde el 12/11/2026), pero en la práctica varía mucho por comunidad autónoma.</p>
+        <p>Según la norma estatal (apartado 3 de esa disposición), el derecho a las prestaciones se genera <strong>desde la fecha de la resolución</strong> que las reconoce o, si pasan tres meses desde la solicitud sin resolución dictada y notificada, desde ese momento. Esto vale también para la prestación económica para cuidados en el entorno familiar (art. 18): la Ley 4/2026 suprimió, con efectos del 23/10/2026, el <strong>plazo suspensivo de hasta dos años</strong> que tenía hasta entonces. Si la solicitaste antes de esa fecha, pregunta en Servicios Sociales cómo se aplica a tu caso. Las comunidades autónomas pueden tener normas propias más favorables: pregunta en Servicios Sociales cómo se aplica en la tuya. Solicitarlo cuanto antes importa porque el plazo de tres meses empieza a contar con la solicitud.</p>
 
       {/* === SECCIONES PROFESIONALES v2.0 === */}
 
@@ -505,7 +507,7 @@ export default function OrientadorGradoDependencia() {
         </div>
         <div className={styles.faqItem}>
           <strong>¿Cuánto tiempo tarda el reconocimiento?</strong>
-          <p>El plazo legal es 6 meses, pero en la práctica puede ser más largo según la comunidad autónoma. Por la norma estatal, el derecho a las prestaciones se genera desde la resolución que las reconoce, o desde que pasan seis meses de la solicitud sin resolución (Ley 39/2006, disposición final primera, apartado 3). Desde el 23/10/2026 eso incluye la prestación para cuidados en el entorno familiar, que hasta entonces tenía además un plazo suspensivo de hasta dos años (lo suprimió la Ley 4/2026).</p>
+          <p>El plazo legal es de 3 meses desde la solicitud hasta la resolución de la prestación (desde el 12/11/2026), pero en la práctica puede ser más largo según la comunidad autónoma. Por la norma estatal, el derecho a las prestaciones se genera desde la resolución que las reconoce, o desde que pasan tres meses de la solicitud sin resolución (Ley 39/2006, disposición final primera, apartado 3). Desde el 23/10/2026 eso incluye la prestación para cuidados en el entorno familiar, que hasta entonces tenía además un plazo suspensivo de hasta dos años (lo suprimió la Ley 4/2026).</p>
         </div>
         <div className={styles.faqItem}>
           <strong>¿Qué baremo se usa para valorar la dependencia?</strong>
@@ -548,7 +550,7 @@ export default function OrientadorGradoDependencia() {
           <div className={styles.stepNumber}>2</div>
           <div className={styles.stepContent}>
             <strong>Presenta la solicitud cuanto antes</strong>
-            <p>El plazo máximo de seis meses para resolver empieza a contar con la solicitud, y si se agota sin resolución el derecho a las prestaciones se genera igualmente desde ese momento (Ley 39/2006, disposición final primera, apartado 3). Presentarla antes adelanta ese reloj.</p>
+            <p>El plazo máximo de tres meses para resolver empieza a contar con la solicitud, y si se agota sin resolución el derecho a las prestaciones se genera igualmente desde ese momento (Ley 39/2006, disposición final primera, apartado 3). Presentarla antes adelanta ese reloj.</p>
           </div>
         </div>
         <div className={styles.step}>
@@ -625,7 +627,7 @@ export default function OrientadorGradoDependencia() {
           <li><strong>Esperar a que la situación sea crítica para solicitar</strong>: Los plazos son largos. Solicitar tarde puede suponer meses sin prestación cuando más se necesita.</li>
           <li><strong>No presentar recursos ante grados bajos</strong>: El sistema tiene una tasa de recurso con éxito considerable. Aceptar sin más un grado que no refleja la realidad supone perder prestaciones.</li>
           <li><strong>No acudir a la valoración en condiciones habituales</strong>: Si el día de la visita la persona está especialmente bien (por medicación, acompañamiento...), el valorador puede asignar un grado inferior al real.</li>
-          <li><strong>Contar con atrasos desde el día de la solicitud</strong>: Por la norma estatal, el derecho a las prestaciones se genera desde la resolución que las reconoce (o a los seis meses de la solicitud si no hay resolución), también en la prestación para cuidados en el entorno familiar, cuyo plazo suspensivo de hasta dos años suprimió la Ley 4/2026 con efectos del 23/10/2026 (Ley 39/2006, disposición final primera, apartado 3). Consulta qué aplica tu comunidad autónoma antes de hacer cuentas.</li>
+          <li><strong>Contar con atrasos desde el día de la solicitud</strong>: Por la norma estatal, el derecho a las prestaciones se genera desde la resolución que las reconoce (o a los tres meses de la solicitud si no hay resolución), también en la prestación para cuidados en el entorno familiar, cuyo plazo suspensivo de hasta dos años suprimió la Ley 4/2026 con efectos del 23/10/2026 (Ley 39/2006, disposición final primera, apartado 3). Consulta qué aplica tu comunidad autónoma antes de hacer cuentas.</li>
           <li><strong>No comunicar cambios de situación</strong>: Si la persona se muda de CCAA, mejora significativamente o su situación empeora, hay obligación de comunicarlo. No hacerlo puede generar reclamaciones.</li>
           <li><strong>Confundir prestaciones con servicios</strong>: Las prestaciones económicas son dinero. Los servicios (SAD, residencia) son atención directa. No son incompatibles en todos los casos: consultar en cada situación.</li>
         </ul>

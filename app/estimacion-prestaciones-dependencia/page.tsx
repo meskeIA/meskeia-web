@@ -416,14 +416,15 @@ export default function EstimacionPrestacionesDependencia() {
             <div className={styles.faqItem}>
               <h4>¿Cuánto tarda la resolución del grado de dependencia?</h4>
               <p>
-                La ley establece un plazo máximo de 6 meses desde la solicitud hasta la resolución
-                del grado y la aprobación del PIA (Programa Individual de Atención). En la práctica,
-                los plazos varían mucho por comunidad autónoma y pueden extenderse entre 6 y 18 meses.
+                La ley establece un plazo máximo de 3 meses desde la solicitud hasta la resolución
+                que reconoce la prestación, PIA (Programa Individual de Atención) incluido, aunque la
+                comunidad tramite por separado el grado y la prestación (Ley 39/2006, disposición
+                final primera, apartado 2, en la redacción vigente desde el 12/11/2026). En la
+                práctica, los plazos varían mucho por comunidad autónoma y pueden superar el año.
                 Por la norma estatal, el derecho a las prestaciones se genera desde la resolución que
-                las reconoce o, si pasan seis meses desde la solicitud sin resolución, desde ese
-                momento (Ley 39/2006, disposición final primera, apartado 3). Es recomendable
-                solicitar cuanto antes, porque ese plazo de seis meses empieza a contar con la
-                solicitud.
+                las reconoce o, si pasan tres meses desde la solicitud sin resolución, desde ese
+                momento (apartado 3). Es recomendable solicitar cuanto antes, porque ese plazo de
+                tres meses empieza a contar con la solicitud.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -530,7 +531,7 @@ export default function EstimacionPrestacionesDependencia() {
               <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Solicita cuanto antes</strong>
               <p>
-                El plazo máximo de seis meses para resolver empieza a contar con la solicitud, y
+                El plazo máximo de tres meses para resolver empieza a contar con la solicitud, y
                 si se agota sin resolución el derecho a las prestaciones se genera desde ese
                 momento. Cada mes de retraso en presentarla retrasa también esa fecha.
               </p>
@@ -593,9 +594,9 @@ export default function EstimacionPrestacionesDependencia() {
             <li>
               <strong>Contar con atrasos desde el día de la solicitud:</strong> Por la norma
               estatal, el derecho a las prestaciones se genera desde la resolución que las reconoce
-              o, si pasan seis meses desde la solicitud sin resolución, desde ese momento (Ley
+              o, si pasan tres meses desde la solicitud sin resolución, desde ese momento (Ley
               39/2006, disposición final primera, apartado 3). Si la resolución tarda 12 meses, los
-              atrasos se cuentan desde que se cumplieron los seis meses, no desde la solicitud; comprueba que el importe
+              atrasos se cuentan desde que se cumplieron los tres meses, no desde la solicitud; comprueba que el importe
               los incluya y consulta qué aplica tu comunidad autónoma.
             </li>
             <li>

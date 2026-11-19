@@ -11,6 +11,9 @@
  * misma afirmación, «retroactivo desde la fecha de solicitud», en checklist-tramites-dependencia
  * (7 sitios) y estimacion-prestaciones-dependencia (4), reparada el 21/10/2026. Este spec mide
  * las tres a la vez para que la próxima no la vuelva a escribir.
+ *
+ * 19/11/2026: el RDL 36/2026 bajó el plazo de los apartados 2 y 3 de seis a TRES meses (en vigor
+ * el 12/11/2026). Segundo caso, por app: el plazo de tres meses en la página y en el FAQPage.
  */
 import { test, expect } from '@playwright/test';
 
@@ -29,5 +32,19 @@ for (const slug of APPS) {
     expect(texto).not.toMatch(/retroactiv\w* desde la (fecha de )?solicitud/i);
     expect(texto).not.toMatch(/(se devengan|son retroactivos|derechos económicos se cuentan) desde la (fecha de )?solicitud/i);
     expect(texto).not.toMatch(/fecha de (la )?solicitud[^.]{0,40}inicio de tus derechos/i);
+  });
+
+  test(`${slug}: el plazo legal es de tres meses (RDL 36/2026), en la página y en el FAQPage`, async ({ page }) => {
+    // DF 1.ª.2 y 3 de la Ley 39/2006 en la redacción del RDL 36/2026, de 10 de noviembre (en vigor
+    // el 12/11/2026), leída en el consolidado del BOE el 19/11/2026: «será de tres meses» y el
+    // derecho nace «cuando haya transcurrido el plazo de tres meses». Las tres apps decían seis
+    // (hallazgo 5190 en checklist-tramites-dependencia; medido y reparado en las otras dos el mismo día).
+    await page.goto(`/${slug}/`);
+    // textContent incluye los <script> del JSON-LD: el FAQPage cuenta igual que la página
+    const texto = ((await page.locator('html').textContent()) ?? '').replace(/\s+/g, ' ');
+    expect(texto).not.toMatch(/plazo (legal|máximo)[^.]{0,60}\b(6|seis) meses/i);
+    expect(texto).not.toMatch(/\b(6|seis) meses (desde|de) (la )?(solicitud|presentación)/i);
+    expect(texto).not.toMatch(/a los (6|seis) meses de la solicitud/i);
+    expect(texto).toMatch(/(3|tres) meses/);
   });
 }
