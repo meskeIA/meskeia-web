@@ -280,13 +280,11 @@ test.describe('generador-cartones-bingo', () => {
     await expect(page.getByRole('button', { name: 'Generar cartones' })).toBeHidden();
   });
 
-  // ABIERTO, hallazgo (inspector 18/11/2026): la FAQ visible y el FAQPage dicen que basta volver a
-  // introducir el n.º de partida para reponer un cartón perdido «a media partida». Hacerlo en la
-  // misma pestaña da los mismos cartones, pero generar() vacía SIEMPRE el bombo (setCantados([])):
-  // con 10 bolas cantadas, el contador vuelve a «0 de 90» y se pierde el historial con el que se
-  // comprueba una línea. Esperado: la misma tirada conserva lo cantado (o, como poco, avisa).
-  test('HALLAZGO (18/11/2026, ABIERTO) · regenerar la misma partida a media partida borra el bombo', async ({ page }) => {
-    test.fail();
+  // REPARADO, hallazgo 5119 (inspector 18/11/2026): la FAQ visible y el FAQPage dicen que basta
+  // volver a introducir el n.º de partida para reponer un cartón perdido «a media partida». Antes
+  // generar() vaciaba SIEMPRE el bombo: con 10 bolas cantadas, el contador volvía a «0 de 90».
+  // Ahora la misma partida conserva lo cantado, y otra partida (otro n.º u «Otra tirada») lo vacía.
+  test('HALLAZGO 5119 (18/11/2026, REPARADO) · regenerar la misma partida a media partida conserva el bombo', async ({ page }) => {
     await generarPartida(page, '123456');
     await expect(page.locator('p', { hasText: 'Partida n.º 123456.' })).toBeVisible();
     const antes = await leerCartones(page);
@@ -294,23 +292,27 @@ test.describe('generador-cartones-bingo', () => {
     await page.getByRole('button', { name: 'Generar cartones' }).click();
     expect(await leerCartones(page), 'misma partida → mismos cartones').toEqual(antes);
     await expect(page.getByText('10 de 90 bolas cantadas')).toBeVisible({ timeout: 2000 });
+    // Otra partida es otro juego: el bombo vuelve a cero.
+    await generarPartida(page, '654321');
+    await expect(page.locator('p', { hasText: 'Partida n.º 654321.' })).toBeVisible();
+    await expect(page.getByText('0 de 90 bolas cantadas')).toBeVisible();
   });
 
-  // ABIERTO, hallazgo (inspector 18/11/2026): el «historial completo» del bombo solo existe para
-  // la vista. El panel es un <div aria-label="Números cantados"> sin rol (el nombre se descarta) y
-  // un número cantado se distingue solo por su clase (fondo y negrita): el árbol de accesibilidad
-  // lee «1 2 3 … 90» igual antes y después de cantar. Con lector de pantalla no hay forma de
-  // comprobar una línea. Esperado: el árbol cambia al cantar y el panel lleva su nombre.
-  test('HALLAZGO (18/11/2026, ABIERTO) · el historial de números cantados no llega al lector de pantalla', async ({
+  // REPARADO, hallazgo 5120 (inspector 18/11/2026): el «historial completo» del bombo solo existía
+  // para la vista (div sin rol, número cantado distinguido solo por su clase). Ahora el panel es un
+  // grupo con nombre que da al lector la lista de lo cantado de menor a mayor; la rejilla visual
+  // queda aria-hidden. Esperado: el árbol cambia al cantar y lista exactamente lo que salió.
+  test('HALLAZGO 5120 (18/11/2026, REPARADO) · el historial de números cantados llega al lector de pantalla', async ({
     page,
   }) => {
-    test.fail();
-    const panel = page.locator('[aria-label="Números cantados"]');
+    const panel = page.getByRole('group', { name: 'Números cantados' });
     const antes = await panel.ariaSnapshot();
-    await cantar(page, 3, 90);
+    const salidos = await cantar(page, 3, 90);
     const despues = await panel.ariaSnapshot();
     expect(despues, 'cantar tres números cambia lo que lee el lector').not.toBe(antes);
     expect(despues).toContain('Números cantados');
+    const ordenados = [...salidos].sort((a, b) => a - b).join(', ');
+    expect(despues).toContain(`3 cantados, de menor a mayor: ${ordenados}.`);
   });
 
   // ABIERTO, hallazgo (inspector 18/11/2026): la tabla del cartón usa table-layout automático y las

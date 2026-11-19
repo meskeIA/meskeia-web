@@ -203,6 +203,10 @@ export default function GeneradorCartonesBingoPage() {
    * `otraTirada`: «Otra tirada» sortea siempre un n.º de partida nuevo, distinto del actual, y
    * vacía el campo. Antes tomaba el n.º del campo como «Generar» y, con un n.º escrito, repetía los
    * mismos cartones (cabo C0808: el hallazgo 4948 de generador-laberintos).
+   *
+   * Volver a generar la MISMA partida (mismo n.º, misma modalidad) conserva el bombo: es lo que
+   * prometen la FAQ y la guía para reponer un cartón perdido a media partida. Antes vaciaba siempre
+   * lo cantado y se perdía el historial con el que se comprueba una línea (hallazgo 5119).
    */
   const generar = useCallback(
     (otraTirada: boolean) => {
@@ -210,13 +214,17 @@ export default function GeneradorCartonesBingoPage() {
       while (nuevaSemilla <= 0 || (otraTirada && nuevaSemilla === semilla)) {
         nuevaSemilla = Math.floor(Math.random() * 900000) + 100000;
       }
+      const mismaPartida = !otraTirada && cartones.length > 0 && nuevaSemilla === semilla;
       if (otraTirada) setSemillaManual('');
       setCartones(generarTirada(modalidad, cantidad, nuevaSemilla));
       setSemilla(nuevaSemilla);
-      setCantados([]);
+      if (!mismaPartida) setCantados([]);
     },
-    [modalidad, cantidad, semillaManual, semilla],
+    [modalidad, cantidad, semillaManual, semilla, cartones.length],
   );
+
+  /** Lo cantado, de menor a mayor: es como se comprueba una línea contra el cartón. */
+  const cantadosOrdenados = [...cantados].sort((a, b) => a - b);
 
   const totalBolas = DATOS_MODALIDAD[modalidad].bolas;
 
@@ -368,12 +376,21 @@ export default function GeneradorCartonesBingoPage() {
               </button>
             </div>
 
-            <div className={styles.panelNumeros} aria-label="Números cantados">
-              {Array.from({ length: totalBolas }, (_, i) => i + 1).map((n) => (
-                <span key={n} className={cantados.includes(n) ? styles.numeroCantado : styles.numero}>
-                  {n}
-                </span>
-              ))}
+            {/* El panel visual distingue lo cantado solo por el color; el lector de pantalla recibe
+                la misma información como lista de lo cantado, de menor a mayor (hallazgo 5120). */}
+            <div role="group" aria-label="Números cantados">
+              <p className={styles.srOnly}>
+                {cantados.length === 0
+                  ? 'Todavía no se ha cantado ningún número.'
+                  : `${cantados.length} cantados, de menor a mayor: ${cantadosOrdenados.join(', ')}.`}
+              </p>
+              <div className={styles.panelNumeros} aria-hidden="true">
+                {Array.from({ length: totalBolas }, (_, i) => i + 1).map((n) => (
+                  <span key={n} className={cantados.includes(n) ? styles.numeroCantado : styles.numero}>
+                    {n}
+                  </span>
+                ))}
+              </div>
             </div>
 
             <p className={styles.pista}>
