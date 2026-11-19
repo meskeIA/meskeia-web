@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styles from './TestZaritCuidador.module.css';
 import {
   MeskeiaLogo,
@@ -67,15 +67,29 @@ export default function TestZaritCuidadorPage() {
 
   const handleRespuesta = (preguntaIdx: number, valor: number) => {
     setRespuestas(prev => ({ ...prev, [preguntaIdx]: valor }));
-    // Avanzar automáticamente a la siguiente pregunta
-    if (preguntaActual < totalPreguntas - 1) {
-      setTimeout(() => setPreguntaActual(prev => prev + 1), 400);
+    // Avanzar automáticamente a la siguiente pregunta, pero solo desde la que se contestó: con
+    // «prev + 1», dos clics en 400 ms (doble clic, corregir la respuesta o pulsar «Siguiente»)
+    // programaban dos avances y la pregunta siguiente se saltaba sin aviso (hallazgo 5183)
+    if (preguntaIdx < totalPreguntas - 1) {
+      setTimeout(() => setPreguntaActual(prev => (prev === preguntaIdx ? preguntaIdx + 1 : prev)), 400);
     }
   };
+
+  // Al cambiar de fase el botón pulsado desaparece y el foco caía a <body>: se lleva al título
+  // del resultado o, al repetir, a la pregunta (hallazgo 5184)
+  const tituloResultadoRef = useRef<HTMLHeadingElement>(null);
+  const preguntaRef = useRef<HTMLDivElement>(null);
+  const [focoPendiente, setFocoPendiente] = useState<'resultado' | 'pregunta' | null>(null);
+  useEffect(() => {
+    if (focoPendiente === 'resultado') tituloResultadoRef.current?.focus();
+    if (focoPendiente === 'pregunta') preguntaRef.current?.focus();
+    if (focoPendiente) setFocoPendiente(null);
+  }, [focoPendiente]);
 
   const calcularResultados = () => {
     if (respondidas < totalPreguntas) return;
     setMostrarResultados(true);
+    setFocoPendiente('resultado');
     setTimeout(() => {
       const el = document.getElementById('resultados');
       el?.scrollIntoView({ behavior: 'smooth' });
@@ -86,6 +100,7 @@ export default function TestZaritCuidadorPage() {
     setRespuestas({});
     setMostrarResultados(false);
     setPreguntaActual(0);
+    setFocoPendiente('pregunta');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -183,7 +198,7 @@ export default function TestZaritCuidadorPage() {
 
             {/* Pregunta actual */}
             <div className={styles.tarjetaPregunta}>
-              <div className={styles.numeroPregunta}>
+              <div className={styles.numeroPregunta} ref={preguntaRef} tabIndex={-1}>
                 Pregunta {preguntaActual + 1}
               </div>
               <p className={styles.textoPregunta}>
@@ -255,7 +270,7 @@ export default function TestZaritCuidadorPage() {
         {/* Resultados */}
         {mostrarResultados && (
           <section id="resultados" className={styles.resultadosSection}>
-            <h2 className={styles.resultadosTitulo}>
+            <h2 className={styles.resultadosTitulo} ref={tituloResultadoRef} tabIndex={-1}>
               <span aria-hidden="true">📊</span> Tu resultado
             </h2>
             <p className={styles.resultadosSubtitulo}>
@@ -356,7 +371,9 @@ export default function TestZaritCuidadorPage() {
                 </div>
               </div>
 
-              <div className={styles.emergencyBox} role="alert">
+              {/* Sin rol de alerta: es una caja fija, no un aviso que aparece, y era lo único que se
+                  anunciaba al ver el resultado, antes que el propio resultado (hallazgo 5184) */}
+              <div className={styles.emergencyBox}>
                 <strong>Si necesitas ayuda urgente:</strong>{' '}
                 <span className={styles.emergencyNumber}>024</span> (conducta suicida) ·{' '}
                 <span className={styles.emergencyNumber}>112</span> (emergencias)
@@ -643,8 +660,13 @@ export default function TestZaritCuidadorPage() {
               <div className={styles.faqItem}>
                 <h3>¿El cuidador no profesional cotiza a la Seguridad Social?</h3>
                 <p>
-                  Sí. Desde 2023, el Estado cubre el 100% de la cotización mediante convenio especial.
-                  El cuidador queda protegido por jubilación, incapacidad temporal y muerte/supervivencia.
+                  {/* RDL 6/2019 (disposición adicional 14.ª de la LGSS) y RD 615/2007, art. 3, leídos
+                      en el BOE el 19/11/2026 (hallazgo 5182): la incapacidad temporal no está */}
+                  Puede hacerlo mediante un convenio especial con la Seguridad Social. Desde el
+                  1 de abril de 2019 las cuotas las abona el IMSERSO (Real Decreto-ley 6/2019). Ese
+                  convenio protege a efectos de jubilación, incapacidad permanente y muerte y
+                  supervivencia (Real Decreto 615/2007, art. 3); no cubre la incapacidad temporal, así
+                  que no da derecho a una baja pagada.
                 </p>
               </div>
               <div className={styles.faqItem}>

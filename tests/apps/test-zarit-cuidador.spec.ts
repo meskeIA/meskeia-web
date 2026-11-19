@@ -160,39 +160,42 @@ test.describe('Test de Zarit — la puntuación y su nivel', () => {
     await expect(page.getByText('NO constituye diagnóstico clínico')).toBeVisible();
   });
 
-  test('HALLAZGO · el FAQPage da los cortes de la versión que usa la app (22-110: 46 / 47-55 / 56)', async ({ page }) => {
-    // ABIERTO: la respuesta a «¿Qué puntuación indica sobrecarga intensa en el test de Zarit?» dice
+  test('HALLAZGO 5181 (REPARADO 19/11/2026) · el FAQPage da los cortes de la versión que usa la app (22-110: 46 / 47-55 / 56)', async ({ page }) => {
+    // REPARADO; los cortes salen ahora de ESCALA_ZARIT_NIVELES. Era: la respuesta a «¿Qué puntuación indica sobrecarga intensa en el test de Zarit?» dice
     // «En la versión de 22 ítems con puntuación de 0 a 88, una puntuación igual o superior a 47
     // indica sobrecarga intensa. Entre 46 y 47 se considera sobrecarga leve o moderada, y por
     // debajo de 46 se interpreta como ausencia de sobrecarga». La app puntúa 1-5 (22-110) y su
     // módulo y su tabla dicen intensa 56-110 y leve 47-55. En la escala 0-88 que declara el FAQ
     // (cada ítem una unidad menos: total − 22), un 40 equivale a 62 → intensa para la app, y el
     // FAQ lo da por «ausencia de sobrecarga».
-    test.fail();
     const p = (await faqJsonLd(page)).find((q) => q.name.includes('sobrecarga intensa'));
     expect(p, 'la pregunta de los cortes').toBeDefined();
     const texto = p!.acceptedAnswer.text;
     expect(texto).not.toContain('0 a 88');
     expect(texto).toMatch(/56/);
     expect(texto).toMatch(/47\s*(?:y|a|-|–)\s*55/);
+    expect(texto).toContain('Sobrecarga intensa: de 56 a 110');
+    expect(texto).toContain('Sin sobrecarga: de 22 a 46');
   });
 
-  test('HALLAZGO · la FAQ visible da bien la protección del convenio especial del cuidador', async ({ page }) => {
-    // ABIERTO: «Desde 2023, el Estado cubre el 100% de la cotización mediante convenio especial.
+  test('HALLAZGO 5182 (REPARADO 19/11/2026) · la FAQ visible da bien la protección del convenio especial del cuidador', async ({ page }) => {
+    // REPARADO; era: «Desde 2023, el Estado cubre el 100% de la cotización mediante convenio especial.
     // El cuidador queda protegido por jubilación, incapacidad temporal y muerte/supervivencia.»
     // RD 615/2007, art. 3 (BOE, texto consolidado): la asimilación al alta «será a efectos de las
     // prestaciones de jubilación y de incapacidad permanente y muerte y supervivencia»; la
     // incapacidad temporal no aparece. RDL 6/2019, disp. adic. 14.ª: «A partir del 1 de abril de
     // 2019, los convenios especiales que se suscriban…», con las cuotas abonadas «conjunta y
     // directamente por el Instituto de Mayores y Servicios Sociales (IMSERSO)»: no desde 2023.
-    test.fail();
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const item = page.locator('h3', { hasText: '¿El cuidador no profesional cotiza a la Seguridad Social?' }).locator('xpath=..');
     await expect(item).toBeVisible();
     const texto = (await item.textContent()) ?? '';
-    expect(texto).not.toContain('incapacidad temporal');
+    // La IT puede nombrarse para decir que NO está; lo que no puede es contarse entre lo que protege
+    expect(texto).not.toMatch(/proteg\w*[^.;]*incapacidad temporal/);
     expect(texto).toContain('incapacidad permanente');
     expect(texto).not.toContain('Desde 2023');
+    expect(texto).toContain('Desde el 1 de abril de 2019 las cuotas las abona el IMSERSO');
+    expect(texto).toContain('no cubre la incapacidad temporal');
   });
 
   test('la FAQ visible da bien la excedencia y la reducción de jornada (ET arts. 46.3 y 37.6)', async ({ page }) => {
@@ -206,23 +209,27 @@ test.describe('Test de Zarit — la puntuación y su nivel', () => {
     expect(texto).toContain('art. 37.6 ET');
   });
 
-  test('HALLAZGO · un doble clic en una respuesta no se salta la pregunta siguiente', async ({ page }) => {
-    // ABIERTO: cada clic en una opción programa un setTimeout(400 ms) que hace «actual + 1»; dos
+  test('HALLAZGO 5183 (REPARADO 19/11/2026) · un doble clic en una respuesta no se salta la pregunta siguiente', async ({ page }) => {
+    // REPARADO: el avance solo se da si sigue en la pregunta contestada. Era: cada clic en una opción programa un setTimeout(400 ms) que hace «actual + 1»; dos
     // clics (doble clic, o corregir la respuesta antes de 400 ms, o «Siguiente →» justo después de
     // responder) programan dos avances. Medido: doble clic en «3 A veces» de la pregunta 1 →
     // «Pregunta 3 de 22» con «1 de 22 respondidas»: la 2 se salta sin aviso.
-    test.fail();
     await opcion(page, 3).dblclick();
     await page.waitForTimeout(1000);
     await expect(page.getByText(/^Pregunta \d+ de 22$/)).toHaveText('Pregunta 2 de 22');
+    // Responder y pulsar «Siguiente →» enseguida tampoco salta: de la 2 a la 3, no a la 4
+    await opcion(page, 2).click();
+    await page.getByRole('button', { name: 'Siguiente →' }).click();
+    await page.waitForTimeout(1000);
+    await expect(page.getByText(/^Pregunta \d+ de 22$/)).toHaveText('Pregunta 3 de 22');
   });
 
-  test('HALLAZGO · al ver el resultado el foco va al resultado, no a <body>', async ({ page }) => {
-    // ABIERTO: «Ver resultado» desmonta el cuestionario (con el botón pulsado dentro) y monta
+  test('HALLAZGO 5184 (REPARADO 19/11/2026) · al ver el resultado el foco va al resultado, no a <body>', async ({ page }) => {
+    // REPARADO: el foco va al título «Tu resultado» y, al repetir, a la pregunta 1; la caja del
+    // 024/112 ya no lleva rol de alerta. Era: «Ver resultado» desmonta el cuestionario (con el botón pulsado dentro) y monta
     // #resultados sin mover el foco ni anunciar la cifra: document.activeElement = BODY. Lo único
     // que anuncia el lector es la caja role="alert" de «Si necesitas ayuda urgente: 024 … 112»,
     // que es contenido estático. Igual con «Repetir el test»: el foco vuelve a <body>.
-    test.fail();
     test.setTimeout(TIEMPO_RECORRIDO);
     await responder(page, CICLICO);
     await verResultado(page);
@@ -231,6 +238,11 @@ test.describe('Test de Zarit — la puntuación y su nivel', () => {
       () => document.getElementById('resultados')?.contains(document.activeElement) ?? false,
     );
     expect(dentro, 'el foco está dentro de #resultados').toBe(true);
+    await expect(page.locator('#resultados [role="alert"]')).toHaveCount(0);
+    await page.getByRole('button', { name: /Repetir el test/ }).click();
+    await expect(page.getByText(/^Pregunta \d+ de 22$/)).toHaveText('Pregunta 1 de 22');
+    const tag = await page.evaluate(() => document.activeElement?.tagName ?? 'NADA');
+    expect(tag, 'tras repetir, el foco no cae a <body>').not.toBe('BODY');
   });
 
   test('HALLAZGO · las marcas «46» y «55» de la barra están en su punto de corte', async ({ page }) => {

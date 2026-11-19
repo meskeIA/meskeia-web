@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { ESCALA_ZARIT_NIVELES } from '@/data/fiscal';
 
 export const metadata: Metadata = {
   title: 'Test de Zarit - Sobrecarga del Cuidador | meskeIA',
@@ -60,7 +61,9 @@ export const faqJsonLd = {
       name: '¿Qué puntuación indica sobrecarga intensa en el test de Zarit?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En la versión de 22 ítems con puntuación de 0 a 88, una puntuación igual o superior a 47 indica sobrecarga intensa. Entre 46 y 47 se considera sobrecarga leve o moderada, y por debajo de 46 se interpreta como ausencia de sobrecarga. Estas umbrales son orientativos: la interpretación definitiva debe realizarla un profesional de salud o servicios sociales.',
+        // Cortes derivados de ESCALA_ZARIT_NIVELES, los mismos que usa la página: escritos a mano
+        // daban otra escala (0-88) y otros cortes (hallazgo 5181)
+        text: `En la versión de 22 ítems que usa este test, cada respuesta vale de 1 a 5 y el total va de ${ESCALA_ZARIT_NIVELES[0].puntuacionDesde} a ${ESCALA_ZARIT_NIVELES[ESCALA_ZARIT_NIVELES.length - 1].puntuacionHasta}. ${ESCALA_ZARIT_NIVELES.map((n) => `${n.nombre}: de ${n.puntuacionDesde} a ${n.puntuacionHasta}`).join('; ')}. Estos umbrales son orientativos: la interpretación definitiva debe realizarla un profesional de salud o servicios sociales.`,
       },
     },
     {
