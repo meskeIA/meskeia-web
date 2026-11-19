@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './TestHabitos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { RESPUESTA_FAQ_HORAS_SUENO } from './metadata';
+import { enfocarALaVista } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
+import { RESPUESTA_FAQ_CAFE, RESPUESTA_FAQ_HORAS_SUENO } from './metadata';
 
 interface Question {
   id: string;
@@ -36,11 +38,14 @@ interface CategoryResult {
 }
 
 const CATEGORIES: Category[] = [
+  // Los siete colores llevan texto blanco encima (opción marcada, cabecera del área y etiqueta de
+  // nivel) en los dos temas: todos dan 4,5:1 o más con blanco (hallazgo 3925, 19/11/2026; antes
+  // #3498DB 3,15 · #27AE60 2,87 · #E67E22 2,85 · #E74C3C 3,82 · #1ABC9C 2,41 · #2E86AB 4,11).
   {
     id: 'hidratacion',
     name: 'Hidratación',
     icon: '💧',
-    color: '#3498DB',
+    color: '#1A6AA0', // 5,81:1
     questions: [
       {
         id: 'h1',
@@ -78,7 +83,7 @@ const CATEGORIES: Category[] = [
     id: 'alimentacion',
     name: 'Alimentación',
     icon: '🥗',
-    color: '#27AE60',
+    color: '#1E7A43', // 5,36:1
     questions: [
       {
         id: 'a1',
@@ -116,7 +121,7 @@ const CATEGORIES: Category[] = [
     id: 'actividad',
     name: 'Actividad Física',
     icon: '🏃',
-    color: '#E67E22',
+    color: '#A8530C', // 5,37:1
     questions: [
       {
         id: 'f1',
@@ -154,7 +159,7 @@ const CATEGORIES: Category[] = [
     id: 'descanso',
     name: 'Descanso y Sueño',
     icon: '😴',
-    color: '#9B59B6',
+    color: '#8E44AD', // 5,87:1
     questions: [
       {
         id: 'd1',
@@ -192,7 +197,7 @@ const CATEGORIES: Category[] = [
     id: 'tiempo',
     name: 'Gestión del Tiempo',
     icon: '⏰',
-    color: '#E74C3C',
+    color: '#C0392B', // 5,44:1
     questions: [
       {
         id: 't1',
@@ -230,7 +235,7 @@ const CATEGORIES: Category[] = [
     id: 'social',
     name: 'Conexión Social',
     icon: '👥',
-    color: '#1ABC9C',
+    color: '#11806A', // 4,86:1
     questions: [
       {
         id: 's1',
@@ -268,7 +273,7 @@ const CATEGORIES: Category[] = [
     id: 'personal',
     name: 'Tiempo Personal',
     icon: '🎯',
-    color: '#2E86AB',
+    color: '#26718F', // --primary-boton, 5,47:1
     questions: [
       {
         id: 'p1',
@@ -304,11 +309,29 @@ const CATEGORIES: Category[] = [
   },
 ];
 
-const getLevel = (percentage: number): string => {
-  if (percentage >= 80) return 'Frecuente';
-  if (percentage >= 60) return 'Ocasional';
-  if (percentage >= 40) return 'Poco frecuente';
-  return 'Casi nunca';
+type Tono = 'low' | 'medium' | 'high';
+
+/**
+ * El ÚNICO juego de tramos del resultado (hallazgo 3916, 19/11/2026): de él salen el nivel de cada
+ * área, el tono de su sugerencia y el mensaje global. Antes había tres (nivel 40/60/80, sugerencia y
+ * mensaje 50/75), y un 75 % salía «Ocasional» junto a «¡Excelente hidratación!».
+ */
+const TRAMOS: { min: number; nivel: string; tono: Tono }[] = [
+  { min: 80, nivel: 'Frecuente', tono: 'high' },
+  { min: 60, nivel: 'Ocasional', tono: 'medium' },
+  { min: 40, nivel: 'Poco frecuente', tono: 'low' },
+  { min: 0, nivel: 'Casi nunca', tono: 'low' },
+];
+
+const tramoDe = (percentage: number) =>
+  TRAMOS.find((t) => percentage >= t.min) ?? TRAMOS[TRAMOS.length - 1];
+
+const getLevel = (percentage: number): string => tramoDe(percentage).nivel;
+
+const MENSAJE_GLOBAL: Record<Tono, string> = {
+  high: '¡Excelente! Tus hábitos de vida son muy saludables.',
+  medium: 'Bien encaminado/a. Hay áreas donde puedes mejorar.',
+  low: 'Hay varias áreas con oportunidades de mejora.',
 };
 
 const getSuggestion = (categoryId: string, percentage: number): string => {
@@ -350,8 +373,7 @@ const getSuggestion = (categoryId: string, percentage: number): string => {
     },
   };
 
-  const level = percentage < 50 ? 'low' : percentage < 75 ? 'medium' : 'high';
-  return suggestions[categoryId]?.[level] || '';
+  return suggestions[categoryId]?.[tramoDe(percentage).tono] || '';
 };
 
 export default function TestHabitosPage() {
@@ -359,6 +381,24 @@ export default function TestHabitosPage() {
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [results, setResults] = useState<CategoryResult[]>([]);
+
+  // Al cambiar de fase o de área, el foco va al título del área nueva o a la puntuación global, y la
+  // página sube a ellos si no se ven (hallazgos 3926 y 3927, 19/11/2026): antes el botón pulsado se
+  // desmontaba (o se deshabilitaba) y el foco caía a <body>, y la vista se quedaba en el final del
+  // área nueva o de los resultados.
+  const tituloAreaRef = useRef<HTMLHeadingElement>(null);
+  const puntuacionRef = useRef<HTMLDivElement>(null);
+  const focoPendiente = useRef<'area' | 'resultados' | null>(null);
+  // Como la página ahora se mueve al cambiar de área, el 2.º toque de un doble toque caería sobre
+  // una opción del área nueva: la guarda lo ignora (receta de la familia de quizzes, C0082).
+  const marcarCambioPantalla = useGuardaRafaga();
+
+  useEffect(() => {
+    const destino = focoPendiente.current;
+    if (!destino) return;
+    focoPendiente.current = null;
+    enfocarALaVista(destino === 'area' ? tituloAreaRef.current : puntuacionRef.current);
+  }, [currentStep, currentCategoryIndex]);
 
   const currentCategory = CATEGORIES[currentCategoryIndex];
   const totalQuestions = CATEGORIES.reduce((acc, cat) => acc + cat.questions.length, 0);
@@ -374,17 +414,28 @@ export default function TestHabitosPage() {
   };
 
   const nextCategory = () => {
+    marcarCambioPantalla();
     if (currentCategoryIndex < CATEGORIES.length - 1) {
+      focoPendiente.current = 'area';
       setCurrentCategoryIndex(prev => prev + 1);
     } else {
+      focoPendiente.current = 'resultados';
       calculateResults();
     }
   };
 
   const prevCategory = () => {
     if (currentCategoryIndex > 0) {
+      marcarCambioPantalla();
+      focoPendiente.current = 'area';
       setCurrentCategoryIndex(prev => prev - 1);
     }
+  };
+
+  const comenzar = () => {
+    marcarCambioPantalla();
+    focoPendiente.current = 'area';
+    setCurrentStep('test');
   };
 
   const calculateResults = () => {
@@ -470,7 +521,7 @@ export default function TestHabitosPage() {
             <button
               type="button"
               className={styles.btnStart}
-              onClick={() => setCurrentStep('test')}
+              onClick={comenzar}
             >
               Comenzar Test
             </button>
@@ -507,7 +558,9 @@ export default function TestHabitosPage() {
             style={{ backgroundColor: currentCategory.color }}
           >
             <span className={styles.categoryIcon} aria-hidden="true">{currentCategory.icon}</span>
-            <h2 className={styles.categoryName}>{currentCategory.name}</h2>
+            <h2 ref={tituloAreaRef} tabIndex={-1} className={styles.categoryName}>
+              {currentCategory.name}
+            </h2>
           </div>
 
           {/* Questions */}
@@ -567,18 +620,12 @@ export default function TestHabitosPage() {
       {/* Results */}
       {currentStep === 'results' && (
         <div className={styles.resultsSection}>
-          <div className={styles.overallScore}>
+          <div ref={puntuacionRef} tabIndex={-1} className={styles.overallScore}>
             <div className={styles.scoreCircle}>
               <span className={styles.scoreValue}>{getOverallScore()}%</span>
               <span className={styles.scoreLabel}>Puntuación Global</span>
             </div>
-            <p className={styles.scoreMessage}>
-              {getOverallScore() >= 75
-                ? '¡Excelente! Tus hábitos de vida son muy saludables.'
-                : getOverallScore() >= 50
-                ? 'Bien encaminado/a. Hay áreas donde puedes mejorar.'
-                : 'Hay varias áreas con oportunidades de mejora.'}
-            </p>
+            <p className={styles.scoreMessage}>{MENSAJE_GLOBAL[tramoDe(getOverallScore()).tono]}</p>
           </div>
 
           <h2 className={styles.resultsTitle}><span aria-hidden="true">📊</span> Tu Perfil de Hábitos</h2>
@@ -628,7 +675,9 @@ export default function TestHabitosPage() {
         <ul className={styles.disclaimerList}>
           <li><strong>No constituye un diagnóstico médico</strong>: Los resultados son informativos, no diagnósticos</li>
           <li><strong>Consulta con profesionales</strong>: Para una evaluación completa de tu estado de salud, acude a tu médico o nutricionista</li>
+          <li><strong>Antes de cambiar hábitos</strong>: Consulta siempre con tu médico o especialista antes de realizar cambios significativos en tu salud o hábitos, sobre todo si tienes alguna condición de salud previa</li>
         </ul>
+        <p>meskeIA no se responsabiliza de decisiones basadas en el uso de esta herramienta.</p>
       </DisclaimerCard>
 
       <EducationalSection
@@ -644,39 +693,30 @@ export default function TestHabitosPage() {
                 <th>Área</th>
                 <th>Hábito clave</th>
                 <th>Beneficio principal</th>
-                <th>Tiempo mínimo</th>
               </tr>
             </thead>
+            {/* Sin la columna «Tiempo mínimo» ni la fila de 10 min de meditación: cifras sin fuente
+                ni año (hallazgo 3924, regla 1 de neutralidad editorial). */}
             <tbody>
               <tr>
                 <td><strong>Sueño</strong></td>
                 <td>7-9 h regulares</td>
                 <td>Memoria, inmunidad, peso</td>
-                <td>Inmediato</td>
               </tr>
               <tr>
                 <td><strong>Ejercicio</strong></td>
                 <td>150 min/semana moderado</td>
                 <td>Cardiovascular, estado de ánimo</td>
-                <td>2-4 semanas</td>
               </tr>
               <tr>
                 <td><strong>Nutrición</strong></td>
                 <td>5 raciones fruta/verdura</td>
                 <td>Micronutrientes, digestión</td>
-                <td>1-2 semanas</td>
               </tr>
               <tr>
                 <td><strong>Hidratación</strong></td>
                 <td>Total recomendado EFSA: ~2 L (mujeres) / 2,5 L (hombres) contando alimentos y bebidas — variable según clima y actividad</td>
                 <td>Concentración, piel, riñones</td>
-                <td>24-48 horas</td>
-              </tr>
-              <tr>
-                <td><strong>Gestión estrés</strong></td>
-                <td>10 min meditación/día</td>
-                <td>Cortisol, presión arterial</td>
-                <td>4-8 semanas</td>
               </tr>
             </tbody>
           </table>
@@ -724,19 +764,19 @@ export default function TestHabitosPage() {
           </div>
           <div className={styles.eduFaqItem}>
             <dt className={styles.eduFaqPregunta}>¿Realmente importa cuándo como, no solo qué como?</dt>
-            <dd className={styles.eduFaqRespuesta}>Sí. La crononutrición muestra que comer tarde altera el ritmo circadiano y el metabolismo. Cenar antes de las 20:00 y hacer ayuno nocturno de 12 h se asocia con mejor control glucémico.</dd>
+            <dd className={styles.eduFaqRespuesta}>Puede importar. La crononutrición estudia cómo el horario de las comidas se relaciona con el ritmo circadiano y el metabolismo. Es un campo de investigación activo y sus recomendaciones concretas de horario todavía se discuten.</dd>
           </div>
           <div className={styles.eduFaqItem}>
             <dt className={styles.eduFaqPregunta}>¿Qué ejercicio es mejor para empezar?</dt>
-            <dd className={styles.eduFaqRespuesta}>Caminar 30 minutos diarios es la intervención con mejor relación esfuerzo-beneficio para sedentarios. La OMS recomienda 150-300 min/semana de actividad moderada o 75-150 min intensa.</dd>
+            <dd className={styles.eduFaqRespuesta}>Caminar es una forma accesible de empezar si llevas una vida sedentaria. La OMS recomienda 150-300 min/semana de actividad moderada o 75-150 min intensa.</dd>
           </div>
           <div className={styles.eduFaqItem}>
             <dt className={styles.eduFaqPregunta}>¿Las pantallas antes de dormir afectan realmente?</dt>
-            <dd className={styles.eduFaqRespuesta}>Sí. La luz azul suprime la melatonina hasta 3 horas. Evita pantallas 1 h antes de dormir o usa filtros de luz azul desde las 20:00. Esto también mejora la calidad de sueño profundo.</dd>
+            <dd className={styles.eduFaqRespuesta}>Pueden afectar. La luz de las pantallas por la noche puede retrasar la liberación de melatonina y la hora de dormirse. Reducir su uso en el rato previo a acostarte es una medida sencilla de probar.</dd>
           </div>
           <div className={styles.eduFaqItem}>
             <dt className={styles.eduFaqPregunta}>¿Es malo tomar café?</dt>
-            <dd className={styles.eduFaqRespuesta}>No con moderación. Hasta 3-4 tazas al día (400 mg cafeína) es seguro para la mayoría de adultos. El problema es tomarlo después de las 14:00: su vida media de 5-6 h altera el sueño nocturno.</dd>
+            <dd className={styles.eduFaqRespuesta}>{RESPUESTA_FAQ_CAFE}</dd>
           </div>
           <div className={styles.eduFaqItem}>
             <dt className={styles.eduFaqPregunta}>¿Cómo sé si tengo estrés crónico?</dt>
@@ -765,7 +805,7 @@ export default function TestHabitosPage() {
           </li>
           <li className={styles.eduPaso}>
             <span className={styles.eduPasoNum}>5</span>
-            <div><strong>Semana 5 — Aumenta gradualmente:</strong> Si caminas 10 min, pasa a 15. El incremento del 10% semanal es sostenible y evita abandono.</div>
+            <div><strong>Semana 5 — Aumenta gradualmente:</strong> Si caminas 10 min, pasa a 15. Sube poco a poco, a un ritmo que puedas mantener.</div>
           </li>
           <li className={styles.eduPaso}>
             <span className={styles.eduPasoNum}>6</span>
@@ -778,7 +818,7 @@ export default function TestHabitosPage() {
         <div className={styles.eduTipsGrid}>
           <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">🎯</span><p>Un hábito a la vez. El «todo o nada» es la principal causa de abandono.</p></div>
           <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">📅</span><p>Misma hora, mismo lugar. La consistencia contextual acelera la automatización.</p></div>
-          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">👥</span><p>Comparte tu objetivo con alguien. La responsabilidad social duplica la adherencia.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">👥</span><p>Comparte tu objetivo con alguien: contarlo puede ayudarte a mantenerlo.</p></div>
           <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">⚡</span><p>Prepara el entorno: zapatillas a la vista, fruta en la encimera, móvil fuera del dormitorio.</p></div>
           <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">🔄</span><p>Los fallos son normales. Fallar un día no rompe el hábito; abandonar tras el fallo, sí.</p></div>
           <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">🧠</span><p>Reencuadra la identidad: «soy una persona activa» funciona mejor que «intento hacer ejercicio».</p></div>

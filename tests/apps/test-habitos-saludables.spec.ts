@@ -12,11 +12,12 @@ import { test, expect, type Locator, type Page } from '@playwright/test';
  *   page.tsx puntúa cada opción por su posición: la 1.ª vale 1 punto y la 4.ª, 4. Por área:
  *       % = round(suma / 12 · 100)        → 3 → 25 · 4 → 33 · 5 → 42 · 6 → 50 · 7 → 58 · 8 → 67
  *                                            9 → 75 · 10 → 83 · 11 → 92 · 12 → 100
- *       nivel (getLevel)     ≥ 80 «Frecuente» · ≥ 60 «Ocasional» · ≥ 40 «Poco frecuente» · «Casi nunca»
- *       sugerencia           < 50 low · < 75 medium · resto high
- *   Global = round(media de los 7 % ya redondeados); mensaje ≥ 75 «¡Excelente!…» · ≥ 50
- *   «Bien encaminado/a…» · resto «Hay varias áreas…». (El doble redondeo no cambia de mensaje a
- *   ningún total: el error máximo es 7 · 0,33 / 7 = 0,33 puntos, y 62/84 = 73,8 + 0,33 < 74,5.)
+ *       Un solo juego de tramos (TRAMOS, desde el 19/11/2026, hallazgo 3916) para el nivel, la
+ *       sugerencia y el mensaje global:
+ *       ≥ 80 «Frecuente» + sugerencia high · ≥ 60 «Ocasional» + medium · ≥ 40 «Poco frecuente» +
+ *       low · resto «Casi nunca» + low
+ *   Global = round(media de los 7 % ya redondeados); mensaje ≥ 80 «¡Excelente!…» · ≥ 60
+ *   «Bien encaminado/a…» · resto «Hay varias áreas…». (Antes: sugerencia y mensaje con 50/75.)
  *   Cada caso se resolvió a mano ANTES de abrir el navegador:
  *     CASO 1  [3,3,2] [2,3,4] [1,2,2] [3,3,3] [2,2,2] [4,4,2] [1,3,2]
  *             = 8, 9, 5, 9, 6, 10, 6 → 67, 75, 42, 75, 50, 83, 50 → 442 / 7 = 63,14 → 63 %
@@ -230,7 +231,8 @@ test('CASO 3 — 75 % y 74 % globales: una sola respuesta cruza la frontera', as
   await hacerTest(page, Array(7).fill([3, 3, 3]));
   expect((await leerAreas(page)).map((a) => a.pct)).toEqual(Array(7).fill(75));
   expect(await leerGlobal(page)).toBe(75);
-  // El mensaje de 75 % es parte del hallazgo de umbrales (al final): aquí solo el número.
+  // 75 está en el tramo ≥ 60 (hallazgo 3916): el mismo que el nivel «Ocasional» de cada área.
+  await expect(mensajeGlobal(page)).toHaveText('Bien encaminado/a. Hay áreas donde puedes mejorar.');
 
   await abrir(page);
   await hacerTest(page, [...Array(6).fill([3, 3, 3]), [3, 3, 2]]);
@@ -355,12 +357,11 @@ test.describe('móvil 390 × 844', () => {
     expect(await desborde()).toBe(0);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · tras «Siguiente» el área nueva queda por encima de la pantalla, y tras «Ver Resultados» la puntuación global', async ({ page }) => {
+  test('HALLAZGO 3927 (02/11/2026, REPARADO 19/11/2026) · tras «Siguiente» el área nueva quedaba por encima de la pantalla, y tras «Ver Resultados» la puntuación global', async ({ page }) => {
     // Medido: con «Siguiente» a la vista, scrollY = 945 y la cabecera del área 2 en y = −471; al
-    // terminar, el círculo de la puntuación global en y = −1.223. La página no se mueve al
-    // cambiar de fase: se ve el final del área nueva (o de los resultados) y hay que subir a
-    // buscar el principio, seis veces y una más. Receta del catálogo: `traerALaVista` de lib/cromoFijo.
-    test.fail();
+    // terminar, el círculo de la puntuación global en y = −1.223. La página no se movía al
+    // cambiar de fase. Ahora `enfocarALaVista` (lib/cromoFijo) sube al título del área nueva y a
+    // la puntuación global, y les lleva el foco.
     await abrir(page);
     await botonComenzar(page).click();
     await contestarArea(page, [3, 3, 3]);
@@ -445,22 +446,33 @@ test('CASO 9 — el aviso médico no se pliega y la página sirve WebApplication
 // HALLAZGOS DEL 02/11/2026, ABIERTOS: cada test afirma lo correcto y hoy falla
 // ═══════════════════════════════════════════════════════════════════════════
 
-test('HALLAZGO (02/11/2026, ABIERTO) · el nivel de un área contradice a su sugerencia y al mensaje global', async ({ page }) => {
-  // Tres juegos de umbrales: nivel 40/60/80 (getLevel), sugerencia 50/75 (getSuggestion) y mensaje
-  // global 50/75. Con las 21 respuestas en la 3.ª opción (9/12 = 75 % en cada área) las siete
-  // tarjetas dicen «Ocasional» —el 2.º de 4 niveles— y a la vez «¡Excelente hidratación!»,
-  // «¡Fantástico nivel de actividad!»…, y arriba «¡Excelente! Tus hábitos de vida son muy
-  // saludables.». La sugerencia de nivel alto es la que empieza por «¡».
-  test.fail();
+test('HALLAZGO 3916 (02/11/2026, REPARADO 19/11/2026) · el nivel de un área contradecía a su sugerencia y al mensaje global', async ({ page }) => {
+  // Había tres juegos de umbrales: nivel 40/60/80 (getLevel), sugerencia 50/75 (getSuggestion) y
+  // mensaje global 50/75. Con las 21 respuestas en la 3.ª opción (9/12 = 75 % en cada área) las
+  // siete tarjetas decían «Ocasional» y a la vez «¡Excelente hidratación!»…, y arriba «¡Excelente!».
+  // Ahora uno solo (TRAMOS): 75 → «Ocasional», sugerencia media y «Bien encaminado/a».
   await abrir(page);
   await hacerTest(page, Array(7).fill([3, 3, 3]));
   const areas = await leerAreas(page);
   const contradictorias = areas.filter((a) => a.nivel === 'Ocasional' && a.sugerencia.startsWith('¡'));
   expect(contradictorias.map((a) => a.area)).toEqual([]);
-  const mensaje = await mensajeGlobal(page).innerText();
-  if (mensaje.startsWith('¡Excelente')) {
-    expect(areas.map((a) => a.nivel)).not.toEqual(Array(7).fill('Ocasional'));
-  }
+  expect(areas[0].sugerencia).toBe(
+    'Vas por buen camino. Prueba a beber un vaso de agua al despertar y antes de cada comida.',
+  );
+  await expect(mensajeGlobal(page)).toHaveText('Bien encaminado/a. Hay áreas donde puedes mejorar.');
+});
+
+test('HALLAZGO 3916 · CASO 1: el 50 % de Gestión del Tiempo es «Poco frecuente» con la sugerencia baja', async ({ page }) => {
+  // CASO 1 de la ficha: Gestión del Tiempo 6/12 = 50 % salía «Poco frecuente» junto a «Buen
+  // equilibrio. Sigue protegiendo tu tiempo personal.» (sugerencia media, umbral 50). Con TRAMOS,
+  // 50 cae en ≥ 40: «Poco frecuente» y la sugerencia baja.
+  await abrir(page);
+  await hacerTest(page, [[3, 3, 2], [2, 3, 4], [1, 2, 2], [3, 3, 3], [2, 2, 2], [4, 4, 2], [1, 3, 2]]);
+  const areas = await leerAreas(page);
+  expect(areas[4]).toMatchObject({
+    nivel: 'Poco frecuente',
+    sugerencia: 'Reserva bloques de tiempo en tu agenda específicamente para ti.',
+  });
 });
 
 test('HALLAZGO (02/11/2026, ABIERTO) · la pregunta de sueño no tiene opción para 6-7 horas', async ({ page }) => {
@@ -480,12 +492,10 @@ test('HALLAZGO (02/11/2026, ABIERTO) · la pregunta de sueño no tiene opción p
   expect(opciones.some((t) => /6\D{1,6}7/.test(t)), opciones.join(' · ')).toBe(true);
 });
 
-test('HALLAZGO (02/11/2026, ABIERTO) · el texto blanco de la opción marcada no llega a 4,5:1 en 6 de las 7 áreas', async ({ page }) => {
+test('HALLAZGO 3925 (02/11/2026, REPARADO 19/11/2026) · el texto blanco de la opción marcada no llegaba a 4,5:1 en 6 de las 7 áreas', async ({ page }) => {
   // Blanco sobre el color del área: 3,15 (Hidratación) · 2,87 (Alimentación) · 2,85 (Actividad) ·
-  // 4,67 (Descanso, la única que pasa) · 3,82 (Tiempo) · 2,41 (Social) · 4,11 (Personal). Texto de
-  // 14,4 px y peso 400: exige 4,5:1. Los colores son literales de CATEGORIES, fuera de
-  // `check:contraste-marca`, que solo mira la marca.
-  test.fail();
+  // 4,67 (Descanso, la única que pasaba) · 3,82 (Tiempo) · 2,41 (Social) · 4,11 (Personal). Texto de
+  // 14,4 px y peso 400: exige 4,5:1. Ahora los siete colores de CATEGORIES dan de 4,86 a 5,87:1.
   await abrir(page);
   await botonComenzar(page).click();
   const fallos: string[] = [];
@@ -504,10 +514,9 @@ test('HALLAZGO (02/11/2026, ABIERTO) · el texto blanco de la opción marcada no
   expect(fallos).toEqual([]);
 });
 
-test('HALLAZGO (02/11/2026, ABIERTO) · la etiqueta de nivel y la cabecera del área, blanco sobre el color del área', async ({ page }) => {
+test('HALLAZGO 3925 (02/11/2026, REPARADO 19/11/2026) · la etiqueta de nivel y la cabecera del área, blanco sobre el color del área', async ({ page }) => {
   // La etiqueta (12 px, 600) y el <h2> de la cabecera (20,8 px, 600: no es texto grande, que pide
-  // 24 px o 18,66 px en negrita) usan el mismo blanco sobre los mismos siete colores.
-  test.fail();
+  // 24 px o 18,66 px en negrita) usan el mismo blanco sobre los mismos siete colores, ya oscurecidos.
   await abrir(page);
   await botonComenzar(page).click();
   const cabecera = await page.locator('[class*="categoryHeader"]').evaluate((el) => ({
@@ -531,10 +540,9 @@ test('HALLAZGO (02/11/2026, ABIERTO) · la etiqueta de nivel y la cabecera del �
   expect(fallos).toEqual([]);
 });
 
-test('HALLAZGO (02/11/2026, ABIERTO) · «Comenzar Test» y «Ver Resultados» dejan el foco en <body>', async ({ page }) => {
-  // Los dos botones se desmontan al cambiar de fase y el foco cae a <body>: con teclado o lector
-  // de pantalla se vuelve al principio de la página y no se oye la primera pregunta ni el resultado.
-  test.fail();
+test('HALLAZGO 3926 (02/11/2026, REPARADO 19/11/2026) · «Comenzar Test» y «Ver Resultados» dejaban el foco en <body>', async ({ page }) => {
+  // Los dos botones se desmontan al cambiar de fase y el foco caía a <body>. Ahora va al título del
+  // área (<h2 tabindex="-1">) y a la puntuación global.
   await abrir(page);
   await botonComenzar(page).focus();
   await page.keyboard.press('Enter');
@@ -556,11 +564,10 @@ test('HALLAZGO (02/11/2026, ABIERTO) · «Comenzar Test» y «Ver Resultados» d
   ).toBe(true);
 });
 
-test('HALLAZGO (02/11/2026, ABIERTO) · tras «Siguiente» con teclado, el Tabulador salta las preguntas del área nueva', async ({ page }) => {
-  // El foco se queda en «Siguiente», que pasa a deshabilitado; el siguiente Tab va a «Ver guía
-  // educativa», DESPUÉS del área: las 12 opciones nuevas quedan detrás y el cambio de área no se
-  // anuncia. Correcto: el siguiente Tab cae en una opción del área nueva.
-  test.fail();
+test('HALLAZGO 3926 (02/11/2026, REPARADO 19/11/2026) · tras «Siguiente» con teclado, el Tabulador saltaba las preguntas del área nueva', async ({ page }) => {
+  // El foco se quedaba en «Siguiente», que pasa a deshabilitado; el siguiente Tab iba a «Ver guía
+  // educativa», DESPUÉS del área. Ahora el foco va al título del área nueva (que se anuncia) y el
+  // siguiente Tab cae en una opción.
   await abrir(page);
   await botonComenzar(page).click();
   await contestarArea(page, [2, 2, 2]);
@@ -572,6 +579,8 @@ test('HALLAZGO (02/11/2026, ABIERTO) · tras «Siguiente» con teclado, el Tabul
     await page.evaluate(() => !!document.activeElement?.closest('[class*="questionCard"]')),
     'el Tab siguiente cae en una opción del área 2',
   ).toBe(true);
+  // La primera opción de la primera pregunta del área 2 (Alimentación, «¿Cuántas porciones…?»)
+  await expect(page.locator(':focus')).toHaveText('Menos de 2');
 });
 
 test('HALLAZGO 3929 (02/11/2026, REPARADO 07/11/2026) · los iconos de área junto a su nombre llevan aria-hidden', async ({ page }) => {
@@ -605,32 +614,30 @@ test('HALLAZGO (02/11/2026, ABIERTO) · el porcentaje se pega a la cifra («63%�
   await expect(page.locator('[class*="resultPercent"]').first()).toHaveText('67 %');
 });
 
-test('HALLAZGO (02/11/2026, ABIERTO) · el aviso visible no trae la descarga de responsabilidad del nivel 2', async ({ page }) => {
+test('HALLAZGO 3918 (02/11/2026, REPARADO 19/11/2026) · el aviso visible no traía la descarga de responsabilidad del nivel 2', async ({ page }) => {
   // El texto propio del DisclaimerCard SUSTITUYE al estándar del componente (variante médica,
   // nivel 2: «Consulta siempre con tu médico o especialista antes de realizar cambios
   // significativos en tu salud o hábitos» + «meskeIA no se responsabiliza de decisiones…»), y
-  // no trae ni lo uno ni lo otro. Lo equivalente («Cambios drásticos de dieta o ejercicio sin
-  // supervisión…», «Si tienes condiciones de salud preexistentes, consulta a tu médico antes de
-  // modificar hábitos») vive solo en el aviso del bloque educativo, que nace plegado.
-  test.fail();
+  // no traía ni lo uno ni lo otro: lo equivalente vivía solo en el bloque educativo, plegado.
+  // Ahora la tarjeta visible trae las dos piezas.
   await abrir(page);
   const aviso = page.getByRole('note').filter({ hasText: 'Aviso Médico Importante' });
   await expect(aviso).toContainText('no se responsabiliza');
   await expect(aviso).toContainText(/antes de (realizar cambios|modificar)/);
+  await expect(aviso).toBeVisible();
 });
 
-test('HALLAZGO (02/11/2026, ABIERTO) · la FAQPage da «1,5 a 2 litros» de agua sin fuente, contra la cifra EFSA de la página', async ({ page }) => {
+test('HALLAZGO 3919 (02/11/2026, REPARADO 19/11/2026) · la FAQPage daba «1,5 a 2 litros» de agua sin fuente, contra la cifra EFSA de la página', async ({ page }) => {
   // La página dice «Total recomendado EFSA: ~2 L (mujeres) / 2,5 L (hombres) contando alimentos
   // y bebidas» (corregido así en 7f116989, 12/05/2026, que quitó «1,5-2 L agua/día»). La FAQPage,
-  // de 29/05/2026 (148f545f), volvió a servir a buscadores e IAs la cifra retirada, sin fuente
-  // ni distinción por sexo.
-  test.fail();
+  // de 29/05/2026 (148f545f), volvió a servir la cifra retirada. Ahora da la de la tabla.
   await page.goto(RUTA);
   const agua = (await faqLd(page)).find((q) => /agua/i.test(q.name));
   expect(agua, 'la FAQPage tiene la pregunta del agua').toBeTruthy();
   const texto = (agua as PreguntaLd).acceptedAnswer.text;
   expect(texto).not.toContain('1,5 a 2 litros');
   if (/litro/i.test(texto)) expect(texto).toContain('EFSA');
+  expect(texto).toContain('2 litros de agua al día para las mujeres y 2,5 litros para los hombres');
 });
 
 test('HALLAZGO (02/11/2026, ABIERTO) · la FAQPage dice que el test mide «gestión del estrés» y calla dos de sus áreas', async ({ page }) => {
@@ -671,28 +678,34 @@ test('HALLAZGO (02/11/2026, ABIERTO) · el JSON-LD sale con `features` vacía', 
   expect(lista.length).toBeLessThanOrEqual(8);
 });
 
-test('HALLAZGO (02/11/2026, ABIERTO) · «hasta 400 mg de cafeína es seguro» sin fuente y sin el límite del embarazo', async ({ page }) => {
-  // EFSA (efsa.europa.eu/en/topics/topic/caffeine): 400 mg/día para adultos sanos, y 200 mg/día
-  // en embarazo y lactancia. La FAQ visible dice «Hasta 3-4 tazas al día (400 mg cafeína) es
-  // seguro para la mayoría de adultos» y calla el segundo límite.
-  test.fail();
+test('HALLAZGO 3923 (02/11/2026, REPARADO 19/11/2026) · «hasta 400 mg de cafeína es seguro» sin fuente y sin el límite del embarazo', async ({ page }) => {
+  // EFSA (efsa.europa.eu/en/topics/topic/caffeine, consultada el 19/11/2026): 400 mg/día para
+  // adultos sanos salvo embarazo, y 200 mg/día en el embarazo. La FAQ visible decía «Hasta 3-4 tazas
+  // al día (400 mg cafeína) es seguro…», callaba el segundo límite y daba sin fuente una hora de
+  // corte (14:00) y una vida media (5-6 h).
   await page.goto(RUTA);
   const cafe = page.locator('[data-guia-educativa] dd', { hasText: '400 mg' });
   await expect(cafe).toContainText(/embaraz/i);
   await expect(cafe).toContainText('EFSA');
+  await expect(cafe).toContainText('200 mg al día');
+  await expect(cafe).not.toContainText('14:00');
 });
 
-test('HALLAZGO (02/11/2026, ABIERTO) · cifras populares del bloque educativo sin fuente', async ({ page }) => {
+test('HALLAZGO 3924 (02/11/2026, REPARADO 19/11/2026) · cifras populares del bloque educativo sin fuente', async ({ page }) => {
   // Regla 1 de neutralidad editorial (CLAUDE.md §1.quinquies): cifra con fuente y año, o fuera.
-  // Cada frase de la lista, si sigue, tiene que llevar un año en su párrafo.
-  test.fail();
+  // Cada frase de la lista, si sigue, tiene que llevar un año en su párrafo. Salieron todas, y
+  // también la columna «Tiempo mínimo» y la fila de 10 min de meditación de la tabla.
   await page.goto(RUTA);
+  const tabla = page.locator('[data-guia-educativa] table');
+  await expect(tabla.locator('th')).toHaveText(['Área', 'Hábito clave', 'Beneficio principal']);
+  await expect(tabla).not.toContainText('meditación');
   const frases = [
     'duplica la adherencia',
     'incremento del 10',
     'suprime la melatonina hasta 3 horas',
     'antes de las 20:00',
     'mejor relación esfuerzo-beneficio',
+    '1 h antes de dormir',
   ];
   const sinFuente = await page.evaluate((lista) => {
     const bloques = Array.from(document.querySelectorAll('[data-guia-educativa] :is(p, dd, li)'));

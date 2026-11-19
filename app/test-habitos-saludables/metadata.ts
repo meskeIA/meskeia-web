@@ -45,6 +45,13 @@ export const jsonLd = generateWebAppSchema({
 export const RESPUESTA_FAQ_HORAS_SUENO =
   'La mayoría de los adultos necesitan entre 7 y 9 horas de sueño por noche, según las recomendaciones de la National Sleep Foundation. Dormir de forma consistente en ese rango se asocia con mejor memoria, regulación del estado de ánimo, control del peso y salud cardiovascular, y dormir menos de 6 horas de forma crónica se asocia con obesidad, diabetes tipo 2, deterioro cognitivo y mayor mortalidad. Las necesidades individuales varían: algunas personas se recuperan bien con 7 horas y otras necesitan 9.';
 
+// FAQ visible «¿Es malo tomar café?» (hallazgo 3923, 19/11/2026). Antes: «Hasta 3-4 tazas al día
+// (400 mg cafeína) es seguro…» sin fuente, sin el límite del embarazo y con una hora de corte
+// (14:00) y una vida media (5-6 h) sin fuente. Cifras de la página de la EFSA sobre la cafeína
+// (efsa.europa.eu/en/topics/topic/caffeine, consultada el 19/11/2026; dictamen del 27/05/2015).
+export const RESPUESTA_FAQ_CAFE =
+  'Con moderación, no. Según la EFSA (dictamen sobre la seguridad de la cafeína, 2015), hasta 400 mg de cafeína al día, sumando todas las fuentes, no plantean problemas de seguridad en adultos sanos, salvo en el embarazo, donde la referencia baja a 200 mg al día. La misma EFSA señala que una dosis de 100 mg puede afectar a la duración y al patrón del sueño en algunos adultos, sobre todo si se toma cerca de la hora de acostarse.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -62,7 +69,9 @@ export const faqJsonLd = {
       name: '¿Cuánta agua hay que beber al día para estar bien hidratado?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las recomendaciones generales hablan de unos 1,5 a 2 litros de agua al día para un adulto en condiciones normales, aunque la cantidad varía según el peso corporal, la actividad física, el clima y la dieta. El color de la orina es un indicador práctico: debe ser amarillo claro. La sensación de sed ya indica que hay cierto grado de deshidratación.',
+        // Hallazgo 3919 (19/11/2026): servía «1,5 a 2 litros» sin fuente, la cifra que la tabla de la
+        // página cambió por la de la EFSA el 12/05/2026 (7f116989). Ahora, la misma de la tabla.
+        text: 'La EFSA da como ingesta total de referencia unos 2 litros de agua al día para las mujeres y 2,5 litros para los hombres, contando el agua de los alimentos y de todas las bebidas, y la cantidad varía según la actividad física, el clima y la dieta. El color de la orina es un indicador práctico: debe ser amarillo claro. La sensación de sed ya indica que hay cierto grado de deshidratación.',
       },
     },
     {
