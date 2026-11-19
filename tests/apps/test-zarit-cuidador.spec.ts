@@ -309,14 +309,12 @@ test.describe('Test de Zarit — la puntuación y su nivel', () => {
     await expect(ref).not.toContainText('RD 1051/2013');
   });
 
-  test('CABO C0832 (1) · el resultado pinta los teléfonos de RECURSOS_CUIDADORES, cada uno con su organismo (SIN ANCLAR)', async ({ page }) => {
-    // SIN ANCLAR (19/11/2026): 901 109 899 y 900 123 700 salen de RECURSOS_CUIDADORES
-    // (data/fiscal/dependencia.ts), que no lleva fuente ni fecha de verificación propias; la fuente
-    // del META del módulo son normas (Ley 39/2006, LPGE 2025, RD 1051/2013…) y ninguna da teléfonos.
-    // imserso.es no está en la red de fuentes y el buscador del BOE no admitió la consulta por
-    // WebFetch: los números los comprueba el usuario a mano. Este caso NO los da por buenos: fija lo
-    // que pinta la app y a quién se lo atribuye, para que un cambio de número o de organismo
-    // obligue a volver a cotejarlo. Esperado literal: los valores del módulo.
+  test('CABO C0838 (antes C0832 (1)) · el teléfono del Imserso es el de su página de contacto y el 900 123 700 ya no sale', async ({ page }) => {
+    // ANCLADO (19/11/2026, cabo C0838, decidido por el usuario): https://imserso.es/contacto da un
+    // único teléfono, «+34 912 667 713». El 901 109 899 que pintaba la app solo sale en las memorias
+    // del Imserso de 2014 a 2019, y el 900 123 700 («Atención a la Dependencia», repetido en la
+    // recomendación de sobrecarga intensa) no lo atribuye a la dependencia ninguna fuente oficial:
+    // se retiró la tarjeta y la línea de la recomendación remite a los Servicios Sociales municipales.
     test.setTimeout(TIEMPO_RECORRIDO);
     await responder(page, CICLICO);
     await verResultado(page);
@@ -326,12 +324,16 @@ test.describe('Test de Zarit — la puntuación y su nivel', () => {
       .locator('xpath=..');
     const tarjeta = (organismo: string) =>
       recursos.locator('strong', { hasText: organismo }).locator('xpath=..');
-    await expect(tarjeta('IMSERSO')).toContainText('901 109 899');
-    await expect(tarjeta('Atención a la Dependencia')).toContainText('900 123 700');
-    // Con 63 puntos (sobrecarga intensa) la recomendación repite el 900 con otro nombre de servicio
-    await expect(page.locator('#resultados li', { hasText: '900 123 700' })).toHaveText(
-      'Teléfono de atención al cuidador: 900 123 700 (Línea de Atención a la Dependencia)',
+    await expect(tarjeta('IMSERSO')).toContainText('912 667 713');
+    await expect(tarjeta('IMSERSO').getByRole('link', { name: /Portal SAAD/ })).toHaveAttribute(
+      'href',
+      'https://imserso.es/el-saad',
     );
+    await expect(recursos.locator('strong', { hasText: 'Atención a la Dependencia' })).toHaveCount(0);
+    // Con 63 puntos (sobrecarga intensa): ni el 900 ni el 901 en ningún sitio del resultado
+    await expect(page.locator('#resultados')).not.toContainText('900 123 700');
+    await expect(page.locator('#resultados')).not.toContainText('901 109 899');
+    await expect(page.locator('#resultados li', { hasText: 'Servicios Sociales de tu ayuntamiento' })).toHaveCount(1);
   });
 
   test('CABO C0832 (2) · la cifra de cuidadores de la guía cita fuente y año, o no está', async ({ page }) => {

@@ -449,7 +449,10 @@ export const ESCALA_ZARIT_NIVELES: NivelZarit[] = [
       'Contactar con asociaciones de cuidadores de la CCAA',
       'Valorar la incorporación de ayuda profesional (SAD, cuidador externo)',
       'Considerar la prestación económica del SAAD si no se ha solicitado',
-      'Teléfono de atención al cuidador: 900 123 700 (Línea de Atención a la Dependencia)',
+      // Aquí iba «Teléfono de atención al cuidador: 900 123 700 (Línea de Atención a la
+      // Dependencia)»: ninguna fuente oficial atribuye ese número a la dependencia (cabo C0838,
+      // decidido por el usuario el 19/11/2026). Se remite a la puerta que sí es oficial.
+      'Pedir cita en los Servicios Sociales de tu ayuntamiento: son la puerta de entrada al respiro familiar y a la dependencia',
     ],
   },
 ];
@@ -481,9 +484,17 @@ export const PREGUNTAS_ZARIT = [
 
 // ─── Recursos y teléfonos de ayuda ───────────────────────────────────────────
 
+/*
+ * Teléfonos (cabo C0838, decidido por el usuario el 19/11/2026). El del Imserso es el único que da
+ * su página de contacto, https://imserso.es/contacto, consultada el 19/11/2026: «+34 912 667 713».
+ * Antes ponía 901 109 899, que solo sale en las memorias del Imserso de 2014 a 2019 (la de 2025 ya
+ * da el 912 667 713). El 900 123 700 que se pintaba como «Atención a la Dependencia» se retiró:
+ * ninguna fuente oficial se lo atribuye.
+ */
 export const RECURSOS_CUIDADORES = {
-  telefonoIMSERSO: '901 109 899',
-  telefonoDependencia: '900 123 700',
+  telefonoIMSERSO: '912 667 713',
+  telefonoIMSERSOFuente: 'https://imserso.es/contacto',
+  telefonoIMSERSOVerificado: '2026-11-19',
   telefonoEmergencias: '112',
   webIMSERSO: 'https://imserso.es',
   webSAAD: 'https://imserso.es/el-saad',

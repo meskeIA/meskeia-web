@@ -541,7 +541,8 @@
 
 .recursosGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* Dos tarjetas desde que se retiró la del 900 123 700 (cabo C0838) */
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
 }

@@ -346,14 +346,10 @@ export default function TestZaritCuidadorPage() {
                     <p>{RECURSOS_CUIDADORES.telefonoIMSERSO}</p>
                     <a href={RECURSOS_CUIDADORES.webIMSERSO} target="_blank" rel="noopener noreferrer">
                       Web oficial →
-                    </a>
-                  </div>
-                </div>
-                <div className={styles.recursoCard}>
-                  <span className={styles.recursoIcono} aria-hidden="true">📱</span>
-                  <div>
-                    <strong>Atención a la Dependencia</strong>
-                    <p>{RECURSOS_CUIDADORES.telefonoDependencia}</p>
+                    </a>{' '}
+                    {/* La tarjeta «Atención a la Dependencia» con el 900 123 700 se retiró (cabo C0838):
+                        ninguna fuente oficial atribuye ese número a la dependencia. El portal del SAAD
+                        es del Imserso y queda aquí. */}
                     <a href={RECURSOS_CUIDADORES.webSAAD} target="_blank" rel="noopener noreferrer">
                       Portal SAAD →
                     </a>
