@@ -229,6 +229,12 @@
   color: var(--primary-texto);
 }
 
+/* En oscuro, --primary-texto sobre el tinte de la fila daba 4,19:1 (hallazgo 5258);
+   el azul claro de la marca da ~5,3:1 */
+[data-theme='dark'] .rowMax .tdPct {
+  color: var(--accent);
+}
+
 .tdPct {
   font-weight: 600;
   color: var(--primary-texto);
@@ -320,7 +326,8 @@
     font-size: 0.85rem;
   }
 
-  .tdUso {
+  .tdUso,
+  .colUso {
     display: none;
   }
 }

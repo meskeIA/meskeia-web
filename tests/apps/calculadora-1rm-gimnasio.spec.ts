@@ -100,6 +100,9 @@ async function filas(page: Page): Promise<string[][]> {
     );
 }
 
+/** En la tabla la unidad va con espacio duro, para que «146,7 kg» no se parta (hallazgo 5259). */
+const kgDuro = (s: string): string => s.replace(' kg', ' kg');
+
 const TITULOS = ['Fórmula Epley', 'Fórmula Brzycki', 'Media de las dos fórmulas'];
 
 /** Todas las cifras en kg que pintan las tarjetas y la tabla, ya convertidas a número. */
@@ -146,7 +149,7 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
     const f = await filas(page);
     expect(f.map((r) => r[1])).toEqual([
       '114,6 kg', '108,9 kg', '103,1 kg', '97,4 kg', '91,7 kg', '85,9 kg', '80,2 kg', '74,5 kg', '68,8 kg',
-    ]);
+    ].map(kgDuro));
     // Repeticiones aproximadas: coherentes con las dos fórmulas invertidas (75 % → 10 reps en ambas)
     expect(f.map((r) => r[2])).toEqual(['1', '2', '3–4', '5–6', '7–8', '9–10', '11–13', '14–16', '17–20']);
     // Sin aviso con 5 repeticiones
@@ -167,7 +170,7 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
     }
     expect((await filas(page)).map((r) => r[1])).toEqual([
       '100,0 kg', '95,0 kg', '90,0 kg', '85,0 kg', '80,0 kg', '75,0 kg', '70,0 kg', '65,0 kg', '60,0 kg',
-    ]);
+    ].map(kgDuro));
   });
 
   test('CASO 2b · 12 repeticiones (máximo del rótulo) → 140,0 · 144,1 · 142,0, sin aviso; con 13 se rechaza', async ({ page }) => {
@@ -311,11 +314,11 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
   });
 
   test('HALLAZGO · la app de la suite salud monta su DisclaimerCard', async ({ page }) => {
-    // ABIERTO: page.tsx lleva «// @disclaimer: exempt». Suites salud + tecnicas → nivel 2 ALTO
-    // (no colapsable) según la política; sus hermanas calculadora-zonas-cardiacas y
-    // calculadora-potencia-ciclismo montan severity="high". El FAQPage habla de riesgo de lesión.
-    test.fail();
+    // REPARADO (5256): page.tsx llevaba «// @disclaimer: exempt». Suites salud + tecnicas → nivel
+    // 2 ALTO (no colapsable) según la política; sus hermanas calculadora-zonas-cardiacas y
+    // calculadora-potencia-ciclismo montan severity="high". Ahora variant medical, high, fijo.
     await expect(page.getByRole('note')).toHaveCount(1);
+    await expect(page.getByRole('note')).toContainText('carácter exclusivamente orientativo');
   });
 
   test('HALLAZGO · el resultado se anuncia y el botón se llama como se lee', async ({ page }) => {
@@ -331,11 +334,11 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
   });
 
   test('HALLAZGO · en oscuro, «100%» de la fila destacada llega a 4,5:1', async ({ page }) => {
-    // ABIERTO: --primary-texto sobre el tinte rgba(46,134,171,0,18) de .rowMax encima de la tarjeta
-    // #2A2A2A: medido 4,19:1 (texto de 15,2 px en negrita: no es «grande», pide 4,5:1).
+    // REPARADO (5258): --primary-texto sobre el tinte rgba(46,134,171,0,18) de .rowMax encima de
+    // la tarjeta #2A2A2A: medido 4,19:1 (texto de 15,2 px en negrita: no es «grande», pide 4,5:1).
+    // Ahora, en oscuro, var(--accent) (#7FB3D3).
     // El tema se pone ANTES de calcular: cambiarlo con la tabla ya pintada mide a mitad de la
     // transición de color (2,54:1 con el texto aún del tema claro), que no es el estado estable.
-    test.fail();
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
     await calcular(page, '100', '5');
@@ -385,9 +388,9 @@ test.describe('calculadora-1rm-gimnasio · móvil (Pixel 7)', () => {
   });
 
   test('HALLAZGO · la cabecera «Uso habitual» no queda sobre una columna vacía', async ({ page }) => {
-    // ABIERTO: por debajo de 768 px el CSS oculta las celdas de «Uso habitual» (td) pero no su
-    // <th>: la cabecera ocupa ~75 px sobre nada y el peso se parte en dos líneas («146,7 / kg»).
-    test.fail();
+    // REPARADO (5259): por debajo de 768 px el CSS ocultaba las celdas de «Uso habitual» (td) pero
+    // no su <th>: la cabecera ocupaba ~75 px sobre nada y el peso se partía en dos líneas («146,7
+    // / kg»). Ahora la cabecera se oculta con sus celdas y la unidad va con espacio duro.
     await rellenar(page, '100', '5');
     await boton(page).tap();
     await expect(tabla(page)).toBeVisible();
@@ -396,5 +399,6 @@ test.describe('calculadora-1rm-gimnasio · móvil (Pixel 7)', () => {
     const cabeceraVisible = await cabecera.isVisible();
     const celdaVisible = await celda.isVisible();
     expect(cabeceraVisible).toBe(celdaVisible);
+    await expect(tabla(page).locator('tbody tr').first().locator('td').nth(1)).toHaveText('114,6 kg');
   });
 });

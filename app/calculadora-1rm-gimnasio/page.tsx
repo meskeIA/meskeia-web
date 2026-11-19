@@ -1,5 +1,4 @@
 'use client';
-// @disclaimer: exempt
 
 import { useEffect, useRef, useState } from 'react';
 import styles from './Calculadora1RMGimnasio.module.css';
@@ -12,6 +11,7 @@ import {
   RelatedApps,
   LegalNotice,
   ShareCard,
+  DisclaimerCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber, traerALaVista } from '@/lib';
 import {
@@ -175,7 +175,8 @@ export default function Calculadora1RMGimnasioPage() {
                   <th scope="col">% del 1RM</th>
                   <th scope="col">Peso (kg)</th>
                   <th scope="col">Repeticiones aprox.</th>
-                  <th scope="col">Uso habitual</th>
+                  {/* Por debajo de 768 px se oculta junto con sus celdas (hallazgo 5259) */}
+                  <th scope="col" className={styles.colUso}>Uso habitual</th>
                 </tr>
               </thead>
               <tbody>
@@ -185,7 +186,7 @@ export default function Calculadora1RMGimnasioPage() {
                     className={fila.porcentaje === 100 ? styles.rowMax : undefined}
                   >
                     <td className={styles.tdPct}>{`${fila.porcentaje} %`}</td>
-                    <td className={styles.tdPeso}>{formatNumber(fila.peso_kg, 1)} kg</td>
+                    <td className={styles.tdPeso}>{`${formatNumber(fila.peso_kg, 1)} kg`}</td>
                     <td>{fila.repsAproximadas}</td>
                     <td className={styles.tdUso}>{banda1RM(fila.porcentaje).objetivo}</td>
                   </tr>
@@ -195,6 +196,10 @@ export default function Calculadora1RMGimnasioPage() {
           </div>
         </div>
       )}
+
+      {/* Suites salud + tecnicas → nivel 2 ALTO, no colapsable (hallazgo 5256), como sus hermanas
+          calculadora-zonas-cardiacas y calculadora-potencia-ciclismo */}
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} />
 
       {/* Contenido educativo colapsable */}
       <EducationalSection
