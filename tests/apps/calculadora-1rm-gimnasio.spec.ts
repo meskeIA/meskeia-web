@@ -70,7 +70,8 @@ async function rellenar(page: Page, peso: string, reps: string): Promise<void> {
   await esperarValorEnReact(page, SEL_REPS, reps);
 }
 
-const boton = (page: Page) => page.getByRole('button', { name: 'Calcular repetición máxima' });
+// Antes se llamaba «Calcular repetición máxima» (aria-label distinto del texto visible, hallazgo 5253)
+const boton = (page: Page) => page.getByRole('button', { name: 'Calcular 1RM', exact: true });
 
 async function calcular(page: Page, peso: string, reps: string): Promise<void> {
   await rellenar(page, peso, reps);
@@ -304,10 +305,10 @@ test.describe('calculadora-1rm-gimnasio · escritorio', () => {
   });
 
   test('HALLAZGO · el resultado se anuncia y el botón se llama como se lee', async ({ page }) => {
-    // ABIERTO: las tarjetas y la tabla aparecen fuera de toda región viva (solo el aviso de > 12
-    // la tiene) y el botón visible «Calcular 1RM» se llama «Calcular repetición máxima» (WCAG
-    // 2.5.3: el nombre accesible debe contener el texto visible).
-    test.fail();
+    // REPARADO (5253): las tarjetas y la tabla aparecían fuera de toda región viva (solo el aviso
+    // de > 12 la tenía) y el botón visible «Calcular 1RM» se llamaba «Calcular repetición máxima»
+    // (WCAG 2.5.3: el nombre accesible debe contener el texto visible). Ahora las tarjetas van en
+    // una región aria-live siempre montada y el botón no lleva aria-label.
     await calcular(page, '100', '5');
     await expect(
       page.locator('[aria-live]:not(#__next-route-announcer__), [role="status"]').filter({ hasText: '114,6 kg' }),
@@ -357,9 +358,9 @@ test.describe('calculadora-1rm-gimnasio · móvil (Pixel 7)', () => {
   });
 
   test('HALLAZGO · tras tocar «Calcular 1RM» la cifra queda a la vista', async ({ page }) => {
-    // ABIERTO: medido a 412 × 839, la tarjeta «Media» queda con su borde superior a 1155 px, por
-    // debajo de la ventana: en pantalla no cambia nada y el foco se queda en el botón.
-    test.fail();
+    // REPARADO (5252): medido a 412 × 839, la tarjeta «Media» quedaba con su borde superior a
+    // 1155 px, por debajo de la ventana: en pantalla no cambiaba nada. Ahora traerALaVista sube el
+    // panel de resultados si la media no se ve entera.
     await rellenar(page, '100', '5');
     await boton(page).scrollIntoViewIfNeeded();
     await boton(page).tap();

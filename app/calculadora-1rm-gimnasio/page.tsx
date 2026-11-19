@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './Calculadora1RMGimnasio.module.css';
 import {
   MeskeiaLogo,
@@ -13,7 +13,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { formatNumber, parseSpanishNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber, traerALaVista } from '@/lib';
 import { calcular1RM, errorEntrada1RM, REPS_MAX_1RM, Resultado1RM } from '@/lib/calculadoras/deporte';
 
 export default function Calculadora1RMGimnasioPage() {
@@ -38,6 +38,14 @@ export default function Calculadora1RMGimnasioPage() {
     setError('');
     setResultado(calcular1RM(pesoNum, repsNum));
   };
+
+  // Por debajo de 1024 px el panel de resultados va debajo del de entrada: tras calcular, si la
+  // media no se ve entera, se sube el panel (hallazgo 5252). En escritorio ya se ve y no se mueve.
+  const panelResultadosRef = useRef<HTMLDivElement>(null);
+  const mediaRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (resultado) traerALaVista(panelResultadosRef.current, mediaRef.current);
+  }, [resultado]);
 
   return (
     <div className={styles.container}>
@@ -77,11 +85,11 @@ export default function Calculadora1RMGimnasioPage() {
             />
           </div>
 
+          {/* Sin aria-label: el nombre accesible es el texto visible (WCAG 2.5.3, hallazgo 5253) */}
           <button
             type="button"
             onClick={calcular}
             className={styles.btnPrimary}
-            aria-label="Calcular repetición máxima"
           >
             Calcular 1RM
           </button>
@@ -96,8 +104,10 @@ export default function Calculadora1RMGimnasioPage() {
           </div>
         </div>
 
-        <div className={styles.resultsPanel}>
-          {resultado ? (
+        <div className={styles.resultsPanel} ref={panelResultadosRef}>
+          {/* Región viva siempre montada: al calcular se anuncian las tres cifras (hallazgo 5253) */}
+          <div aria-live="polite">
+          {resultado && (
             <>
               <h2 className={styles.panelTitle}>Resultados</h2>
 
@@ -119,7 +129,7 @@ export default function Calculadora1RMGimnasioPage() {
                 />
 
                 {/* Media — resultado principal destacado */}
-                <div className={styles.resultCardMediaWrapper}>
+                <div className={styles.resultCardMediaWrapper} ref={mediaRef}>
                   <ResultCard
                     title="Media (más fiable)"
                     value={`${formatNumber(resultado.media, 1)} kg`}
@@ -129,8 +139,10 @@ export default function Calculadora1RMGimnasioPage() {
                 </div>
               </div>
             </>
-          ) : (
-            <div className={styles.emptyState} aria-label="Sin resultados todavía">
+          )}
+          </div>
+          {!resultado && (
+            <div className={styles.emptyState}>
               <span className={styles.emptyIcon} aria-hidden="true">🏋️</span>
               <p>Introduce el peso y las repeticiones para calcular tu 1RM</p>
             </div>
