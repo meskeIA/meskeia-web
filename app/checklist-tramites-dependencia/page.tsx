@@ -11,6 +11,20 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
+import { BVD_ACTIVIDADES_18_MAS, GRADOS_DEPENDENCIA } from '@/data/fiscal';
+import { FAQ_PLAZO } from './faq';
+
+// El BVD de la FAQ sale del módulo (RD 174/2011): escrito a mano decía 47 tareas, y la escala
+// general tiene 51 en 10 actividades (hallazgo 5196)
+const ACTIVIDADES_GENERAL = BVD_ACTIVIDADES_18_MAS.filter(a => a.pesoGeneral !== null);
+const ACTIVIDADES_BVD_GENERAL = ACTIVIDADES_GENERAL.length;
+const TAREAS_BVD_GENERAL = ACTIVIDADES_GENERAL.reduce((n, a) => n + a.tareas.length, 0);
+const ROMANOS = ['I', 'II', 'III'];
+const CORTES_GRADO = GRADOS_DEPENDENCIA.map(g =>
+  g.puntuacionBVDHasta >= 100
+    ? `${g.puntuacionBVDDesde} o más es Grado ${ROMANOS[g.grado - 1]}`
+    : `de ${g.puntuacionBVDDesde} a ${g.puntuacionBVDHasta} puntos es Grado ${ROMANOS[g.grado - 1]}`,
+).join(', ');
 
 // ──────────────────────────────────────────
 // TIPOS
@@ -57,7 +71,7 @@ const FASES: FaseConfig[] = [
       { id: 'f2-rellenar', texto: 'Rellenar formulario con datos del solicitante y representante' },
       { id: 'f2-adjuntar', texto: 'Adjuntar toda la documentación preparada' },
       { id: 'f2-presentar', texto: 'Presentar la solicitud (presencial, correo certificado u online según CCAA)' },
-      { id: 'f2-copia', texto: 'Guardar copia sellada con fecha de registro', nota: 'CRÍTICO: los derechos económicos cuentan desde esta fecha', critico: true },
+      { id: 'f2-copia', texto: 'Guardar copia sellada con fecha de registro', nota: 'CRÍTICO: desde esta fecha corre el plazo legal de 3 meses para resolver la prestación; si vence sin resolución, el derecho nace ese día', critico: true },
     ],
   },
   {
@@ -77,10 +91,10 @@ const FASES: FaseConfig[] = [
     id: 'fase-4',
     titulo: 'Resolución del grado',
     icono: '📄',
-    plazo: 'Plazo legal: 6 meses desde la solicitud',
+    plazo: 'Dentro del plazo legal de 3 meses desde la solicitud (fases 2 a 5)',
     items: [
       { id: 'f4-resolucion', texto: 'Recibir la resolución de grado' },
-      { id: 'f4-grado', texto: 'Revisar el grado reconocido (Grado I, II o III)' },
+      { id: 'f4-grado', texto: 'Revisar el grado reconocido (Grado I, II, III o III+)' },
       { id: 'f4-recurso', texto: 'Si no se está de acuerdo: presentar recurso de alzada en 1 mes', nota: 'Acompañar de informes médicos adicionales que justifiquen un grado mayor' },
     ],
   },
@@ -88,7 +102,7 @@ const FASES: FaseConfig[] = [
     id: 'fase-5',
     titulo: 'Plan Individualizado de Atención (PIA)',
     icono: '🤝',
-    plazo: 'Variable según CCAA',
+    plazo: 'Plazo legal: la resolución de la prestación, en 3 meses desde la solicitud',
     items: [
       { id: 'f5-reunion', texto: 'Reunión con trabajador social para elaborar el PIA' },
       { id: 'f5-modalidad', texto: 'Elegir modalidad de prestación/servicio', nota: 'Opciones: PEVS, PECEF, SAD, teleasistencia, centro de día, residencia...' },
@@ -102,7 +116,7 @@ const FASES: FaseConfig[] = [
     plazo: 'Variable',
     items: [
       { id: 'f6-confirmar', texto: 'Confirmar inicio del servicio o cobro de la prestación' },
-      { id: 'f6-importe', texto: 'Verificar el importe', nota: 'Si la resolución llegó más de 6 meses después de la solicitud, el derecho nace a los 6 meses: comprueba que se incluyan esos atrasos (la copia sellada prueba la fecha)' },
+      { id: 'f6-importe', texto: 'Verificar el importe', nota: 'Si la resolución de la prestación llegó más de 3 meses después de la solicitud, el derecho nace a los 3 meses: comprueba que se incluyan esos atrasos (la copia sellada prueba la fecha)' },
       { id: 'f6-documentacion', texto: 'Guardar toda la documentación para futuras revisiones' },
       { id: 'f6-cambios', texto: 'Comunicar cualquier cambio de situación', nota: 'Mudanza, mejora, empeoramiento, cambio de cuidador, fallecimiento...' },
     ],
@@ -232,7 +246,7 @@ export default function ChecklistTramitesDependenciaPage() {
                 ? <span key="completo"><span aria-hidden="true">🎉</span> ¡Has completado todos los pasos!</span>
                 : <span key="progreso">{`${itemsCompletados} de ${totalItems} pasos completados`}</span>}
             </span>
-            <span className={styles.progresoPorcentaje}>{porcentaje}%</span>
+            <span className={styles.progresoPorcentaje}>{`${porcentaje} %`}</span>
           </div>
           <div
             className={styles.progresoBar}
@@ -240,7 +254,7 @@ export default function ChecklistTramitesDependenciaPage() {
             aria-valuenow={porcentaje}
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-label={`Progreso: ${porcentaje}%`}
+            aria-label={`Progreso: ${porcentaje} %`}
           >
             <div className={styles.progresoFill} style={{ width: `${porcentaje}%` }} />
           </div>
@@ -296,9 +310,11 @@ export default function ChecklistTramitesDependenciaPage() {
                 </button>
 
                 {expanded && (
-                  <ul id={`items-${fase.id}`} className={styles.itemsLista}>
+                  // Un grupo de casillas y no una <ul>: un <li role="checkbox"> pierde su papel de
+                  // elemento de lista y deja la lista con hijos no permitidos (hallazgo 5198)
+                  <div id={`items-${fase.id}`} className={styles.itemsLista} role="group" aria-label={fase.titulo}>
                     {fase.items.map(item => (
-                      <li
+                      <div
                         key={item.id}
                         className={`${styles.item} ${itemsChecked[item.id] ? styles.itemChecked : ''}`}
                         onClick={() => toggleItem(item.id)}
@@ -324,9 +340,9 @@ export default function ChecklistTramitesDependenciaPage() {
                           </span>
                           {item.nota && <p className={styles.itemNota}>{item.nota}</p>}
                         </div>
-                      </li>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 )}
               </div>
             );
@@ -391,13 +407,13 @@ export default function ChecklistTramitesDependenciaPage() {
                   <tr>
                     <td>4. Resolución</td>
                     <td>Notificación del grado reconocido</td>
-                    <td>Plazo legal: 6 meses</td>
+                    <td>Dentro del plazo legal de 3 meses (fases 2 a 5)</td>
                     <td>Administración autonómica</td>
                   </tr>
                   <tr>
                     <td>5. PIA</td>
                     <td>Elaborar el Plan Individualizado de Atención</td>
-                    <td>Variable (semanas-meses)</td>
+                    <td>Plazo legal: resolución de la prestación en 3 meses desde la solicitud</td>
                     <td>Trabajador social + familia</td>
                   </tr>
                   <tr>
@@ -437,7 +453,8 @@ export default function ChecklistTramitesDependenciaPage() {
                   El formulario varía según la CCAA. En algunas se puede presentar online
                   (sede electrónica), en otras es presencial (Servicios Sociales municipales
                   o autonómicos). <strong>Guarda siempre la copia sellada con fecha</strong>:
-                  es tu prueba de cuándo empezaron a contar los derechos económicos.
+                  es tu prueba de cuándo empezó a correr el plazo legal de tres meses para
+                  resolver, y por tanto de desde cuándo se te deben atrasos si se agota.
                 </p>
               </div>
               <div className={styles.faseDetalleCard}>
@@ -460,9 +477,14 @@ export default function ChecklistTramitesDependenciaPage() {
                 </div>
                 <p>
                   Los grados son: <strong>Grado I</strong> (dependencia moderada),
-                  <strong> Grado II</strong> (dependencia severa) y <strong>Grado III</strong>
-                  (gran dependencia). El plazo legal para resolver es de 6 meses, aunque en
-                  la práctica muchas CCAA tardan más. Si no estás de acuerdo con el grado,
+                  <strong> Grado II</strong> (dependencia severa), <strong>Grado III</strong>
+                  (gran dependencia) y <strong>Grado III+</strong> (dependencia extrema, para
+                  personas con Grado III y ELA en fase avanzada u otras enfermedades de alta
+                  complejidad e irreversibles; Ley 39/2006, disposición adicional 17.ª). El
+                  plazo legal es de 3 meses desde la solicitud hasta la resolución que reconoce
+                  la <strong>prestación</strong>, no solo el grado, aunque la comunidad tramite
+                  los dos por separado (disposición final primera, apartado 2, en la redacción
+                  vigente desde el 12/11/2026); en la práctica muchas CCAA tardan más. Si no estás de acuerdo con el grado,
                   tienes <strong>1 mes</strong> para presentar un recurso de alzada con
                   informes médicos adicionales.
                 </p>
@@ -488,10 +510,10 @@ export default function ChecklistTramitesDependenciaPage() {
                 <p>
                   Una vez aprobado el PIA, se activa el servicio o prestación económica.
                   Por la norma estatal, <strong>el derecho a las prestaciones se genera desde
-                  la resolución</strong> que las reconoce o, si pasan seis meses desde la
+                  la resolución</strong> que las reconoce o, si pasan tres meses desde la
                   solicitud (fase 2) sin resolución, desde ese momento (Ley 39/2006,
                   disposición final primera, apartado 3): en ese caso el primer pago puede
-                  incluir los meses de espera posteriores a esos seis. Ante cualquier cambio
+                  incluir los meses de espera posteriores a esos tres. Ante cualquier cambio
                   relevante (mudanza, cambio de cuidador, empeoramiento), hay que comunicarlo a
                   los Servicios Sociales.
                 </p>
@@ -508,7 +530,7 @@ export default function ChecklistTramitesDependenciaPage() {
               prestaciones. Algunas diferencias relevantes:
             </p>
             <ul className={styles.eduLista}>
-              <li><strong>Plazos reales</strong>: Mientras el plazo legal es de 6 meses, algunas CCAA tardan más de un año en resolver. Consulta los datos publicados por el IMSERSO para tu comunidad.</li>
+              <li><strong>Plazos reales</strong>: Mientras el plazo legal es de 3 meses, algunas CCAA tardan más de un año en resolver. Consulta los datos publicados por el IMSERSO para tu comunidad.</li>
               <li><strong>Formularios</strong>: Cada CCAA tiene su propio formulario de solicitud. No uses el de otra comunidad.</li>
               <li><strong>Prestaciones económicas</strong>: Las cuantías varían. La PECEF (cuidados en entorno familiar) puede ser complementada por algunas CCAA.</li>
               <li><strong>Copago</strong>: Las CCAA aplican copagos diferentes en función de la renta y patrimonio del beneficiario.</li>
@@ -531,7 +553,7 @@ export default function ChecklistTramitesDependenciaPage() {
                 <span className={styles.tipIcon} aria-hidden="true">⏰</span>
                 <div>
                   <strong>La administración no responde en plazo</strong>
-                  <p>Si han pasado más de 6 meses sin resolución, hay silencio administrativo positivo. Un profesional puede ayudarte a reclamarlo.</p>
+                  <p>Si han pasado más de 3 meses desde la solicitud sin resolución de la prestación, el derecho nace en esa fecha aunque la resolución llegue después (Ley 39/2006, disposición final primera, apartado 3). Un profesional puede ayudarte a reclamar la resolución y los atrasos.</p>
                 </div>
               </div>
               <div className={styles.tipCard}>
@@ -558,32 +580,23 @@ export default function ChecklistTramitesDependenciaPage() {
               <div className={styles.faqItem}>
                 <dt>¿Quién puede solicitar la valoración de dependencia?</dt>
                 <dd>
-                  Cualquier persona de nacionalidad española (o con residencia legal en España
-                  durante al menos 5 años) que necesite ayuda para realizar actividades básicas
-                  de la vida diaria. No hay edad mínima: se puede solicitar para personas
-                  mayores, para personas con discapacidad o para menores de 3 años con
-                  limitaciones funcionales graves.
+                  La persona en situación de dependencia que resida en España y lo haya hecho
+                  durante cinco años, dos de ellos inmediatamente anteriores a la solicitud, también
+                  si tiene nacionalidad española (Ley 39/2006, art. 5.1; en los menores de cinco
+                  años ese periodo se exige a quien tenga su guarda y custodia). No hay edad
+                  mínima: los menores de 6 años se valoran con una escala específica (disposición
+                  adicional decimotercera). Si no tienes nacionalidad española, confirma tus
+                  requisitos con los Servicios Sociales.
                 </dd>
               </div>
               <div className={styles.faqItem}>
-                <dt>¿Cuánto tarda el proceso completo?</dt>
-                <dd>
-                  El plazo legal máximo para la resolución es de <strong>6 meses</strong> desde
-                  la solicitud. En la práctica, muchas CCAA tardan entre 6 y 18 meses. Tras la
-                  resolución, el PIA se elabora en semanas o meses adicionales. Por la norma
-                  estatal, el derecho a las prestaciones se genera desde la resolución que las
-                  reconoce o, si pasan seis meses desde la solicitud sin resolución, desde ese
-                  momento (Ley 39/2006, disposición final primera, apartado 3).
-                </dd>
+                <dt>{FAQ_PLAZO.pregunta}</dt>
+                <dd>{FAQ_PLAZO.respuesta}</dd>
               </div>
               <div className={styles.faqItem}>
                 <dt>¿Qué es el baremo BVD y cómo funciona?</dt>
                 <dd>
-                  El BVD (Baremo de Valoración de la Dependencia) evalúa la capacidad de la persona
-                  para realizar 47 tareas agrupadas en 10 actividades de la vida diaria: comer y
-                  beber, higiene personal, vestirse, mantenimiento de la salud, movilidad,
-                  desplazarse fuera del hogar, entre otras. Se puntúa de 0 a 100: de 25 a 49
-                  puntos es Grado I, de 50 a 74 es Grado II, y 75 o más es Grado III.
+                  {`El BVD (Baremo de Valoración de la Dependencia) evalúa la capacidad de la persona para realizar ${TAREAS_BVD_GENERAL} tareas agrupadas en ${ACTIVIDADES_BVD_GENERAL} actividades de la vida diaria: comer y beber, higiene personal, vestirse, mantenimiento de la salud, movilidad, desplazarse fuera del hogar, entre otras (con una condición de salud que afecte a las funciones mentales se añade «Tomar decisiones»). Se puntúa de 0 a 100: ${CORTES_GRADO}. El Grado III+ de dependencia extrema no tiene todavía puntuación propia en el baremo.`}
                 </dd>
               </div>
               <div className={styles.faqItem}>
@@ -609,10 +622,11 @@ export default function ChecklistTramitesDependenciaPage() {
               <div className={styles.faqItem}>
                 <dt>¿La persona dependiente tiene que pagar algo?</dt>
                 <dd>
-                  Depende del servicio y de la CCAA. Las prestaciones económicas no tienen copago,
-                  pero los servicios (residencia, centro de día, SAD) sí pueden tenerlo, calculado
-                  en función de la <strong>capacidad económica</strong> del beneficiario (renta +
-                  patrimonio). Cada CCAA aplica su propio baremo de copago.
+                  Depende del servicio y de la CCAA, pero en todos los casos cuenta la
+                  <strong> capacidad económica</strong> del beneficiario (renta + patrimonio): en
+                  los servicios (residencia, centro de día, SAD) como copago, y en las
+                  prestaciones económicas reduciendo su cuantía (Ley 39/2006, art. 33.2). Cada
+                  CCAA aplica su propio baremo.
                 </dd>
               </div>
             </dl>
@@ -633,7 +647,7 @@ export default function ChecklistTramitesDependenciaPage() {
                 <span className={styles.tipIcon} aria-hidden="true">📝</span>
                 <div>
                   <strong>Fase 2: Fecha de registro</strong>
-                  <p>Con la fecha de la solicitud sellada empieza a contar el plazo de seis meses para resolver; si se agota sin resolución, el derecho a las prestaciones nace en ese momento. Presenta cuanto antes, incluso si te falta algún documento menor que puedas aportar después.</p>
+                  <p>Con la fecha de la solicitud sellada empieza a contar el plazo de tres meses para resolver la prestación; si se agota sin resolución, el derecho a las prestaciones nace en ese momento. Presenta cuanto antes, incluso si te falta algún documento menor que puedas aportar después.</p>
                 </div>
               </div>
               <div className={styles.tipCard}>
@@ -661,7 +675,7 @@ export default function ChecklistTramitesDependenciaPage() {
                 <span className={styles.tipIcon} aria-hidden="true">✅</span>
                 <div>
                   <strong>Fase 6: Verificar los atrasos</strong>
-                  <p>Si la resolución tardó más de seis meses, la prestación económica debe incluir los meses desde que se cumplieron esos seis, no desde la solicitud. Si el importe no cuadra, reclama por escrito ante los Servicios Sociales.</p>
+                  <p>Si la resolución de la prestación tardó más de tres meses, la prestación económica debe incluir los meses desde que se cumplieron esos tres, no desde la solicitud. Si el importe no cuadra, reclama por escrito ante los Servicios Sociales.</p>
                 </div>
               </div>
             </div>
@@ -677,7 +691,7 @@ export default function ChecklistTramitesDependenciaPage() {
               <ul className={styles.warningList}>
                 <li>
                   <strong>No guardar la copia sellada de la solicitud.</strong> Sin
-                  fecha de registro no podrás probar cuándo se cumplieron los seis meses del
+                  fecha de registro no podrás probar cuándo se cumplieron los tres meses del
                   plazo para resolver, ni reclamar los atrasos desde entonces.
                   Es el documento más importante del proceso.
                 </li>

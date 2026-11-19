@@ -214,7 +214,9 @@
 
 .faseProgreso {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  /* --text-secondary y no --text-muted: sobre --border, 4,04:1 en claro y 3,73:1 en oscuro
+     (hallazgo 5199); así, #666 sobre #E5E5E5 = 4,6:1 y #B0B0B0 sobre #404040 = 4,8:1 */
+  color: var(--text-secondary);
   font-weight: 600;
   background: var(--border);
   padding: 0.2rem 0.6rem;

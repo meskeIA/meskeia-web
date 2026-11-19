@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FAQ_PLAZO } from './faq';
 
 export const metadata: Metadata = {
   title: 'Checklist Trámites de Dependencia - Documentación y Pasos | meskeIA',
@@ -53,7 +54,7 @@ export const faqJsonLd = {
       name: '¿Cómo se solicita la valoración de dependencia en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La solicitud se presenta ante los servicios sociales de la comunidad autónoma donde reside la persona. Se puede hacer de forma presencial en la oficina de servicios sociales o, en muchas comunidades, de forma telemática. Hay que aportar el formulario oficial de solicitud, documentación de identidad, informe médico actualizado y, en algunos casos, informes sociales. El plazo máximo de resolución es de 6 meses desde la solicitud.',
+        text: 'La solicitud se presenta ante los servicios sociales de la comunidad autónoma donde reside la persona. Se puede hacer de forma presencial en la oficina de servicios sociales o, en muchas comunidades, de forma telemática. Hay que aportar el formulario oficial de solicitud, documentación de identidad, informe médico actualizado y, en algunos casos, informes sociales. El plazo legal máximo es de 3 meses desde la solicitud hasta la resolución que reconoce la prestación.',
       },
     },
     {
@@ -66,10 +67,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cuánto tiempo tarda en resolverse una solicitud de dependencia?',
+      name: FAQ_PLAZO.pregunta,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El plazo legal máximo es de 6 meses desde la presentación de la solicitud. Sin embargo, en la práctica los tiempos varían mucho según la comunidad autónoma: en algunas la resolución puede llegar en 3-4 meses, mientras que en otras los retrasos superan el año. Si transcurren 6 meses sin resolución, se produce silencio administrativo negativo, que puede recurrirse.',
+        text: FAQ_PLAZO.respuesta,
       },
     },
     {
@@ -77,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre el grado de dependencia y el grado de discapacidad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Son reconocimientos distintos con finalidades diferentes. El grado de discapacidad (mínimo 33 %) se obtiene a través del IMSERSO o el organismo autonómico y da acceso a beneficios fiscales, laborales y sociales. El grado de dependencia (I, II o III) lo valora el SAAD y determina las prestaciones y servicios de cuidado (ayuda a domicilio, centros de día, residencias). Tener una no implica automáticamente la otra, aunque muchas personas tienen ambas.',
+        text: 'Son reconocimientos distintos con finalidades diferentes. El grado de discapacidad (mínimo 33 %) se obtiene a través del IMSERSO o el organismo autonómico y da acceso a beneficios fiscales, laborales y sociales. El grado de dependencia (I, II, III o III+) lo valora el SAAD y determina las prestaciones y servicios de cuidado (ayuda a domicilio, centros de día, residencias). Tener una no implica automáticamente la otra, aunque muchas personas tienen ambas.',
       },
     },
     {

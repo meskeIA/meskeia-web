@@ -55,8 +55,10 @@ import { ORIGEN } from './_puerto';
  *   · BVD (BVD_ACTIVIDADES_18_MAS de data/fiscal, RD 174/2011): la escala general tiene 10
  *     actividades y 51 tareas (4+4+5+4+5+5+8+6+6+4), no 47.
  *
- * Los test con test.fail() son HALLAZGOS ABIERTOS: el día que se reparen, fallarán por pasar y
- * habrá que quitarles el test.fail() (y cambiar ABIERTO por REPARADO).
+ * Los once hallazgos (5190-5200) se repararon el 19/11/2026 (/reparar): el texto consolidado de
+ * la Ley 39/2006 se volvió a leer ese día en el BOE (DF 1.ª.2 y 3 con «tres meses», art. 33.2,
+ * DA 13.ª y DA 17.ª). Plazo y nacimiento del derecho viven en faq.ts, que importan la FAQ visible
+ * y el FAQPage.
  */
 
 const RUTA = '/checklist-tramites-dependencia/';
@@ -68,7 +70,8 @@ async function cargar(page: Page): Promise<void> {
   await page.goto(`${ORIGEN}${RUTA}`);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Checklist de Trámites de Dependencia');
   await page.waitForFunction(() => {
-    const li = document.querySelector('li[role="checkbox"]');
+    // [role="checkbox"] y no li[…]: las casillas son <div> dentro de un role="group" (hallazgo 5198)
+    const li = document.querySelector('[role="checkbox"]');
     return Boolean(li && Object.keys(li).some((k) => k.startsWith('__reactProps$')));
   });
 }
@@ -185,91 +188,95 @@ test.describe('escritorio', () => {
     }
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el plazo legal sigue en seis meses; desde el 12/11/2026 son tres', async ({ page }) => {
-    // ABIERTO: DF 1.ª.2 y 3 de la Ley 39/2006 (RDL 36/2026, BOE-A-2026-23605) y art. 28.1 (Ley
+  test('HALLAZGO (18/11/2026, REPARADO 19/11/2026) · el plazo legal sigue en seis meses; desde el 12/11/2026 son tres', async ({ page }) => {
+    // REPARADO; era así:DF 1.ª.2 y 3 de la Ley 39/2006 (RDL 36/2026, BOE-A-2026-23605) y art. 28.1 (Ley
     // 4/2026): tres meses de la solicitud a la resolución de la prestación, y el derecho nace a los
     // tres si no hay resolución. La app dice seis en la fase 4, la nota de «Verificar el importe»,
     // la tabla, el bloque educativo, la FAQ visible y dos respuestas del FAQPage.
-    test.fail();
     await cargar(page);
     const texto = `${await textoPagina(page)} ${await textoFaqPage(page)}`;
     expect(texto).not.toMatch(/plazo (legal|máximo)[^.]{0,40}\b(6|seis) meses/i);
     expect(texto).not.toMatch(/\b(6|seis) meses desde (la )?(solicitud|presentación)/i);
     expect(texto).not.toMatch(/\b(6|seis) meses sin resolución/i);
     expect(texto).not.toMatch(/nace a los 6 meses/i);
+    // Y dice el bueno: tres meses, en la fase 4, la nota del importe y las dos FAQ
+    await expect(fase(page, 'Resolución del grado')).toContainText('3 meses');
+    expect(texto).toMatch(/el derecho nace a los 3 meses/);
+    expect(await textoFaqPage(page)).toMatch(/plazo legal máximo es de 3 meses desde la presentación de la solicitud/);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · la casilla «Crítico» da los derechos económicos por contados desde el registro', async ({ page }) => {
-    // ABIERTO: la nota de «Guardar copia sellada con fecha de registro» dice «CRÍTICO: los derechos
+  test('HALLAZGO (18/11/2026, REPARADO 19/11/2026) · la casilla «Crítico» da los derechos económicos por contados desde el registro', async ({ page }) => {
+    // REPARADO; era así:la nota de «Guardar copia sellada con fecha de registro» dice «CRÍTICO: los derechos
     // económicos cuentan desde esta fecha», y la Fase 2 del bloque educativo «es tu prueba de cuándo
     // empezaron a contar los derechos económicos». DF 1.ª.3: nacen con la resolución o al vencer el
     // plazo sin ella, no con la solicitud. La propia fase 6 de la app lo dice bien. El regex de
     // dependencia-nacimiento-derecho.spec.ts («derechos económicos se cuentan») no casa con esta forma.
-    test.fail();
     await cargar(page);
     const texto = await textoPagina(page);
     expect(texto).not.toMatch(/derechos económicos cuentan desde esta fecha/i);
     expect(texto).not.toMatch(/cuándo empezaron a contar los derechos económicos/i);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · la página dice silencio positivo y el FAQPage silencio negativo', async ({ page }) => {
-    // ABIERTO: tarjeta «La administración no responde en plazo»: «hay silencio administrativo
+  test('HALLAZGO (18/11/2026, REPARADO 19/11/2026) · la página dice silencio positivo y el FAQPage silencio negativo', async ({ page }) => {
+    // REPARADO; era así:tarjeta «La administración no responde en plazo»: «hay silencio administrativo
     // positivo»; FAQPage («¿Cuánto tiempo tarda…?»): «se produce silencio administrativo negativo».
     // La Ley 39/2006 no contiene ninguna cláusula de silencio (texto consolidado, 18/11/2026).
-    test.fail();
     await cargar(page);
     const pagina = await textoPagina(page);
     const faq = await textoFaqPage(page);
     const positivo = /silencio administrativo positivo/i.test(pagina) || /silencio administrativo positivo/i.test(faq);
     const negativo = /silencio administrativo negativo/i.test(pagina) || /silencio administrativo negativo/i.test(faq);
     expect(positivo && negativo, 'la app afirma los dos sentidos del silencio a la vez').toBe(false);
+    // Ni uno ni otro: la ley no fija el sentido, solo el efecto (DF 1.ª.3)
+    expect(positivo || negativo).toBe(false);
+    // La pregunta del plazo es una sola, con la misma respuesta en la página y en el FAQPage
+    const respuesta = /El plazo legal máximo es de 3 meses desde la presentación[^]*?\(apartado 3\)\./.exec(faq)?.[0] ?? 'NO ESTÁ EN EL FAQPAGE';
+    expect(pagina).toContain(respuesta);
+    expect(pagina).not.toContain('¿Cuánto tarda el proceso completo?');
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el plazo legal se pone a la resolución del grado y el PIA queda fuera', async ({ page }) => {
-    // ABIERTO: la DF 1.ª.2 cuenta el plazo hasta la resolución de reconocimiento de la PRESTACIÓN,
+  test('HALLAZGO (18/11/2026, REPARADO 19/11/2026) · el plazo legal se pone a la resolución del grado y el PIA queda fuera', async ({ page }) => {
+    // REPARADO; era así:la DF 1.ª.2 cuenta el plazo hasta la resolución de reconocimiento de la PRESTACIÓN,
     // «independientemente» de que la comunidad separe grado y prestación. La app pone «Plazo legal»
     // en la fase 4, deja el PIA en «Variable según CCAA» y la FAQ dice que «Tras la resolución, el
     // PIA se elabora en semanas o meses adicionales».
-    test.fail();
     await cargar(page);
     await expect(fase(page, 'Plan Individualizado de Atención (PIA)')).not.toContainText('Variable según CCAA');
     expect(await textoPagina(page)).not.toMatch(/Tras la resolución, el PIA se elabora en semanas o meses adicionales/);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · «Las prestaciones económicas no tienen copago»', async ({ page }) => {
-    // ABIERTO: art. 33.2 de la Ley 39/2006: la capacidad económica «se tendrá también en cuenta
+  test('HALLAZGO (18/11/2026, REPARADO 19/11/2026) · «Las prestaciones económicas no tienen copago»', async ({ page }) => {
+    // REPARADO; era así:art. 33.2 de la Ley 39/2006: la capacidad económica «se tendrá también en cuenta
     // para la determinación de la cuantía de las prestaciones económicas»; data/fiscal
     // (FISCAL_DEPENDENCIA_META.nota): «El copago reduce la prestación según capacidad económica».
-    test.fail();
     await cargar(page);
     expect(await textoPagina(page)).not.toMatch(/prestaciones económicas no tienen copago/i);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · quién puede solicitar: residencia de los españoles y menores de 6 años', async ({ page }) => {
-    // ABIERTO: «Cualquier persona de nacionalidad española (o con residencia legal en España durante
+  test('HALLAZGO (18/11/2026, REPARADO 19/11/2026) · quién puede solicitar: residencia de los españoles y menores de 6 años', async ({ page }) => {
+    // REPARADO; era así:«Cualquier persona de nacionalidad española (o con residencia legal en España durante
     // al menos 5 años)… menores de 3 años». Art. 5.1.c: cinco años de residencia, dos
     // inmediatamente anteriores, exigidos a los españoles; art. 5.1.b y DA 13.ª: menores de 6 años.
-    test.fail();
     await cargar(page);
     const texto = await textoPagina(page);
     expect(texto).not.toMatch(/nacionalidad española \(o con residencia legal/i);
     expect(texto).not.toMatch(/menores de 3 años/i);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el BVD no tiene 47 tareas y falta el Grado III+', async ({ page }) => {
-    // ABIERTO: BVD_ACTIVIDADES_18_MAS (data/fiscal, RD 174/2011): 51 tareas en las 10 actividades
+  test('HALLAZGO (18/11/2026, REPARADO 19/11/2026) · el BVD no tiene 47 tareas y falta el Grado III+', async ({ page }) => {
+    // REPARADO; era así:BVD_ACTIVIDADES_18_MAS (data/fiscal, RD 174/2011): 51 tareas en las 10 actividades
     // de la escala general. GRADO_III_PLUS (data/fiscal) y DA 17.ª de la Ley 39/2006: existe el
     // Grado III+ de dependencia extrema; la app dice «Los grados son: Grado I, II y III».
-    test.fail();
     await cargar(page);
     const texto = await textoPagina(page);
     expect(texto).not.toMatch(/\b47 tareas\b/);
+    expect(texto).toMatch(/51 tareas agrupadas en 10 actividades/);
+    expect(texto).toMatch(/de 25 a 49 puntos es Grado I, de 50 a 74 puntos es Grado II, 75 o más es Grado III/);
     expect(texto).toMatch(/III\+|dependencia extrema/i);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el porcentaje pega el % a la cifra', async ({ page }) => {
-    // ABIERTO: CLAUDE.md §2 (decidido el 25/09/2026): «15 %» con espacio duro. Sale «12%».
-    test.fail();
+  test('HALLAZGO (18/11/2026, REPARADO 19/11/2026) · el porcentaje pega el % a la cifra', async ({ page }) => {
+    // REPARADO; era así:CLAUDE.md §2 (decidido el 25/09/2026): «15 %» con espacio duro. Sale «12%».
     await cargar(page);
     await page.getByRole('checkbox', { name: /Recopilar DNI\/NIE/ }).click();
     await page.getByRole('checkbox', { name: /Solicitar informe médico/ }).click();
@@ -277,10 +284,9 @@ test.describe('escritorio', () => {
     await expect(page.locator('[class*="_progresoPorcentaje"]')).toHaveText('12 %');
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · las casillas rompen la lista (li con role="checkbox")', async ({ page }) => {
-    // ABIERTO: axe-core: «list» (serious) en las 6 listas — «List element has direct children that
+  test('HALLAZGO (18/11/2026, REPARADO 19/11/2026) · las casillas rompen la lista (li con role="checkbox")', async ({ page }) => {
+    // REPARADO; era así:axe-core: «list» (serious) en las 6 listas — «List element has direct children that
     // are not allowed: [role=checkbox]» — y «aria-allowed-role» en las 25 casillas.
-    test.fail();
     await cargar(page);
     const axe = await new AxeBuilder({ page })
       .include('[class*="_checklist"]')
@@ -289,21 +295,22 @@ test.describe('escritorio', () => {
     expect(axe.violations.flatMap((v) => v.nodes.map((n) => `${v.id}: ${n.html.slice(0, 60)}`))).toEqual([]);
   });
 
-  test('HALLAZGO (18/11/2026, ABIERTO) · el contador de cada fase no llega a 4,5:1 en ningún tema', async ({ page }) => {
-    // ABIERTO: «1/5» en #6E6E6E sobre #E5E5E5 = 4,04:1 en claro; #9B9B9B sobre #404040 = 3,73:1 en
+  test('HALLAZGO (18/11/2026, REPARADO 19/11/2026) · el contador de cada fase no llega a 4,5:1 en ningún tema', async ({ page }) => {
+    // REPARADO; era así:«1/5» en #6E6E6E sobre #E5E5E5 = 4,04:1 en claro; #9B9B9B sobre #404040 = 3,73:1 en
     // oscuro (13,6 px, no es texto grande). Medido con axe-core el 18/11/2026.
-    test.fail();
     await cargar(page);
     for (const tema of ['claro', 'oscuro']) {
       if (tema === 'oscuro') {
         await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
         await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+        // El fondo cambia con transición: medido al vuelo, axe lee un gris intermedio (#d2d2d2)
+        await expect(page.locator('[class*="_faseProgreso"]').first()).toHaveCSS('background-color', 'rgb(64, 64, 64)');
       }
       const axe = await new AxeBuilder({ page })
         .include('[class*="_faseProgreso"]')
         .withRules(['color-contrast'])
         .analyze();
-      expect(axe.violations.flatMap((v) => v.nodes.map((n) => n.html)), `tema ${tema}`).toEqual([]);
+      expect(axe.violations.flatMap((v) => v.nodes.map((n) => `${n.html} ${n.failureSummary}`)), `tema ${tema}`).toEqual([]);
     }
   });
 });
