@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, MINIMOS_IRPF_2025 } from '@/data/fiscal';
+import { FISCAL_IRPF_META, TRAMOS_IRPF_2025 } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
+import { FAQ_BASE_LIQUIDABLE, FAQ_TIPO_MEDIO, FAQ_SUBIR_TRAMO } from './faq';
 
 // Año del título: la vigencia del módulo que sella los datos. Sale del dato
 // y no se escribe a mano (lo exige check:anio-titulo).
@@ -82,18 +83,18 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué diferencia hay entre el tipo marginal y el tipo medio del IRPF?',
+      name: FAQ_TIPO_MEDIO.pregunta,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El tipo marginal es el porcentaje que se aplica al último euro ganado, es decir, el tipo del tramo más alto en que se encuentra tu renta. El tipo medio es el porcentaje efectivo que pagas sobre la totalidad de tu base liquidable: cuota total dividida entre base. Siempre es menor que el marginal porque los tramos inferiores tributan a tipos más bajos. Por ejemplo, con 40.000 € de base, el tipo marginal es el 37% pero el tipo medio puede rondar el 20%.',
+        text: FAQ_TIPO_MEDIO.respuesta,
       },
     },
     {
       '@type': 'Question',
-      name: '¿Qué pasa con mi cuota si subo de tramo IRPF?',
+      name: FAQ_SUBIR_TRAMO.pregunta,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Al cruzar un tramo, el tipo más alto solo se aplica a la parte de renta que supera el límite del tramo anterior, no a toda tu renta. Por tanto, ganar más siempre deja más neto en tu bolsillo, aunque el incremento tributa al tipo superior. Este es un malentendido muy frecuente: "subir de tramo" no implica pagar más en total, sino que el exceso sobre el umbral queda sujeto al tipo siguiente.',
+        text: FAQ_SUBIR_TRAMO.respuesta,
       },
     },
     {
@@ -106,10 +107,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué es la base liquidable y sobre qué se calculan los tramos del IRPF?',
+      name: FAQ_BASE_LIQUIDABLE.pregunta,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `La base liquidable es la cantidad sobre la que se aplican los tramos del IRPF: la base imponible (rendimientos netos y demás rentas) menos las reducciones previstas en la ley, como las aportaciones a planes de pensiones o la de tributación conjunta. El mínimo personal y familiar (${euros(MINIMOS_IRPF_2025.personal)} el del contribuyente, más lo que corresponda por hijos, mayores o discapacidad) no se resta de la base: se grava a tipo cero, aplicando la escala también a su importe y restando esa cuota (art. 63.1 LIRPF). No es lo mismo que el salario bruto: la base liquidable suele ser bastante inferior.`,
+        text: FAQ_BASE_LIQUIDABLE.respuesta,
       },
     },
   ],

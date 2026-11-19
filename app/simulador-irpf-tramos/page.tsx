@@ -13,8 +13,29 @@ import {
   DataReference,
 } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
-import { TRAMOS_IRPF_2025, FISCAL_IRPF_META } from '@/data/fiscal';
+import {
+  TRAMOS_IRPF_2025,
+  FISCAL_IRPF_META,
+  MINIMOS_IRPF_2025,
+  cuotaEscalaGeneral,
+  calcularCuotaIntegraGeneral,
+} from '@/data/fiscal';
 import styles from './SimuladorIrpfTramos.module.css';
+import { FAQ_BASE_LIQUIDABLE, FAQ_TIPO_MEDIO, FAQ_SUBIR_TRAMO } from './faq';
+
+// Año de los datos: la vigencia del módulo, como el title (hallazgo 5164)
+const ANIO = FISCAL_IRPF_META.vigencia;
+
+// Casos de uso calculados con la escala de data/fiscal, no tecleados (hallazgo 5160)
+const fmtEur = (n: number) => formatCurrency(n);
+const fmtPct = (n: number) => `${formatNumber(n, 2)} %`;
+const JUBILADO_BASE = 24000;
+const JUBILADO_ESCALA = cuotaEscalaGeneral(JUBILADO_BASE);
+const JUBILADO_CUOTA = calcularCuotaIntegraGeneral(JUBILADO_BASE, MINIMOS_IRPF_2025.personal_65);
+const MINIMO_HIJOS_2 = MINIMOS_IRPF_2025.hijo_1 + MINIMOS_IRPF_2025.hijo_2;
+const MINIMO_FAMILIA = MINIMOS_IRPF_2025.personal + MINIMO_HIJOS_2;
+// Ahorro frente al soltero de la misma base, que también tiene su mínimo personal
+const AHORRO_FAMILIA = cuotaEscalaGeneral(MINIMO_FAMILIA) - cuotaEscalaGeneral(MINIMOS_IRPF_2025.personal);
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -403,7 +424,7 @@ export default function SimuladorIrpfTramosPage() {
 
       <header className={styles.hero}>
         <span className={styles.heroIcon} aria-hidden="true">📊</span>
-        <h1 className={styles.title}>Simulador Visual de Tramos IRPF 2025</h1>
+        <h1 className={styles.title}>{`Simulador Visual de Tramos IRPF ${ANIO}`}</h1>
         <p className={styles.subtitle}>
           Visualiza cómo afectan los tramos a tu cuota — interactivo y didáctico
         </p>
@@ -414,7 +435,7 @@ export default function SimuladorIrpfTramosPage() {
       <DisclaimerCard variant="financial" severity="critical" />
 
       <DataReference
-        normativa="IRPF 2025"
+        normativa={`IRPF ${ANIO}`}
         fuente={FISCAL_IRPF_META.fuente}
         verificado={FISCAL_IRPF_META.verificado}
         urlOficial={FISCAL_IRPF_META.urlOficial}
@@ -563,7 +584,7 @@ export default function SimuladorIrpfTramosPage() {
         title="Guía de los Tramos del IRPF"
         subtitle="Cómo funciona el impuesto sobre la renta en España"
       >
-        <h3>Tabla de Tramos IRPF 2025</h3>
+        <h3>{`Tabla de Tramos IRPF ${ANIO}`}</h3>
         <div className={styles.tableWrapper}>
           <table className={styles.comparativaTable}>
             <thead>
@@ -642,13 +663,13 @@ export default function SimuladorIrpfTramosPage() {
           <div className={styles.escenarioCard}>
             <h4>Jubilado con pensión (24.000 €)</h4>
             <p>
-              Pensión = rendimiento del trabajo a efectos de IRPF. Cuota ~3.866 €, tipo medio 16,1%. Las pensiones llevan retención mensual; el resultado de la declaración suele ser pequeño.
+              {`Pensión = rendimiento del trabajo a efectos de IRPF. La escala da ${fmtEur(JUBILADO_ESCALA)} (${fmtPct((JUBILADO_ESCALA / JUBILADO_BASE) * 100)}); restando la cuota de su mínimo personal de mayor de 65 años (${fmtEur(MINIMOS_IRPF_2025.personal_65)}, que se grava a tipo cero), la cuota íntegra queda en ${fmtEur(JUBILADO_CUOTA)}, un ${fmtPct((JUBILADO_CUOTA / JUBILADO_BASE) * 100)}. Las pensiones llevan retención mensual; el resultado de la declaración suele ser pequeño.`}
             </p>
           </div>
           <div className={styles.escenarioCard}>
             <h4>Familia con un solo ingreso (45.000 €, 2 hijos)</h4>
             <p>
-              La base liquidable es la misma que la del soltero, pero la cuota es menor: el mínimo personal (5.550 €) y los mínimos por hijos (2.400 + 2.700 = 5.100 €) no se restan de la base, se gravan a tipo cero (art. 63.1.2.º LIRPF). En la práctica, esos 10.650 € se valoran al 19 % —2.023,50 € menos de cuota—, y no al tipo marginal.
+              {`La base liquidable es la misma que la del soltero, pero la cuota es menor: el mínimo personal (${fmtEur(MINIMOS_IRPF_2025.personal)}) y los mínimos por hijos (${fmtEur(MINIMOS_IRPF_2025.hijo_1)} + ${fmtEur(MINIMOS_IRPF_2025.hijo_2)} = ${fmtEur(MINIMO_HIJOS_2)}) no se restan de la base, se gravan a tipo cero (art. 63.1.2.º LIRPF), así que se valoran a los tipos bajos de la escala y no al marginal. El soltero también tiene su mínimo personal: frente a él, la familia paga ${fmtEur(AHORRO_FAMILIA)} menos de cuota, lo que valen los ${fmtEur(MINIMO_HIJOS_2)} de los hijos en el primer tramo.`}
             </p>
           </div>
         </div>
@@ -656,10 +677,8 @@ export default function SimuladorIrpfTramosPage() {
         <h3>Preguntas Frecuentes</h3>
         <div className={styles.faqList}>
           <div className={styles.faqItem}>
-            <strong>¿Cuál es la diferencia entre tipo marginal y tipo medio?</strong>
-            <p>
-              El <em>tipo marginal</em> es el porcentaje que se aplica al último euro ganado (al tramo más alto en el que cae tu base). El <em>tipo medio efectivo</em> es la cuota total dividida entre la base. Casi siempre el medio es notablemente menor que el marginal porque los primeros euros tributan a tipos bajos.
-            </p>
+            <strong>{FAQ_TIPO_MEDIO.pregunta}</strong>
+            <p>{FAQ_TIPO_MEDIO.respuesta}</p>
           </div>
           <div className={styles.faqItem}>
             <strong>¿El IRPF es estatal o autonómico?</strong>
@@ -668,10 +687,8 @@ export default function SimuladorIrpfTramosPage() {
             </p>
           </div>
           <div className={styles.faqItem}>
-            <strong>¿Qué es la base liquidable?</strong>
-            <p>
-              Es el resultado de partir de tus ingresos brutos, restar cotizaciones SS y gastos deducibles del trabajo, aplicar las reducciones (art. 20 LIRPF, planes de pensiones, etc.) y restar los mínimos personales y familiares. Es la cifra a la que se aplican los tramos.
-            </p>
+            <strong>{FAQ_BASE_LIQUIDABLE.pregunta}</strong>
+            <p>{FAQ_BASE_LIQUIDABLE.respuesta}</p>
           </div>
           <div className={styles.faqItem}>
             <strong>¿Por qué los tramos son progresivos?</strong>
@@ -680,10 +697,8 @@ export default function SimuladorIrpfTramosPage() {
             </p>
           </div>
           <div className={styles.faqItem}>
-            <strong>Si subo de tramo, ¿todo mi sueldo tributa al nuevo tipo?</strong>
-            <p>
-              <strong>NO.</strong> Es un mito muy extendido. Solo la parte de tu base que entra en el nuevo tramo paga ese tipo. Por ejemplo, si pasas de 35.000 a 36.000 €: los primeros 35.200 € siguen pagando lo mismo, y solo los 800 € adicionales pagan al 37%. Nunca pierdes dinero por subir de tramo.
-            </p>
+            <strong>{FAQ_SUBIR_TRAMO.pregunta}</strong>
+            <p>{FAQ_SUBIR_TRAMO.respuesta}</p>
           </div>
           <div className={styles.faqItem}>
             <strong>¿Cómo se calcula la retención mensual en nómina?</strong>
@@ -707,9 +722,9 @@ export default function SimuladorIrpfTramosPage() {
           <div className={styles.step}>
             <span className={styles.stepNumber}>2</span>
             <div className={styles.stepContent}>
-              <strong>Resta los mínimos personales y familiares</strong>
+              <strong>Obtén la base liquidable y suma tu mínimo personal y familiar</strong>
               <p>
-                Personal: 5.550 €. Por cada hijo: 2.400 / 2.700 / 4.000 / 4.500 €. Adicional por hijo &lt; 3 años: 2.800 €. Mínimos por discapacidad o ascendientes a cargo. El resultado es la base liquidable.
+                La base liquidable es la base imponible menos las reducciones (planes de pensiones, tributación conjunta…). El mínimo personal y familiar <strong>no se resta</strong> de ella (art. 63.1.2.º LIRPF): súmalo aparte para el paso 3. Personal: 5.550 €. Por cada hijo: 2.400 / 2.700 / 4.000 / 4.500 €. Adicional por hijo &lt; 3 años: 2.800 €. Mínimos por discapacidad o ascendientes a cargo.
               </p>
             </div>
           </div>
@@ -718,7 +733,7 @@ export default function SimuladorIrpfTramosPage() {
             <div className={styles.stepContent}>
               <strong>Aplica los tramos uno a uno</strong>
               <p>
-                Ve rellenando los tramos de menor a mayor: primer tramo (hasta 12.450 € al 19%), segundo (12.450–20.200 al 24%), etc. Suma las cuotas parciales.
+                Ve rellenando los tramos de menor a mayor con la base liquidable entera: primer tramo (hasta 12.450 € al 19%), segundo (12.450–20.200 al 24%), etc. Suma las cuotas parciales. Aplica después la misma escala al importe del mínimo personal y familiar y resta esa cuota: así el mínimo tributa a tipo cero y no a tu tipo marginal.
               </p>
             </div>
           </div>
@@ -795,11 +810,11 @@ export default function SimuladorIrpfTramosPage() {
           </div>
           <ul className={styles.warningList}>
             <li>Confundir el tipo marginal con el tipo aplicado a toda la base (es solo al último euro).</li>
-            <li>No restar los mínimos personales y familiares de la base imponible antes de aplicar tramos.</li>
+            <li>Restar el mínimo personal y familiar de la base antes de aplicar los tramos: se grava a tipo cero (art. 63.1.2.º LIRPF), y restarlo lo valora a tu tipo marginal y subestima la cuota.</li>
             <li>Ignorar las variaciones autonómicas: Madrid, Andalucía o Galicia tributan distinto.</li>
             <li>No actualizar los tramos tras la Ley de Presupuestos Generales del Estado de cada año.</li>
             <li>Asumir que la retención mensual de la nómina equivale a la cuota IRPF final.</li>
-            <li>Confundir base imponible con base liquidable (la liquidable ya tiene restados los mínimos).</li>
+            <li>Confundir base imponible con base liquidable (la liquidable es la imponible menos las reducciones; el mínimo personal y familiar no se resta de ninguna de las dos).</li>
           </ul>
         </div>
       </EducationalSection>

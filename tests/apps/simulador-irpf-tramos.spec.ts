@@ -193,71 +193,75 @@ test.describe('simulador-irpf-tramos', () => {
     await expect.poll(() => texto(aviso), { timeout: 3000 }).toContain('(19,0% del incremento');
   });
 
-  test('ABIERTO · la FAQ visible no manda restar los mínimos de la base y dice lo mismo que el FAQPage', async ({ page }) => {
-    // Art. 63.1.2.º LIRPF: el mínimo NO se resta de la base liquidable. La FAQ visible dice «…y
-    // restar los mínimos personales y familiares. Es la cifra a la que se aplican los tramos»; el
-    // FAQPage de la misma app dice lo contrario («no se resta de la base: se grava a tipo cero»).
-    test.fail();
+  test('REPARADO (5158, 19/11/2026) · la FAQ visible no manda restar los mínimos de la base y dice lo mismo que el FAQPage', async ({ page }) => {
+    // Art. 63.1.2.º LIRPF: el mínimo NO se resta de la base liquidable. Era: la FAQ visible decía
+    // «…y restar los mínimos personales y familiares. Es la cifra a la que se aplican los tramos»;
+    // el FAQPage, lo contrario. Ahora las dos salen de FAQ_BASE_LIQUIDABLE (faq.ts).
     const visible = await respuestaVisible(page, /Qué es la base liquidable/);
     expect(visible).not.toContain('restar los mínimos');
     const jsonLd = (await faqPage(page)).find((q) => /base liquidable/.test(q.name));
     expect(visible).toBe(normalizar(jsonLd?.acceptedAnswer.text ?? ''));
   });
 
-  test('ABIERTO · el paso 2 de «Cómo calcular tu IRPF a mano» no resta los mínimos para obtener la base liquidable', async ({ page }) => {
-    // Paso 2: «Resta los mínimos personales y familiares … El resultado es la base liquidable».
-    // Quien lo siga con 45.050 € de base y el mínimo de 5.550 € mete 39.500 € y la app le da
+  test('REPARADO (5158) · el paso 2 de «Cómo calcular tu IRPF a mano» no resta los mínimos para obtener la base liquidable', async ({ page }) => {
+    // Era: «Resta los mínimos personales y familiares … El resultado es la base liquidable». Quien
+    // lo siguiera con 45.050 € de base y el mínimo de 5.550 € metía 39.500 € y la app le daba
     // 10.316,50 €; por el art. 63.1.2.º son 12.370,00 − 1.054,50 = 11.315,50 € (999,00 € menos).
-    test.fail();
     const pasos = page.locator('h3', { hasText: 'Paso a Paso' }).locator('xpath=following-sibling::div[1]');
-    expect(await texto(pasos)).not.toContain('Resta los mínimos personales y familiares');
+    const t = await texto(pasos);
+    expect(t).not.toContain('Resta los mínimos personales y familiares');
+    expect(t).toContain('El mínimo personal y familiar no se resta de ella (art. 63.1.2.º LIRPF)');
+    expect(t).toContain('Aplica después la misma escala al importe del mínimo personal y familiar y resta esa cuota');
   });
 
-  test('ABIERTO · «Errores frecuentes» no da por error NO restar los mínimos de la base', async ({ page }) => {
-    // Dos viñetas contra el art. 63.1.2.º: «No restar los mínimos personales y familiares de la
-    // base imponible antes de aplicar tramos» y «la liquidable ya tiene restados los mínimos».
-    test.fail();
+  test('REPARADO (5158) · «Errores frecuentes» no da por error NO restar los mínimos de la base', async ({ page }) => {
+    // Eran dos viñetas contra el art. 63.1.2.º: «No restar los mínimos personales y familiares de
+    // la base imponible antes de aplicar tramos» y «la liquidable ya tiene restados los mínimos».
     await expect(page.locator('li', { hasText: 'No restar los mínimos' })).toHaveCount(0, { timeout: 2000 });
     await expect(page.locator('li', { hasText: 'ya tiene restados los mínimos' })).toHaveCount(0, { timeout: 2000 });
+    await expect(page.locator('li', { hasText: 'Restar el mínimo personal y familiar de la base antes de aplicar los tramos' })).toHaveCount(1);
   });
 
-  test('ABIERTO · tipo marginal y medio: una sola respuesta, sin «siempre menor» ni «≈20 % con 40.000 €»', async ({ page }) => {
+  test('REPARADO (5159) · tipo marginal y medio: una sola respuesta, sin «siempre menor» ni «≈20 % con 40.000 €»', async ({ page }) => {
     // Con 40.000 € la escala da 10.501,50 € (26,25 %; 23,62 % con el mínimo de 5.550 €), no
-    // «rondar el 20%». Y con base ≤ 12.450 € el medio IGUALA al marginal (19 %). La FAQ visible
-    // («Casi siempre… menor») y el FAQPage responden distinto a la misma pregunta.
-    test.fail();
+    // «rondar el 20%». Y con base ≤ 12.450 € el medio IGUALA al marginal (19 %).
     const jsonLd = (await faqPage(page)).find((q) => /tipo marginal y (el )?tipo medio/.test(q.name));
     const respuesta = normalizar(jsonLd?.acceptedAnswer.text ?? '');
     expect(respuesta).not.toMatch(/rondar el 20%/);
     expect(respuesta).not.toContain('Siempre es menor');
+    expect(respuesta).toContain('Con una base de hasta 12.450 € los dos coinciden (19%)');
+    expect(respuesta).toContain('la escala da 10.501,50 € de cuota, un tipo medio del 26,25% (23,62% restando la cuota del mínimo personal de 5550 €)');
     expect(await respuestaVisible(page, /tipo marginal y (el )?tipo medio/)).toBe(respuesta);
   });
 
-  test('ABIERTO · «subo de tramo»: una sola respuesta en la FAQ visible y en el FAQPage', async ({ page }) => {
-    // Las dos dicen lo mismo con distintas palabras (la visible añade el ejemplo 35.000 → 36.000:
-    // 800 € al 37 %). La reparación es una constante que importen las dos (check:faq-unica).
-    test.fail();
+  test('REPARADO (5161) · «subo de tramo»: una sola respuesta en la FAQ visible y en el FAQPage', async ({ page }) => {
+    // Las dos decían lo mismo con distintas palabras; ahora salen de FAQ_SUBIR_TRAMO (faq.ts),
+    // con el ejemplo 35.000 → 36.000: 800 € al 37 %.
     const jsonLd = (await faqPage(page)).find((q) => /subo de tramo/.test(q.name));
-    expect(await respuestaVisible(page, /subo de tramo/)).toBe(normalizar(jsonLd?.acceptedAnswer.text ?? ''));
+    const respuesta = normalizar(jsonLd?.acceptedAnswer.text ?? '');
+    expect(respuesta).toContain('solo los 800 € que entran en el tramo siguiente pagan el 37%');
+    expect(await respuestaVisible(page, /subo de tramo/)).toBe(respuesta);
   });
 
-  test('ABIERTO · «Casos de uso»: jubilado de 24.000 € y familia con dos hijos cuadran con la escala', async ({ page }) => {
-    // Jubilado: la escala da 5.365,50 € (22,36 %), con el mínimo de 65 años (6.700 €) 4.092,50 €;
-    // la tarjeta dice «~3.866 €, tipo medio 16,1%», que no sale con ningún mínimo de data/fiscal.
-    // Familia: el soltero también tiene su mínimo de 5.550 €; lo que ahorra la familia frente a él
-    // son los 5.100 € de los hijos al 19 % = 969,00 €, no «2.023,50 € menos de cuota».
-    test.fail();
+  test('REPARADO (5160) · «Casos de uso»: jubilado de 24.000 € y familia con dos hijos cuadran con la escala', async ({ page }) => {
+    // Jubilado: la escala da 5.365,50 € (22,36 %), con el mínimo de 65 años (6.700 €) 4.092,50 €
+    // (17,05 %); la tarjeta decía «~3.866 €, tipo medio 16,1%». Familia: el soltero también tiene
+    // su mínimo de 5.550 €; lo que ahorra la familia frente a él son los 5.100 € de los hijos al
+    // 19 % = 969,00 €, no «2.023,50 € menos de cuota».
     const jubilado = await texto(page.locator('h4', { hasText: 'Jubilado con pensión' }).locator('xpath=..'));
     expect(jubilado).not.toContain('3.866');
+    expect(jubilado).toContain('La escala da 5365,50 € (22,36%)');
+    expect(jubilado).toContain('la cuota íntegra queda en 4092,50 €, un 17,05%');
     const familia = await texto(page.locator('h4', { hasText: 'Familia con un solo ingreso' }).locator('xpath=..'));
     expect(familia).not.toContain('2.023,50 € menos de cuota');
+    expect(familia).toContain('la familia paga 969,00 € menos de cuota');
   });
 
-  test('ABIERTO · el <h1> lleva el año de la vigencia de data/fiscal, como el title y el FAQPage', async ({ page }) => {
+  test('REPARADO (5164) · el <h1> lleva el año de la vigencia de data/fiscal, como el title y el FAQPage', async ({ page }) => {
     // Title, FAQPage y features dicen FISCAL_IRPF_META.vigencia (2026); el <h1>, la tabla y el
-    // DataReference, «2025» escrito a mano.
-    test.fail();
+    // DataReference decían «2025» escrito a mano.
     await expect(page.locator('h1')).toContainText(FISCAL_IRPF_META.vigencia, { timeout: 2000 });
+    await expect(page.locator('h3', { hasText: 'Tabla de Tramos IRPF' })).toContainText(FISCAL_IRPF_META.vigencia);
   });
 
   test('ABIERTO · el «%» del resumen va con espacio duro (U+00A0)', async ({ page }) => {
