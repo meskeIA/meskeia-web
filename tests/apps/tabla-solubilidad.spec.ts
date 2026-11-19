@@ -276,7 +276,11 @@ test.describe('Comprobador de precipitación (inspector 14/11/2026)', () => {
     expect(categoria((await resultado(page)).estado)).toBe('poco');
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) · el umbral que declara la app contradice sus propias clasificaciones', async ({ page }) => {
+  // REPARADO el 19/11/2026 (hallazgo 4654), por el lado del texto: las etiquetas son las de las
+  // reglas clásicas y no se tocan; la guía, junto al corte, nombra los tres casos que caen al otro
+  // lado con su cifra, y la ficha del CaSO₄ ya no llama «caso típico» a lo que el corte da por
+  // insoluble. Mide: cada par cuya etiqueta no es la del corte está nombrado en la guía.
+  test('HALLAZGO 4654 (14/11/2026, REPARADO) · el umbral que declara la app no contradice en silencio sus propias clasificaciones', async ({ page }) => {
     // La guía declara: «soluble: más de 0,1 mol/L · poco soluble: entre 0,01 y 0,1 mol/L ·
     // insoluble: menos de 0,01 mol/L». Con las cifras de la PROPIA app:
     //   · Li₂CO₃ «unos 13 g/L» ÷ 73,888 g/mol = 0,176 mol/L → soluble (PubChem: 1,3 g/100 mL).
@@ -285,27 +289,34 @@ test.describe('Comprobador de precipitación (inspector 14/11/2026)', () => {
     //   · CaSO₄ «s = 7,0×10⁻³ mol/L» → insoluble, y su ficha dice «Con solo 7 mmol/L es el caso
     //     típico de «poco soluble»» (PubChem/CRC: 0,209 g/100 mL ÷ 136,14 = 15 mmol/L, que sí es
     //     poco soluble). Hoy las tres salen «Poco soluble».
-    // Si se cambia la forma del umbral, este caso deja de poder medirlo y pasa: revisarlo.
-    test.fail();
-    const cuerpo = (await page.locator('body').textContent()) ?? '';
+    const cuerpo = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
     const alto = cuerpo.match(/soluble: más de ([\d,]+) mol\/L/);
     const bajo = cuerpo.match(/insoluble: menos de ([\d,]+) mol\/L/);
+    expect(alto && bajo, 'la guía sigue declarando el corte').toBeTruthy();
     if (!alto || !bajo) return;
     const umbralAlto = parseSpanishNumber(alto[1]);
     const umbralBajo = parseSpanishNumber(bajo[1]);
     const segunUmbral = (s: number): Categoria => (s > umbralAlto ? 'soluble' : s < umbralBajo ? 'insoluble' : 'poco');
+    // El párrafo de la guía que va tras el corte
+    const aclaracion = cuerpo.match(/Las etiquetas de esta tabla siguen las reglas clásicas[^]*?«poco soluble»\./)?.[0] ?? '';
 
-    const casos: [string, string, number][] = [
-      ['Li', 'CO3', 13 / 73.888],
-      ['K', 'ClO4', Math.sqrt(1.05e-2)],
-      ['Ca', 'SO4', 7.0e-3],
+    const casos: [string, string, number, string][] = [
+      ['Li', 'CO3', 13 / 73.888, 'Li₂CO₃, unos 0,18 mol/L'],
+      ['K', 'ClO4', Math.sqrt(1.05e-2), 'KClO₄, unos 0,10 mol/L'],
+      ['Ca', 'SO4', 7.0e-3, 'CaSO₄, 7,0×10⁻³ mol/L'],
     ];
-    for (const [cation, anion, s] of casos) {
+    let discrepancias = 0;
+    for (const [cation, anion, s, nombre] of casos) {
       await elegirPar(page, cation, anion);
-      expect.soft(categoria((await resultado(page)).estado), `${cation} + ${anion}: s = ${s.toPrecision(3)} mol/L`).toBe(
-        segunUmbral(s),
-      );
+      const etiqueta = categoria((await resultado(page)).estado);
+      if (etiqueta !== segunUmbral(s)) {
+        discrepancias += 1;
+        expect.soft(aclaracion, `${cation} + ${anion} sale «${etiqueta}» con s = ${s.toPrecision(3)} mol/L: la guía lo nombra`).toContain(nombre);
+      }
     }
+    expect(discrepancias, 'los tres pares siguen al otro lado del corte (si cambia, revisar la guía)').toBe(3);
+    // La ficha del CaSO₄ ya no llama «caso típico de poco soluble» a 7 mmol/L
+    expect(await detalle(page, 'kps-caso4')).not.toContain('caso típico');
   });
 
   test('HALLAZGO (14/11/2026, ABIERTO) · la característica «iónica completa de cada precipitación» que el comprobador no da', async ({ page }) => {
@@ -582,15 +593,16 @@ test.describe('Cabos C0746 y C0751 (inspector 14/11/2026)', () => {
     await cargar(page);
   });
 
-  // ABIERTO — hallazgo de C0746 (a). Esperado: Al³⁺ + S²⁻ no da Al₂S₃(s), que en agua se hidroliza
-  // a hidróxido de aluminio y sulfuro de hidrógeno (Merck Index, vía PubChem CID 159369); lo que
-  // precipita es Al(OH)₃. Hoy: «Al₂S₃ ✕ Insoluble — precipita» y «2 Al³⁺ + 3 S²⁻ → Al₂S₃(s)↓».
-  test('HALLAZGO C0746 (a) (14/11/2026, ABIERTO) · Al³⁺ + S²⁻ escribe «Al₂S₃(s)↓», que en agua se hidroliza a Al(OH)₃ y H₂S', async ({ page }) => {
-    test.fail();
+  // REPARADO el 19/11/2026 (hallazgo 4707) — C0746 (a). Al³⁺ + S²⁻ no da Al₂S₃(s), que en agua se
+  // hidroliza a hidróxido de aluminio y sulfuro de hidrógeno (Merck Index, vía PubChem CID 159369);
+  // lo que precipita es Al(OH)₃. Daba «Al₂S₃ ✕ Insoluble — precipita» y «2 Al³⁺ + 3 S²⁻ → Al₂S₃(s)↓».
+  // Ecuación iónica neta, ajustada a mano: Al 2 = 2 · S 3 = 3 · O 6 = 6 · H 12 = 6 + 6 · carga 0 = 0.
+  test('HALLAZGO 4707 C0746 (a) (14/11/2026, REPARADO) · Al³⁺ + S²⁻ da Al(OH)₃ y H₂S, no «Al₂S₃(s)↓»', async ({ page }) => {
     await elegirPar(page, 'Al', 'S');
     const r = await resultado(page);
     expect.soft(r.texto, 'el precipitado no es Al₂S₃').not.toContain('Al₂S₃(s)');
     expect.soft(r.texto, 'lo que precipita es el hidróxido').toContain('Al(OH)₃');
+    expect(r.texto).toContain('2 Al³⁺ + 3 S²⁻ + 6 H₂O → 2 Al(OH)₃(s)↓ + 3 H₂S(g)↑');
   });
 
   // ABIERTO — hallazgo de C0746 (b). Esperado: si la tarjeta Hidróxidos dice «NH₄OH no existe como
@@ -614,9 +626,10 @@ test.describe('Cabos C0746 y C0751 (inspector 14/11/2026)', () => {
   //   Fe(OH)₃: s = 1,0×10⁻¹⁰ mol/L (su ficha de Kps: ⁴√(2,8×10⁻³⁹/27) = 1,009×10⁻¹⁰).
   //   log₁₀(27,3 / 1,0×10⁻¹⁰) = 11,4 → unos ONCE órdenes, no cuarenta.
   // Si se cambia la forma de la frase, el caso deja de poder medirla y pasa: revisarlo.
-  test('HALLAZGO C0746 (c) (14/11/2026, ABIERTO) · «casi cuarenta órdenes de magnitud» entre NaOH y Fe(OH)₃: en solubilidad molar son unos once', async ({ page }) => {
-    test.fail();
+  // REPARADO el 19/11/2026 (hallazgo 4709): la tarjeta dice «unos once órdenes de magnitud».
+  test('HALLAZGO 4709 C0746 (c) (14/11/2026, REPARADO) · entre NaOH y Fe(OH)₃ hay unos once órdenes de magnitud de solubilidad molar, no cuarenta', async ({ page }) => {
     const tarjeta = await detalle(page, 'hidroxidos');
+    expect(tarjeta, 'la frase sigue ahí para poder medirla').toMatch(/órdenes de magnitud/);
     const fila = (await page.locator('button[aria-controls="detalle-kps-feoh3"]').textContent()) ?? '';
     const sFeOH3 = solubilidadMolar(fila);
     const sNaOH = 1090 / 39.997;
@@ -649,12 +662,15 @@ test.describe('Cabos C0746 y C0751 (inspector 14/11/2026)', () => {
   // y el MgS «Reacts with water producing toxic and extremely flammable gas» (PubChem CID 82824).
   // Hoy: «MgS ✕ Insoluble — precipita» con la regla «salvo los de metales alcalinos y amonio» y
   // «Mg²⁺ + S²⁻ → MgS(s)↓», mientras Ca²⁺ + S²⁻ sale «Soluble» por la excepción de alcalinotérreos.
-  test('HALLAZGO C0746 (e) (14/11/2026, ABIERTO) · Mg²⁺ + S²⁻ escribe «MgS(s)↓» fuera de la excepción de los alcalinotérreos', async ({ page }) => {
-    test.fail();
+  // REPARADO el 19/11/2026 (hallazgo 4711): Mg|S entra en la excepción de los alcalinotérreos, y
+  // la tarjeta Sulfuros lo nombra (MgS, CaS, SrS, BaS).
+  test('HALLAZGO 4711 C0746 (e) (14/11/2026, REPARADO) · Mg²⁺ + S²⁻ no escribe «MgS(s)↓»: entra en la excepción de los alcalinotérreos', async ({ page }) => {
     const tarjeta = await detalle(page, 'sulfuros');
-    expect(tarjeta).toMatch(/alcalinotérreos/);
+    expect(tarjeta).toMatch(/alcalinotérreos \(MgS, CaS, SrS, BaS\)/);
     await elegirPar(page, 'Mg', 'S');
     const r = await resultado(page);
     expect(r.texto, 'el MgS reacciona con el agua: no es el precipitado').not.toContain('MgS(s)');
+    expect(categoria(r.estado)).toBe('soluble');
+    expect(r.texto).toContain('el magnesio también es alcalinotérreo');
   });
 });

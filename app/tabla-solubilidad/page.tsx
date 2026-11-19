@@ -429,7 +429,7 @@ const REGLAS: ReglaSolubilidad[] = [
       'Los sulfuros son insolubles en agua, y algunos de los sólidos menos solubles que se conocen: el sulfuro de plata tiene un Kps del orden de 10⁻⁵⁰. Muchos minerales metálicos son sulfuros por este motivo.',
     excepciones: [
       'Solubles los de metales alcalinos y el de amonio.',
-      'Los de alcalinotérreos (CaS, SrS, BaS) se disuelven, aunque hidrolizándose y liberando H₂S.',
+      'Los de alcalinotérreos (MgS, CaS, SrS, BaS) no precipitan: se disuelven o reaccionan con el agua, hidrolizándose y liberando H₂S.',
     ],
     ejemplos: 'CuS, ZnS, PbS, Ag₂S, HgS, CdS, FeS',
     reaccion: {
@@ -450,7 +450,7 @@ const REGLAS: ReglaSolubilidad[] = [
     titulo: 'Hidróxidos',
     estado: 'insoluble',
     enunciado:
-      'Los hidróxidos son insolubles en agua salvo los de los metales alcalinos. Es la regla con más excepciones graduales: entre el NaOH (muy soluble) y el Fe(OH)₃ (Kps ≈ 10⁻³⁹) hay casi cuarenta órdenes de magnitud.',
+      'Los hidróxidos son insolubles en agua salvo los de los metales alcalinos. Es la regla con más excepciones graduales: entre el NaOH (muy soluble, unos 27 mol por litro de agua) y el Fe(OH)₃ (s ≈ 1,0×10⁻¹⁰ mol/L) hay unos once órdenes de magnitud de solubilidad molar.',
     excepciones: [
       'Solubles: los de metales alcalinos (NaOH, KOH, LiOH…) y Ba(OH)₂.',
       'Parcialmente solubles: Ca(OH)₂ (agua de cal) y Sr(OH)₂.',
@@ -1203,7 +1203,7 @@ const KPS: CompuestoKps[] = [
     expresion: 'Kps = [Ca²⁺]·[SO₄²⁻]',
     relacion: 'Kps = s²',
     solubilidad: 's = √Kps = 7,0×10⁻³ mol/L',
-    nota: 'El yeso. Con solo 7 mmol/L es el caso típico de «poco soluble»: se nota turbidez pero no es un precipitado limpio.',
+    nota: 'El yeso. Con unos 7 mmol/L queda por debajo del corte de 0,01 mol/L de la guía, pero las reglas lo enseñan como «poco soluble»: se nota turbidez pero no es un precipitado limpio.',
     busqueda: 'sulfato de calcio CaSO4 kps yeso poco soluble dureza del agua',
   },
   {
@@ -1465,6 +1465,13 @@ const ANIONES_INSOLUBLES = ['CO3', 'PO4', 'CrO4', 'S', 'OH', 'SO3', 'C2O4', 'F',
 interface Veredicto {
   estado: Estado;
   regla: string;
+  /**
+   * Lo que precipita y sus ecuaciones cuando NO es la sal que sale de cruzar las cargas: el
+   * Al₂S₃ no existe en agua, se hidroliza (hallazgo 4707). Sin ellos se construyen cruzando cargas.
+   */
+  formula?: string;
+  molecular?: string;
+  ionicaNeta?: string;
 }
 
 /** Excepciones concretas: se comprueban antes que cualquier regla general. */
@@ -1556,6 +1563,22 @@ const EXCEPCIONES: Record<string, Veredicto> = {
   'Ca|S': {
     estado: 'soluble',
     regla: 'Excepción de los sulfuros: los de alcalinotérreos se disuelven con hidrólisis.',
+  },
+  // El magnesio es alcalinotérreo (grupo 2) y el MgS «reacts with water producing toxic and
+  // extremely flammable gas» (Alfa Aesar MSDS, vía Haz-Map, PubChem CID 82824): no es un
+  // precipitado en agua (hallazgo 4711). La tarjeta Sulfuros lo incluye en la excepción.
+  'Mg|S': {
+    estado: 'soluble',
+    regla: 'Excepción de los sulfuros: el magnesio también es alcalinotérreo, y el MgS no precipita como tal: reacciona con el agua y libera H₂S.',
+  },
+  // «Hydrolyzes in water forming aluminum hydroxide and hydrogen sulfide» (Merck Index, vía
+  // PubChem CID 159369): lo que precipita es el Al(OH)₃, no el Al₂S₃ (hallazgo 4707).
+  'Al|S': {
+    estado: 'insoluble',
+    regla: 'El Al₂S₃ no existe en agua: se hidroliza al momento a hidróxido de aluminio, que precipita, y sulfuro de hidrógeno, que se desprende. El precipitado es Al(OH)₃.',
+    formula: 'Al(OH)₃',
+    molecular: '2 Al(NO₃)₃(ac) + 3 Na₂S(ac) + 6 H₂O(l) → 2 Al(OH)₃(s)↓ + 3 H₂S(g)↑ + 6 NaNO₃(ac)',
+    ionicaNeta: '2 Al³⁺ + 3 S²⁻ + 6 H₂O → 2 Al(OH)₃(s)↓ + 3 H₂S(g)↑',
   },
   'Ag|CH3COO': {
     estado: 'poco',
@@ -1799,9 +1822,9 @@ export default function TablaSolubilidadPage() {
     const veredicto = resolverSolubilidad(cationSeleccionado, anionSeleccionado);
     return {
       ...veredicto,
-      formula: formulaCompuesto(cationSeleccionado, anionSeleccionado),
-      ionicaNeta: ecuacionIonicaNeta(cationSeleccionado, anionSeleccionado),
-      molecular: ecuacionMolecular(cationSeleccionado, anionSeleccionado),
+      formula: veredicto.formula ?? formulaCompuesto(cationSeleccionado, anionSeleccionado),
+      ionicaNeta: veredicto.ionicaNeta ?? ecuacionIonicaNeta(cationSeleccionado, anionSeleccionado),
+      molecular: veredicto.molecular ?? ecuacionMolecular(cationSeleccionado, anionSeleccionado),
     };
   }, [cationSeleccionado, anionSeleccionado]);
 
@@ -2216,6 +2239,17 @@ export default function TablaSolubilidadPage() {
             soluble: más de 0,1 mol/L · poco soluble: entre 0,01 y 0,1 mol/L · insoluble: menos de
             0,01 mol/L
           </div>
+          {/* Hallazgo 4654: tres etiquetas de la tabla caen al otro lado de este corte con las
+              cifras de la propia app (13 g/L ÷ 73,89 g/mol = 0,18; √1,05×10⁻² = 0,10; s del CaSO₄
+              7,0×10⁻³). Se dice aquí en vez de dejar que el corte las contradiga en silencio. */}
+          <p>
+            Las etiquetas de esta tabla siguen las reglas clásicas de solubilidad, no este corte al
+            milímetro, y tres casos caen al otro lado: el carbonato de litio (Li₂CO₃, unos 0,18
+            mol/L) y el perclorato de potasio (KClO₄, unos 0,10 mol/L) pasan del corte de «soluble»,
+            pero se enseñan como las excepciones «poco solubles» de unas reglas que dan por solubles
+            todas las sales de su grupo; y el sulfato de calcio (CaSO₄, 7,0×10⁻³ mol/L según su Kps)
+            queda por debajo de 0,01 mol/L y se enseña como «poco soluble».
+          </p>
           <p>
             Por eso una misma sal puede aparecer como «poco soluble» en un libro y como
             «insoluble» en otro sin que ninguno esté equivocado: están usando cortes distintos. Lo
