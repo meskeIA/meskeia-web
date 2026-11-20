@@ -55,7 +55,8 @@
   transition: all 0.15s ease;
 }
 .filtroBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
-.filtroBtnActivo { color: white !important; border-color: transparent !important; background: var(--primary-boton); }
+/* --tinta la pone el TSX con el relleno de nivel o grupo (rellenoConTinta): blanco u oscuro */
+.filtroBtnActivo { color: var(--tinta, white) !important; border-color: transparent !important; background: var(--primary-boton); }
 
 .resultadosInfo { font-size: 0.82rem; color: var(--text-secondary); margin: 0; }
 
@@ -87,7 +88,7 @@
   font-size: 0.7rem; font-weight: 700;
   padding: 0.15rem 0.5rem;
   border-radius: 8px;
-  color: white;
+  color: var(--tinta, white);
 }
 .badgeGrupo {
   font-size: 0.7rem; font-weight: 600;
@@ -169,7 +170,7 @@
 .btnQuiz {
   display: block; text-align: center;
   padding: 0.85rem;
-  color: white; border-radius: 10px;
+  color: var(--tinta, white); border-radius: 10px;
   font-size: 0.95rem; font-weight: 600;
   text-decoration: none;
   transition: opacity 0.15s ease;
@@ -281,6 +282,19 @@
 .warningList li::before { content: '✗'; position: absolute; left: 0; color: var(--rojo-texto, #c0392b); font-size: 0.75rem; }
 
 /* ── Dark mode ── */
+/*
+ * Tono de TEXTO de cada nivel y grupo (C0798, 20/11/2026): su color de dato puro no llega a 4,5:1
+ * como texto; aquí cada uno con su variante oscura. Van después de .statNum para pesar más.
+ */
+.container { --rl-violeta-texto: #6C3483; }
+.tonoMarca { color: var(--primary-texto); }
+.tonoTeal { color: var(--secondary-texto); }
+.tonoVioleta { color: var(--rl-violeta-texto); }
+.tonoVerde { color: var(--verde-texto, #136E35); }
+.tonoNaranja { color: var(--naranja-texto, #B93E0B); }
+.tonoRojo { color: var(--rojo-texto, #B91C1C); }
+[data-theme='dark'] .container { --rl-violeta-texto: #D2B4DE; }
+
 [data-theme='dark'] .statCard,
 [data-theme='dark'] .filtrosBox { border-color: rgba(255,255,255,0.08); }
 [data-theme='dark'] .buscador { border-color: rgba(255,255,255,0.15); background: var(--bg-primary); }

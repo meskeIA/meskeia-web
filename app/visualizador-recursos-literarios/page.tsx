@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type CSSProperties } from 'react';
 import styles from './VisualizadorRecursosLiterarios.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -9,6 +9,7 @@ import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { figurasRetorica, FiguraRetorica, GrupoFigura, NivelFigura } from '@/data/figuras-retoricas';
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 type FiltroNivel = NivelFigura | 'todos';
 type FiltroGrupo = GrupoFigura | 'todos';
@@ -42,6 +43,41 @@ const GRUPO_COLOR: Record<GrupoFigura, string> = {
   sintaxis:      '#27AE60',
   'contigüidad': '#16A085',
 };
+
+/*
+ * El color de cada nivel y grupo no se lee como TEXTO ni bajo texto blanco (C0798, 20/11/2026):
+ * las cifras de nivel y las insignias de grupo iban en su color puro (verde 2,87:1, naranja 2,85,
+ * teal 3,28 en claro; violeta 2,35 en oscuro) y el blanco de las insignias de nivel, los filtros
+ * activos y el botón del quiz sobre el color tal cual (2,85-4,11). El texto en color va por una
+ * clase de tono con su variante oscura (TONO_*), y bajo el texto, el relleno con la tinta que le
+ * llega (rellenoConTinta), igual en los dos temas. El color de dato puro se queda en los bordes.
+ */
+const TONO_NIVEL: Record<NivelFigura, string> = {
+  basico:     styles.tonoVerde,
+  intermedio: styles.tonoNaranja,
+  avanzado:   styles.tonoRojo,
+};
+
+const TONO_GRUPO: Record<GrupoFigura, string> = {
+  imagen:        styles.tonoMarca,
+  repeticion:    styles.tonoVioleta,
+  contraste:     styles.tonoNaranja,
+  enfasis:       styles.tonoRojo,
+  sintaxis:      styles.tonoVerde,
+  'contigüidad': styles.tonoTeal,
+};
+
+type Relleno = { relleno: string; tinta: string };
+const RELLENO_NIVEL = Object.fromEntries(
+  Object.entries(NIVEL_COLOR).map(([k, c]) => [k, rellenoConTinta(c)]),
+) as Record<NivelFigura, Relleno>;
+const RELLENO_GRUPO = Object.fromEntries(
+  Object.entries(GRUPO_COLOR).map(([k, c]) => [k, rellenoConTinta(c)]),
+) as Record<GrupoFigura, Relleno>;
+
+/** Fondo y tinta de un elemento relleno con un color de datos (la tinta va por --tinta). */
+const estiloRelleno = ({ relleno, tinta }: Relleno): CSSProperties =>
+  ({ background: relleno, borderColor: relleno, '--tinta': tinta }) as CSSProperties;
 
 interface ParConfundido {
   figuraA: string;
@@ -156,15 +192,15 @@ export default function VisualizadorRecursosLiterariosPage() {
             <span className={styles.statLabel}>figuras totales</span>
           </div>
           <div className={styles.statCard} style={{ borderColor: NIVEL_COLOR.basico }}>
-            <span className={styles.statNum} style={{ color: NIVEL_COLOR.basico }}>{totalPorNivel.basico}</span>
+            <span className={`${styles.statNum} ${TONO_NIVEL.basico}`}>{totalPorNivel.basico}</span>
             <span className={styles.statLabel}>nivel ESO</span>
           </div>
           <div className={styles.statCard} style={{ borderColor: NIVEL_COLOR.intermedio }}>
-            <span className={styles.statNum} style={{ color: NIVEL_COLOR.intermedio }}>{totalPorNivel.intermedio}</span>
+            <span className={`${styles.statNum} ${TONO_NIVEL.intermedio}`}>{totalPorNivel.intermedio}</span>
             <span className={styles.statLabel}>Bachillerato</span>
           </div>
           <div className={styles.statCard} style={{ borderColor: NIVEL_COLOR.avanzado }}>
-            <span className={styles.statNum} style={{ color: NIVEL_COLOR.avanzado }}>{totalPorNivel.avanzado}</span>
+            <span className={`${styles.statNum} ${TONO_NIVEL.avanzado}`}>{totalPorNivel.avanzado}</span>
             <span className={styles.statLabel}>Selectividad</span>
           </div>
         </div>
@@ -190,7 +226,7 @@ export default function VisualizadorRecursosLiterariosPage() {
                   aria-pressed={filtroNivel === n}
                   className={`${styles.filtroBtn} ${filtroNivel === n ? styles.filtroBtnActivo : ''}`}
                   onClick={() => { setFiltroNivel(n); setFiltroGrupo('todos'); }}
-                  style={filtroNivel === n && n !== 'todos' ? { background: NIVEL_COLOR[n as NivelFigura], borderColor: NIVEL_COLOR[n as NivelFigura] } : {}}
+                  style={filtroNivel === n && n !== 'todos' ? estiloRelleno(RELLENO_NIVEL[n as NivelFigura]) : {}}
                 >
                   {n === 'todos' ? 'Todos' : NIVEL_LABEL[n as NivelFigura]}
                 </button>
@@ -216,7 +252,7 @@ export default function VisualizadorRecursosLiterariosPage() {
                   aria-pressed={filtroGrupo === g}
                   className={`${styles.filtroBtn} ${filtroGrupo === g ? styles.filtroBtnActivo : ''}`}
                   onClick={() => setFiltroGrupo(g)}
-                  style={filtroGrupo === g ? { background: GRUPO_COLOR[g], borderColor: GRUPO_COLOR[g] } : {}}
+                  style={filtroGrupo === g ? estiloRelleno(RELLENO_GRUPO[g]) : {}}
                 >
                   {GRUPO_LABEL[g]}
                 </button>
@@ -247,13 +283,13 @@ export default function VisualizadorRecursosLiterariosPage() {
                   <div className={styles.figuraBadges}>
                     <span
                       className={styles.badgeNivel}
-                      style={{ background: NIVEL_COLOR[figura.nivel] }}
+                      style={estiloRelleno(RELLENO_NIVEL[figura.nivel])}
                     >
                       {NIVEL_LABEL[figura.nivel]}
                     </span>
                     <span
-                      className={styles.badgeGrupo}
-                      style={{ color: GRUPO_COLOR[figura.grupo], borderColor: GRUPO_COLOR[figura.grupo] }}
+                      className={`${styles.badgeGrupo} ${TONO_GRUPO[figura.grupo]}`}
+                      style={{ borderColor: GRUPO_COLOR[figura.grupo] }}
                     >
                       {GRUPO_LABEL[figura.grupo]}
                     </span>
@@ -287,10 +323,10 @@ export default function VisualizadorRecursosLiterariosPage() {
               <div className={styles.modalHeader} style={{ borderColor: GRUPO_COLOR[figuraActiva.grupo] }}>
                 <h2 className={styles.modalNombre}>{figuraActiva.nombre}</h2>
                 <div className={styles.modalBadges}>
-                  <span className={styles.badgeNivel} style={{ background: NIVEL_COLOR[figuraActiva.nivel] }}>
+                  <span className={styles.badgeNivel} style={estiloRelleno(RELLENO_NIVEL[figuraActiva.nivel])}>
                     {NIVEL_LABEL[figuraActiva.nivel]}
                   </span>
-                  <span className={styles.badgeGrupo} style={{ color: GRUPO_COLOR[figuraActiva.grupo], borderColor: GRUPO_COLOR[figuraActiva.grupo] }}>
+                  <span className={`${styles.badgeGrupo} ${TONO_GRUPO[figuraActiva.grupo]}`} style={{ borderColor: GRUPO_COLOR[figuraActiva.grupo] }}>
                     {GRUPO_LABEL[figuraActiva.grupo]}
                   </span>
                 </div>
@@ -312,9 +348,9 @@ export default function VisualizadorRecursosLiterariosPage() {
                   <ul className={styles.ejemplosList}>
                     {figuraActiva.ejemplos.map((ej, i) => (
                       <li key={i} className={styles.ejemploItem}>
-                        <span className={styles.ejemploComilla} style={{ color: GRUPO_COLOR[figuraActiva.grupo] }}>"</span>
+                        <span className={`${styles.ejemploComilla} ${TONO_GRUPO[figuraActiva.grupo]}`}>"</span>
                         {ej}
-                        <span className={styles.ejemploComilla} style={{ color: GRUPO_COLOR[figuraActiva.grupo] }}>"</span>
+                        <span className={`${styles.ejemploComilla} ${TONO_GRUPO[figuraActiva.grupo]}`}>"</span>
                       </li>
                     ))}
                   </ul>
@@ -325,7 +361,7 @@ export default function VisualizadorRecursosLiterariosPage() {
                 <a
                   href="/quiz-figuras-retoricas/"
                   className={styles.btnQuiz}
-                  style={{ background: GRUPO_COLOR[figuraActiva.grupo] }}
+                  style={estiloRelleno(RELLENO_GRUPO[figuraActiva.grupo])}
                 >
                   ¿La dominas? Prueba el quiz →
                 </a>

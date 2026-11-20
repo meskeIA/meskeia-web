@@ -201,6 +201,11 @@ const APPS: App[] = [
   // propio fondo, 1,00:1), el blanco sobre el color de cada capa TCP/IP, de cada paso DNS y de las
   // insignias de registro (el verde claro 1,63, el acento 2,26, el teal 2,80, la marca 4,11)
   { slug: 'visualizador-redes-computadoras', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 20/11/2026 (C0798): las cifras de cada nivel y las insignias de grupo en su color puro con style
+  // (el verde 2,87:1, el naranja 2,85, el teal 3,32 en claro) y el blanco sobre las insignias de
+  // nivel y el filtro de grupo activo (2,19-4,11). Los filtros de grupo como secciones: los de
+  // nivel cambian cuántos grupos quedan, y sus colores ya salen en las insignias de cada tarjeta
+  { slug: 'visualizador-recursos-literarios', todo: true, secciones: "[class*='filtrosBox'] > div:last-of-type button" },
   // 13/11/2026: el título del panel de la capa en su color con style (el núcleo interno en oro, 1,73:1)
   { slug: 'visualizador-capas-tierra', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
   // 13/11/2026: «Producción de bilis» en amarillo (1,52:1), «FASE 2» en verde (2,56-2,75) y el título del
