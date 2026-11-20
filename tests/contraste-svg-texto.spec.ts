@@ -112,6 +112,9 @@ const APPS: App[] = [
   // de las marcas en #bbb (1,90) y el centro «C(0,0)» en el teal 48A9A6 (2,78) en claro. Cada pestaña
   // (circunferencia, elipse, parábola, hipérbola, polares y la ecuación general) como sección
   { slug: 'visualizador-geometria-analitica', secciones: "nav[aria-label^='Selección de cónica'] button" },
+  // Del censo del 20/11/2026 (C0297): la escala de la línea del tiempo en #999 (2,82:1 en claro) y la
+  // marca ▲ de la especie elegida en la marca (4,07)
+  { slug: 'visualizador-evolucion-humana' },
   // Del censo del 08/11/2026 (C0297), reparada el 10/11/2026: rótulos sobre la tarjeta en #1A1A1A,
   // #666 y #999 fijos (1,28-2,37:1 en oscuro, 2,82 en claro), el espermatozoide y el notocordio
   // en la marca y el teal (2,78-4,07), y blanco sobre el teal y la marca translúcidos (2,42-2,77)

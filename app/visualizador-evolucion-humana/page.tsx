@@ -324,11 +324,11 @@ export default function VisualizadorEvolucionHumana() {
               {/* Línea base */}
               <line x1="30" y1="100" x2="680" y2="100" stroke="#2E86AB" strokeWidth="3" strokeLinecap="round" />
               {/* Etiquetas de escala */}
-              <text x="30" y="130" fontSize="9" fill="#999">7 Ma</text>
-              <text x="175" y="130" fontSize="9" fill="#999">5 Ma</text>
-              <text x="320" y="130" fontSize="9" fill="#999">3 Ma</text>
-              <text x="465" y="130" fontSize="9" fill="#999">1 Ma</text>
-              <text x="630" y="130" fontSize="9" fill="#999">Hoy</text>
+              <text x="30" y="130" fontSize="9" fill="#999" className={styles.svgEscala}>7 Ma</text>
+              <text x="175" y="130" fontSize="9" fill="#999" className={styles.svgEscala}>5 Ma</text>
+              <text x="320" y="130" fontSize="9" fill="#999" className={styles.svgEscala}>3 Ma</text>
+              <text x="465" y="130" fontSize="9" fill="#999" className={styles.svgEscala}>1 Ma</text>
+              <text x="630" y="130" fontSize="9" fill="#999" className={styles.svgEscala}>Hoy</text>
               {/* Marcas de escala */}
               {[30, 175, 320, 465, 640].map(x => (
                 <line key={x} x1={x} y1="95" x2={x} y2="107" stroke="#999" strokeWidth="1" />
@@ -363,7 +363,7 @@ export default function VisualizadorEvolucionHumana() {
                       {esp.icono}
                     </text>
                     {isActive && (
-                      <text x={cx} y={125} textAnchor="middle" fontSize="8" fill="#2E86AB" fontWeight="bold" style={{ userSelect: 'none', pointerEvents: 'none' }}>
+                      <text x={cx} y={125} textAnchor="middle" fontSize="8" fill="#2E86AB" className={styles.svgMarcaActiva} fontWeight="bold" style={{ userSelect: 'none', pointerEvents: 'none' }}>
                         ▲
                       </text>
                     )}

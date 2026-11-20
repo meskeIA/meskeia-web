@@ -232,6 +232,10 @@
   height: 160px;
 }
 
+/* La escala en #999 daba 2,82:1 en claro y la marca ▲ de la especie elegida en la marca, 4,07 (C0297) */
+.timelineSvg .svgEscala { fill: var(--text-secondary); }
+.timelineSvg .svgMarcaActiva { fill: var(--primary-texto); }
+
 /* ─── Tarjetas de especie ─── */
 .especiesGrid {
   display: grid;
