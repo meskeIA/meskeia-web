@@ -420,7 +420,7 @@ export default function DesempleoTiposPage() {
                     fontSize="10"
                     fill="var(--text-secondary)"
                   >
-                    {v}%
+                    {v}&nbsp;%
                   </text>
                 </g>
               ))}
@@ -440,7 +440,7 @@ export default function DesempleoTiposPage() {
                     fontSize="10"
                     fill="var(--text-secondary)"
                   >
-                    {v}%
+                    {v}&nbsp;%
                   </text>
                 </g>
               ))}
@@ -468,7 +468,7 @@ export default function DesempleoTiposPage() {
                 y={bevY(pA.vac) - 12}
                 fontSize="11"
                 fontWeight="700"
-                fill="#E74C3C"
+                className={styles.svgRojo}
                 textAnchor="middle"
               >
                 A (2012)
@@ -477,10 +477,10 @@ export default function DesempleoTiposPage() {
                 x={bevX(pA.unemp) - 12}
                 y={bevY(pA.vac) - 1}
                 fontSize="9"
-                fill="#E74C3C"
+                className={styles.svgRojo}
                 textAnchor="middle"
               >
-                25% paro
+                25&nbsp;% paro
               </text>
 
               {/* Punto B — auge 2023 */}
@@ -497,7 +497,7 @@ export default function DesempleoTiposPage() {
                 y={bevY(pB.vac) - 8}
                 fontSize="11"
                 fontWeight="700"
-                fill="#2E86AB"
+                className={styles.svgMarca}
                 textAnchor="middle"
               >
                 B (2023)
@@ -506,10 +506,10 @@ export default function DesempleoTiposPage() {
                 x={bevX(pB.unemp) + 36}
                 y={bevY(pB.vac) + 4}
                 fontSize="9"
-                fill="#2E86AB"
+                className={styles.svgMarca}
                 textAnchor="middle"
               >
-                12% paro
+                12&nbsp;% paro
               </text>
             </svg>
 
@@ -577,7 +577,7 @@ export default function DesempleoTiposPage() {
                     fontSize="10"
                     fill="var(--text-secondary)"
                   >
-                    {pct}%
+                    {pct}&nbsp;%
                   </text>
                 </g>
               ))}
@@ -638,9 +638,9 @@ export default function DesempleoTiposPage() {
                 textAnchor="middle"
                 fontSize="10"
                 fontWeight="700"
-                fill="#E74C3C"
+                className={styles.svgRojo}
               >
-                26% (2013)
+                26&nbsp;% (2013)
               </text>
             </svg>
 

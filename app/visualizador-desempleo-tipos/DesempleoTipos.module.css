@@ -474,6 +474,12 @@
   border-color: rgba(255, 255, 255, 0.08);
 }
 
+/* Rótulos de los puntos de las gráficas (cabo C0297, 20/11/2026): el rojo E74C3C y la marca puros
+   daban 3,79 y 4,07:1 en claro y 3,55 y 3,31 en oscuro; el color puro se queda en el punto y la
+   línea, y el texto toma su tono de texto por tema (el fill por CSS manda sobre el atributo) */
+.svgRojo { fill: var(--rojo-texto, #B91C1C); }
+.svgMarca { fill: var(--primary-texto); }
+
 .beveridgeExplicacion {
   display: flex;
   flex-direction: column;

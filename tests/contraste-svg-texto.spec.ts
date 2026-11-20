@@ -426,6 +426,9 @@ const APPS: App[] = [
     extremos: true,
     subestados: "button[aria-pressed]:not(nav button)",
   },
+  // 20/11/2026 (tanda 3): «A (2012)», «25 % paro» y «26 % (2013)» en rojo E74C3C puro (3,79:1 en
+  // claro, 3,55 en oscuro) y «B (2023)» y «12 % paro» en la marca pura (4,07 y 3,31)
+  { slug: 'visualizador-desempleo-tipos' },
 ];
 
 interface TextoSvg {
