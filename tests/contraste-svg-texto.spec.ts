@@ -432,6 +432,10 @@ const APPS: App[] = [
   // 20/11/2026 (tanda 3): en el flujo comercial, «Exportaciones» y su cifra en la marca pura (4,07:1
   // en claro, 3,31 en oscuro) e «Importaciones» y la suya en rojo E74C3C (3,79 y 3,55)
   { slug: 'visualizador-comercio-internacional', secciones: SECCIONES },
+  // 20/11/2026 (tanda 3): «V_eq» en #059669 (3,61:1 en claro, 3,87 en oscuro), «pH» y «V (mL)» en
+  // #475569 fijo (1,92 en oscuro) y, en los tipos con ácido o base débil, «pKa» en #b45309 fijo (en
+  // oscuro). Cada tipo de titulación, como subestado
+  { slug: 'simulador-titulacion', extremos: true, subestados: "button[class*='tabBtn']" },
 ];
 
 interface TextoSvg {

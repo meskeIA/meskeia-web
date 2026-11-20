@@ -10,11 +10,17 @@
      sobre su banda amarilla en 2,13:1 (hallazgo 349). En tema claro sí cumplían. */
   --svg-eje: #475569;
   --svg-viraje: #78350f;
+  /* «V_eq» iba en #059669 (3,61:1 en claro, 3,87 en oscuro), «pH» y «V (mL)» en #475569 fijo
+     (1,92 en oscuro) y «pKa» en #b45309 fijo (2,9 en oscuro): cabo C0297, 20/11/2026 */
+  --svg-veq: #047857;
+  --svg-pka: #b45309;
 }
 
 [data-theme='dark'] .container {
   --svg-eje: #cbd5e1;
   --svg-viraje: #451a03;
+  --svg-veq: #34d399;
+  --svg-pka: #fbbf24;
 }
 
 .hero {

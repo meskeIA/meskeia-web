@@ -608,7 +608,7 @@ export default function SimuladorTitulacion() {
 
                 {/* Línea V_eq */}
                 <line x1={xEq} y1="30" x2={xEq} y2="320" stroke="#10b981" strokeWidth="1.5" strokeDasharray="4 3" />
-                <text x={xEq + 4} y="40" fontSize="10" fill="#059669" fontWeight="700">
+                <text x={xEq + 4} y="40" fontSize="10" fill="var(--svg-veq)" fontWeight="700">
                   V_eq
                 </text>
 
@@ -624,7 +624,7 @@ export default function SimuladorTitulacion() {
                       strokeWidth="1"
                       strokeDasharray="3 3"
                     />
-                    <text x="34" y={320 - (pKa / 14) * 290 - 4} fontSize="9" fill="#b45309">
+                    <text x="34" y={320 - (pKa / 14) * 290 - 4} fontSize="9" fill="var(--svg-pka)">
                       pKa = {formatNumber(pKa, 2)}
                     </text>
                   </>
@@ -662,12 +662,12 @@ export default function SimuladorTitulacion() {
                 )}
 
                 {/* Ejes */}
-                <line x1="30" y1="30" x2="30" y2="320" stroke="#475569" strokeWidth="1" />
-                <line x1="30" y1="320" x2="490" y2="320" stroke="#475569" strokeWidth="1" />
-                <text x="14" y="20" fontSize="10" fill="#475569" fontWeight="700">
+                <line x1="30" y1="30" x2="30" y2="320" stroke="var(--svg-eje)" strokeWidth="1" />
+                <line x1="30" y1="320" x2="490" y2="320" stroke="var(--svg-eje)" strokeWidth="1" />
+                <text x="14" y="20" fontSize="10" fill="var(--svg-eje)" fontWeight="700">
                   pH
                 </text>
-                <text x="490" y="348" fontSize="10" fill="#475569" fontWeight="700" textAnchor="end">
+                <text x="490" y="348" fontSize="10" fill="var(--svg-eje)" fontWeight="700" textAnchor="end">
                   V (mL)
                 </text>
               </svg>
