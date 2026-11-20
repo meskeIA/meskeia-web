@@ -47,6 +47,13 @@
 .svgEclipse { width: 100%; max-width: 500px; margin: 0 auto var(--spacing-lg); display: block; overflow: visible; }
 .svgMareas { width: 100%; max-width: 400px; margin: 0 auto var(--spacing-lg); display: block; }
 
+/* Rótulos naranja de los eclipses (cabo C0297, 20/11/2026): «~270 km», «Luna roja» y «Luz
+   refractada» en FF5722 y FF7043 puros daban 1,78-2,53:1 sobre los conos de sombra en claro; el
+   naranja vivo se queda en la franja y el arco. Más oscuro que --naranja-texto porque «Luna roja» va
+   sobre el gris de la umbra (#C2C2C2: 5,3:1) */
+.svgNaranja { fill: #7C2D12; }
+[data-theme='dark'] .svgNaranja { fill: #FDBA74; }
+
 /* ─── Sección 1: Fases Lunares ─── */
 .faseDetalle { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 .faseDetalleHeader { display: flex; align-items: center; gap: var(--spacing-lg); margin-bottom: var(--spacing-md); }

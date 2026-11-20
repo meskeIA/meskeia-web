@@ -169,7 +169,7 @@ function DiagramaOrbital({ faseIndex, onFaseClick }: { faseIndex: number; onFase
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onFaseClick(i); }}
             />
             {/* Número */}
-            <text x={lx} y={ly - lunaR - 8} textAnchor="middle" fill={esActiva ? '#2E86AB' : 'var(--text-muted, #999)'} fontSize={9} fontWeight={esActiva ? 700 : 400}>{i + 1}</text>
+            <text x={lx} y={ly - lunaR - 8} textAnchor="middle" fill={esActiva ? 'var(--primary-texto)' : 'var(--text-muted, #999)'} fontSize={9} fontWeight={esActiva ? 700 : 400}>{i + 1}</text>
           </g>
         );
       })}
@@ -263,8 +263,10 @@ function DiagramaEclipseSolar() {
       <polygon points="240,130 240,150 400,110 400,170" fill="rgba(0,0,0,0.15)" stroke="none" />
 
       {/* Etiquetas sombra */}
-      <text x={350} y={108} textAnchor="middle" fill="var(--text-muted, #999)" fontSize={9}>Penumbra</text>
-      <text x={330} y={145} textAnchor="middle" fill="var(--text-secondary, #666)" fontSize={9} fontWeight={600}>Umbra</text>
+      {/* Dentro de los conos el fondo se oscurece: texto secundario en la penumbra y principal en la
+          umbra (con --text-muted y --text-secondary daban 4,09 y 3,22:1 en claro; cabo C0297) */}
+      <text x={350} y={108} textAnchor="middle" fill="var(--text-secondary, #666)" fontSize={9}>Penumbra</text>
+      <text x={330} y={145} textAnchor="middle" fill="var(--text-primary, #1A1A1A)" fontSize={9} fontWeight={600}>Umbra</text>
 
       {/* Luna */}
       <circle cx={240} cy={140} r={15} fill="#555" />
@@ -272,11 +274,11 @@ function DiagramaEclipseSolar() {
 
       {/* Tierra */}
       <circle cx={420} cy={140} r={22} fill="url(#tierraGradEcl)" />
-      <text x={420} y={178} textAnchor="middle" fill="var(--text-muted, #999)" fontSize={11}>Tierra</text>
+      <text x={420} y={178} textAnchor="middle" fill="var(--text-secondary, #666)" fontSize={11}>Tierra</text>
 
-      {/* Franja de totalidad */}
+      {/* Franja de totalidad: el rótulo, por encima de la Tierra (a y=126 caía sobre su borde) */}
       <line x1={410} y1={132} x2={430} y2={132} stroke="#FF5722" strokeWidth={3} />
-      <text x={420} y={126} textAnchor="middle" fill="#FF5722" fontSize={8} fontWeight={600}>~270 km</text>
+      <text x={420} y={113} textAnchor="middle" className={styles.svgNaranja} fontSize={8} fontWeight={600}>~270 km</text>
 
       <defs>
         <radialGradient id="solGradEcl" cx="35%" cy="35%">
@@ -309,22 +311,22 @@ function DiagramaEclipseLunar() {
       <polygon points="280,108 280,172 480,60 480,220" fill="rgba(0,0,0,0.08)" stroke="none" />
       <polygon points="280,118 280,162 440,100 440,180" fill="rgba(0,0,0,0.15)" stroke="none" />
 
-      <text x={400} y={96} textAnchor="middle" fill="var(--text-muted, #999)" fontSize={9}>Penumbra</text>
-      <text x={370} y={143} textAnchor="middle" fill="var(--text-secondary, #666)" fontSize={9} fontWeight={600}>Umbra</text>
+      <text x={400} y={96} textAnchor="middle" fill="var(--text-secondary, #666)" fontSize={9}>Penumbra</text>
+      <text x={370} y={143} textAnchor="middle" fill="var(--text-primary, #1A1A1A)" fontSize={9} fontWeight={600}>Umbra</text>
 
       {/* Tierra */}
       <circle cx={270} cy={140} r={22} fill="url(#tierraGradEclL)" />
-      <text x={270} y={178} textAnchor="middle" fill="var(--text-muted, #999)" fontSize={11}>Tierra</text>
+      <text x={270} y={178} textAnchor="middle" fill="var(--text-secondary, #666)" fontSize={11}>Tierra</text>
 
       {/* Luna (roja en eclipse total) */}
       <circle cx={430} cy={140} r={13} fill="#B71C1C" opacity={0.7} />
       <circle cx={430} cy={140} r={13} fill="none" stroke="#FF5722" strokeWidth={1.5} />
-      <text x={430} y={168} textAnchor="middle" fill="#FF5722" fontSize={10} fontWeight={600}>Luna roja</text>
-      <text x={430} y={180} textAnchor="middle" fill="var(--text-muted, #999)" fontSize={8}>&quot;Luna de sangre&quot;</text>
+      <text x={430} y={168} textAnchor="middle" className={styles.svgNaranja} fontSize={10} fontWeight={600}>Luna roja</text>
+      <text x={430} y={180} textAnchor="middle" fill="var(--text-secondary, #666)" fontSize={8}>&quot;Luna de sangre&quot;</text>
 
       {/* Arco de refracción atmosférica */}
       <path d="M 258,118 Q 240,140 258,162" fill="none" stroke="#FF7043" strokeWidth={1} strokeDasharray="3 2" />
-      <text x={230} y={145} textAnchor="middle" fill="#FF7043" fontSize={7}>Luz refractada</text>
+      <text x={230} y={145} textAnchor="middle" className={styles.svgNaranja} fontSize={7}>Luz refractada</text>
 
       <defs>
         <radialGradient id="solGradEclL" cx="35%" cy="35%">
@@ -359,8 +361,8 @@ function DiagramaMareas({ tipo }: { tipo: 'vivas' | 'muertas' }) {
       <ellipse cx={cx} cy={cy} rx={65} ry={48} fill="rgba(46,134,171,0.2)" stroke="#2E86AB" strokeWidth={1.5} strokeDasharray="4 2" />
 
       {/* Etiquetas marea alta */}
-      <text x={cx + 70} y={cy + 4} fontSize={8} fill="#2E86AB" fontWeight={600}>Marea alta</text>
-      <text x={cx - 70} y={cy + 4} fontSize={8} fill="#2E86AB" fontWeight={600} textAnchor="end">Marea alta</text>
+      <text x={cx + 70} y={cy + 4} fontSize={8} fill="var(--primary-texto)" fontWeight={600}>Marea alta</text>
+      <text x={cx - 70} y={cy + 4} fontSize={8} fill="var(--primary-texto)" fontWeight={600} textAnchor="end">Marea alta</text>
 
       {/* Luna */}
       {tipo === 'vivas' ? (

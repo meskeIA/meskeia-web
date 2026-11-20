@@ -444,6 +444,17 @@ const APPS: App[] = [
   // el cian 7FDBFF (1,54), el grosor del grafeno en el teal (2,78) y «60 átomos de carbono» en el oro
   // F0A500 (2,06). Cada alótropo, como subestado
   { slug: 'visualizador-carbono', subestados: "[role='tablist'][aria-label='Seleccionar alótropo'] [role='tab']" },
+  // 20/11/2026 (tanda 3): el número de la fase elegida y «Marea alta» en la marca pura (3,93:1 en
+  // claro, 4,24 en oscuro); en los eclipses, «Umbra» en #666 sobre la umbra (3,22), «Tierra» en
+  // --text-muted sobre la penumbra (4,09) y «~270 km», «Luna roja» y «Luz refractada» en naranja
+  // FF5722 y FF7043 (2,53 sobre la penumbra, 1,78 sobre la umbra). Solar y lunar, y vivas y muertas,
+  // como subestados
+  {
+    slug: 'visualizador-fases-luna-eclipses',
+    secciones: SECCIONES,
+    extremos: true,
+    subestados: "button[class*='toggleBtn']",
+  },
 ];
 
 interface TextoSvg {
