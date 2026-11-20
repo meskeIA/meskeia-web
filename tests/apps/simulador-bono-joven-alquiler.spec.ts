@@ -1,6 +1,8 @@
 import { test, expect, Page } from '@playwright/test';
 import { BONO_ALQUILER_JOVEN_2026 } from '../../data/fiscal/vivienda-joven';
-import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import { esperarHidratacion, esperarPaginaAsentada, sembrarValor } from './_hidratacion';
+import { contrasteSobreFondoReal } from './_contraste';
+import { activarTemaOscuro, prepararParaMedir } from '../_contraste';
 
 /**
  * Inspector — simulador-bono-joven-alquiler (segmento fiscal, RIESGO 1 CRÍTICO)
@@ -32,7 +34,10 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *      mismo 07/10/2026 (5060f57b): se les quitó la marca y quedan como guardián.
  *  12. CASOS 23-25, móvil y HALLAZGOS 01/11 — la re-inspección del 01/11/2026, tras 5060f57b,
  *      el desborde a 390 px (2487ae59) y los lotes de página traducida (C0312, C0438). Sus
- *      hallazgos (tests H29-H31) van con `test.fail()`: ABIERTOS a esa fecha.
+ *      hallazgos (tests H29-H31) se REPARARON el 02/11/2026.
+ *  13. AVISO PROPIO 20/11 — modo cambio tras 544fa23b6 (C0829, hallazgo 5213): el texto propio
+ *      del DisclaimerCard crítico, que iba en `context` y no se pintaba, pasa a `detalle`. Un
+ *      guardián de que se pinta y un hallazgo (H32) con `test.fail()`: ABIERTO a esa fecha.
  *
  * Qué promete la app
  * ──────────────────
@@ -2831,5 +2836,142 @@ test.describe('Inspector 01/11/2026 — móvil (390 px)', () => {
       for (const c of otra.columnas) expect(c).toBeGreaterThanOrEqual(150);
       expect(otra.scroll).toBeLessThanOrEqual(otra.cliente);
     }
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 20/11/2026 — MODO CAMBIO: el aviso propio del DisclaimerCard (544fa23b6, C0829)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Lo que cambió desde la validación del 02/11/2026 (`git diff 911b7cee HEAD`): una sola línea de
+// page.tsx. El texto propio del aviso crítico iba en la prop `context`, que en DisclaimerCard es
+// la CLAVE de almacenamiento del plegado y no se pinta, así que desde que se escribió no lo había
+// visto nadie: la página solo mostraba el genérico de la variante. Ahora va en `detalle`, que
+// DisclaimerCard pinta encima del genérico sin sustituirlo (hallazgo 5213). data/fiscal/iprem.ts
+// y data/fiscal/vivienda-joven.ts no cambian.
+//
+// Antes de lo cambiado, la batería entera: 76/76 en verde.
+//
+// Comprobado en el navegador (1280 y 390 px, temas claro y oscuro):
+//   · Un solo aviso con nombre «Aviso importante» (el que DisclaimerCard pone SOLO a
+//     severity="critical": nivel 1 de la política, el que exige una app fiscal) y sin botón de
+//     plegar: collapsible={false}, y la severidad crítica lo ignoraría de todos modos.
+//   · El párrafo propio se ve (742 × 94 px a 1280; 290 × 222 a 390), una sola vez en la página,
+//     encima de la cláusula «TÚ ERES RESPONSABLE…», que sigue.
+//   · Fuera de <EducationalSection> y antes de la calculadora («Tu alquiler actual»).
+//   · Contraste del párrafo: 16,38:1 en claro (#1A1A1A sobre 255,248,225) y 10,51:1 en oscuro
+//     (229,229,229 sobre 58,47,0). 0 errores de página.
+//
+// Cotejo del texto con la FUENTE (texto consolidado del BOE, BOE-A-2026-8872, leído hoy):
+//   · art. 133.1.d: «Que la persona beneficiaria tenga unas rentas anuales iguales o inferiores a
+//     5 veces el IPREM» (5,5 y 6 con discapacidad: `UMBRAL_IPREM_VIVIENDA_JOVEN`).
+//   · art. 135: las comunidades «podrán incrementar la renta o precio máximo mensual», con acuerdo
+//     previo del Ministerio. Es el ÚNICO límite de esta ayuda que la comunidad puede mover; ni el
+//     umbral de ingresos del 133.1.d ni las cuantías del art. 137 (300 y 200 €).
+//   · art. 8.1: la comunidad «podrá establecer requisitos adicionales». Añadir requisitos no es
+//     fijar el límite de ingresos.
+//   El aviso dice «Los requisitos concretos, límite de ingresos y condiciones específicas los fija
+//   cada Comunidad Autónoma en su convocatoria», y la tarjeta de ingresos de la checklist —en la
+//   misma pantalla, sin desplegar nada— dice «El RD 326/2026 fija el umbral en 5 veces el IPREM
+//   (42.000 €/año) […] Cada Comunidad Autónoma concreta el cómputo en su convocatoria». La FAQ
+//   «¿Qué pasa si mis ingresos suben…?» repite que «El umbral de ingresos lo fija el Estado».
+//   → H32 (ABIERTO). Es la forma del hallazgo 643 (la advertencia final atribuía a la comunidad
+//   los límites de renta), ahora en el aviso que se lee primero.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** El aviso crítico de la app: DisclaimerCard solo le pone este nombre con severity="critical" */
+const avisoCritico = (page: Page) => page.getByRole('note', { name: 'Aviso importante' });
+
+/**
+ * El párrafo propio del aviso (prop `detalle`). Su arranque literal sale de page.tsx: identifica
+ * la ayuda y la norma (RD 326/2026, FISCAL_VIVIENDA_JOVEN_META.fuente) y es la frase con la que
+ * lo busca también el testigo tests/disclaimer-detalle.spec.ts («las cuantías son orientativas»).
+ */
+const PROPIO_INICIO = /^Bono Joven al Alquiler 2026-2030 \(RD 326\/2026\): las cuantías son orientativas\./;
+
+test.describe('Inspector 20/11/2026 — aviso propio del DisclaimerCard (C0829)', () => {
+  test('El aviso crítico pinta su texto propio, una vez, fuera de la guía, sin plegado y legible en los dos temas', async ({ page }) => {
+    await abrirHidratado(page);
+    await esperarPaginaAsentada(page);
+    await prepararParaMedir(page);
+
+    const aviso = avisoCritico(page);
+    await expect(aviso).toHaveCount(1);
+    // Nivel 1 de la política: no se puede plegar (ni botón de plegar ni de desplegar)
+    await expect(aviso.getByRole('button')).toHaveCount(0);
+
+    // El texto propio SE VE, no solo está en el código: antes iba en `context` y no salía nunca
+    const propio = aviso.getByText(PROPIO_INICIO);
+    await expect(propio).toBeVisible();
+    const texto = norm(await propio.innerText());
+    expect(texto).toContain('Consulta siempre con tu CA antes de tomar decisiones económicas.');
+    // Y no sustituye a la cláusula de responsabilidad del genérico, que sigue debajo
+    await expect(aviso).toContainText('TÚ ERES RESPONSABLE');
+    await expect(aviso).toContainText('no constituye asesoramiento financiero, fiscal ni jurídico');
+
+    // Una sola vez en la página, fuera de <EducationalSection> (nace colapsada) y antes de la
+    // calculadora: lo exige el CLAUDE.md del proyecto para todo aviso legal
+    const sitio = await page.evaluate(() => {
+      const nota = document.querySelector('[role="note"][aria-label="Aviso importante"]');
+      const encabezado = (texto: string) =>
+        Array.from(document.querySelectorAll('h2')).find((h) => (h.textContent ?? '').includes(texto)) ?? null;
+      const faq = encabezado('Preguntas frecuentes sobre el Bono Joven');
+      const calculadora = encabezado('Tu alquiler actual');
+      const boton = Array.from(document.querySelectorAll('button[aria-expanded]')).find((b) =>
+        /guía/i.test(`${b.getAttribute('aria-label') ?? ''} ${b.textContent ?? ''}`),
+      );
+      // El contenedor de la guía: el ancestro más cercano del botón que la despliega que
+      // contiene también su contenido (la FAQ)
+      let guia: Element | null = boton ? boton.parentElement : null;
+      while (guia && faq && !guia.contains(faq)) guia = guia.parentElement;
+      return {
+        hayGuia: Boolean(guia && faq),
+        guiaEsLaPagina: Boolean(guia && calculadora && guia.contains(calculadora)),
+        dentroDeLaGuia: Boolean(guia && nota && guia.contains(nota)),
+        antesDeLaCalculadora: Boolean(
+          nota && calculadora && nota.compareDocumentPosition(calculadora) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ),
+        apariciones: document.body.innerText.split('las cuantías son orientativas').length - 1,
+      };
+    });
+    expect(sitio.hayGuia).toBe(true);
+    expect(sitio.guiaEsLaPagina).toBe(false); // el contenedor hallado es la guía, no el <body>
+    expect(sitio.dentroDeLaGuia).toBe(false);
+    expect(sitio.antesDeLaCalculadora).toBe(true);
+    expect(sitio.apariciones).toBe(1);
+
+    // Contraste del párrafo (texto normal, 16 px → 4,5:1). Medido: 16,38 en claro y 10,51 en oscuro
+    expect(await contrasteSobreFondoReal(propio)).toBeGreaterThanOrEqual(4.5);
+    await activarTemaOscuro(page);
+    await expect(propio).toBeVisible();
+    expect(await contrasteSobreFondoReal(propio)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  // H32 (MEDIO) — ABIERTO a 20/11/2026. El aviso que se lee primero atribuye a la comunidad
+  // autónoma el límite de ingresos, y lo fija el art. 133.1.d del RD 326/2026 para toda España
+  // (5 veces el IPREM; 5,5 y 6 con discapacidad). Las comunidades solo pueden subir la renta
+  // máxima del ALQUILER (art. 135) y añadir requisitos (art. 8.1). La tarjeta de ingresos de la
+  // misma pantalla y la FAQ de los ingresos dicen lo contrario que el aviso.
+  // CASO: persona de 30 años, vivienda de 700 €/mes, rentas de 45.000 €/año y sin discapacidad →
+  // esperado: no apta por el art. 133.1.d (45.000 > 5 × 8.400 = 42.000, IPREM_2026.anual14), sin
+  // que la página le sugiera otro umbral · obtenido: la tarjeta le dice que el RD fija 42.000 €/año
+  // y el aviso de arriba, que el límite de ingresos «lo fija cada Comunidad Autónoma en su
+  // convocatoria», así que podría esperar otro en la suya.
+  test('H32 — el aviso no debería atribuir a la comunidad autónoma el límite de ingresos que fija el art. 133.1.d', async ({ page }) => {
+    test.fail();
+    await abrirHidratado(page);
+
+    // Lo que dice la propia app en la tarjeta de ingresos (5 × 8.400 = 42.000, data/fiscal)
+    const ingresos = norm(await page.getByRole('listitem').filter({ hasText: /veces el IPREM/ }).first().innerText());
+    expect(ingresos).toContain('El RD 326/2026 fija el umbral en 5 veces el IPREM (42.000 €/año)');
+    expect(ingresos).toContain('Cada Comunidad Autónoma concreta el cómputo en su convocatoria');
+
+    // El aviso no puede decir lo contrario. El párrafo propio es el PRIMERO del aviso (DisclaimerCard
+    // pinta `detalle` antes del genérico): se toma por su posición y no por su arranque literal, para
+    // que una reparación que reescriba la frase ponga este test en rojo y no lo deje fallando por
+    // no encontrarlo
+    const primero = avisoCritico(page).locator('p').first();
+    const propio = norm(await primero.innerText());
+    expect(propio).not.toMatch(/límite de ingresos[^.]*los fija cada Comunidad Autónoma/);
   });
 });

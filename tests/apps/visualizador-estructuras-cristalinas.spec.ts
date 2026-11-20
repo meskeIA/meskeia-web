@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { esperarPaginaAsentada } from './_hidratacion';
 import { contrasteSobreFondoReal } from './_contraste';
+import { activarTemaOscuro, prepararParaMedir } from '../_contraste';
 
 /**
  * visualizador-estructuras-cristalinas — primera inspección · 09/11/2026
@@ -25,6 +26,9 @@ import { contrasteSobreFondoReal } from './_contraste';
  * cuando se reparen, y entonces se quita la marca. Reparados el 09/11/2026: 4357 (aristas),
  * 4358 (trigonal), 4359 (caras hexagonales), 4360 (grafito), 4361 (cuarzo SiO₄), 4363, 4364,
  * 4365, 4366, 4367 (contraste), 4368 (%) y 4362 (el cuarzo, solo en trigonal).
+ *
+ * Inspección en MODO FIRMA · 20/11/2026: los bloques «Firma» del final. Sus `test.fail()` son
+ * hallazgos ABIERTOS de ese día.
  */
 
 const RUTA = '/visualizador-estructuras-cristalinas/';
@@ -512,5 +516,346 @@ test.describe('Móvil 390 px', () => {
     }
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     await expect.poll(async () => (await leerGiro(page)).y, { message: 'el dedo gira la celda' }).toBeGreaterThan(antes.y);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN EN MODO FIRMA · 20/11/2026
+// ═════════════════════════════════════════════════════════════════════════════════════════════
+/*
+ * La cola la sacó por la firma «64 % de visitas cortas (catálogo 55,8 %) y 5 % de recargas
+ * (catálogo 2,3 %) en 100 visitas». Se buscó lo que impide USAR la app en escritorio (1280 px) y
+ * en móvil. La escena es CSS 3D (divs con transform y perspective: 800px), no WebGL: no hay
+ * contexto que pueda faltar en headless. Esperados resueltos a mano ANTES de ejecutar:
+ *   · rotar() de page.tsx suma o resta 30° por pulsación: desde el giro inicial (y = 30°), cuatro
+ *     pulsaciones de «Rotar derecha» → 150°
+ *   · arrastrar dx px gira dx·0,5° en Y; dy px gira −dy·0,5° en X (handlePointerMove)
+ *   · un átomo representa una esfera: mide lo mismo mirado desde cualquier lado. Un disco plano
+ *     girado y° mide tamaño·|cos y|, que en y = 90° es 0
+ *   · átomos / aristas / caras de cada escena, contados en los generadores de page.tsx
+ *   · HCP compacta: el átomo de la capa intermedia toca los tres de debajo a la distancia a,
+ *     (a/√3)² + (c/2)² = a² → c/a = 2·√(2/3) = 1,633 y 12 vecinos a la misma distancia
+ *   · contraste WCAG con la luminancia relativa; 3:1 para un gráfico necesario (WCAG 1.4.11)
+ */
+
+/** Átomos de la escena: tamaño declarado y lo que miden en pantalla (caja proyectada). */
+async function medidasAtomos(page: Page): Promise<{ tamano: number; ancho: number; alto: number }[]> {
+  return page.locator(ESCENA).evaluate((escena) =>
+    Array.from((escena.firstElementChild as HTMLElement).children)
+      .filter((n) => !/rotate/.test((n as HTMLElement).style.transform))
+      .map((n) => {
+        const r = n.getBoundingClientRect();
+        return { tamano: parseFloat((n as HTMLElement).style.width), ancho: r.width, alto: r.height };
+      }),
+  );
+}
+
+/**
+ * Espera a que el giro termine su transición (.estructura3d lleva `transition: transform 0.05s`):
+ * el transform calculado ya es el que pide el estado. Una persona no pulsa en mitad de los 50 ms;
+ * un test que pulsa nada más cambiar el estado cae en el botón ANTES de que la celda girada llegue
+ * a taparlo, y daba verde en el defecto de abajo (medido el 20/11/2026: 150° con la espera
+ * quitada, 120° con ella).
+ */
+async function esperarGiroAsentado(page: Page): Promise<void> {
+  await expect
+    .poll(
+      () =>
+        page.locator(ESCENA).evaluate((e) => {
+          const el = e.firstElementChild as HTMLElement;
+          const a = new DOMMatrix(getComputedStyle(el).transform);
+          const b = new DOMMatrix(el.style.transform);
+          const difs = [a.m11 - b.m11, a.m12 - b.m12, a.m13 - b.m13, a.m21 - b.m21, a.m22 - b.m22, a.m23 - b.m23, a.m31 - b.m31, a.m32 - b.m32, a.m33 - b.m33];
+          return Math.max(...difs.map(Math.abs));
+        }),
+      { message: 'el giro ha terminado su transición' },
+    )
+    .toBeLessThan(1e-3);
+}
+
+/** Pulsa como un usuario: con el giro ya quieto, en el centro del botón, sin esperar a que nada deje de taparlo. */
+async function pulsarEnSuSitio(page: Page, nombre: string, tactil = false): Promise<void> {
+  await esperarGiroAsentado(page);
+  const caja = await page.getByRole('button', { name: nombre }).boundingBox();
+  expect(caja, `botón «${nombre}» en pantalla`).not.toBeNull();
+  const x = (caja?.x ?? 0) + (caja?.width ?? 0) / 2;
+  const y = (caja?.y ?? 0) + (caja?.height ?? 0) / 2;
+  if (tactil) await page.touchscreen.tap(x, y);
+  else await page.mouse.click(x, y);
+}
+
+/**
+ * Contraste de cada color de átomo (su color declarado, sin transición de por medio) y de las
+ * aristas (rgba compuesto) contra el fondo opaco que tiene la escena detrás.
+ */
+async function contrastesEscena(page: Page): Promise<{ fondoLum: number; atomos: number[]; arista: number }> {
+  return page.locator(ESCENA).evaluate((escena) => {
+    const rgba = (s: string): number[] => {
+      const n = (s.match(/[\d.]+/g) ?? []).map(Number);
+      return [n[0], n[1], n[2], n.length > 3 ? n[3] : 1];
+    };
+    const lum = ([r, g, b]: number[]): number => {
+      const f = (c: number) => {
+        const x = c / 255;
+        return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+    };
+    const k = (a: number[], b: number[]) => {
+      const x = lum(a);
+      const y = lum(b);
+      return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+    };
+    let fondo = [255, 255, 255];
+    for (let n = escena.parentElement; n; n = n.parentElement) {
+      const c = rgba(getComputedStyle(n).backgroundColor);
+      if (c[3] >= 1) {
+        fondo = c;
+        break;
+      }
+    }
+    const atomos: number[] = [];
+    let arista = Infinity;
+    for (const nodo of Array.from((escena.firstElementChild as HTMLElement).children)) {
+      const el = nodo as HTMLElement;
+      const t = el.style.transform;
+      if (/rotateZ/.test(t)) continue;
+      if (/rotate/.test(t)) {
+        const [r, g, b, a] = rgba(getComputedStyle(el).backgroundColor);
+        arista = Math.min(arista, k([r * a + fondo[0] * (1 - a), g * a + fondo[1] * (1 - a), b * a + fondo[2] * (1 - a)], fondo));
+        continue;
+      }
+      atomos.push(k(rgba(el.style.backgroundColor), fondo));
+    }
+    return { fondoLum: lum(fondo), atomos, arista };
+  });
+}
+
+test.describe('Firma 20/11/2026 · escritorio 1280 px', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test('control: las 14 escenas pintan sus átomos, aristas y caras dentro de su caja, sin errores en consola', async ({ page }) => {
+    const errores: string[] = [];
+    page.on('console', (m) => {
+      if (m.type() === 'error') errores.push(m.text());
+    });
+    page.on('pageerror', (e) => errores.push(e.message));
+    await abrir(page);
+    // [sección, escena, átomos, aristas, caras] — contados en los generadores de page.tsx
+    const escenas: [RegExp | null, string | RegExp, number, number, number][] = [
+      [null, 'Cúbico', 8, 12, 6], [null, 'Tetragonal', 8, 12, 6], [null, 'Ortorrómbico', 8, 12, 6],
+      [null, 'Hexagonal', 14, 18, 6], [null, 'Trigonal', 8, 12, 0], [null, 'Monoclínico', 8, 12, 0],
+      [null, 'Triclínico', 8, 12, 0],
+      [/Metálicas/, /^BCC/, 9, 12, 6], [/Metálicas/, /^FCC/, 14, 12, 6], [/Metálicas/, /^HCP/, 17, 18, 6],
+      // NaCl: rejilla 3×3×3 = 27 iones y 3 direcciones × 9 filas × 2 tramos = 54 enlaces;
+      // diamante 8 + 6 + 4 interiores; grafito 2 capas × 10 C y 2 × 11 enlaces; cuarzo 3 × (Si + 4 O)
+      [/Cristales Famosos/, /Sal \(NaCl\)/, 27, 54, 6], [/Cristales Famosos/, /Diamante/, 18, 12, 6],
+      [/Cristales Famosos/, /Grafito/, 20, 22, 0], [/Cristales Famosos/, /Cuarzo/, 15, 18, 6],
+    ];
+    for (const [seccion, nombre, nAt, nAr, nCa] of escenas) {
+      if (seccion) await irASeccion(page, seccion);
+      await elegir(page, nombre);
+      const { atomos, aristas, caras } = await leerEscena(page);
+      expect([atomos.length, aristas.length, caras.length], `${nombre}: átomos, aristas y caras`).toEqual([nAt, nAr, nCa]);
+      const fuera = await page.locator(ESCENA).evaluate((escena) => {
+        const e = escena.getBoundingClientRect();
+        return Array.from((escena.firstElementChild as HTMLElement).children).filter((n) => {
+          const r = n.getBoundingClientRect();
+          return r.width < 1 || r.height < 1 || r.left < e.left - 2 || r.right > e.right + 2 || r.top < e.top - 2 || r.bottom > e.bottom + 2;
+        }).length;
+      });
+      expect(fuera, `${nombre}: elementos sin tamaño o fuera de la escena en el giro inicial`).toBe(0);
+    }
+    expect(errores, 'errores en consola').toEqual([]);
+  });
+
+  test.fail('ABIERTO (firma 20/11/2026) · «Rotar derecha» deja de responder a la 4.ª pulsación: la celda girada tapa el botón', async ({ page }) => {
+    // Desde y = 30° cada pulsación suma 30°: 60, 90, 120, 150. Obtenido: 60, 90, 120 y 120. A 120°
+    // el plano de .estructura3d (100 % × 100 % de la escena, con preserve-3d y perspective 800px)
+    // proyecta su esquina cercana por debajo de la escena, sobre la fila de botones, y se queda el
+    // clic (elementFromPoint en el centro del botón da el div de la estructura). A 60° tapa
+    // «Rotar izquierda». Igual en móvil (bloque «Firma · móvil»).
+    await abrir(page);
+    await page.getByRole('button', { name: 'Rotar derecha' }).scrollIntoViewIfNeeded();
+    expect((await leerGiro(page)).y).toBe(30);
+    for (let i = 1; i <= 4; i++) {
+      await pulsarEnSuSitio(page, 'Rotar derecha');
+      await expect.poll(async () => (await leerGiro(page)).y, { message: `pulsación ${i}`, timeout: 2000 }).toBe(30 + 30 * i);
+    }
+  });
+
+  test.fail('ABIERTO (firma 20/11/2026) · girada 90°, la celda se queda sin átomos: son discos planos, no esferas', async ({ page }) => {
+    // Dos pulsaciones de «Rotar derecha» (30° → 90°, las dos llegan). Una esfera mediría ~18 px de
+    // ancho; un disco de canto mide 18·|cos 90°| = 0. Obtenido: 1,1-1,5 px los 8 átomos del cúbico
+    // (8 % de su tamaño); a 60°, 120°, 240° y 300° miden el 52 %. Umbral 60 %: holgura sobre la
+    // perspectiva (a 0° y 180° miden 95-103 %) y muy lejos del 8 % del defecto.
+    await abrir(page);
+    await page.getByRole('button', { name: 'Rotar derecha' }).scrollIntoViewIfNeeded();
+    await pulsarEnSuSitio(page, 'Rotar derecha');
+    await pulsarEnSuSitio(page, 'Rotar derecha');
+    await expect.poll(async () => (await leerGiro(page)).y).toBe(90);
+    await expect
+      .poll(async () => Math.min(...(await medidasAtomos(page)).map((m) => m.ancho / m.tamano)), {
+        message: 'ancho aparente del átomo más estrecho / su tamaño, a 90°',
+        timeout: 2000,
+      })
+      .toBeGreaterThanOrEqual(0.6);
+  });
+
+  test.fail('ABIERTO (firma 20/11/2026) · la escena 3D no asoma en la primera pantalla', async ({ page }) => {
+    // Lo que promete el <h1> («Estructuras Cristalinas 3D … arrastra para rotar») no está en lo que
+    // se ve al entrar: a 1280×800 la escena empieza en y ≈ 1158 px (la mitad de la escena, en
+    // 1308 px). Delante van el hero, el aviso legal, el banner de Stemum, las 4 secciones, la
+    // cabecera, el texto de contexto, las 7 tarjetas y los parámetros. Esperado: al menos media
+    // escena dentro de los 800 px iniciales.
+    await abrir(page);
+    const { mitad, alto } = await page.locator(ESCENA).evaluate((e) => {
+      const r = e.getBoundingClientRect();
+      return { mitad: r.top + window.scrollY + r.height / 2, alto: window.innerHeight };
+    });
+    expect(mitad, `mitad de la escena (px desde arriba) frente a ${alto} px de pantalla`).toBeLessThan(alto);
+  });
+
+  test.fail('ABIERTO (firma 20/11/2026) · HCP: la capa intermedia queda más lejos que los vecinos del plano', async ({ page }) => {
+    // La tarjeta dice «Nº coordinación 12» y «74 %»: en la HCP compacta los 6 vecinos del plano y
+    // los 3 + 3 de las capas contiguas están a la MISMA distancia a, y c/a = 2·√(2/3) = 1,633.
+    // Dibujada: a = 40,5 px, c = 90 px (c/a = 2,22) y la capa intermedia a 50,69 px de la base.
+    await abrir(page);
+    await irASeccion(page, /Metálicas/);
+    await elegir(page, /^HCP/);
+    const { atomos } = await leerEscena(page);
+    const ys = [...new Set(atomos.map((p) => Math.round(p[1])))].sort((a, b) => a - b);
+    expect(ys, 'tres capas').toHaveLength(3);
+    const base = atomos.filter((p) => Math.round(p[1]) === ys[0]);
+    const medio = atomos.filter((p) => Math.round(p[1]) === ys[1]);
+    const enPlano = Math.min(...base.flatMap((p, i) => base.filter((_, j) => j !== i).map((q) => dist(p, q))));
+    const entreCapas = Math.min(...medio.flatMap((p) => base.map((q) => dist(p, q))));
+    expect(Math.abs(entreCapas - enPlano), `vecino de la capa contigua ${entreCapas.toFixed(2)} px · del plano ${enPlano.toFixed(2)} px`).toBeLessThan(1);
+  });
+
+  test.fail('ABIERTO (firma 20/11/2026) · aristas a 1,45:1 en claro: el contorno de la celda apenas se ve', async ({ page }) => {
+    // .arista: rgba(46, 134, 171, 0.3) sobre la tarjeta blanca = rgb(192,3; 218,7; 229,8) → 1,45:1.
+    // En trigonal, monoclínico y triclínico (sin caras) son lo único que dibuja la celda, y en el
+    // grafito y la sal, los enlaces. Mínimo para un gráfico necesario: 3:1 (WCAG 1.4.11).
+    await abrir(page);
+    await prepararParaMedir(page);
+    await elegir(page, 'Monoclínico');
+    const { arista } = await contrastesEscena(page);
+    expect(arista, 'contraste de las aristas contra la tarjeta').toBeGreaterThanOrEqual(3);
+  });
+});
+
+test.describe('Firma 20/11/2026 · movimiento reducido', () => {
+  test.use({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
+
+  test.fail('ABIERTO (firma 20/11/2026) · con movimiento reducido el arrastre no gira y la app sigue diciendo «Arrastra para rotar»', async ({ page }) => {
+    // handlePointerDown sale sin hacer nada si prefers-reduced-motion: el arrastre es manipulación
+    // directa, no una animación. Arrastrar 40 px → y = 30 + 40·0,5 = 50°. Obtenido: 30°, cursor
+    // «default», y el texto bajo la escena, el aria-label y el subtítulo siguen pidiendo arrastrar.
+    // Se acepta cualquiera de las dos reparaciones coherentes: que gire, o que deje de prometerlo.
+    await abrir(page);
+    const escena = page.locator(ESCENA);
+    await escena.scrollIntoViewIfNeeded();
+    const caja = await escena.boundingBox();
+    const cx = (caja?.x ?? 0) + (caja?.width ?? 0) / 2;
+    const cy = (caja?.y ?? 0) + (caja?.height ?? 0) / 2;
+    await page.mouse.move(cx, cy);
+    await page.mouse.down();
+    await page.mouse.move(cx + 40, cy, { steps: 8 });
+    await page.mouse.up();
+    const gira = (await leerGiro(page)).y === 50;
+    const prometeArrastre =
+      (await page.getByText(/Arrastra para rotar/i).count()) > 0 || /Arrastra/i.test((await escena.getAttribute('aria-label')) ?? '');
+    expect(gira || !prometeArrastre, `gira: ${gira} · promete arrastrar: ${prometeArrastre}`).toBe(true);
+  });
+});
+
+test.describe('Firma 20/11/2026 · tema oscuro', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test.fail('ABIERTO (firma 20/11/2026) · en oscuro los átomos del diamante y del grafito no se distinguen de la tarjeta', async ({ page }) => {
+    // Tarjeta oscura #2A2A2A. Diamante: #555555 → 1,92:1 y los 4 interiores #1A1A1A → 1,21:1;
+    // grafito: capa superior #333333 → 1,14:1 y la inferior #666666 → 2,50:1. Mínimo 3:1.
+    await abrir(page);
+    await prepararParaMedir(page);
+    await activarTemaOscuro(page);
+    await irASeccion(page, /Cristales Famosos/);
+    const peores: string[] = [];
+    for (const nombre of [/Diamante/, /Grafito/]) {
+      await elegir(page, nombre);
+      await expect.poll(async () => (await contrastesEscena(page)).fondoLum, { message: 'la tarjeta ya es oscura' }).toBeLessThan(0.05);
+      const { atomos } = await contrastesEscena(page);
+      const peor = Math.min(...atomos);
+      if (peor < 3) peores.push(`${nombre.source} ${peor.toFixed(2)}:1`);
+    }
+    expect(peores, 'átomos por debajo de 3:1 contra la tarjeta oscura').toEqual([]);
+  });
+});
+
+test.describe('Firma 20/11/2026 · móvil 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('control: el dedo en vertical gira la celda sin desplazar la página; fuera de la escena, la desplaza', async ({ page, context }) => {
+    // Escena con touch-action: none. Dedo 60 px hacia abajo sobre ella → x = −20 − 60·0,5 = −50° y
+    // scrollY igual. Fuera de la escena (margen izquierdo), 200 px hacia arriba → la página baja.
+    await abrir(page);
+    const escena = page.locator(ESCENA);
+    await escena.scrollIntoViewIfNeeded();
+    const caja = await escena.boundingBox();
+    const cdp = await context.newCDPSession(page);
+    const fotograma = () => page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => r())));
+    const cx = (caja?.x ?? 0) + (caja?.width ?? 0) / 2;
+    const cy = (caja?.y ?? 0) + (caja?.height ?? 0) / 2;
+    const scroll0 = await page.evaluate(() => window.scrollY);
+    expect(await leerGiro(page)).toEqual({ x: -20, y: 30 });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: cx, y: cy - 30 }] });
+    await fotograma();
+    for (let i = 1; i <= 10; i++) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: cx, y: cy - 30 + i * 6 }] });
+      await fotograma();
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await expect.poll(async () => (await leerGiro(page)).x, { message: 'el dedo inclina la celda' }).toBe(-50);
+    expect(await page.evaluate(() => window.scrollY), 'la página no se mueve bajo el dedo').toBe(scroll0);
+
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 8, y: 600 }] });
+    await fotograma();
+    for (let i = 1; i <= 10; i++) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 8, y: 600 - i * 20 }] });
+      await fotograma();
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await expect.poll(async () => page.evaluate(() => window.scrollY), { message: 'fuera de la escena el dedo desplaza' }).toBeGreaterThan(scroll0);
+  });
+
+  test.fail('ABIERTO (firma 20/11/2026) · tocar 4 veces «Rotar derecha» deja la celda en 120°', async ({ page }) => {
+    // Mismo defecto que en escritorio, con el dedo: esperado 60, 90, 120, 150 · obtenido 60, 90,
+    // 120, 120 (el cuarto toque cae en el plano girado de la estructura, no en el botón).
+    await abrir(page);
+    await page.getByRole('button', { name: 'Rotar derecha' }).scrollIntoViewIfNeeded();
+    for (let i = 1; i <= 4; i++) {
+      await pulsarEnSuSitio(page, 'Rotar derecha', true);
+      await expect.poll(async () => (await leerGiro(page)).y, { message: `toque ${i}`, timeout: 2000 }).toBe(30 + 30 * i);
+    }
+  });
+
+  test.fail('ABIERTO (firma 20/11/2026) · en el móvil la escena 3D queda casi dos pantallas por debajo', async ({ page }) => {
+    // A 390×844 (este bloque) la mitad de la escena cae en y ≈ 1576 px; en Pixel 7 (412×839) la
+    // escena empieza en y ≈ 1466 px y hay que bajar ~850 px para verla entera. Delante: hero, aviso
+    // legal, banner de Stemum, las 4 secciones en 2×2, la cabecera, el contexto, las 7 tarjetas en
+    // tres filas y los parámetros. Esperado: al menos media escena dentro de la primera pantalla.
+    await abrir(page);
+    const { mitad, alto } = await page.locator(ESCENA).evaluate((e) => {
+      const r = e.getBoundingClientRect();
+      return { mitad: r.top + window.scrollY + r.height / 2, alto: window.innerHeight };
+    });
+    expect(mitad, `mitad de la escena (px desde arriba) frente a ${alto} px de pantalla`).toBeLessThan(alto);
   });
 });
