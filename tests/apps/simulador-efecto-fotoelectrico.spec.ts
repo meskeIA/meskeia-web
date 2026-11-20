@@ -488,9 +488,9 @@ test.fail('HALLAZGO (19/11/2026, ABIERTO) · h·c sale como «1239,84» y «1240
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-test.fail('HALLAZGO (19/11/2026, ABIERTO) · «Otro φ» por debajo de 0,5 se reescribe al salir como «0.5», con punto', async ({ page }) => {
-  // NumberInput acota al salir con `min.toString()`: el campo pasa de «0,2» a «0.5». El cálculo
-  // es el de 0,5 eV (tarjeta «0,50 eV»), pero el campo enseña el formato inglés.
+test('HALLAZGO 5276 (19/11/2026, REPARADO) · «Otro φ» por debajo de 0,5 se reescribe al salir como «0,5», con coma', async ({ page }) => {
+  // REPARADO (20/11/2026, C0850): NumberInput acotaba al salir con `min.toString()` y el campo
+  // pasaba de «0,2» a «0.5», en formato inglés. Ahora escribe el límite con coma decimal.
   await page.getByRole('button', { name: /^Otro φ/ }).click();
   const entradaPhi = page.getByLabel('Función de trabajo φ (eV)');
   await entradaPhi.fill('0,2');

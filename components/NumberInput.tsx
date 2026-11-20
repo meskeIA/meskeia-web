@@ -45,6 +45,18 @@ interface NumberInputProps {
   acotarAlSalir?: boolean;
 }
 
+/**
+ * El límite al que se acota, escrito como lo escribiría el usuario: coma decimal y sin agrupar
+ * los miles, igual que el resto del campo (un entero sale como antes, «1500»).
+ *
+ * ── De dónde sale (cabo C0850, hallazgo 5276 en `simulador-efecto-fotoelectrico`, 19/11/2026) ──
+ * El blur escribía `min.toString()`: con un límite decimal el campo pasaba de «0,2» a «0.5», en
+ * formato inglés, en una página que pide la coma en todo lo demás.
+ */
+function limiteEnTexto(limite: number): string {
+  return String(limite).replace('.', ',');
+}
+
 export default function NumberInput({
   value,
   onChange,
@@ -123,11 +135,11 @@ export default function NumberInput({
       // del dato y no solo su valor (hallazgos 822 y 844).
       if (!isNaN(num) && acotarAlSalir) {
         if (min !== undefined && num < min) {
-          onChange(min.toString());
+          onChange(limiteEnTexto(min));
           return;
         }
         if (max !== undefined && num > max) {
-          onChange(max.toString());
+          onChange(limiteEnTexto(max));
           return;
         }
       }
