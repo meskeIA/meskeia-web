@@ -4,6 +4,7 @@
 import { useState, useMemo, useCallback, useId } from 'react';
 import styles from './Combinatoria.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, CampoNumerico } from '@/components';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 // ======== TIPOS ========
 type TabId = 'permcomb' | 'pascal' | 'principio';
@@ -70,11 +71,25 @@ function buildPascalTriangle(rows: number): PascalCell[][] {
 }
 
 // ======== COLORES DE PATRONES PASCAL ========
+/** hsl (tono en grados, saturación y luminosidad en %) → #rrggbb */
+function hslAHex(h: number, s: number, l: number): string {
+  const sat = s / 100;
+  const lum = l / 100;
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const c = lum - sat * Math.min(lum, 1 - lum) * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+    return Math.round(c * 255).toString(16).padStart(2, '0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
 function getPascalCellColor(cell: PascalCell, pattern: PascalPattern, maxRows: number): string {
+  // Colores hexadecimales para que rellenoConTinta elija la tinta legible de cada celda (C0297): con
+  // var(--primary) y el blanco fijo al 85 % de opacidad no había cómo medirla
   const { row, col, value } = cell;
   switch (pattern) {
     case 'binomial':
-      return 'var(--primary)';
+      return '#2E86AB';
     case 'fibonacci': {
       // Diagonales ascendentes: 1,1,2,3,5,8,13...
       // Diagonal d = row - col
@@ -85,64 +100,80 @@ function getPascalCellColor(cell: PascalCell, pattern: PascalPattern, maxRows: n
       // resaltar columna 0 y diagonales
       if (col === 0) return '#F59E0B';
       if (row - col === col - 1) return '#F59E0B';
-      return 'var(--primary)';
+      return '#2E86AB';
     }
     case 'potencias2':
       // Suma de cada fila = 2^row; resaltar toda la fila con intensidad
-      return `hsl(${160 + row * 8}, 70%, ${55 - row * 2}%)`;
+      return hslAHex(160 + row * 8, 70, 55 - row * 2);
     case 'triangulares': {
       // Columna k=2: 1,3,6,10,15... son números triangulares
       if (col === 2) return '#10B981';
-      return 'var(--primary)';
+      return '#2E86AB';
     }
     case 'sierpinski': {
-      // Números impares: resaltar
-      if (value % 2 !== 0) return '#7C3AED';
+      // Números impares: resaltar (iban en un violeta prohibido, fuera de la marca)
+      if (value % 2 !== 0) return '#2E86AB';
       return '#E5E7EB';
     }
     default:
-      return 'var(--primary)';
+      return '#2E86AB';
   }
 }
 
 // ======== ÁRBOL DE PERMUTACIONES SVG ========
-function buildPermTree(n: number, k: number): TreeNode[] {
-  if (n > 5 || k === 0) return [];
-  const nodes: TreeNode[] = [];
-  const svgWidth = 360;
-  const svgHeight = 200;
-  const levelHeight = svgHeight / (k + 1);
+/** La ruta resaltada: la marca oscurecida lo justo para el blanco (sobre #2E86AB daba 4,11:1, C0297) */
+const RUTA_ARBOL = rellenoConTinta('#2E86AB');
 
-  // Nodo raíz
-  nodes.push({ value: -1, x: svgWidth / 2, y: 20, selected: false, level: -1 });
+/** Separación entre hojas del árbol, en unidades del viewBox: un nodo de radio 10 y 4 de aire */
+const SEPARACION_HOJAS = 24;
+const ANCHO_MINIMO_ARBOL = 360;
 
-  // Generar hasta k niveles con hasta n ramas
-  function buildLevel(parentX: number, parentY: number, level: number, count: number) {
-    if (level >= k) return;
-    const startX = parentX - (count * 30) / 2;
-    for (let i = 0; i < Math.min(count, n); i++) {
-      const x = startX + i * 30 + 15;
-      const y = parentY + levelHeight;
-      nodes.push({
-        value: i + 1,
-        x,
-        y,
-        parentX,
-        parentY,
-        selected: i < k,
-        level,
-      });
-      if (level + 1 < k) {
-        buildLevel(x, y, level + 1, Math.min(count - 1, n - 1));
+/**
+ * El árbol de P(n,k): bajo cada nodo, solo los elementos que aún no se han usado en su rama, así que
+ * tiene exactamente P(n,k) hojas. Hasta el 20/11/2026 cada nivel repetía 1, 2, 3… sin mirar la rama
+ * (bajo el «1» volvía a salir el «1»), los hijos de padres distintos caían en la misma x y se pintaban
+ * unos encima de otros, y con n = 5 solo se dibujaba la raíz. Las hojas se reparten a SEPARACION_HOJAS
+ * y cada nodo interior se centra sobre las suyas; si no caben en 360, el árbol se ensancha (y su
+ * contenedor hace scroll). La ruta resaltada es la primera: 1 → 2 → 3…
+ */
+function buildPermTree(n: number, k: number): { nodos: TreeNode[]; ancho: number } {
+  if (n > 5 || k === 0 || k > n) return { nodos: [], ancho: ANCHO_MINIMO_ARBOL };
+  const hojas = permutations(n, k);
+  const ancho = Math.max(ANCHO_MINIMO_ARBOL, hojas * SEPARACION_HOJAS + SEPARACION_HOJAS);
+  const margen = (ancho - hojas * SEPARACION_HOJAS) / 2;
+  const alturaNivel = 200 / (k + 1);
+  const nodos: TreeNode[] = [];
+  let siguienteHoja = 0;
+
+  // Añade los hijos de una rama; la x de cada nodo interior es la media de las x de sus hojas
+  function construir(usados: number[], nivel: number, padreX: number, padreY: number, enRuta: boolean): void {
+    const y = 20 + alturaNivel * (nivel + 1);
+    const libres = Array.from({ length: n }, (_, i) => i + 1).filter((v) => !usados.includes(v));
+    libres.forEach((valor, i) => {
+      const seleccionado = enRuta && i === 0;
+      const indice = nodos.length;
+      nodos.push({ value: valor, x: 0, y, parentX: padreX, parentY: padreY, selected: seleccionado, level: nivel });
+      if (nivel + 1 < k) {
+        const primeraHoja = siguienteHoja;
+        // La x del padre de los hijos aún no se conoce: se corrige al volver
+        construir([...usados, valor], nivel + 1, NaN, y, seleccionado);
+        const ultimaHoja = siguienteHoja - 1;
+        const x = margen + ((primeraHoja + ultimaHoja) / 2) * SEPARACION_HOJAS + SEPARACION_HOJAS / 2;
+        nodos[indice].x = x;
+        for (let j = indice + 1; j < nodos.length; j++) {
+          if (nodos[j].level === nivel + 1 && Number.isNaN(nodos[j].parentX)) nodos[j].parentX = x;
+        }
+      } else {
+        nodos[indice].x = margen + siguienteHoja * SEPARACION_HOJAS + SEPARACION_HOJAS / 2;
+        siguienteHoja++;
       }
-    }
+    });
   }
 
-  if (n <= 4) {
-    buildLevel(svgWidth / 2, 20, 0, n);
-  }
-
-  return nodes;
+  const raiz: TreeNode = { value: -1, x: ancho / 2, y: 20, selected: false, level: -1 };
+  nodos.push(raiz);
+  construir([], 0, raiz.x, raiz.y, true);
+  return { nodos, ancho };
 }
 
 // ======== BINOMIO DE NEWTON ========
@@ -202,10 +233,7 @@ export default function VisualizadorCombinatoriaPage() {
   // ======== CÁLCULOS ========
   const pnk = useMemo(() => permutations(nVal, kVal), [nVal, kVal]);
   const cnk = useMemo(() => combinations(nVal, kVal), [nVal, kVal]);
-  const treeNodes = useMemo(() => {
-    if (nVal <= 5) return buildPermTree(nVal, kVal);
-    return [];
-  }, [nVal, kVal]);
+  const { nodos: treeNodes, ancho: anchoArbol } = useMemo(() => buildPermTree(nVal, kVal), [nVal, kVal]);
 
   const pascalTriangle = useMemo(() => buildPascalTriangle(pascalRows), [pascalRows]);
   const rowSums = useMemo(
@@ -368,8 +396,9 @@ export default function VisualizadorCombinatoriaPage() {
                 </p>
                 <div className={styles.svgWrapper}>
                   <svg
-                    viewBox="0 0 360 220"
+                    viewBox={`0 0 ${anchoArbol} 220`}
                     className={styles.treeSvg}
+                    style={anchoArbol > ANCHO_MINIMO_ARBOL ? { width: `${anchoArbol}px`, maxWidth: 'none' } : undefined}
                     aria-label={`Árbol de permutaciones para n=${nVal}, k=${kVal}`}
                   >
                     {/* Conexiones */}
@@ -380,7 +409,7 @@ export default function VisualizadorCombinatoriaPage() {
                         y1={node.parentY}
                         x2={node.x}
                         y2={node.y}
-                        stroke={node.selected ? '#2E86AB' : '#CBD5E1'}
+                        stroke={node.selected ? RUTA_ARBOL.relleno : '#CBD5E1'}
                         strokeWidth={node.selected ? 2 : 1}
                         strokeDasharray={node.selected ? undefined : '4,2'}
                       />
@@ -392,7 +421,7 @@ export default function VisualizadorCombinatoriaPage() {
                           cx={node.x}
                           cy={node.y}
                           r={i === 0 ? 14 : 10}
-                          fill={node.selected ? '#2E86AB' : '#E2E8F0'}
+                          fill={node.selected ? RUTA_ARBOL.relleno : '#E2E8F0'}
                           stroke={node.selected ? '#1A5F7A' : '#94A3B8'}
                           strokeWidth={1.5}
                         />
@@ -401,7 +430,7 @@ export default function VisualizadorCombinatoriaPage() {
                           y={node.y + 4}
                           textAnchor="middle"
                           fontSize={i === 0 ? 11 : 9}
-                          fill={node.selected ? '#FFFFFF' : '#475569'}
+                          fill={node.selected ? RUTA_ARBOL.tinta : '#475569'}
                           fontWeight="600"
                         >
                           {i === 0 ? '●' : node.value}
@@ -477,7 +506,12 @@ export default function VisualizadorCombinatoriaPage() {
                     const startX = (pascalSvgWidth - rowWidth) / 2;
                     const cx = startX + c * (CELL_SIZE + CELL_GAP) + CELL_SIZE / 2;
                     const cy = r * (CELL_SIZE + CELL_GAP) + CELL_SIZE / 2 + 10;
-                    const color = getPascalCellColor(cell, pascalPattern, pascalRows);
+                    // Las pares del Sierpinski, apagadas con los tokens del tema; el resto, relleno y
+                    // tinta del mismo color
+                    const atenuada = pascalPattern === 'sierpinski' && cell.value % 2 === 0;
+                    const { relleno, tinta } = atenuada
+                      ? { relleno: 'var(--border)', tinta: 'var(--text-secondary)' }
+                      : rellenoConTinta(getPascalCellColor(cell, pascalPattern, pascalRows));
                     const isSelected = selectedCell?.row === r && selectedCell?.col === c;
                     const displayVal = cell.value > 999 ? '…' : String(cell.value);
                     return (
@@ -494,8 +528,7 @@ export default function VisualizadorCombinatoriaPage() {
                           width={CELL_SIZE}
                           height={CELL_SIZE}
                           rx={4}
-                          fill={color}
-                          opacity={pascalPattern === 'sierpinski' && cell.value % 2 === 0 ? 0.15 : 0.85}
+                          fill={relleno}
                           stroke={isSelected ? '#F59E0B' : 'rgba(255,255,255,0.3)'}
                           strokeWidth={isSelected ? 2.5 : 1}
                         />
@@ -504,7 +537,7 @@ export default function VisualizadorCombinatoriaPage() {
                           y={cy + 4}
                           textAnchor="middle"
                           fontSize={cell.value > 99 ? 7 : 9}
-                          fill="#FFFFFF"
+                          fill={tinta}
                           fontWeight="600"
                         >
                           {displayVal}
