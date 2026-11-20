@@ -484,7 +484,7 @@ export default function IndiceGlucemicoPage() {
                 return (
                   <g key={val}>
                     <line x1="60" y1={yPos} x2="680" y2={yPos} stroke="#e5e7eb" strokeWidth="1" strokeDasharray="4,4" />
-                    <text x="55" y={yPos + 4} textAnchor="end" fontSize="11" fill="#9CA3AF">{val}</text>
+                    <text x="55" y={yPos + 4} textAnchor="end" fontSize="11" fill="var(--text-secondary)">{val}</text>
                   </g>
                 );
               })}
@@ -495,7 +495,7 @@ export default function IndiceGlucemicoPage() {
                 return (
                   <g key={t}>
                     <line x1={xPos} y1="230" x2={xPos} y2="235" stroke="#9CA3AF" strokeWidth="1" />
-                    <text x={xPos} y="248" textAnchor="middle" fontSize="11" fill="#9CA3AF">{t}min</text>
+                    <text x={xPos} y="248" textAnchor="middle" fontSize="11" fill="var(--text-secondary)">{t} min</text>
                   </g>
                 );
               })}
@@ -536,7 +536,7 @@ export default function IndiceGlucemicoPage() {
                 y="130"
                 textAnchor="middle"
                 fontSize="11"
-                fill="#6B7280"
+                fill="var(--text-secondary)"
                 transform="rotate(-90, 15, 130)"
               >
                 Glucosa (mg/dL)

@@ -505,6 +505,9 @@ const APPS: App[] = [
   // marca (3,93) o en rojo E53E3E (3,95 en claro, 4,22 en oscuro) y, en los errores, «H₀» en la marca
   // (3,93 y 4,24) y «H₁» en el teal (2,68 en claro)
   { slug: 'visualizador-estadistica-inferencial', secciones: "nav[aria-label*='ecciones'] button", extremos: true },
+  // 20/11/2026 (tanda 4): en la curva de glucemia, las cifras de los ejes en #9CA3AF fijo (2,52:1 en
+  // claro) y «Glucosa (mg/dL)» en #6B7280 fijo (2,81 en oscuro)
+  { slug: 'visualizador-indice-glucemico', secciones: SECCIONES },
 ];
 
 interface TextoSvg {
