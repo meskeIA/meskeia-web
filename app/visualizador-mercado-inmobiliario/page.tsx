@@ -122,7 +122,9 @@ function GraficaOfertaDemanda({ modo }: { modo: ModoOfertaDemanda }) {
         strokeWidth="2.5"
         strokeLinecap="round"
       />
-      <text x={dX2 + 4} y={dY2 + 4} fontSize="11" fill="#2E86AB" fontWeight="700">D</text>
+      {/* Rótulos de las curvas y del equilibrio en su tono de texto por tema: el color de la curva como
+          texto daba 2,04-4,07:1 en claro y 3,31 en oscuro (cabo C0297, 20/11/2026) */}
+      <text x={dX2 + 4} y={dY2 + 4} fontSize="11" fill="var(--primary-texto)" fontWeight="700">D</text>
 
       {/* Curva de oferta */}
       <line
@@ -132,13 +134,13 @@ function GraficaOfertaDemanda({ modo }: { modo: ModoOfertaDemanda }) {
         strokeWidth="2.5"
         strokeLinecap="round"
       />
-      <text x={oX2 + 4} y={oY2 + 4} fontSize="11" fill="#48A9A6" fontWeight="700">O</text>
+      <text x={oX2 + 4} y={oY2 + 4} fontSize="11" fill="var(--secondary-texto)" fontWeight="700">O</text>
 
       {/* Punto de equilibrio */}
       {eqX > PAD && eqX < W - PAD && eqY > PAD && eqY < H - PAD && (
         <>
           <circle cx={eqX} cy={eqY} r={6} fill="#F4A261" stroke="white" strokeWidth="1.5" />
-          <text x={eqX + 8} y={eqY - 4} fontSize="10" fill="#F4A261" fontWeight="700">E</text>
+          <text x={eqX + 8} y={eqY - 4} fontSize="10" fill="var(--naranja-texto, #B93E0B)" fontWeight="700">E</text>
           {/* Líneas punteadas al equilibrio */}
           <line x1={PAD} y1={eqY} x2={eqX} y2={eqY} stroke="#F4A261" strokeWidth="1" strokeDasharray="4 3" />
           <line x1={eqX} y1={H - PAD} x2={eqX} y2={eqY} stroke="#F4A261" strokeWidth="1" strokeDasharray="4 3" />
@@ -249,7 +251,7 @@ function GraficaBurbuja() {
             x={cx}
             y={cy + dy}
             fontSize="8.5"
-            fill="#F4A261"
+            fill="var(--naranja-texto, #B93E0B)"
             fontWeight="700"
             textAnchor="middle"
           >

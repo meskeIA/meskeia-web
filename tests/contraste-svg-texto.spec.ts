@@ -479,6 +479,9 @@ const APPS: App[] = [
     extremos: true,
     subestados: "button[class*='modeloBtn']",
   },
+  // 20/11/2026 (tanda 3): «D» en la marca (4,07:1 en claro, 3,31 en oscuro), «O» en el teal (2,78) y
+  // «E» y los hitos de la serie de precios en F4A261 (1,88-2,04 en claro)
+  { slug: 'visualizador-mercado-inmobiliario', extremos: true },
 ];
 
 interface TextoSvg {
