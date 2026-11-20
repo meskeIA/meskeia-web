@@ -109,6 +109,14 @@
 }
 .espectroSvg { width: 100%; height: auto; display: block; }
 
+/* Tonos de texto de la gráfica y la leyenda (C0297, 20/11/2026): el fill por CSS manda sobre el atributo */
+.container { --tf-acento-texto: #3D6E8C; }
+[data-theme='dark'] .container { --tf-acento-texto: #7FB3D3; }
+.espectroSvg .svgEje { fill: var(--text-secondary); }
+/* El punto de la suma es el negro de la onda sobre el lienzo claro; en oscuro, con un filo claro para verse */
+.puntoSuma { color: #1A1A1A; }
+[data-theme='dark'] .puntoSuma { -webkit-text-stroke: 1px #B0B0B0; }
+
 /* Info box */
 .infoBox {
   display: flex; gap: var(--spacing-md); align-items: flex-start;

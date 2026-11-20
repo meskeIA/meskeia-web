@@ -11,6 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { formatNumber } from '@/lib';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -64,6 +65,20 @@ const PRESETS: SenalPreset[] = [
 ];
 
 const COLORES_COMPONENTES = ['#2E86AB', '#48A9A6', '#E8A838', '#E84A5F', '#7FB3D3'];
+
+/*
+ * El color de cada componente se queda en su barra, su onda y su borde; como TEXTO (la amplitud
+ * sobre la barra, el nombre del componente y la leyenda) va su tono por tema (C0297, 20/11/2026):
+ * el ámbar daba 2,06:1, el teal 2,78 y la marca 4,07 en claro, y la marca 3,50 en oscuro.
+ */
+const TONOS_COMPONENTES: Record<string, string> = {
+  '#2E86AB': 'var(--primary-texto)',
+  '#48A9A6': 'var(--secondary-texto)',
+  '#E8A838': 'var(--ambar-texto, #8A5A00)',
+  '#E84A5F': 'var(--rojo-texto, #B91C1C)',
+  '#7FB3D3': 'var(--tf-acento-texto)',
+};
+const tonoDe = (color: string): string => TONOS_COMPONENTES[color.toUpperCase()] ?? 'var(--text-primary)';
 
 // ─────────────────────────────────────────────
 // Hook: canvas de síntesis de señal
@@ -279,20 +294,21 @@ function EspectroSVG({ componentes }: { componentes: Componente[] }) {
         <line x1={padLeft} y1={H - padBottom} x2={W - 8} y2={H - padBottom} stroke="#CCCCCC" strokeWidth="1" />
 
         {/* Etiqueta eje Y */}
-        <text x={8} y={H / 2} textAnchor="middle" fill="#999" fontSize="9" transform={`rotate(-90, 12, ${H / 2})`}>
+        {/* Rótulos de los ejes: #999 daba 2,82:1 en claro y las frecuencias en #666 2,50 en oscuro */}
+        <text x={8} y={H / 2} textAnchor="middle" fill="#999" className={styles.svgEje} fontSize="9" transform={`rotate(-90, 12, ${H / 2})`}>
           Amplitud
         </text>
         {/* Etiqueta eje X */}
-        <text x={W / 2 + padLeft / 2} y={H - 4} textAnchor="middle" fill="#999" fontSize="9">
+        <text x={W / 2 + padLeft / 2} y={H - 4} textAnchor="middle" fill="#999" className={styles.svgEje} fontSize="9">
           Frecuencia (Hz)
         </text>
 
         {/* Etiquetas eje Y (0 y máx) */}
-        <text x={padLeft - 4} y={H - padBottom} textAnchor="end" fill="#999" fontSize="8">
+        <text x={padLeft - 4} y={H - padBottom} textAnchor="end" fill="#999" className={styles.svgEje} fontSize="8">
           0
         </text>
-        <text x={padLeft - 4} y={padTop + 6} textAnchor="end" fill="#999" fontSize="8">
-          {maxAmp.toFixed(1)}
+        <text x={padLeft - 4} y={padTop + 6} textAnchor="end" fill="#999" className={styles.svgEje} fontSize="8">
+          {formatNumber(maxAmp, 1)}
         </text>
 
         {/* Barras del espectro */}
@@ -316,19 +332,21 @@ function EspectroSVG({ componentes }: { componentes: Componente[] }) {
                 y={H - padBottom + 11}
                 textAnchor="middle"
                 fill="#666"
+                className={styles.svgEje}
                 fontSize="9"
               >
-                {comp.frecuencia}Hz
+                {comp.frecuencia} Hz
               </text>
               <text
                 x={bx + barWidth / 2}
                 y={by - 3}
                 textAnchor="middle"
                 fill={comp.color}
+                style={{ fill: tonoDe(comp.color) }}
                 fontSize="8"
                 fontWeight="600"
               >
-                {comp.amplitud.toFixed(1)}
+                {formatNumber(comp.amplitud, 1)}
               </text>
             </g>
           );
@@ -357,7 +375,7 @@ function ComponenteSlider({
   return (
     <div className={styles.componenteCard} style={{ borderLeftColor: comp.color }}>
       <div className={styles.componenteHeader}>
-        <span className={styles.componenteLabel} style={{ color: comp.color }}>
+        <span className={styles.componenteLabel} style={{ color: tonoDe(comp.color) }}>
           Componente {comp.id}
         </span>
         {puedeBorrar && (
@@ -390,7 +408,7 @@ function ComponenteSlider({
       </div>
       <div className={styles.sliderFila}>
         <label htmlFor={`${baseId}-amplitud`} className={styles.sliderLabel}>
-          Amplitud: <strong>{comp.amplitud.toFixed(1)}</strong>
+          Amplitud: <strong>{formatNumber(comp.amplitud, 1)}</strong>
         </label>
         <input
           id={`${baseId}-amplitud`}
@@ -599,12 +617,14 @@ export default function TransformadaFourierPage() {
           />
           <div className={styles.canvasLeyenda}>
             {componentes.map((c) => (
-              <span key={c.id} className={styles.leyendaItem} style={{ color: c.color }}>
-                ● {c.frecuencia}Hz
+              <span key={c.id} className={styles.leyendaItem} style={{ color: tonoDe(c.color) }}>
+                <span aria-hidden="true" style={{ color: c.color }}>●</span> {c.frecuencia} Hz
               </span>
             ))}
-            <span className={styles.leyendaItem} style={{ color: '#1A1A1A' }}>
-              ● Suma
+            {/* La suma va en negro sobre el lienzo, que es claro en los dos temas; el rótulo, en el
+                texto del tema (#1A1A1A fijo era negro sobre negro en oscuro) */}
+            <span className={styles.leyendaItem} style={{ color: 'var(--text-primary)' }}>
+              <span aria-hidden="true" className={styles.puntoSuma}>●</span> Suma
             </span>
           </div>
         </div>

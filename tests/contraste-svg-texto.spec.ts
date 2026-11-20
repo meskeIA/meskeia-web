@@ -115,6 +115,10 @@ const APPS: App[] = [
   // Del censo del 20/11/2026 (C0297): la escala de la línea del tiempo en #999 (2,82:1 en claro) y la
   // marca ▲ de la especie elegida en la marca (4,07)
   { slug: 'visualizador-evolucion-humana' },
+  // Del censo del 20/11/2026 (C0297): los rótulos de los ejes del espectro en #999 (2,82:1 en claro),
+  // las frecuencias en #666 (2,50 en oscuro) y la amplitud sobre cada barra en su color (el ámbar 2,06,
+  // el teal 2,78 y la marca 4,07 en claro; 3,50 en oscuro)
+  { slug: 'visualizador-transformada-fourier' },
   // Del censo del 08/11/2026 (C0297), reparada el 10/11/2026: rótulos sobre la tarjeta en #1A1A1A,
   // #666 y #999 fijos (1,28-2,37:1 en oscuro, 2,82 en claro), el espermatozoide y el notocordio
   // en la marca y el teal (2,78-4,07), y blanco sobre el teal y la marca translúcidos (2,42-2,77)

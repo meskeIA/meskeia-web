@@ -226,6 +226,10 @@ const APPS: App[] = [
   // en oscuro, cada token en su color puro sobre su tinte (1,95-4,49), el blanco de los botones
   // activos pisado por el gris del botón (2,52 y 4,46) y --primary-texto sobre el tinte (4,18-4,32)
   { slug: 'visualizador-llm-funcionamiento', todo: true },
+  // 20/11/2026 (C0297): el nombre de cada componente y la leyenda del lienzo en el color de su onda
+  // con style (la marca 4,11:1, el teal 2,80, el ámbar 2,1 en claro) y «● Suma» en #1A1A1A fijo, negro
+  // sobre negro en oscuro
+  { slug: 'visualizador-transformada-fourier', todo: true },
   // 13/11/2026: el título del panel de la capa en su color con style (el núcleo interno en oro, 1,73:1)
   { slug: 'visualizador-capas-tierra', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
   // 13/11/2026: «Producción de bilis» en amarillo (1,52:1), «FASE 2» en verde (2,56-2,75) y el título del
