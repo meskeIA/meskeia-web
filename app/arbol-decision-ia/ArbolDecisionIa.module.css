@@ -200,6 +200,25 @@
 .etiquetaBtnNo { background: transparent; }
 .etiquetaBtn:hover { opacity: 0.8; }
 
+/*
+ * Tono de TEXTO de cada color de datos, para el fill del SVG y el color del HTML (C0297): el color
+ * puro como texto no llegaba a 4,5:1 sobre el tinte del nodo. El naranja de texto común (B93E0B)
+ * se queda en 4,52 sobre el tinte naranja: aquí uno algo más oscuro, A0430A (5,15).
+ */
+.tonoVerde { color: var(--verde-texto, #136E35); fill: var(--verde-texto, #136E35); }
+.tonoRojo { color: var(--rojo-texto, #B91C1C); fill: var(--rojo-texto, #B91C1C); }
+.tonoNaranja { color: #A0430A; fill: #A0430A; }
+.tonoMarca { color: var(--primary-texto); fill: var(--primary-texto); }
+/* --text-primary y no --text-secondary: el #666 se queda en 4,20:1 sobre el tinte rojo del nodo */
+.tonoTenue { fill: var(--text-primary); }
+
+[data-theme='dark'] .tonoNaranja { color: var(--naranja-texto, #FDBA74); fill: var(--naranja-texto, #FDBA74); }
+/* El --primary-texto oscuro (3FA5D1) da 4,45:1 sobre el tinte azul del nodo de pregunta */
+[data-theme='dark'] .tonoMarca { color: #6CC0E5; fill: #6CC0E5; }
+/* Lo mismo sobre el tinte azul de los atributos activos y del contador (4,50:1 con 3FA5D1) */
+[data-theme='dark'] .featBtnOn,
+[data-theme='dark'] .contadorBadge { color: #6CC0E5; }
+
 /* Eliminar button */
 .eliminarBtn {
   width: 22px;

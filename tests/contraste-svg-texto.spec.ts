@@ -511,6 +511,10 @@ const APPS: App[] = [
   // 20/11/2026 (tanda 4): el nombre y la cifra de cada región con el texto del tema (la regla .mapaSvg
   // text) sobre su círculo al 82 %: 4,22-4,26:1 en claro y 3,09-4,37 en oscuro
   { slug: 'visualizador-migracion-global' },
+  // 20/11/2026 (tanda 4): el rótulo de cada nodo en el color de su borde sobre el tinte del nodo (la marca
+  // 3,48:1 en claro y 3,03 en oscuro, el verde 2,35, el rojo 3,98 en claro y 2,29 en oscuro), las cuentas
+  // y el Gini en #888 (2,59-3,52) y «Sí» y «No» de las ramas en #888 (3,51 en claro, 4,05 en oscuro)
+  { slug: 'arbol-decision-ia', extremos: true },
 ];
 
 interface TextoSvg {

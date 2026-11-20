@@ -281,6 +281,21 @@ export default function ArbolDecisionIa() {
     return '#2E86AB22';
   }
 
+  /**
+   * Clase con el tono de TEXTO de un color de datos (C0297): el color puro como texto daba
+   * 2,35-3,98:1 sobre el tinte del nodo en claro y 2,29-3,60 en oscuro. El color puro se queda en
+   * el borde. Vale para el `fill` del SVG y para el `color` del HTML.
+   */
+  function tonoTexto(hex: string): string {
+    switch (hex.toLowerCase()) {
+      case '#27ae60': return styles.tonoVerde;
+      case '#c0392b':
+      case '#e74c3c': return styles.tonoRojo;
+      case '#e67e22': return styles.tonoNaranja;
+      default: return styles.tonoMarca;
+    }
+  }
+
   function getNodoBorde(nodo: Nodo): string {
     if (!nodo.feature) {
       const pos = nodo.ejemplos.filter((e) => e.etiqueta).length;
@@ -364,9 +379,9 @@ export default function ArbolDecisionIa() {
                       <td className={styles.td}>
                         <button
                           type="button"
-                          className={`${styles.etiquetaBtn} ${ej.etiqueta ? styles.etiquetaBtnSi : styles.etiquetaBtnNo}`}
+                          className={`${styles.etiquetaBtn} ${ej.etiqueta ? styles.etiquetaBtnSi : styles.etiquetaBtnNo} ${tonoTexto(ej.etiqueta ? ds.colorSi : ds.colorNo)}`}
                           onClick={() => toggleEtiqueta(ej.id)}
-                          style={{ borderColor: ej.etiqueta ? ds.colorSi : ds.colorNo, color: ej.etiqueta ? ds.colorSi : ds.colorNo }}
+                          style={{ borderColor: ej.etiqueta ? ds.colorSi : ds.colorNo }}
                           aria-label={`Resultado: ${ej.etiqueta ? ds.etiquetaSi : ds.etiquetaNo}. Clic para cambiar.`}
                           aria-pressed={ej.etiqueta}
                         >
@@ -416,7 +431,7 @@ export default function ArbolDecisionIa() {
                           stroke={enCamino ? '#e67e22' : '#CCCCCC'}
                           strokeWidth={enCamino ? 2.5 : 1.5}
                         />
-                        <text x={midX} y={midY - 4} textAnchor="middle" fontSize="10" fill={enCamino ? '#e67e22' : '#888888'} fontWeight={enCamino ? 700 : 400}>
+                        <text x={midX} y={midY - 4} textAnchor="middle" fontSize="10" className={enCamino ? styles.tonoNaranja : styles.tonoTenue} fontWeight={enCamino ? 700 : 400}>
                           {nl.esDerecha ? 'Sí' : 'No'}
                         </text>
                       </g>
@@ -443,10 +458,10 @@ export default function ArbolDecisionIa() {
                           stroke={enCamino ? (esFinal ? '#e67e22' : stroke) : stroke}
                           strokeWidth={enCamino ? (esFinal ? 3 : 2.5) : 1.5}
                         />
-                        <text x={x} y={y - 5} textAnchor="middle" fontSize="11" fontWeight="700" fill={stroke}>
+                        <text x={x} y={y - 5} textAnchor="middle" fontSize="11" fontWeight="700" className={tonoTexto(stroke)}>
                           {texto}
                         </text>
-                        <text x={x} y={y + 10} textAnchor="middle" fontSize="9" fill="#888888">
+                        <text x={x} y={y + 10} textAnchor="middle" fontSize="9" className={styles.tonoTenue}>
                           {getCountLabel(nodo)} · Gini {giniStr(nodo.gini)}
                         </text>
                       </g>
@@ -490,12 +505,12 @@ export default function ArbolDecisionIa() {
                 style={{ borderColor: resultado.prediccion ? ds.colorSi : ds.colorNo }}
                 role="status" aria-live="polite"
               >
-                <span className={styles.resultadoIcono} style={{ color: resultado.prediccion ? ds.colorSi : ds.colorNo }}>
+                <span className={`${styles.resultadoIcono} ${tonoTexto(resultado.prediccion ? ds.colorSi : ds.colorNo)}`}>
                   {resultado.prediccion ? '✓' : '✗'}
                 </span>
                 <div>
                   <p className={styles.resultadoTexto}>
-                    Predicción: <strong style={{ color: resultado.prediccion ? ds.colorSi : ds.colorNo }}>
+                    Predicción: <strong className={tonoTexto(resultado.prediccion ? ds.colorSi : ds.colorNo)}>
                       {resultado.prediccion ? ds.etiquetaSi : ds.etiquetaNo}
                     </strong>
                   </p>

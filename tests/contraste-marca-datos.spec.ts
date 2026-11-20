@@ -273,6 +273,10 @@ const APPS: App[] = [
   // 2,85:1 y América del Norte 2,87 en claro; América Latina 2,35 y Oriente Medio 2,53 en oscuro). Cada
   // región del mapa, abierta una a una
   { slug: 'visualizador-migracion-global', todo: true, secciones: "svg g[role='button']" },
+  // 20/11/2026 (de paso por C0297): el resultado de cada ejemplo y la predicción en el color de su clase
+  // con style (el verde 27AE60 a 2,87:1 sobre blanco), y en oscuro los atributos activos en --primary-
+  // texto sobre su tinte azul (4,50). Cada conjunto de datos, como sección
+  { slug: 'arbol-decision-ia', todo: true, secciones: "button[class*='dsPill']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
