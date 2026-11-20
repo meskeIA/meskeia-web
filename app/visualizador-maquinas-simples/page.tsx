@@ -404,17 +404,19 @@ export default function VisualizadorMaquinasSimples() {
                       />
                       <text x={fulcroX} y="138" textAnchor="middle" fontSize="11" fill="var(--text-secondary)" fontWeight="600">Fulcro</text>
                       {/* Carga (izquierda) */}
-                      <rect x="30" y="50" width="30" height="30" rx="4" fill="var(--secondary)" />
+                      {/* --secondary-boton: el blanco sobre el teal puro daba 2,77:1 (C0297) */}
+                      <rect x="30" y="50" width="30" height="30" rx="4" fill="var(--secondary-boton)" />
                       <text x="45" y="70" textAnchor="middle" fontSize="9" fill="white" fontWeight="700">{pesoCarga}</text>
                       <text x="45" y="45" textAnchor="middle" fontSize="10" fill="var(--text-secondary)">Carga</text>
                       {/* Flecha esfuerzo (derecha) */}
                       <line x1="350" y1="78" x2="350" y2="40" stroke="var(--primary)" strokeWidth="3" markerEnd="url(#arrowUp)" />
-                      <text x="350" y="30" textAnchor="middle" fontSize="10" fill="var(--primary)" fontWeight="700">{formatNumber(fuerzaPalanca, 1)} kg</text>
-                      {/* Distancias */}
+                      <text x="350" y="30" textAnchor="middle" fontSize="10" fill="var(--primary-texto)" fontWeight="700">{formatNumber(fuerzaPalanca, 1)} kg</text>
+                      {/* Distancias: centradas en su tramo, pero nunca encima del fulcro (C0297): con
+                          el tramo corto, «0,5 m» caía sobre el triángulo en la marca (1,48:1) */}
                       <line x1="45" y1="100" x2={fulcroX} y2="100" stroke="var(--text-muted)" strokeWidth="1" strokeDasharray="3" />
-                      <text x={(45 + fulcroX) / 2} y="113" textAnchor="middle" fontSize="9" fill="var(--text-muted)">{formatNumber(distCarga, 1)} m</text>
+                      <text x={Math.min((45 + fulcroX) / 2, fulcroX - 34)} y="113" textAnchor="middle" fontSize="9" fill="var(--text-secondary)">{formatNumber(distCarga, 1)} m</text>
                       <line x1={fulcroX} y1="100" x2="350" y2="100" stroke="var(--text-muted)" strokeWidth="1" strokeDasharray="3" />
-                      <text x={(fulcroX + 350) / 2} y="113" textAnchor="middle" fontSize="9" fill="var(--text-muted)">{formatNumber(distEsfuerzo, 1)} m</text>
+                      <text x={Math.max((fulcroX + 350) / 2, fulcroX + 34)} y="113" textAnchor="middle" fontSize="9" fill="var(--text-secondary)">{formatNumber(distEsfuerzo, 1)} m</text>
                     </>
                   );
                 })()}
@@ -502,12 +504,14 @@ export default function VisualizadorMaquinasSimples() {
                       <text x="160" y={150 - (hPx * 0.3) - 8} textAnchor="middle" fontSize="9" fill="white" fontWeight="700">📦</text>
                       {/* Flecha de fuerza */}
                       <line x1="175" y1={150 - (hPx * 0.3) - 16} x2="220" y2={150 - (hPx * 0.55) - 16} stroke="var(--primary)" strokeWidth="2.5" markerEnd="url(#arrowPlano)" />
-                      <text x="210" y={150 - (hPx * 0.45) - 22} textAnchor="middle" fontSize="10" fill="var(--primary)" fontWeight="700">{formatNumber(fuerzaPlano, 1)} kg</text>
+                      <text x="210" y={150 - (hPx * 0.45) - 22} textAnchor="middle" fontSize="10" fill="var(--primary-texto)" fontWeight="700">{formatNumber(fuerzaPlano, 1)} kg</text>
                       {/* Etiquetas */}
                       <text x="200" y="168" textAnchor="middle" fontSize="10" fill="var(--text-secondary)">Longitud: {formatNumber(longPlano, 1)} m</text>
                       <text x="355" y={(topY + 150) / 2} textAnchor="start" fontSize="10" fill="var(--text-secondary)">↕ {formatNumber(alturaPlano, 1)} m</text>
                       {/* Ángulo */}
-                      <text x="80" y="142" fontSize="10" fill="var(--primary)" fontWeight="600">{formatNumber(anguloPlano, 1)}°</text>
+                      {/* --text-primary: con el plano empinado el ángulo cae dentro del tinte del
+                          triángulo, y en la marca daba 2,82-3,80:1 (4,15-4,49 con --primary-texto) */}
+                      <text x="80" y="142" fontSize="10" fill="var(--text-primary)" fontWeight="600">{formatNumber(anguloPlano, 1)}°</text>
                     </>
                   );
                 })()}

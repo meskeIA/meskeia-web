@@ -527,6 +527,10 @@ const APPS: App[] = [
   // tinte del océano (2,05-2,74:1 en claro, 2,67-3,33 en oscuro), «upwelling» en 1E88E5 (3,65) y la
   // intensidad de los alisios en 546E7A (4,00-4,45 en claro, 1,73-1,91 en oscuro)
   { slug: 'visualizador-el-nino', secciones: SECCIONES, extremos: true },
+  // 20/11/2026 (tanda 4): el blanco de la carga sobre el teal puro (2,77:1), la fuerza y el ángulo del plano
+  // en la marca (3,12-3,80) y, con el tramo corto, la distancia «0,5 m» encima del fulcro en la marca (1,48
+  // en oscuro)
+  { slug: 'visualizador-maquinas-simples', secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']", extremos: true },
 ];
 
 interface TextoSvg {
