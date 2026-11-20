@@ -117,6 +117,17 @@
 .husosTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm) 0; }
 .husosDesc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0 0 var(--spacing-md) 0; }
 .husosSvg { width: 100%; max-width: 500px; margin: 0 auto var(--spacing-md); display: block; }
+/* «UTC» en la marca sobre su franja teñida (3,47:1 en claro, 3,02 en oscuro) y «ESP» en E65100 sobre
+   la naranja (3,42 y 2,89): tono de texto por tema, más claro en oscuro que --primary-texto porque
+   la franja aclara el fondo (cabo C0297, 20/11/2026) */
+.svgUtc { fill: var(--primary-texto); }
+.svgEsp { fill: #9A3412; }
+[data-theme='dark'] .svgUtc { fill: #8ECDE8; }
+[data-theme='dark'] .svgEsp { fill: #FDBA74; }
+/* «Polo Norte» de la azimutal cae sobre la tierra (verde claro en claro, verde oscuro en oscuro):
+   con --text-muted daba 3,09:1 en claro y 1,79 en oscuro */
+.svgSobreTierra { fill: #1A1A1A; }
+[data-theme='dark'] .svgSobreTierra { fill: #FFFFFF; }
 .husosNota { font-size: 0.82rem; color: var(--primary-texto); font-weight: 500; margin: 0; line-height: 1.4; text-align: center; }
 
 .fechaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }

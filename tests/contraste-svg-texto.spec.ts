@@ -459,6 +459,15 @@ const APPS: App[] = [
   // oscuro), las habitaciones del plano y los canales no recomendados en currentColor al 50 % (3,33
   // en claro) y los canales 1, 6 y 11 y sus «CH» en la marca pura. Las dos frecuencias, como subestados
   { slug: 'visualizador-como-funciona-wifi', secciones: SECCIONES, subestados: "button[class*='frecuenciaBtn']" },
+  // 20/11/2026 (tanda 3): blanco sobre Groenlandia al 60 % (2,30:1 en claro), «UTC» en la marca sobre su
+  // franja (3,47 en claro, 3,02 en oscuro), «ESP» en E65100 sobre la naranja (3,42 y 2,89) y blanco
+  // sobre la barra de África en el teal al 80 % (2,24 y 3,82) y, en la azimutal, «Polo Norte» en
+  // --text-muted sobre la tierra (3,09 en claro, 1,79 en oscuro). Cada proyección, como subestado
+  {
+    slug: 'visualizador-cartografia-proyecciones',
+    secciones: SECCIONES,
+    subestados: "button[class*='proyeccionPill']",
+  },
 ];
 
 interface TextoSvg {

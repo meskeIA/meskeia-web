@@ -155,7 +155,8 @@ function GridMercator() {
       {/* Australia */}
       <ellipse cx={330} cy={200} rx={20} ry={15} fill="var(--land-color, #8BC34A)" opacity={0.7} />
       {/* Groenlandia - ENORME en Mercator */}
-      <ellipse cx={160} cy={30} rx={30} ry={22} fill="#F44336" opacity={0.6} />
+      {/* Rellenos opacos y oscurecidos bajo el blanco: el color de antes al 60 % lo dejaba a 2,30:1 (C0297) */}
+      <ellipse cx={160} cy={30} rx={30} ry={22} fill="#C62828" />
       <text x={160} y={35} textAnchor="middle" fontSize="8" fill="white" fontWeight="bold">Groenlandia</text>
       {/* Indicadores de Tissot */}
       <circle cx={200} cy={150} r={10} fill="none" stroke="var(--primary, #2E86AB)" strokeWidth="1.5" opacity={0.8} />
@@ -186,7 +187,7 @@ function GridPeters() {
       <ellipse cx={300} cy={85} rx={45} ry={30} fill="var(--land-color, #8BC34A)" opacity={0.7} />
       <ellipse cx={325} cy={195} rx={18} ry={12} fill="var(--land-color, #8BC34A)" opacity={0.7} />
       {/* Groenlandia - PEQUEÑA (correcta) */}
-      <ellipse cx={155} cy={35} rx={10} ry={8} fill="#4CAF50" opacity={0.6} />
+      <ellipse cx={155} cy={35} rx={10} ry={8} fill="#2E7D32" />
       <text x={155} y={38} textAnchor="middle" fontSize="6" fill="white" fontWeight="bold">Gr.</text>
       {/* Tissot: elipses horizontales (achatadas) */}
       <ellipse cx={200} cy={150} rx={12} ry={8} fill="none" stroke="var(--primary, #2E86AB)" strokeWidth="1.5" opacity={0.8} />
@@ -229,7 +230,7 @@ function GridRobinson() {
       <ellipse cx={295} cy={90} rx={42} ry={30} fill="var(--land-color, #8BC34A)" opacity={0.7} />
       <ellipse cx={310} cy={190} rx={16} ry={12} fill="var(--land-color, #8BC34A)" opacity={0.7} />
       {/* Groenlandia - tamaño intermedio */}
-      <ellipse cx={150} cy={45} rx={15} ry={12} fill="#FF9800" opacity={0.6} />
+      <ellipse cx={150} cy={45} rx={15} ry={12} fill="#B45309" />
       <text x={150} y={48} textAnchor="middle" fontSize="6" fill="white" fontWeight="bold">Gr.</text>
       {/* Tissot: ligeramente deformados */}
       <ellipse cx={200} cy={150} rx={10} ry={9} fill="none" stroke="var(--primary, #2E86AB)" strokeWidth="1.5" opacity={0.8} />
@@ -316,7 +317,7 @@ function GridAzimutal() {
       <ellipse cx={310} cy={290} rx={18} ry={12} fill="var(--land-color, #8BC34A)" opacity={0.7} />
       {/* Polo Norte central */}
       <circle cx={200} cy={200} r={5} fill="var(--primary, #2E86AB)" opacity={0.8} />
-      <text x={200} y={215} textAnchor="middle" fontSize="8" fill="var(--text-muted, #999)">Polo Norte</text>
+      <text x={200} y={215} textAnchor="middle" fontSize="8" className={styles.svgSobreTierra}>Polo Norte</text>
       {/* Tissot: círculos que se deforman en los bordes */}
       <circle cx={200} cy={140} r={8} fill="none" stroke="var(--primary, #2E86AB)" strokeWidth="1.5" opacity={0.8} />
       <ellipse cx={200} cy={340} rx={12} ry={6} fill="none" stroke="#F44336" strokeWidth="1.5" opacity={0.8} />
@@ -650,10 +651,10 @@ export default function CartografiaProyeccionesPage() {
                 })}
                 {/* Greenwich destacado */}
                 <rect x={12 * (400 / 24)} y={0} width={400 / 24} height={80} fill="var(--primary, #2E86AB)" opacity={0.15} />
-                <text x={12 * (400 / 24) + (400 / 48)} y={45} textAnchor="middle" fontSize="8" fill="var(--primary, #2E86AB)" fontWeight="bold">UTC</text>
+                <text x={12 * (400 / 24) + (400 / 48)} y={45} textAnchor="middle" fontSize="8" className={styles.svgUtc} fontWeight="bold">UTC</text>
                 {/* España */}
                 <rect x={13 * (400 / 24)} y={0} width={400 / 24} height={80} fill="#FF9800" opacity={0.15} />
-                <text x={13 * (400 / 24) + (400 / 48)} y={45} textAnchor="middle" fontSize="7" fill="#E65100" fontWeight="bold">ESP</text>
+                <text x={13 * (400 / 24) + (400 / 48)} y={45} textAnchor="middle" fontSize="7" className={styles.svgEsp} fontWeight="bold">ESP</text>
               </svg>
               <p className={styles.husosNota}>España usa UTC+1 (o UTC+2 en verano) a pesar de estar geográficamente en UTC+0. Esto se debe a una decisión de Franco en 1940 para sincronizarse con Alemania.</p>
             </div>
@@ -712,7 +713,7 @@ export default function CartografiaProyeccionesPage() {
               <h3 className={styles.comparacionFinalTitulo}><span aria-hidden="true">🌍</span> La distorsión en perspectiva</h3>
               <svg viewBox="0 0 400 120" className={styles.comparacionSvg} role="img" aria-label="Comparación visual: Groenlandia es 14 veces más pequeña que África">
                 {/* África */}
-                <rect x={20} y={10} width={280} height={40} rx={4} fill="#48A9A6" opacity={0.8} />
+                <rect x={20} y={10} width={280} height={40} rx={4} fill="var(--secondary-boton)" />
                 <text x={160} y={35} textAnchor="middle" fontSize="11" fill="white" fontWeight="bold">África — {formatNumber(30.37, 2)} M km²</text>
                 {/* Groenlandia real */}
                 <rect x={20} y={60} width={20} height={40} rx={4} fill="#2E86AB" opacity={0.8} />
