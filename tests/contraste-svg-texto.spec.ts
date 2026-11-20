@@ -440,6 +440,10 @@ const APPS: App[] = [
   // naranja 2,17, 35k rojo 2,65, 60k violeta 2,61 en claro), «Después» en verde (3,16 en claro),
   // «Antes» en rojo (3,60 en oscuro) y los ejes en #6b7280 fijo (3,60 en oscuro)
   { slug: 'simulador-mito-tramo-superior', extremos: true },
+  // 20/11/2026 (tanda 3): en claro, «capas débilmente unidas» en #999 (2,82:1), «Red covalente 3D» en
+  // el cian 7FDBFF (1,54), el grosor del grafeno en el teal (2,78) y «60 átomos de carbono» en el oro
+  // F0A500 (2,06). Cada alótropo, como subestado
+  { slug: 'visualizador-carbono', subestados: "[role='tablist'][aria-label='Seleccionar alótropo'] [role='tab']" },
 ];
 
 interface TextoSvg {

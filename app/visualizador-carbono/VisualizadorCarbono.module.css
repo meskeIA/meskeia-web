@@ -189,6 +189,17 @@
   height: auto;
 }
 
+/* Rótulos de los alótropos (cabo C0297, 20/11/2026): en claro, «capas débilmente unidas» en #999
+   (2,82:1), «Red covalente 3D» en el cian 7FDBFF (1,54), el grosor del grafeno en el teal 48A9A6
+   (2,78) y los 60 átomos del fullereno en el oro F0A500 (2,06); el color se queda en la estructura y
+   el rótulo toma su tono de texto por tema (el fill por CSS manda sobre el atributo) */
+.svgNota { fill: var(--text-secondary); }
+.svgCian { fill: #0E6E8C; }
+.svgTeal { fill: var(--secondary-texto); }
+.svgOro { fill: var(--ambar-texto, #8A5A00); }
+
+[data-theme='dark'] .svgCian { fill: #7FDBFF; }
+
 .alotropoNombre {
   font-size: 1.35rem;
   font-weight: 700;

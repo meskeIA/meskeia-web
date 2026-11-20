@@ -141,7 +141,7 @@ function SvgAlotropo({ id }: { id: Alotropo }): React.ReactNode {
           </g>
         ))}
         {/* Flechas separación capas */}
-        <text x="10" y="85" fontSize="10" fill="#999" fontStyle="italic">capas débilmente unidas</text>
+        <text x="10" y="85" fontSize="10" className={styles.svgNota} fontStyle="italic">capas débilmente unidas</text>
       </svg>
     );
   }
@@ -157,7 +157,7 @@ function SvgAlotropo({ id }: { id: Alotropo }): React.ReactNode {
         <circle cx="70" cy="140" r="6" fill="#7FDBFF" />
         <circle cx="130" cy="140" r="6" fill="#7FDBFF" />
         <circle cx="100" cy="80" r="6" fill="white" stroke="#7FDBFF" strokeWidth="2" />
-        <text x="60" y="155" fontSize="9" fill="#7FDBFF">Red covalente 3D</text>
+        <text x="60" y="155" fontSize="9" className={styles.svgCian}>Red covalente 3D</text>
       </svg>
     );
   }
@@ -180,7 +180,7 @@ function SvgAlotropo({ id }: { id: Alotropo }): React.ReactNode {
         {centers.map(([cx, cy], i) => (
           <circle key={`n-${i}`} cx={cx} cy={cy} r="4" fill="#48A9A6" />
         ))}
-        <text x="40" y="150" fontSize="9" fill="#48A9A6">1 átomo de grosor (0,335 nm)</text>
+        <text x="40" y="150" fontSize="9" className={styles.svgTeal}>1 átomo de grosor (0,335 nm)</text>
       </svg>
     );
   }
@@ -201,7 +201,7 @@ function SvgAlotropo({ id }: { id: Alotropo }): React.ReactNode {
         const cy = 80 + 50 * Math.sin(angle);
         return <circle key={`h-${i}`} cx={cx} cy={cy} r="4" fill="#F0A500" />;
       })}
-      <text x="68" y="150" fontSize="9" fill="#F0A500">60 átomos de carbono</text>
+      <text x="68" y="150" fontSize="9" className={styles.svgOro}>60 átomos de carbono</text>
     </svg>
   );
 }
