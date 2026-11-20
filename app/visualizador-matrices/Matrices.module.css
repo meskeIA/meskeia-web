@@ -123,7 +123,8 @@
 .planoCartesiano { width: 100%; height: auto; display: block; }
 [data-theme='dark'] .planoCartesiano line[stroke="#e0e0e0"] { stroke: #333; }
 [data-theme='dark'] .planoCartesiano line[stroke="#666"] { stroke: #888; }
-[data-theme='dark'] .planoCartesiano text { fill: #888; }
+/* #888 daba 4,05:1 sobre la tarjeta oscura (C0297, 20/11/2026) */
+[data-theme='dark'] .planoCartesiano text { fill: #A0A0A0; }
 .figuraAnimada { transition: all 0.4s ease; }
 
 .transControles { display: flex; flex-direction: column; gap: var(--spacing-md); }
