@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { contraste, luminancia, rellenoConTinta, rgbDeHex, tintaSobre, TINTA_CLARA, TINTA_OSCURA } from '../lib/tintaLegible';
+import { contraste, luminancia, rellenoConTinta, rgbDeHex, tintaSobre, tonoSobre, TINTA_CLARA, TINTA_OSCURA } from '../lib/tintaLegible';
 
 /**
  * lib/tintaLegible.ts (cabo C0297, 06/11/2026). Casos a mano con la fórmula WCAG 2.x:
@@ -59,6 +59,35 @@ test.describe('tintaLegible', () => {
           const hex = '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');
           const { relleno, tinta } = rellenoConTinta(hex);
           expect(contraste(tinta, relleno), hex).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    }
+  });
+
+  /**
+   * tonoSobre (cabo C0798, visualizador-hipertension, 20/11/2026). A mano:
+   *   · #2E86AB sobre blanco: 4,11 → oscurecido un 5 % es #2C7FA2 (cálculo de arriba), 4,503 →
+   *     devuelve #2C7FA2.
+   *   · #922B21 sobre blanco: R 146 → 0,2874, G 43 → 0,0242, B 33 → 0,0152;
+   *     L = 0,0611 + 0,0173 + 0,0011 = 0,0795; 1,05 / 0,1295 = 8,1 → intacto.
+   *   · Sobre un fondo oscuro aclara: #2E86AB sobre #2D2D2D (L 0,0262) da 0,2557 / 0,0762 = 3,36,
+   *     y el tono devuelto es más claro (luminancia mayor) y llega a 4,5.
+   */
+  test('tonoSobre deja el color si llega, y si no lo oscurece o lo aclara lo justo según el fondo', () => {
+    expect(tonoSobre('#2E86AB', '#FFFFFF')).toBe('#2C7FA2');
+    expect(tonoSobre('#922B21', '#FFFFFF')).toBe('#922B21');
+    const enOscuro = tonoSobre('#2E86AB', '#2D2D2D');
+    expect(luminancia(enOscuro)).toBeGreaterThan(luminancia('#2E86AB'));
+    expect(contraste(enOscuro, '#2D2D2D')).toBeGreaterThanOrEqual(4.5);
+    expect(tonoSobre('var(--x)', '#FFFFFF')).toBe('var(--x)');
+    // La garantía, para una rejilla de colores sobre fondos claros y oscuros
+    for (const fondo of ['#FFFFFF', '#EAFAF1', '#FDEDEC', '#2D2D2D', '#1A1A1A']) {
+      for (let r = 0; r <= 255; r += 51) {
+        for (let g = 0; g <= 255; g += 51) {
+          for (let b = 0; b <= 255; b += 51) {
+            const hex = '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');
+            expect(contraste(tonoSobre(hex, fondo), fondo), `${hex} sobre ${fondo}`).toBeGreaterThanOrEqual(4.5);
+          }
         }
       }
     }

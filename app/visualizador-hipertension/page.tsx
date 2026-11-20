@@ -1,8 +1,9 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import styles from './Hipertension.module.css';
+import { rellenoConTinta, tonoSobre } from '@/lib/tintaLegible';
 import {
   MeskeiaLogo,
   Footer,
@@ -112,6 +113,36 @@ const ETAPAS: Etapa[] = [
   },
 ];
 
+/**
+ * Colores de los datos como TEXTO o como relleno bajo texto (cabo C0798, 20/11/2026). Medido antes:
+ * «Riesgo: …» en el color de la etapa sobre su pastel a 1,98-3,99:1; en oscuro, el nombre y los
+ * valores de cada etapa en el texto claro del tema sobre ese mismo pastel, a 1,06-1,17:1; y el
+ * blanco sobre la fase o el órgano elegido en rojo o naranja, a 2,9-3,8:1. Ahora el pastel solo va
+ * en claro (en oscuro, la tarjeta), el «Riesgo» toma el tono de su color que llega a 4,5:1 sobre su
+ * fondo de cada tema, y la etapa, la fase y el órgano elegidos van sobre su color oscurecido lo
+ * justo para su tinta. El color tal cual se queda en los bordes.
+ */
+const FONDO_TARJETA_OSCURO = '#2D2D2D';
+
+const estiloEtapa = (e: Etapa): CSSProperties => {
+  const activo = rellenoConTinta(e.color);
+  return {
+    borderColor: e.color,
+    '--etapa-fondo': e.colorFondo,
+    '--etapa-activa': activo.relleno,
+    '--etapa-tinta': activo.tinta,
+    '--riesgo-claro': tonoSobre(e.color, e.colorFondo),
+    '--riesgo-oscuro': tonoSobre(e.color, FONDO_TARJETA_OSCURO),
+  } as CSSProperties;
+};
+
+/** Borde en el color del dato y, si está elegido, relleno oscurecido lo justo con su tinta. */
+const estiloElegible = (color: string, elegido: boolean): CSSProperties => {
+  if (!elegido) return { borderColor: color };
+  const { relleno, tinta } = rellenoConTinta(color);
+  return { borderColor: color, backgroundColor: relleno, color: tinta };
+};
+
 function SeccionPresion() {
   const [etapaActiva, setEtapaActiva] = useState<number | null>(null);
 
@@ -166,11 +197,7 @@ function SeccionPresion() {
             key={i}
             type="button"
             className={`${styles.etapaBtn} ${etapaActiva === i ? styles.etapaActiva : ''}`}
-            style={{
-              borderColor: e.color,
-              backgroundColor: etapaActiva === i ? e.color : e.colorFondo,
-              color: etapaActiva === i ? 'white' : 'inherit',
-            }}
+            style={estiloEtapa(e)}
             onClick={() => setEtapaActiva(etapaActiva === i ? null : i)}
             aria-pressed={etapaActiva === i}
           >
@@ -178,10 +205,7 @@ function SeccionPresion() {
             <span className={styles.etapaValores}>
               {e.sistolica} / {e.diastolica}
             </span>
-            <span
-              className={styles.etapaRiesgo}
-              style={{ color: etapaActiva === i ? 'rgba(255,255,255,0.85)' : e.color }}
-            >
+            <span className={styles.etapaRiesgo}>
               Riesgo: {e.riesgo}
             </span>
           </button>
@@ -196,7 +220,7 @@ function SeccionPresion() {
           role="region"
           aria-live="polite"
         >
-          <h4 className={styles.etapaDetalleTitulo} style={{ color: ETAPAS[etapaActiva].color }}>
+          <h4 className={styles.etapaDetalleTitulo}>
             {ETAPAS[etapaActiva].nombre} — {ETAPAS[etapaActiva].sistolica} / {ETAPAS[etapaActiva].diastolica} mmHg
           </h4>
           <p className={styles.etapaDetalleDesc}>{ETAPAS[etapaActiva].descripcion}</p>
@@ -311,10 +335,7 @@ function SeccionMecanismo() {
             key={f.id}
             type="button"
             className={`${styles.faseBtn} ${faseActiva === i ? styles.faseActiva : ''}`}
-            style={{
-              borderColor: f.color,
-              ...(faseActiva === i ? { backgroundColor: f.color, color: 'white' } : {}),
-            }}
+            style={estiloElegible(f.color, faseActiva === i)}
             onClick={() => setFaseActiva(i)}
             aria-pressed={faseActiva === i}
           >
@@ -327,7 +348,7 @@ function SeccionMecanismo() {
 
       {/* Detalle de la fase */}
       <div className={styles.faseDetalle} style={{ borderLeftColor: fase.color }}>
-        <h3 className={styles.faseDetalleTitulo} style={{ color: fase.color }}>
+        <h3 className={styles.faseDetalleTitulo}>
           <span aria-hidden="true">{fase.icono}</span> {fase.titulo}
         </h3>
         <div className={styles.fasePasos}>
@@ -335,7 +356,7 @@ function SeccionMecanismo() {
             <div key={i} className={styles.fasePaso}>
               <div
                 className={styles.fasePasoNum}
-                style={{ backgroundColor: fase.color }}
+                style={estiloElegible(fase.color, true)}
                 aria-hidden="true"
               >
                 {i + 1}
@@ -456,11 +477,7 @@ function SeccionOrganos() {
             key={o.id}
             type="button"
             className={`${styles.organoBtn} ${organoActivo === o.id ? styles.organoActivo : ''}`}
-            style={{
-              borderColor: o.color,
-              backgroundColor: organoActivo === o.id ? o.color : undefined,
-              color: organoActivo === o.id ? 'white' : undefined,
-            }}
+            style={estiloElegible(o.color, organoActivo === o.id)}
             onClick={() => setOrganoActivo(organoActivo === o.id ? null : o.id)}
             aria-pressed={organoActivo === o.id}
           >
@@ -478,7 +495,7 @@ function SeccionOrganos() {
           role="region"
           aria-live="polite"
         >
-          <h3 className={styles.organoDetalleTitulo} style={{ color: organo.color }}>
+          <h3 className={styles.organoDetalleTitulo}>
             <span aria-hidden="true">{organo.icono}</span> {organo.nombre}
           </h3>
           <ul className={styles.organoDanoList}>

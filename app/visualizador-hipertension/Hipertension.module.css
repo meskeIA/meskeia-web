@@ -290,6 +290,21 @@
   cursor: pointer;
   transition: all 0.2s;
   text-align: left;
+  /* Las variables las pone el TSX por etapa (estiloEtapa, cabo C0798): el pastel de la etapa, su
+     relleno y su tinta al elegirla, y el tono del «Riesgo» que llega a 4,5:1 en cada tema */
+  background-color: var(--etapa-fondo);
+  color: var(--text-primary);
+}
+
+/* El pastel es claro en los dos temas: en oscuro dejaba el texto claro del tema a 1,1:1 */
+[data-theme='dark'] .etapaBtn {
+  background-color: var(--bg-card);
+}
+
+.etapaBtn.etapaActiva,
+[data-theme='dark'] .etapaBtn.etapaActiva {
+  background-color: var(--etapa-activa);
+  color: var(--etapa-tinta);
 }
 
 .etapaBtn:hover {
@@ -320,6 +335,16 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  color: var(--riesgo-claro);
+}
+
+[data-theme='dark'] .etapaRiesgo {
+  color: var(--riesgo-oscuro);
+}
+
+.etapaActiva .etapaRiesgo,
+[data-theme='dark'] .etapaActiva .etapaRiesgo {
+  color: var(--etapa-tinta);
 }
 
 /* Detalle de etapa */
@@ -332,10 +357,12 @@
   margin-bottom: var(--spacing-lg);
 }
 
+/* Los títulos de los detalles, en el texto del tema; el color del dato va en el borde (C0798) */
 .etapaDetalleTitulo {
   font-size: 1rem;
   font-weight: 700;
   margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-primary);
 }
 
 .etapaDetalleDesc {
@@ -392,6 +419,11 @@
   color: white;
 }
 
+/* Sobre el relleno de la fase elegida, la tinta entera: al 80 % bajaba de 4,5:1 */
+.faseActiva .faseFase {
+  opacity: 1;
+}
+
 .faseFase {
   font-size: 0.68rem;
   font-weight: 700;
@@ -416,6 +448,7 @@
 }
 
 .faseDetalleTitulo {
+  color: var(--text-primary);
   font-size: 1.05rem;
   font-weight: 700;
   margin: 0 0 var(--spacing-lg) 0;
@@ -526,6 +559,7 @@
 }
 
 .organoDetalleTitulo {
+  color: var(--text-primary);
   font-size: 1.05rem;
   font-weight: 700;
   margin: 0 0 var(--spacing-md) 0;

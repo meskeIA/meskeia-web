@@ -281,6 +281,10 @@ const APPS: App[] = [
   // color de dato (teal 2,80 y acento 2,26 en claro) y, en oscuro, --primary-texto sobre el tinte
   // de las chips y de los consejos (3,71 y 3,92:1)
   { slug: 'visualizador-deuda-publica', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 20/11/2026 (C0798): «Riesgo» en el color de cada etapa sobre su pastel (1,98-3,99), en oscuro el
+  // pastel sin cambiar de tema bajo el texto claro (1,06-1,17) y el blanco sobre la fase en rojo (3,82).
+  // Las etapas, fases y órganos ELEGIDOS los mide tests/apps/visualizador-hipertension.spec.ts
+  { slug: 'visualizador-hipertension', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

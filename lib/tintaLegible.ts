@@ -70,3 +70,25 @@ export function rellenoConTinta(relleno: string, minimo = 4.5): { relleno: strin
   }
   return { relleno: '#000000', tinta: TINTA_CLARA };
 }
+
+/**
+ * El tono más cercano a `color` que, como TEXTO sobre `fondo`, llega a `minimo` (4,5:1 por
+ * defecto): el color tal cual si ya llega; si no, oscurecido hacia el negro (fondo claro) o
+ * aclarado hacia el blanco (fondo oscuro) en pasos del 5 %. Para el texto en el color de un dato
+ * sobre un fondo que se conoce, en claro y en oscuro: «Riesgo: Bajo» en #2ECC71 sobre su pastel
+ * daba 1,98:1 en visualizador-hipertension (cabo C0798, 20/11/2026). Un color o un fondo que no
+ * son hexadecimales devuelven el color tal cual.
+ */
+export function tonoSobre(color: string, fondo: string, minimo = 4.5): string {
+  const rgb = rgbDeHex(color);
+  if (!rgb || !rgbDeHex(fondo)) return color;
+  if (contraste(color, fondo) >= minimo) return color;
+  const haciaNegro = contraste(TINTA_OSCURA, fondo) >= contraste(TINTA_CLARA, fondo);
+  for (let k = 0.05; k <= 1.0001; k += 0.05) {
+    const tono = haciaNegro
+      ? hexDeRgb(rgb.map((c) => c * (1 - k)))
+      : hexDeRgb(rgb.map((c) => c + (255 - c) * k));
+    if (contraste(tono, fondo) >= minimo) return tono;
+  }
+  return haciaNegro ? '#000000' : TINTA_CLARA;
+}
