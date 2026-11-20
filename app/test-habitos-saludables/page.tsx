@@ -164,11 +164,16 @@ const CATEGORIES: Category[] = [
       {
         id: 'd1',
         text: '¿Cuántas horas duermes habitualmente por noche?',
+        // Ordenadas por horas, no por puntos: el rango 7-9 h es el de la National Sleep Foundation
+        // que cita la FAQ (RESPUESTA_FAQ_HORAS_SUENO), y dormir más de 9 h no puntúa por encima de
+        // 6-7 h. La calidad no va aquí: la pregunta d3. Decidido en /reparar pendientes del
+        // 20/11/2026 (cabo C0846, hallazgo 3917). Cada opción con su score distinto: la respuesta
+        // se guarda por score y aria-pressed compara por él.
         options: [
-          { text: 'Menos de 5 horas', score: 1 },
-          { text: '5-6 horas', score: 2 },
-          { text: '7-8 horas', score: 3 },
-          { text: 'Más de 8 horas de calidad', score: 4 },
+          { text: 'Menos de 6 horas', score: 1 },
+          { text: 'Entre 6 y 7 horas', score: 3 },
+          { text: 'Entre 7 y 9 horas', score: 4 },
+          { text: 'Más de 9 horas', score: 2 },
         ],
       },
       {

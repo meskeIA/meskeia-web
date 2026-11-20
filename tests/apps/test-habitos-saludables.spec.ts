@@ -172,7 +172,7 @@ async function faqLd(page: Page): Promise<PreguntaLd[]> {
 // ═══════════════════════════════════════════════════════════════════════════
 test('CASO 1 — perfil mixto: 67, 75, 42, 75, 50, 83 y 50 % por área, 63 % global', async ({ page }) => {
   await abrir(page);
-  await hacerTest(page, [[3, 3, 2], [2, 3, 4], [1, 2, 2], [3, 3, 3], [2, 2, 2], [4, 4, 2], [1, 3, 2]]);
+  await hacerTest(page, [[3, 3, 2], [2, 3, 4], [1, 2, 2], [2, 3, 3], [2, 2, 2], [4, 4, 2], [1, 3, 2]]); // Descanso [2, 3, 3]: la 2.ª opción de d1 da 3 puntos
 
   const areas = await leerAreas(page);
   expect(areas.map((a) => a.area)).toEqual([...AREAS]);
@@ -201,7 +201,7 @@ test('CASO 1 — perfil mixto: 67, 75, 42, 75, 50, 83 y 50 % por área, 63 % glo
 // ═══════════════════════════════════════════════════════════════════════════
 // CASO 2 — los dos extremos
 // ═══════════════════════════════════════════════════════════════════════════
-test('CASO 2 — todo a la 1.ª opción da 25 % en todo; todo a la 4.ª, 100 %', async ({ page }) => {
+test('CASO 2 — todo a la 1.ª opción da 25 % en todo; todo a la de 4 puntos, 100 %', async ({ page }) => {
   await abrir(page);
   await hacerTest(page, Array(7).fill([1, 1, 1]));
   let areas = await leerAreas(page);
@@ -215,7 +215,8 @@ test('CASO 2 — todo a la 1.ª opción da 25 % en todo; todo a la 4.ª, 100 %',
   await expect(mensajeGlobal(page)).toHaveText('Hay varias áreas con oportunidades de mejora.');
 
   await abrir(page);
-  await hacerTest(page, Array(7).fill([4, 4, 4]));
+  // En d1 la mejor opción es la 3.ª («Entre 7 y 9 horas», 4 puntos): van por horas, no por puntos.
+  await hacerTest(page, [...Array(3).fill([4, 4, 4]), [3, 4, 4], ...Array(3).fill([4, 4, 4])]);
   areas = await leerAreas(page);
   expect(areas.map((a) => a.pct)).toEqual(Array(7).fill(100));
   expect(areas.map((a) => a.nivel)).toEqual(Array(7).fill('Frecuente'));
@@ -228,14 +229,15 @@ test('CASO 2 — todo a la 1.ª opción da 25 % en todo; todo a la 4.ª, 100 %',
 // ═══════════════════════════════════════════════════════════════════════════
 test('CASO 3 — 75 % y 74 % globales: una sola respuesta cruza la frontera', async ({ page }) => {
   await abrir(page);
-  await hacerTest(page, Array(7).fill([3, 3, 3]));
+  // Descanso [2, 3, 3]: en d1 los 3 puntos son la 2.ª opción («Entre 6 y 7 horas»).
+  await hacerTest(page, [...Array(3).fill([3, 3, 3]), [2, 3, 3], ...Array(3).fill([3, 3, 3])]);
   expect((await leerAreas(page)).map((a) => a.pct)).toEqual(Array(7).fill(75));
   expect(await leerGlobal(page)).toBe(75);
   // 75 está en el tramo ≥ 60 (hallazgo 3916): el mismo que el nivel «Ocasional» de cada área.
   await expect(mensajeGlobal(page)).toHaveText('Bien encaminado/a. Hay áreas donde puedes mejorar.');
 
   await abrir(page);
-  await hacerTest(page, [...Array(6).fill([3, 3, 3]), [3, 3, 2]]);
+  await hacerTest(page, [...Array(3).fill([3, 3, 3]), [2, 3, 3], ...Array(2).fill([3, 3, 3]), [3, 3, 2]]);
   const areas = await leerAreas(page);
   expect(areas[6].pct).toBe(67); // 8 / 12
   expect(await leerGlobal(page)).toBe(74); // (6 · 75 + 67) / 7 = 73,86
@@ -352,7 +354,7 @@ test.describe('móvil 390 × 844', () => {
     const desborde = () =>
       page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(await desborde()).toBe(0);
-    await hacerTest(page, [[3, 3, 2], [2, 3, 4], [1, 2, 2], [3, 3, 3], [2, 2, 2], [4, 4, 2], [1, 3, 2]]);
+    await hacerTest(page, [[3, 3, 2], [2, 3, 4], [1, 2, 2], [2, 3, 3], [2, 2, 2], [4, 4, 2], [1, 3, 2]]); // Descanso [2, 3, 3]: la 2.ª opción de d1 da 3 puntos
     expect(await leerGlobal(page)).toBe(63); // el mismo perfil que el CASO 1
     expect(await desborde()).toBe(0);
   });
@@ -467,7 +469,7 @@ test('HALLAZGO 3916 · CASO 1: el 50 % de Gestión del Tiempo es «Poco frecuent
   // equilibrio. Sigue protegiendo tu tiempo personal.» (sugerencia media, umbral 50). Con TRAMOS,
   // 50 cae en ≥ 40: «Poco frecuente» y la sugerencia baja.
   await abrir(page);
-  await hacerTest(page, [[3, 3, 2], [2, 3, 4], [1, 2, 2], [3, 3, 3], [2, 2, 2], [4, 4, 2], [1, 3, 2]]);
+  await hacerTest(page, [[3, 3, 2], [2, 3, 4], [1, 2, 2], [2, 3, 3], [2, 2, 2], [4, 4, 2], [1, 3, 2]]); // Descanso [2, 3, 3]: la 2.ª opción de d1 da 3 puntos
   const areas = await leerAreas(page);
   expect(areas[4]).toMatchObject({
     nivel: 'Poco frecuente',
@@ -475,12 +477,12 @@ test('HALLAZGO 3916 · CASO 1: el 50 % de Gestión del Tiempo es «Poco frecuent
   });
 });
 
-test('HALLAZGO (02/11/2026, ABIERTO) · la pregunta de sueño no tiene opción para 6-7 horas', async ({ page }) => {
-  // Opciones de d1: «Menos de 5 horas» · «5-6 horas» · «7-8 horas» · «Más de 8 horas de calidad».
-  // Quien duerme 6 h 30 min no tiene dónde contestar, y «más de 8 h» puntúa más que «7-8 h»
-  // aunque la tabla de la propia página da «7-9 h» como el hábito clave (y mezcla la calidad,
-  // que ya pregunta d3).
-  test.fail();
+test('HALLAZGO 3917 (02/11/2026, REPARADO 20/11/2026) · la pregunta de sueño no tenía opción para 6-7 horas', async ({ page }) => {
+  // Antes, d1: «Menos de 5 horas» · «5-6 horas» · «7-8 horas» · «Más de 8 horas de calidad».
+  // Quien dormía 6 h 30 min no tenía dónde contestar, y «más de 8 h» puntuaba más que «7-8 h»
+  // aunque la tabla de la propia página da «7-9 h» como el hábito clave (y mezclaba la calidad,
+  // que ya pregunta d3). Ahora, decidido por el usuario (C0846): «Menos de 6 horas» (1) ·
+  // «Entre 6 y 7 horas» (3) · «Entre 7 y 9 horas» (4) · «Más de 9 horas» (2).
   await abrir(page);
   await botonComenzar(page).click();
   for (let a = 0; a < 3; a++) {
@@ -490,6 +492,27 @@ test('HALLAZGO (02/11/2026, ABIERTO) · la pregunta de sueño no tiene opción p
   await expect(progreso(page)).toContainText('Descanso y Sueño');
   const opciones = await tarjetas(page).nth(0).getByRole('button').allInnerTexts();
   expect(opciones.some((t) => /6\D{1,6}7/.test(t)), opciones.join(' · ')).toBe(true);
+  expect(opciones.map((t) => t.trim())).toEqual([
+    'Menos de 6 horas',
+    'Entre 6 y 7 horas',
+    'Entre 7 y 9 horas',
+    'Más de 9 horas',
+  ]);
+});
+
+test('HALLAZGO 3917 (REPARADO 20/11/2026) · dormir más de 9 h ya no puntúa por encima de 7-9 h ni de 6-7 h', async ({ page }) => {
+  // Descanso = (d1 + d2 + d3) / 12. Con d2 = d3 = 1 (primera opción):
+  //   7-9 h  → 4 + 1 + 1 = 6/12 = 50 %
+  //   6-7 h  → 3 + 1 + 1 = 5/12 = 41,67 → 42 %
+  //   +9 h   → 2 + 1 + 1 = 4/12 = 33,33 → 33 %
+  const casos: Array<[number, number]> = [[3, 50], [2, 42], [4, 33]];
+  for (const [indice, pct] of casos) {
+    await abrir(page);
+    await hacerTest(page, [[2, 2, 2], [2, 2, 2], [2, 2, 2], [indice, 1, 1], [2, 2, 2], [2, 2, 2], [2, 2, 2]]);
+    const areas = await leerAreas(page);
+    expect(areas[3].area).toContain('Descanso');
+    expect(areas[3].pct, `opción ${indice} de d1`).toBe(pct);
+  }
 });
 
 test('HALLAZGO 3925 (02/11/2026, REPARADO 19/11/2026) · el texto blanco de la opción marcada no llegaba a 4,5:1 en 6 de las 7 áreas', async ({ page }) => {
@@ -609,7 +632,7 @@ test('HALLAZGO (02/11/2026, ABIERTO) · el porcentaje se pega a la cifra («63%�
   // Formato español (CLAUDE.md global §2, decidido el 25/09/2026): «63 %», con espacio duro U+00A0.
   test.fail();
   await abrir(page);
-  await hacerTest(page, [[3, 3, 2], [2, 3, 4], [1, 2, 2], [3, 3, 3], [2, 2, 2], [4, 4, 2], [1, 3, 2]]);
+  await hacerTest(page, [[3, 3, 2], [2, 3, 4], [1, 2, 2], [2, 3, 3], [2, 2, 2], [4, 4, 2], [1, 3, 2]]); // Descanso [2, 3, 3]: la 2.ª opción de d1 da 3 puntos
   await expect(page.locator('[class*="scoreValue"]')).toHaveText('63 %');
   await expect(page.locator('[class*="resultPercent"]').first()).toHaveText('67 %');
 });
