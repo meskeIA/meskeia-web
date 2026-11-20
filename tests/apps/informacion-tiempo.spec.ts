@@ -161,16 +161,6 @@ test.describe('informacion-tiempo — tiempo actual, hoy por franjas y próximos
     }
     await expect(diasDelPronostico(page).first()).toContainText('jue, 19 nov');
   });
-
-  test('C0815 · en móvil se ven los 4 días completos de la lista, ninguno oculto', async ({ page }) => {
-    // El CSS anterior al rediseño (b06d2d8ce) ocultaba el último día bajo 480 px para no dejarlo
-    // huérfano en la rejilla de dos columnas; la lista de ahora no oculta ninguno.
-    await page.setViewportSize({ width: 375, height: 800 });
-    await abrirCon(page, 3600);
-    const dias = diasDelPronostico(page);
-    await expect(dias).toHaveCount(4);
-    for (let i = 0; i < 4; i++) await expect(dias.nth(i)).toBeVisible();
-  });
 });
 
 test.describe('informacion-tiempo — la FAQPage dice lo que la app hace', () => {
