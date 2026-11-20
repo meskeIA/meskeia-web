@@ -2425,7 +2425,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'contador-silabas': [
     { url: '/diccionario-rimas/', icon: '🎵', name: 'Diccionario de Rimas', description: 'Palabras que riman en consonante o asonante' },
     { url: '/guia-metrica-estrofas/', icon: '📜', name: 'Métrica y Estrofas', description: 'Tipos de verso, rima y estrofas clásicas' },
-    { url: '/generador-poemas/', icon: '✒️', name: 'Generador de Poemas', description: 'Haiku, soneto, romance y más con guía métrica' },
+    { url: '/diptongos-e-hiatos/', icon: '🔗', name: 'Diptongos e Hiatos', description: 'Qué vocales van juntas y cuáles se separan' },
     { url: '/quiz-metrica-estrofas/', icon: '🎶', name: 'Quiz de Métrica', description: 'Pon a prueba tipos de verso, estrofas y rima' },
   ],
   'diccionario-rimas': [
@@ -2479,7 +2479,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa en sílabas una palabra o un texto entero' },
     { url: '/conjugador-verbos/', icon: '🔁', name: 'Conjugador Verbos', description: 'Todas las formas de un verbo, con sus tildes' },
     { url: '/quiz-figuras-retoricas/', icon: '🎭', name: 'Quiz Figuras Retóricas', description: 'Metáfora, hipérbole, anáfora… con ejemplos' },
+    { url: '/diptongos-e-hiatos/', icon: '🔗', name: 'Diptongos e Hiatos', description: 'El hiato que pide la tilde, y el diptongo que no' },
+  ],
+  // Diptongos e hiatos (S0285, 20/11/2026): la misma clase de Lengua que la tilde y el silabeo.
+  'diptongos-e-hiatos': [
+    { url: '/palabras-agudas-llanas-esdrujulas/', icon: '✏️', name: 'Agudas, Llanas y Esdrújulas', description: 'Sílaba tónica y cuándo lleva tilde' },
+    { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa en sílabas una palabra o un texto entero' },
     { url: '/diccionario-rimas/', icon: '🎵', name: 'Diccionario de Rimas', description: 'Palabras que riman en consonante o asonante' },
+    { url: '/quiz-figuras-retoricas/', icon: '🎭', name: 'Quiz Figuras Retóricas', description: 'Metáfora, hipérbole, anáfora… con ejemplos' },
   ],
   'tablas-multiplicar': [
     { url: '/calculadora-notas/', icon: '📊', name: 'Calculadora Notas', description: 'Calcula tu nota media' },

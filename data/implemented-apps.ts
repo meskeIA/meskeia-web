@@ -255,6 +255,7 @@ export const implementedAppsUrls = [
   "/contador-silabas/",         // Separar y contar sílabas en español
   "/diccionario-rimas/",        // Rimario: rima consonante y asonante del español
   "/palabras-agudas-llanas-esdrujulas/", // Sílaba tónica, tipo de palabra y tilde razonada (S0279)
+  "/diptongos-e-hiatos/",       // Diptongos, triptongos e hiatos con su regla (S0285)
   "/conversor-formatos/",       // JSON, CSV, Excel, XML, YAML
   "/conjugador-verbos/",        // Conjugador de verbos español con irregulares
   "/tablas-multiplicar/",       // Entrenador tablas multiplicar gamificado

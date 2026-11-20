@@ -317,17 +317,65 @@ export interface EncuentrosVocalicos {
  * educativo, que es lo mismo que da cualquier apunte (hallazgo 212).
  */
 export function encuentrosVocalicos(palabra: string): EncuentrosVocalicos {
+  const todos = encuentrosConPosicion(palabra);
+  return {
+    diptongos: todos.filter((e) => e.clase === 'diptongo').map((e) => e.vocales),
+    triptongos: todos.filter((e) => e.clase === 'triptongo').map((e) => e.vocales),
+    hiatos: todos.filter((e) => e.clase === 'hiato').map((e) => e.vocales),
+  };
+}
+
+export interface EncuentroPosicionado {
+  clase: 'diptongo' | 'triptongo' | 'hiato';
+  /** En minúsculas y sin la h: 'au' en «ahumar», 'uay' en «Uruguay», 'a-í' en «país» */
+  vocales: string;
+  /** Primer carácter del encuentro en la palabra (sin espacios alrededor) */
+  desde: number;
+  /** Carácter siguiente al último del encuentro (exclusivo): `palabra.slice(desde, hasta)` */
+  hasta: number;
+  /** Hay una h entre sus vocales (ahu-mar, bú-ho) */
+  conH: boolean;
+}
+
+/**
+ * Los mismos encuentros que `encuentrosVocalicos`, con su posición en la palabra y en el orden
+ * en que aparecen. Lo usa `diptongos-e-hiatos` para resaltar cada uno dentro de la palabra
+ * escrita; `encuentrosVocalicos` se deriva de aquí para que las dos apps no puedan discrepar.
+ *
+ * Un hiato y un diptongo pueden compartir una vocal (le-í-ais: hiato «í-a» y diptongo «ai»).
+ */
+export function encuentrosConPosicion(palabra: string): EncuentroPosicionado[] {
   const limpia = palabra.toLowerCase().trim();
   const unidades = aUnidades(limpia);
   const nuc = nucleos(unidades);
 
-  const diptongos = nuc.filter((n) => n.vocales.length === 2).map((n) => n.vocales);
-  const triptongos = nuc.filter((n) => n.vocales.length === 3).map((n) => n.vocales);
+  // Carácter donde empieza cada unidad (los dígrafos ocupan dos)
+  const inicio: number[] = [];
+  let cursor = 0;
+  for (const u of unidades) {
+    inicio.push(cursor);
+    cursor += u.texto.length;
+  }
+  const finDe = (k: number) => inicio[k] + unidades[k].texto.length;
+  const hayH = (desde: number, hasta: number) =>
+    unidades.slice(desde, hasta + 1).some((u) => u.tipo === 'H');
+
+  const resultado: EncuentroPosicionado[] = [];
+
+  for (const n of nuc) {
+    if (n.vocales.length < 2) continue;
+    resultado.push({
+      clase: n.vocales.length === 2 ? 'diptongo' : 'triptongo',
+      vocales: n.vocales,
+      desde: inicio[n.desde],
+      hasta: finDe(n.hasta),
+      conH: hayH(n.desde, n.hasta),
+    });
+  }
 
   // Hiato = dos núcleos contiguos sin ninguna consonante en medio (la h no cuenta). No lo es
   // la cerrada átona que abre un diptongo tras otra vocal (ca-ca-hue-te, pa-ra-no-ia,
   // re-huir): ahí suena como consonante de su sílaba, no como vocal en contacto (3872).
-  const hiatos: string[] = [];
   for (let n = 0; n < nuc.length - 1; n++) {
     const enMedio = unidades.slice(nuc[n].hasta + 1, nuc[n + 1].desde);
     const siguiente = nuc[n + 1].vocales;
@@ -336,9 +384,15 @@ export function encuentrosVocalicos(palabra: string): EncuentrosVocalicos {
     if (enMedio.every((u) => u.tipo === 'H') && !abreConSemiconsonante) {
       const a = nuc[n].vocales[nuc[n].vocales.length - 1];
       const b = nuc[n + 1].vocales[0];
-      hiatos.push(`${a}-${b}`);
+      resultado.push({
+        clase: 'hiato',
+        vocales: `${a}-${b}`,
+        desde: inicio[nuc[n].hasta],
+        hasta: finDe(nuc[n + 1].desde),
+        conH: enMedio.length > 0,
+      });
     }
   }
 
-  return { diptongos, triptongos, hiatos };
+  return resultado.sort((x, y) => x.desde - y.desde);
 }

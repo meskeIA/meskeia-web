@@ -1,0 +1,996 @@
+/* Palabras agudas, llanas (graves) y esdrújulas — meskeIA */
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+/* ── Hero ───────────────────────────────────────────────────────────────── */
+.hero {
+  background: var(--hero-bg);
+  color: #fff;
+  padding: 35px 25px;
+  text-align: center;
+  border-radius: 16px;
+  margin-top: 80px;
+  margin-bottom: 25px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  margin: 0;
+  opacity: 0.92;
+  line-height: 1.5;
+}
+
+/* ── Paneles ────────────────────────────────────────────────────────────── */
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 25px;
+  scroll-margin-top: 90px;
+}
+
+.panel:focus {
+  outline: none;
+}
+
+.panelTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.inputPalabra {
+  width: 100%;
+  max-width: 420px;
+  min-height: 48px;
+  padding: 10px 14px;
+  font-size: 1.3rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.inputPalabra:focus-visible,
+.textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.ayuda {
+  margin: 6px 0 14px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.ejemplos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.ejemplosLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.ejemploBtn {
+  min-height: 36px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.ejemploBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary-texto);
+}
+
+.ejemploBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.error {
+  margin: 0 0 12px;
+  font-weight: 600;
+  color: var(--rojo-texto, #B91C1C);
+}
+
+/* ── Resultado de una palabra ───────────────────────────────────────────── */
+.resultado {
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+}
+
+.palabraGrande {
+  margin: 0 0 12px;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.marca {
+  padding: 0 2px;
+  border-radius: 4px;
+  background: rgba(46, 134, 171, 0.18);
+  color: inherit;
+  box-shadow: inset 0 -3px 0 #2E86AB;
+}
+
+.silabas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.silaba {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  min-height: 46px;
+  padding: 6px 12px;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+}
+
+.nota {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.tarjetas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 8px 0 14px;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--secondary);
+  border-radius: 10px;
+}
+
+.tarjetaEtiqueta {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.tarjetaValor {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sinEncuentros {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.encuentros {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.encuentro {
+  padding: 14px 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 5px solid #2E86AB;
+  border-radius: 10px;
+}
+
+.encuentroDiptongo {
+  border-left-color: #2E86AB;
+}
+
+.encuentroTriptongo {
+  border-left-color: #48A9A6;
+}
+
+.encuentroHiato {
+  border-left-color: #C2711A;
+}
+
+.encuentroCabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 6px;
+}
+
+.encuentroTipo {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.encuentroPalabra {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.regla {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.avisos {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* ── Texto ──────────────────────────────────────────────────────────────── */
+.textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  font-family: inherit;
+  line-height: 1.5;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  resize: vertical;
+  margin-bottom: 8px;
+}
+
+.textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.filtro {
+  min-height: 40px;
+  padding: 6px 12px;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.filtro:hover {
+  border-color: var(--primary);
+}
+
+.filtro:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.filtroActivo,
+.filtroActivo:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #fff;
+}
+
+.resumenTexto {
+  margin: 0 0 10px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.listaPalabras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-height: 40px;
+  padding: 6px 10px;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--primary);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.chipTipo {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.chipDiptongo {
+  border-left-color: #2E86AB;
+}
+
+.chipTriptongo {
+  border-left-color: #48A9A6;
+}
+
+.chipHiato {
+  border-left-color: #C2711A;
+}
+
+/* ── Casos para clase ───────────────────────────────────────────────────── */
+.casosSection {
+  padding: 25px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.casosHeader {
+  margin-bottom: 18px;
+}
+
+.casosTitulo {
+  margin: 0 0 8px;
+  font-size: 1.4rem;
+  color: var(--primary-texto);
+}
+
+.casosIntro {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.casosNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.casoBoton {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.casoBoton:hover {
+  border-color: var(--primary);
+  color: var(--primary-texto);
+}
+
+.casoBoton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.casoBotonActivo,
+.casoBotonActivo:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #fff;
+}
+
+.casoBotonPractica {
+  margin-left: auto;
+}
+
+.casoCuerpo {
+  padding: 18px;
+  background: var(--bg-primary);
+  border-radius: 10px;
+}
+
+.casoTitulo {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  color: var(--secondary-texto);
+}
+
+.casoEnunciado {
+  margin: 0 0 14px;
+  color: var(--text-primary);
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+
+.casoRespuesta {
+  margin-bottom: 14px;
+}
+
+.casoLabel {
+  display: block;
+  margin: 0 0 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.casoOpciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.casoOpcion {
+  min-height: 44px;
+  padding: 6px 14px;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.casoOpcion:hover {
+  border-color: var(--primary);
+}
+
+.casoOpcion:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.casoOpcionActiva,
+.casoOpcionActiva:hover {
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
+  color: #fff;
+}
+
+.casoFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.casoInput {
+  flex: 1 1 180px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 12px;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.casoInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.casoComprobar {
+  min-height: 44px;
+  padding: 8px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary-boton);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.casoComprobar:hover {
+  background: var(--hero-bg);
+}
+
+.casoComprobar:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.casoVeredicto {
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* El veredicto está siempre montado (región viva): vacío no ocupa sitio. */
+.casoVeredictoVacio {
+  margin: 0;
+  padding: 0;
+}
+
+.casoOk {
+  background: #dcfce7;
+  color: var(--verde-texto, #166534);
+}
+
+.casoKo {
+  background: #fee2e2;
+  color: var(--rojo-texto, #991b1b);
+}
+
+.casoAyudas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.casoAyudaBoton {
+  min-height: 44px;
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  color: var(--primary-texto);
+  background: transparent;
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.casoAyudaBoton:hover {
+  background: var(--primary-boton);
+  color: #fff;
+}
+
+.casoAyudaBoton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.casoPista {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border-left: 3px solid var(--secondary);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.casoSolucion {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.casoPasos {
+  margin: 0 0 10px;
+  padding-left: 22px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.casoPaso {
+  padding: 1px 0;
+}
+
+.casoResultado {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+}
+
+/* ── Contenido educativo (v2.0) ─────────────────────────────────────────── */
+.guideSection {
+  margin-bottom: 28px;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.guideSection h2 {
+  font-size: 1.3rem;
+  margin: 0 0 12px;
+  color: var(--text-primary);
+}
+
+.guideSection h3 {
+  font-size: 1.05rem;
+  margin: 0 0 6px;
+  color: var(--text-primary);
+}
+
+.guideSection p {
+  margin: 0 0 12px;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.comparativaTable th {
+  background: var(--primary-boton);
+  color: #fff;
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.comparativaTable tbody tr:nth-child(even) td {
+  background: var(--bg-primary);
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.escenarioCard {
+  padding: 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.escenarioIcon {
+  display: block;
+  font-size: 1.6rem;
+  margin-bottom: 6px;
+}
+
+.escenarioCard p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.stepGuide {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex: 0 0 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--primary-boton);
+  color: #fff;
+  font-weight: 700;
+}
+
+.stepContent p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.tipCard {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.tipCard p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.tipCard strong {
+  color: var(--text-primary);
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+
+.warningBox {
+  padding: 18px;
+  background: #FFF8E6;
+  border: 1px solid #F0C36D;
+  border-left: 5px solid #D97706;
+  border-radius: 10px;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.warningHeader h2 {
+  margin: 0;
+  color: #3D2A00;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 20px;
+  color: #3D2A00;
+}
+
+.warningList li {
+  margin-bottom: 6px;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faqItem {
+  padding: 14px 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.faqItem p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* ── Modo oscuro ────────────────────────────────────────────────────────── */
+[data-theme='dark'] .panel,
+[data-theme='dark'] .casosSection {
+  border-color: #374151;
+}
+
+[data-theme='dark'] .inputPalabra,
+[data-theme='dark'] .textarea,
+[data-theme='dark'] .casoInput {
+  background: #2A2A2A;
+  border-color: #444;
+  color: #E8E8E8;
+}
+
+[data-theme='dark'] .silaba,
+[data-theme='dark'] .ejemploBtn,
+[data-theme='dark'] .filtro,
+[data-theme='dark'] .chip,
+[data-theme='dark'] .casoBoton,
+[data-theme='dark'] .casoOpcion {
+  background: #2A2A2A;
+  border-color: #444;
+  color: #E8E8E8;
+}
+
+[data-theme='dark'] .filtroActivo,
+[data-theme='dark'] .casoBotonActivo,
+[data-theme='dark'] .casoOpcionActiva {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #fff;
+}
+
+[data-theme='dark'] .chipDiptongo,
+[data-theme='dark'] .encuentroDiptongo {
+  border-left-color: #5BB0D6;
+}
+
+[data-theme='dark'] .chipTriptongo,
+[data-theme='dark'] .encuentroTriptongo {
+  border-left-color: #6CC5C2;
+}
+
+[data-theme='dark'] .chipHiato,
+[data-theme='dark'] .encuentroHiato {
+  border-left-color: #F0A35E;
+}
+
+[data-theme='dark'] .marca {
+  background: rgba(127, 179, 211, 0.26);
+  box-shadow: inset 0 -3px 0 #5BB0D6;
+}
+
+[data-theme='dark'] .tarjeta,
+[data-theme='dark'] .encuentro,
+[data-theme='dark'] .sinEncuentros,
+[data-theme='dark'] .casoCuerpo {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Solo tres lados: el izquierdo es el color de la familia */
+[data-theme='dark'] .encuentro {
+  border-top-color: #444;
+  border-right-color: #444;
+  border-bottom-color: #444;
+}
+
+[data-theme='dark'] .casoOk {
+  background: rgba(34, 197, 94, 0.16);
+}
+
+[data-theme='dark'] .casoKo {
+  background: rgba(239, 68, 68, 0.16);
+}
+
+[data-theme='dark'] .casoPista,
+[data-theme='dark'] .casoSolucion {
+  background: #2A2A2A;
+}
+
+[data-theme='dark'] .tableWrapper {
+  border-color: #444;
+}
+
+[data-theme='dark'] .comparativaTable tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='dark'] .escenarioCard,
+[data-theme='dark'] .tipCard,
+[data-theme='dark'] .faqItem {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: #444;
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(217, 119, 6, 0.12);
+  border-color: rgba(240, 195, 109, 0.4);
+  border-left-color: #F59E0B;
+}
+
+[data-theme='dark'] .warningHeader h2,
+[data-theme='dark'] .warningList {
+  color: #FDE7B0;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .hero {
+    padding: 26px 18px;
+  }
+
+  .title {
+    font-size: 1.55rem;
+  }
+
+  .panel,
+  .casosSection {
+    padding: 18px;
+  }
+
+  .tarjetas,
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .casoBotonPractica {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .palabraGrande {
+    font-size: 1.6rem;
+  }
+}
