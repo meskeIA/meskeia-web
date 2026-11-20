@@ -398,6 +398,16 @@ const APPS: App[] = [
   // en claro), los rótulos de las cuatro fases en su color puro (Expansión 22c55e, Pico eab308,
   // Recesión ef4444, Valle 3b82f6) y las cifras de la curva en el color del estado
   { slug: 'visualizador-ciclo-economico', subestados: "button[aria-pressed]" },
+  // 20/11/2026: en el diagrama de entalpía, «Productos» y ΔH en verde 22C55E (2,28:1 en claro), Ea en
+  // ámbar F59E0B (2,15) y los ejes en currentColor al 60 %; en el equilibrio, el porcentaje en blanco
+  // sobre la barra, que con poca altura lo dejaba sobre el tinte casi blanco (1,05-2,35), y «A ⇌ B»
+  // al 40 %. Cada reacción de ejemplo, como subestado
+  {
+    slug: 'visualizador-termodinamica-quimica',
+    secciones: SECCIONES,
+    extremos: true,
+    subestados: "button[aria-pressed]:not(nav button)",
+  },
 ];
 
 interface TextoSvg {

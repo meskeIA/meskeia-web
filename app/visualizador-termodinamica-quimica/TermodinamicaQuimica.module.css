@@ -71,6 +71,20 @@
   margin-bottom: var(--spacing-md); overflow: hidden;
 }
 
+/* Rótulos de los SVG (C0297, 20/11/2026): un tono de TEXTO por color de dato y tema, sin opacidad.
+   El color de dato se queda en las líneas, las flechas y las barras. El índigo no está en globals:
+   4338CA da 7,9:1 sobre la tarjeta clara y A5B4FC 7,5:1 sobre la oscura (2D2D2D). */
+.svgWrapper { --tq-indigo-texto: #4338CA; }
+[data-theme='dark'] .svgWrapper { --tq-indigo-texto: #A5B4FC; }
+.svgEje { fill: var(--text-secondary); }
+.svgIndigo { fill: var(--tq-indigo-texto); }
+.svgMarca { fill: var(--primary-texto); }
+.svgVerde { fill: var(--verde-texto, #136E35); }
+.svgRojo { fill: var(--rojo-texto, #B91C1C); }
+.svgAmbar { fill: var(--ambar-texto, #8A5A00); }
+.svgPlaca { fill: var(--bg-card); }
+.svgCifra { fill: var(--text-primary); }
+
 .sliderRow {
   display: flex; align-items: center; gap: var(--spacing-md);
   margin-bottom: var(--spacing-sm);

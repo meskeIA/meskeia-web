@@ -11,7 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, formatPercentage } from '@/lib';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -106,6 +106,7 @@ const DiagramaEntalpia = () => {
     : `M ${x0} ${yReactivos} C ${x0 + plotW * 0.35} ${yReactivos}, ${xMid - 40} ${yProductos}, ${x1} ${yProductos}`;
 
   const colorLinea = esExo ? '#22C55E' : '#F43F5E';
+  const claseTonoLinea = esExo ? styles.svgVerde : styles.svgRojo;
 
   return (
     <div>
@@ -135,16 +136,19 @@ const DiagramaEntalpia = () => {
           <line x1={x0} y1={svgH - padY} x2={x1} y2={svgH - padY} stroke="currentColor" strokeWidth="1.5" opacity="0.3" />
 
           {/* Etiquetas ejes */}
-          <text x={x0 - 10} y={padY + plotH / 2} textAnchor="middle" fontSize="10" fill="currentColor" opacity="0.6" transform={`rotate(-90,${x0 - 38},${padY + plotH / 2})`}>Energía (kJ/mol)</text>
-          <text x={svgW / 2} y={svgH - 6} textAnchor="middle" fontSize="10" fill="currentColor" opacity="0.6">Coordenada de reacción →</text>
+          {/* Los rótulos llevan un tono de TEXTO por tema (clases svg… del módulo); el color de
+              dato se queda en líneas y flechas. Antes el verde 22C55E daba 2,28:1 en claro, el
+              ámbar F59E0B 2,15 y los ejes, con opacidad, por debajo de 4,5 (C0297, 20/11/2026). */}
+          <text x={x0 - 10} y={padY + plotH / 2} textAnchor="middle" fontSize="10" className={styles.svgEje} transform={`rotate(-90,${x0 - 38},${padY + plotH / 2})`}>Energía (kJ/mol)</text>
+          <text x={svgW / 2} y={svgH - 6} textAnchor="middle" fontSize="10" className={styles.svgEje}>Coordenada de reacción →</text>
 
           {/* Línea de reactivos */}
           <line x1={x0} y1={yReactivos} x2={x0 + 50} y2={yReactivos} stroke="#6366F1" strokeWidth="3" strokeLinecap="round" />
-          <text x={x0 + 25} y={yReactivos - 8} textAnchor="middle" fontSize="11" fill="#6366F1" fontWeight="700">Reactivos</text>
+          <text x={x0 + 25} y={yReactivos - 8} textAnchor="middle" fontSize="11" className={styles.svgIndigo} fontWeight="700">Reactivos</text>
 
           {/* Línea de productos */}
           <line x1={x1 - 50} y1={yProductos} x2={x1} y2={yProductos} stroke={colorLinea} strokeWidth="3" strokeLinecap="round" />
-          <text x={x1 - 25} y={yProductos - 8} textAnchor="middle" fontSize="11" fill={colorLinea} fontWeight="700">Productos</text>
+          <text x={x1 - 25} y={yProductos - 8} textAnchor="middle" fontSize="11" className={claseTonoLinea} fontWeight="700">Productos</text>
 
           {/* Curva de perfil */}
           <path d={pathD} fill="none" stroke={colorLinea} strokeWidth="2.5" strokeLinecap="round" />
@@ -163,7 +167,7 @@ const DiagramaEntalpia = () => {
           />
           <text
             x={x1 + 5} y={(yReactivos + yProductos) / 2 + 4}
-            fontSize="11" fill={esExo ? '#22C55E' : '#F43F5E'} fontWeight="700"
+            fontSize="11" className={claseTonoLinea} fontWeight="700"
           >
             ΔH=<tspan>{ejemplo.dH > 0 ? '+' : ''}</tspan>{formatNumber(ejemplo.dH, 0)}
           </text>
@@ -172,12 +176,12 @@ const DiagramaEntalpia = () => {
           {ejemplo.ea > 0 && (
             <>
               <line x1={xMid} y1={yBarrera} x2={xMid} y2={yReactivos} stroke="#F59E0B" strokeWidth="1.5" strokeDasharray="4,3" />
-              <text x={xMid + 6} y={(yBarrera + yReactivos) / 2 + 4} fontSize="10" fill="#F59E0B" fontWeight="700">
-                Ea={formatNumber(eaReducida, 0)} kJ
+              <text x={xMid + 6} y={(yBarrera + yReactivos) / 2 + 4} fontSize="10" className={styles.svgAmbar} fontWeight="700">
+                {`Ea=${formatNumber(eaReducida, 0)} kJ`}
               </text>
               {catalizador > 0 && (
-                <text x={xMid + 6} y={(yBarrera + yReactivos) / 2 + 16} fontSize="9" fill="#22C55E">
-                  (−{catalizador}%)
+                <text x={xMid + 6} y={(yBarrera + yReactivos) / 2 + 16} fontSize="9" className={styles.svgVerde}>
+                  {`(−${formatPercentage(catalizador / 100, 0)})`}
                 </text>
               )}
             </>
@@ -390,30 +394,35 @@ const EquilibrioKeq = () => {
         <svg viewBox="0 0 440 160" width="100%" aria-label="Diagrama de equilibrio A ⇌ B" role="img">
           {/* Recipiente reactivos */}
           <rect x={30} y={30} width={140} height={110} rx={8} fill="none" stroke="currentColor" strokeWidth="2" opacity="0.3" />
-          <text x={100} y={22} textAnchor="middle" fontSize="13" fontWeight="700" fill="#6366F1">Reactivos (A)</text>
+          <text x={100} y={22} textAnchor="middle" fontSize="13" fontWeight="700" className={styles.svgIndigo}>Reactivos (A)</text>
           <rect x={34} y={34} width={132} height={102} rx={6} fill="#EEF2FF" opacity="0.5" />
 
           {/* Barra de reactivos */}
           <rect x={34} y={34 + 102 * (1 - pctReact / 100)} width={132} height={102 * (pctReact / 100)} rx={4}
             fill="#6366F1" opacity="0.6" style={{ transition: 'all 0.6s ease' }} />
-          <text x={100} y={90} textAnchor="middle" fontSize="16" fontWeight="800" fill="white">
-            {formatNumber(pctReact, 0)}%
+          {/* El porcentaje, sobre una placa del color de la tarjeta: en blanco directo sobre la
+              barra, cuando la barra no llegaba a su altura quedaba sobre el tinte casi blanco
+              (1,05-2,35:1, C0297, 20/11/2026) */}
+          <rect x={72} y={70} width={56} height={26} rx={6} className={styles.svgPlaca} />
+          <text x={100} y={90} textAnchor="middle" fontSize="16" fontWeight="800" className={styles.svgCifra}>
+            {formatPercentage(pctReact / 100, 0)}
           </text>
 
           {/* Flecha de equilibrio */}
-          <text x={220} y={82} textAnchor="middle" fontSize="22" fontWeight="700" fill="currentColor" opacity="0.5">⇌</text>
-          <text x={220} y={100} textAnchor="middle" fontSize="10" fill="currentColor" opacity="0.4">A ⇌ B</text>
+          <text x={220} y={82} textAnchor="middle" fontSize="22" fontWeight="700" className={styles.svgEje}>⇌</text>
+          <text x={220} y={100} textAnchor="middle" fontSize="10" className={styles.svgEje}>A ⇌ B</text>
 
           {/* Recipiente productos */}
           <rect x={270} y={30} width={140} height={110} rx={8} fill="none" stroke="currentColor" strokeWidth="2" opacity="0.3" />
-          <text x={340} y={22} textAnchor="middle" fontSize="13" fontWeight="700" fill="#2E86AB">Productos (B)</text>
+          <text x={340} y={22} textAnchor="middle" fontSize="13" fontWeight="700" className={styles.svgMarca}>Productos (B)</text>
           <rect x={274} y={34} width={132} height={102} rx={6} fill="#E0F2FE" opacity="0.5" />
 
           {/* Barra de productos */}
           <rect x={274} y={34 + 102 * (1 - pctProd / 100)} width={132} height={102 * (pctProd / 100)} rx={4}
             fill="#2E86AB" opacity="0.6" style={{ transition: 'all 0.6s ease' }} />
-          <text x={340} y={90} textAnchor="middle" fontSize="16" fontWeight="800" fill="white">
-            {formatNumber(pctProd, 0)}%
+          <rect x={312} y={70} width={56} height={26} rx={6} className={styles.svgPlaca} />
+          <text x={340} y={90} textAnchor="middle" fontSize="16" fontWeight="800" className={styles.svgCifra}>
+            {formatPercentage(pctProd / 100, 0)}
           </text>
         </svg>
       </div>
