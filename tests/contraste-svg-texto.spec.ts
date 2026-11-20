@@ -519,6 +519,10 @@ const APPS: App[] = [
   // CPK (blanco a 3,97:1 sobre el oxígeno, 2,50 sobre el fósforo y 3,10 sobre el xenón) y, en oscuro, la
   // «X» del ligando con la opacidad de profundidad en todo el grupo (4,28-4,48). Cada átomo, como subestado
   { slug: 'simulador-vsepr', subestados: 'button[aria-pressed]' },
+  // 20/11/2026 (tanda 4): en el reloj molecular, el blanco de CLOCK y BMAL1 sobre la marca (4,11:1) y el
+  // de los nodos apagados al 40 % (1,51-1,71 en claro); en los cronotipos, las horas en --text-muted
+  // sobre el tinte de la curva (3,94-4,32 en claro, 4,22 en oscuro)
+  { slug: 'visualizador-cronobiologia', secciones: SECCIONES },
 ];
 
 interface TextoSvg {

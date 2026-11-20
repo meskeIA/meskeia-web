@@ -388,13 +388,19 @@ function TabReloj() {
             {FASES_RELOJ.map((fase, i) => {
               const pos = posCirculo(fase.angulo + 45, radio);
               const activa = i === faseActiva;
+              // Tinta por estado (C0297): el blanco fijo daba 4,11:1 sobre CLOCK y BMAL1 en la marca
+              // y 1,5-1,7 sobre los nodos apagados al 40 %. La fase activa, opaca y con la tinta que
+              // le llega; las apagadas, translúcidas con el texto del tema, que contrasta con ellas
+              // en los dos temas
+              const nodo = rellenoConTinta(fase.color);
+              const tinta = activa ? nodo.tinta : 'var(--text-primary)';
               return (
                 <g key={`nodo-${i}`}>
                   <circle
                     cx={pos.x}
                     cy={pos.y}
                     r={activa ? 22 : 16}
-                    fill={fase.color}
+                    fill={activa ? nodo.relleno : fase.color}
                     opacity={activa ? 1 : 0.4}
                   />
                   <text
@@ -402,7 +408,7 @@ function TabReloj() {
                     y={pos.y - 3}
                     textAnchor="middle"
                     fontSize="7"
-                    fill="white"
+                    fill={tinta}
                     fontWeight="bold"
                   >
                     {fase.proteinas[0]}
@@ -413,7 +419,7 @@ function TabReloj() {
                       y={pos.y + 7}
                       textAnchor="middle"
                       fontSize="7"
-                      fill="white"
+                      fill={tinta}
                       fontWeight="bold"
                     >
                       {fase.proteinas[1]}
@@ -738,8 +744,8 @@ function TabCronotipos() {
 
           {/* Etiquetas de hora */}
           {horas.filter((h) => h % 4 === 0).map((h) => (
-            <text key={h} x={h * 20 + 10} y={118} textAnchor="middle" fontSize="8" fill="var(--text-muted)">
-              {h}h
+            <text key={h} x={h * 20 + 10} y={118} textAnchor="middle" fontSize="8" fill="var(--text-primary)">
+              {h} h
             </text>
           ))}
         </svg>
