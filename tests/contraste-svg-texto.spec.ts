@@ -119,6 +119,10 @@ const APPS: App[] = [
   // las frecuencias en #666 (2,50 en oscuro) y la amplitud sobre cada barra en su color (el ámbar 2,06,
   // el teal 2,78 y la marca 4,07 en claro; 3,50 en oscuro)
   { slug: 'visualizador-transformada-fourier' },
+  // Del censo del 20/11/2026 (C0297): en la regla de profundidad de campo, la «H» de la hiperfocal en
+  // #ea580c (3,42:1 en claro) y, en oscuro, las distancias y la nota en #6b7280 (3,45), «sujeto» en
+  // #1d4ed8 (2,49) y Dn y Df en #15803d (3,32)
+  { slug: 'calculadora-profundidad-campo' },
   // Del censo del 08/11/2026 (C0297), reparada el 10/11/2026: rótulos sobre la tarjeta en #1A1A1A,
   // #666 y #999 fijos (1,28-2,37:1 en oscuro, 2,82 en claro), el espermatozoide y el notocordio
   // en la marca y el teal (2,78-4,07), y blanco sobre el teal y la marca translúcidos (2,42-2,77)

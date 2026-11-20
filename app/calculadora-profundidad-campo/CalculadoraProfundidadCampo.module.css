@@ -630,6 +630,18 @@
   border-color: #374151;
 }
 
+/*
+ * Rótulos de la regla (C0297, 20/11/2026): en oscuro las distancias y la nota en #6b7280 (3,45:1),
+ * «sujeto» en #1d4ed8 (2,49) y Dn y Df en #15803d (3,32); en claro la «H» en #ea580c (3,42). Un tono
+ * de texto por dato y tema; el fill por CSS manda sobre el atributo.
+ */
+.reglaSvg .reglaTexto { fill: #4B5563; }
+.reglaSvg .reglaHiper { fill: var(--naranja-texto, #B93E0B); }
+.reglaSvg .reglaSujeto { fill: #1D4ED8; }
+.reglaSvg .reglaNitidez { fill: var(--verde-texto, #136E35); }
+[data-theme='dark'] .reglaSvg .reglaTexto { fill: #B0B6BF; }
+[data-theme='dark'] .reglaSvg .reglaSujeto { fill: #93C5FD; }
+
 [data-theme='dark'] .resultBlock {
   background: linear-gradient(135deg, #1e3a5f 0%, #14532d 100%);
   border-color: #3b82f6;

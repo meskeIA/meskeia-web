@@ -740,10 +740,11 @@ function ReglaSVG({ dnM, dfM, distanciaM, hiperfocalM, dfEsInfinito }: ReglaSVGP
               y={BASE_Y + 18}
               fontSize="10"
               fill="#6b7280"
+              className={styles.reglaTexto}
               textAnchor="middle"
               fontFamily="system-ui, sans-serif"
             >
-              {t < 1 ? `${t * 100}cm` : `${t}m`}
+              {t < 1 ? `${t * 100} cm` : `${t} m`}
             </text>
           </g>
         );
@@ -766,6 +767,7 @@ function ReglaSVG({ dnM, dfM, distanciaM, hiperfocalM, dfEsInfinito }: ReglaSVGP
             y={BASE_Y - 40}
             fontSize="10"
             fill="#ea580c"
+            className={styles.reglaHiper}
             textAnchor="middle"
             fontWeight="700"
             fontFamily="system-ui, sans-serif"
@@ -783,6 +785,7 @@ function ReglaSVG({ dnM, dfM, distanciaM, hiperfocalM, dfEsInfinito }: ReglaSVGP
           y={BASE_Y - 12}
           fontSize="10"
           fill="#1d4ed8"
+          className={styles.reglaSujeto}
           textAnchor="middle"
           fontWeight="700"
           fontFamily="system-ui, sans-serif"
@@ -797,6 +800,7 @@ function ReglaSVG({ dnM, dfM, distanciaM, hiperfocalM, dfEsInfinito }: ReglaSVGP
         y={BASE_Y + 38}
         fontSize="10"
         fill="#15803d"
+        className={styles.reglaNitidez}
         textAnchor="middle"
         fontWeight="700"
         fontFamily="system-ui, sans-serif"
@@ -808,6 +812,7 @@ function ReglaSVG({ dnM, dfM, distanciaM, hiperfocalM, dfEsInfinito }: ReglaSVGP
         y={BASE_Y + 38}
         fontSize="10"
         fill="#15803d"
+        className={styles.reglaNitidez}
         textAnchor="middle"
         fontWeight="700"
         fontFamily="system-ui, sans-serif"
@@ -829,6 +834,7 @@ function ReglaSVG({ dnM, dfM, distanciaM, hiperfocalM, dfEsInfinito }: ReglaSVGP
         y={H - 8}
         fontSize="11"
         fill="#6b7280"
+        className={styles.reglaTexto}
         textAnchor="middle"
         fontFamily="system-ui, sans-serif"
       >
