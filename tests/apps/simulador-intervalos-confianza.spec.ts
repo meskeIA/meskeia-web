@@ -481,10 +481,10 @@ test.describe('Hallazgos de accesibilidad (19/11/2026)', () => {
     await abrir(page);
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · los emojis de los botones de modo y de las tarjetas de escenario se leen', async ({ page }) => {
-    // ABIERTO: botón «🎯 Modo conceptual …» y «🧮 Modo calculadora …»; tarjetas «📊 Encuestas…»,
-    // «💊», «🏭», «📈» (clase scenarioIcon, que check:iconos-tarjeta no vigila)
-    test.fail();
+  test('HALLAZGO 5283 (19/11/2026, REPARADO) · los emojis de los botones de modo y de las tarjetas de escenario no se leen', async ({ page }) => {
+    // REPARADO (20/11/2026): el botón decía «🎯 Modo conceptual …» y «🧮 Modo calculadora …» y las
+    // tarjetas «📊 Encuestas…», «💊», «🏭», «📈». Ahora .modeIcon y .scenarioIcon llevan
+    // aria-hidden, y check:iconos-tarjeta vigila scenarioIcon (C0851)
     await expect(page.getByRole('button', { name: /^Modo conceptual/ })).toHaveCount(1, { timeout: 2000 });
     await expect(page.getByRole('button', { name: /^Modo calculadora/ })).toHaveCount(1, { timeout: 2000 });
     await abrirGuia(page);

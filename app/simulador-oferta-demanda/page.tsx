@@ -980,7 +980,7 @@ export default function SimuladorOfertaDemandaPage() {
           <h3>4 escenarios históricos reales</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>😷</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">😷</span>
               <strong>COVID-19 y mascarillas (2020)</strong>
               <p>
                 La pandemia disparó la demanda de mascarillas (D se desplazó a la derecha) mientras
@@ -990,7 +990,7 @@ export default function SimuladorOfertaDemandaPage() {
               </p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🛢️</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🛢️</span>
               <strong>Petróleo y coches eléctricos</strong>
               <p>
                 La mejora tecnológica en baterías (desplazador de oferta positivo) y las
@@ -1000,7 +1000,7 @@ export default function SimuladorOfertaDemandaPage() {
               </p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🏠</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🏠</span>
               <strong>Precio máximo del alquiler urbano</strong>
               <p>
                 Varias ciudades han fijado techos de alquiler para proteger a los inquilinos. Si
@@ -1010,7 +1010,7 @@ export default function SimuladorOfertaDemandaPage() {
               </p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>💵</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">💵</span>
               <strong>Precio mínimo: el salario</strong>
               <p>
                 El salario mínimo es el precio mínimo del trabajo. Si se fija por encima del

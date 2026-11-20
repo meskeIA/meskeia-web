@@ -442,7 +442,7 @@ export default function SimuladorIntervalosConfianzaPage() {
           onClick={() => setModo('conceptual')}
           aria-pressed={modo === 'conceptual'}
         >
-          <span className={styles.modeIcon}>🎯</span>
+          <span className={styles.modeIcon} aria-hidden="true">🎯</span>
           <span className={styles.modeName}>Modo conceptual</span>
           <span className={styles.modeDesc}>100 IC simulados — entiende qué significa &quot;95 % de confianza&quot;</span>
         </button>
@@ -452,7 +452,7 @@ export default function SimuladorIntervalosConfianzaPage() {
           onClick={() => setModo('calculadora')}
           aria-pressed={modo === 'calculadora'}
         >
-          <span className={styles.modeIcon}>🧮</span>
+          <span className={styles.modeIcon} aria-hidden="true">🧮</span>
           <span className={styles.modeName}>Modo calculadora</span>
           <span className={styles.modeDesc}>Calcula el IC para tu X̄, s y n concretos</span>
         </button>
@@ -830,22 +830,22 @@ export default function SimuladorIntervalosConfianzaPage() {
           <h3>4 escenarios donde usar IC es clave</h3>
           <div className={styles.scenariosGrid}>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📊</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📊</span>
               <strong>Encuestas y sondeos</strong>
               <p>El típico &quot;42 % ± 3 % al 95 % de confianza&quot; es exactamente un IC para una proporción. Sin él, no sabrías si una diferencia entre dos partidos es real o ruido muestral.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>💊</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">💊</span>
               <strong>Ensayos clínicos</strong>
               <p>El efecto de un fármaco se reporta como IC: &quot;reducción media del 14 % [IC95 %: 9 %, 19 %]&quot;. Si el IC incluye 0, el efecto no es significativo. Si no, hay evidencia de efecto.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>🏭</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">🏭</span>
               <strong>Control de calidad industrial</strong>
               <p>Para certificar que el peso medio de un producto está dentro de tolerancia, se calcula un IC para la media de lotes. Si supera el límite, se detiene producción.</p>
             </div>
             <div className={styles.scenarioCard}>
-              <span className={styles.scenarioIcon}>📈</span>
+              <span className={styles.scenarioIcon} aria-hidden="true">📈</span>
               <strong>Estimaciones financieras</strong>
               <p>La rentabilidad media histórica de un fondo se reporta con IC: &quot;7,3 % anual [IC95 %: 4,1 %, 10,5 %]&quot;. Los rangos amplios indican alta volatilidad y poca seguridad sobre el valor verdadero.</p>
             </div>

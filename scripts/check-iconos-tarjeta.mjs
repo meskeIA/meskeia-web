@@ -69,6 +69,9 @@ export const CLASES_ICONO = [
   // Tarjetas de tipo de hueso y de dato curioso (hallazgo 5010, huesos-cuerpo-humano, 18/11/2026):
   // 11 nodos sin ocultar allí y 4 `factIcon` en minerales-del-mundo, la única otra app que las usa
   'typeIcon', 'factIcon',
+  // La grafía inglesa de `escenarioIcon` (C0851, hallazgo 5283, simulador-intervalos-confianza,
+  // 19/11/2026): 62 apps la usan y casi todas ya la ocultaban; las que no, se le escapaban
+  'scenarioIcon',
 ];
 
 // Exportadas: la comparación mecánica del turno (`normalizarParIconos`) las usa tal cual
