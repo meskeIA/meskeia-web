@@ -206,6 +206,11 @@ const APPS: App[] = [
   // nivel y el filtro de grupo activo (2,19-4,11). Los filtros de grupo como secciones: los de
   // nivel cambian cuántos grupos quedan, y sus colores ya salen en las insignias de cada tarjeta
   { slug: 'visualizador-recursos-literarios', todo: true, secciones: "[class*='filtrosBox'] > div:last-of-type button" },
+  // 20/11/2026 (C0798): las celdas del tipo de matriz elegido en su color puro con style (la marca
+  // 3,77:1 en claro y 3,08 en oscuro sobre el gris de la celda; el acento y el gris aún menos) y el
+  // blanco del tipo activo sobre la marca (4,11). Los cuatro tipos como secciones. El naranja del
+  // determinante, en tests/apps/visualizador-matrices.spec.ts
+  { slug: 'visualizador-matrices', todo: true, secciones: "[class*='tiposGrid'] button" },
   // 13/11/2026: el título del panel de la capa en su color con style (el núcleo interno en oro, 1,73:1)
   { slug: 'visualizador-capas-tierra', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
   // 13/11/2026: «Producción de bilis» en amarillo (1,52:1), «FASE 2» en verde (2,56-2,75) y el título del

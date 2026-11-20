@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -28,32 +29,42 @@ const SECCIONES = [
   { id: 'vidareal' as Seccion, titulo: 'Vida real', icono: '🌍', subtitulo: 'Dónde se usan las matrices' },
 ];
 
+/*
+ * `color` es el color del tipo; `tono`, el que se lee como TEXTO en cada tema (C0798, 20/11/2026):
+ * las celdas del tipo elegido iban en su color puro sobre el gris de la celda (la marca 3,77:1 en
+ * claro y 3,08 en oscuro, el acento y el gris aún menos) y el botón activo con blanco sobre él
+ * (4,11 en Identidad). El botón activo toma el relleno con la tinta que le llega.
+ */
 const TIPOS_MATRIZ = [
   {
     nombre: 'Identidad',
     desc: 'No cambia nada. Es el "1" de las matrices.',
     datos: [[1, 0], [0, 1]],
     color: '#2E86AB',
+    tono: 'var(--primary-texto)',
   },
   {
     nombre: 'Diagonal',
     desc: 'Solo tiene valores en la diagonal principal.',
     datos: [[3, 0], [0, 5]],
     color: '#48A9A6',
+    tono: 'var(--secondary-texto)',
   },
   {
     nombre: 'Simétrica',
     desc: 'Igual que su transpuesta (filas = columnas).',
     datos: [[2, 7], [7, 4]],
     color: '#7FB3D3',
+    tono: 'var(--mx-acento-texto)',
   },
   {
     nombre: 'Nula',
     desc: 'Todo ceros. El "0" de las matrices.',
     datos: [[0, 0], [0, 0]],
     color: '#999999',
+    tono: 'var(--mx-nulo-texto)',
   },
-];
+].map((t) => ({ ...t, activo: rellenoConTinta(t.color) }));
 
 // Figura base: cuadrado unitario centrado
 const FIGURA_BASE: [number, number][] = [
@@ -169,7 +180,7 @@ function SeccionDefinicion() {
             className={`${styles.tipoBtn} ${tipoActivo === idx ? styles.tipoBtnActivo : ''}`}
             onClick={() => setTipoActivo(idx)}
             aria-pressed={tipoActivo === idx}
-            style={{ '--tipo-color': tipo.color } as React.CSSProperties}
+            style={{ '--tipo-color': tipo.color, '--tipo-texto': tipo.tono, '--tipo-relleno': tipo.activo.relleno, '--tipo-tinta': tipo.activo.tinta } as React.CSSProperties}
           >
             <span className={styles.tipoNombre}>{tipo.nombre}</span>
           </button>
@@ -182,7 +193,7 @@ function SeccionDefinicion() {
             <span
               key={i}
               className={styles.celdaPeq}
-              style={{ color: TIPOS_MATRIZ[tipoActivo].color, fontWeight: val !== 0 ? 700 : 400 }}
+              style={{ color: TIPOS_MATRIZ[tipoActivo].tono, fontWeight: val !== 0 ? 700 : 400 }}
             >
               {val}
             </span>
@@ -361,16 +372,16 @@ function OperacionDeterminante() {
       <div className={styles.determinanteVisual}>
         <div className={styles.detMatriz}>
           <span className={styles.celdaDet} style={{ color: 'var(--primary-texto)' }}>{a}</span>
-          <span className={styles.celdaDet} style={{ color: '#e67e22' }}>{b}</span>
-          <span className={styles.celdaDet} style={{ color: '#e67e22' }}>{c}</span>
+          <span className={`${styles.celdaDet} ${styles.detNaranja}`}>{b}</span>
+          <span className={`${styles.celdaDet} ${styles.detNaranja}`}>{c}</span>
           <span className={styles.celdaDet} style={{ color: 'var(--primary-texto)' }}>{d}</span>
         </div>
         <div className={styles.detFormula}>
           <div className={styles.detLinea}>
-            <span style={{ color: 'var(--primary-texto)' }}>{a}</span> × <span style={{ color: 'var(--primary-texto)' }}>{d}</span> − <span style={{ color: '#e67e22' }}>{b}</span> × <span style={{ color: '#e67e22' }}>{c}</span>
+            <span style={{ color: 'var(--primary-texto)' }}>{a}</span> × <span style={{ color: 'var(--primary-texto)' }}>{d}</span> − <span className={styles.detNaranja}>{b}</span> × <span className={styles.detNaranja}>{c}</span>
           </div>
           <div className={styles.detLinea}>
-            <span style={{ color: 'var(--primary-texto)' }}>{a * d}</span> − <span style={{ color: '#e67e22' }}>{b * c}</span> = <strong>{det}</strong>
+            <span style={{ color: 'var(--primary-texto)' }}>{a * d}</span> − <span className={styles.detNaranja}>{b * c}</span> = <strong>{det}</strong>
           </div>
         </div>
       </div>
