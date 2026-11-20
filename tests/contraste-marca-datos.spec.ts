@@ -226,6 +226,13 @@ const APPS: App[] = [
   // en oscuro, cada token en su color puro sobre su tinte (1,95-4,49), el blanco de los botones
   // activos pisado por el gris del botón (2,52 y 4,46) y --primary-texto sobre el tinte (4,18-4,32)
   { slug: 'visualizador-llm-funcionamiento', todo: true },
+  // 20/11/2026 (C0858): la longitud de onda elegida escrita en el color de esa luz con style (el
+  // verde-amarillo de 550 nm sobre la tarjeta clara, 1,2:1), «Siempre brillante» en 27AE60 (2,87) y la
+  // intensidad transmitida en verde, naranja o rojo puros con style (el naranja de 45°, 2,19)
+  { slug: 'visualizador-optica-ondulatoria', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 20/11/2026 (C0857): alfa, beta y la potencia en rojo, naranja y verde puros con style (2,9-3,9:1
+  // en claro) y la potencia del cuarto bloque igual; en oscuro, «Verdadero negativo» en 4A5568 fijo
+  { slug: 'visualizador-estadistica-inferencial', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
   // 20/11/2026 (C0297): el nombre de cada componente y la leyenda del lienzo en el color de su onda
   // con style (la marca 4,11:1, el teal 2,80, el ámbar 2,1 en claro) y «● Suma» en #1A1A1A fijo, negro
   // sobre negro en oscuro

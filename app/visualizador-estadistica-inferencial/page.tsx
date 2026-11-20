@@ -399,16 +399,16 @@ export default function VisualizadorEstadisticaInferencial() {
   }, [nPotencia, efectoPotencia]);
 
   const interpretarPotencia = (p: number): string => {
-    if (p >= 80) return 'Potencia adecuada (≥80%). El estudio tiene suficiente tamaño para detectar el efecto si existe.';
+    if (p >= 80) return 'Potencia adecuada (≥80 %). El estudio tiene suficiente tamaño para detectar el efecto si existe.';
     if (p >= 50) return 'Potencia moderada. Hay riesgo real de no detectar el efecto (error tipo II elevado).';
-    return 'Potencia baja (<50%). El estudio probablemente no detectará el efecto aunque sea real. Aumenta n o el tamaño del efecto.';
+    return 'Potencia baja (<50 %). El estudio probablemente no detectará el efecto aunque sea real. Aumenta n o el tamaño del efecto.';
   };
 
   const interpretarPValor = (): string => {
-    if (pValor < 0.001) return `p = ${pValor.toFixed(4)} — Probabilidad muy baja de observar estos datos si H₀ fuera cierta. Se rechaza H₀.`;
-    if (pValor < 0.05) return `p = ${pValor.toFixed(3)} — Por debajo de α=0.05. Se rechaza H₀. Los datos son estadísticamente significativos.`;
-    if (pValor < 0.1) return `p = ${pValor.toFixed(3)} — Entre 0.05 y 0.10. No se rechaza H₀ con α=0.05. Evidencia débil o borderline.`;
-    return `p = ${pValor.toFixed(3)} — Por encima de 0.05. No hay evidencia suficiente para rechazar H₀.`;
+    if (pValor < 0.001) return `p = ${formatNumber(pValor, 4)} — Probabilidad muy baja de observar estos datos si H₀ fuera cierta. Se rechaza H₀.`;
+    if (pValor < 0.05) return `p = ${formatNumber(pValor, 3)} — Por debajo de α = 0,05. Se rechaza H₀. Los datos son estadísticamente significativos.`;
+    if (pValor < 0.1) return `p = ${formatNumber(pValor, 3)} — Entre 0,05 y 0,10. No se rechaza H₀ con α = 0,05. Evidencia débil o borderline.`;
+    return `p = ${formatNumber(pValor, 3)} — Por encima de 0,05. No hay evidencia suficiente para rechazar H₀.`;
   };
 
   return (
@@ -461,7 +461,7 @@ export default function VisualizadorEstadisticaInferencial() {
               <div className={styles.controlRow}>
                 <label htmlFor="estadistico-z" className={styles.controlLabel}>
                   <span id="estadistico-z-rotulo">Estadístico z (valor del test)</span>
-                  <span className={styles.controlValor}>z = {estadistico.toFixed(2)}</span>
+                  <span className={styles.controlValor}>z = {formatNumber(estadistico, 2)}</span>
                 </label>
                 <input
                   id="estadistico-z"
@@ -485,12 +485,12 @@ export default function VisualizadorEstadisticaInferencial() {
               <div className={styles.resultadoItem}>
                 <span className={styles.label}>P-valor</span>
                 <span className={`${styles.valor} ${rechaza ? styles.valorRechaza : styles.valorAcepta}`}>
-                  {pValor < 0.001 ? '<0.001' : pValor.toFixed(3)}
+                  {pValor < 0.001 ? '<0,001' : formatNumber(pValor, 3)}
                 </span>
               </div>
               <div className={styles.resultadoItem}>
                 <span className={styles.label}>Nivel α</span>
-                <span className={styles.valor}>0.05</span>
+                <span className={styles.valor}>0,05</span>
               </div>
               <div className={styles.resultadoItem}>
                 <span className={styles.label}>Decisión</span>
@@ -532,7 +532,7 @@ export default function VisualizadorEstadisticaInferencial() {
               <div className={styles.controlRow}>
                 <label htmlFor="alpha-errores" className={styles.controlLabel}>
                   <span id="alpha-errores-rotulo">Nivel de significación α</span>
-                  <span className={styles.controlValor}>{alphaErr.toFixed(2)}</span>
+                  <span className={styles.controlValor}>{formatNumber(alphaErr, 2)}</span>
                 </label>
                 <input
                   id="alpha-errores"
@@ -549,7 +549,7 @@ export default function VisualizadorEstadisticaInferencial() {
               <div className={styles.controlRow}>
                 <label htmlFor="efecto-errores" className={styles.controlLabel}>
                   <span id="efecto-errores-rotulo">Tamaño del efecto (separación H₀/H₁)</span>
-                  <span className={styles.controlValor}>{efectoErr.toFixed(1)}</span>
+                  <span className={styles.controlValor}>{formatNumber(efectoErr, 1)}</span>
                 </label>
                 <input
                   id="efecto-errores"
@@ -575,11 +575,11 @@ export default function VisualizadorEstadisticaInferencial() {
                 <small>Rechazar H₀ cuando es falsa ✓</small>
               </div>
               <div className={styles.leyendaItem + ' ' + styles.leyendaFP}>
-                Error Tipo I (α = {alphaErr.toFixed(2)})
+                Error Tipo I (α = {formatNumber(alphaErr, 2)})
                 <small>Rechazar H₀ cuando es verdadera ✗</small>
               </div>
               <div className={styles.leyendaItem + ' ' + styles.leyendaFN}>
-                Error Tipo II (β ≈ {betaErr.toFixed(2)})
+                Error Tipo II (β ≈ {formatNumber(betaErr, 2)})
                 <small>No rechazar H₀ cuando es falsa ✗</small>
               </div>
               <div className={styles.leyendaItem + ' ' + styles.leyendaVN}>
@@ -591,15 +591,15 @@ export default function VisualizadorEstadisticaInferencial() {
             <div className={styles.resultado} style={{ marginTop: '0.75rem' }}>
               <div className={styles.resultadoItem}>
                 <span className={styles.label}>Error Tipo I (α)</span>
-                <span className={styles.valor} style={{ color: '#e53e3e' }}>{alphaErr.toFixed(2)}</span>
+                <span className={`${styles.valor} ${styles.textoRojo}`}>{formatNumber(alphaErr, 2)}</span>
               </div>
               <div className={styles.resultadoItem}>
                 <span className={styles.label}>Error Tipo II (β)</span>
-                <span className={styles.valor} style={{ color: '#dd6b20' }}>{betaErr.toFixed(2)}</span>
+                <span className={`${styles.valor} ${styles.textoNaranja}`}>{formatNumber(betaErr, 2)}</span>
               </div>
               <div className={styles.resultadoItem}>
                 <span className={styles.label}>Potencia (1-β)</span>
-                <span className={styles.valor} style={{ color: '#38a169' }}>{potenciaErr.toFixed(2)}</span>
+                <span className={`${styles.valor} ${styles.textoVerde}`}>{formatNumber(potenciaErr, 2)}</span>
               </div>
             </div>
           </div>
@@ -656,7 +656,7 @@ export default function VisualizadorEstadisticaInferencial() {
               <>
                 <div className={styles.icContador} role="status" aria-live="polite">
                   <span>IC que capturan μ: <strong>{icCapturan}/100</strong></span>
-                  <span style={{ color: '#e53e3e' }}>IC que NO capturan: <strong>{100 - icCapturan}</strong></span>
+                  <span className={styles.textoRojo}>IC que NO capturan: <strong className={styles.textoRojo}>{100 - icCapturan}</strong></span>
                 </div>
 
                 <div className={styles.icGrid} role="img" aria-label={`${icCapturan} de 100 intervalos de confianza capturan el parámetro real`}>
@@ -739,7 +739,7 @@ export default function VisualizadorEstadisticaInferencial() {
               <div className={styles.controlRow}>
                 <label htmlFor="efecto-potencia" className={styles.controlLabel}>
                   <span id="efecto-potencia-rotulo">Tamaño del efecto (Cohen d)</span>
-                  <span className={styles.controlValor}>{efectoPotencia.toFixed(2)}</span>
+                  <span className={styles.controlValor}>{formatNumber(efectoPotencia, 2)}</span>
                 </label>
                 <input
                   id="efecto-potencia"
@@ -758,8 +758,11 @@ export default function VisualizadorEstadisticaInferencial() {
             <div className={styles.potenciaWrapper}>
               <div className={styles.potenciaLabel}>
                 <span>Potencia estadística</span>
-                <span style={{ fontWeight: 700, color: potenciaPct >= 80 ? '#38a169' : potenciaPct >= 50 ? '#dd6b20' : '#e53e3e' }}>
-                  {potenciaPct}%
+                <span
+                  className={potenciaPct >= 80 ? styles.textoVerde : potenciaPct >= 50 ? styles.textoNaranja : styles.textoRojo}
+                  style={{ fontWeight: 700 }}
+                >
+                  {potenciaPct}&nbsp;%
                 </span>
               </div>
               <div className={styles.potenciaBarraTrack} role="progressbar" aria-valuenow={potenciaPct} aria-valuemin={0} aria-valuemax={100} aria-label="Potencia estadística">
@@ -767,7 +770,7 @@ export default function VisualizadorEstadisticaInferencial() {
                   className={styles.potenciaBarraFill}
                   style={{ width: `${potenciaPct}%` }}
                 >
-                  {potenciaPct >= 20 ? `${potenciaPct}%` : ''}
+                  {potenciaPct >= 20 ? `${potenciaPct} %` : ''}
                 </div>
               </div>
               <p className={styles.potenciaInterpretacion} role="status" aria-live="polite">
@@ -782,17 +785,17 @@ export default function VisualizadorEstadisticaInferencial() {
               </div>
               <div className={styles.resultadoItem}>
                 <span className={styles.label}>Efecto d</span>
-                <span className={styles.valor}>{efectoPotencia.toFixed(2)}</span>
+                <span className={styles.valor}>{formatNumber(efectoPotencia, 2)}</span>
               </div>
               <div className={styles.resultadoItem}>
                 <span className={styles.label}>Potencia</span>
-                <span className={styles.valor} style={{ color: potenciaPct >= 80 ? '#38a169' : '#e53e3e' }}>
-                  {potenciaPct}%
+                <span className={`${styles.valor} ${potenciaPct >= 80 ? styles.textoVerde : styles.textoRojo}`}>
+                  {potenciaPct}&nbsp;%
                 </span>
               </div>
               <div className={styles.resultadoItem}>
                 <span className={styles.label}>Efecto d referencia</span>
-                <span className={styles.valor} style={{ fontSize: '0.8rem', color: '#718096' }}>
+                <span className={`${styles.valor} ${styles.valorSecundario}`}>
                   {efectoPotencia < 0.3 ? 'Pequeño' : efectoPotencia < 0.7 ? 'Mediano' : 'Grande'}
                 </span>
               </div>
@@ -800,7 +803,7 @@ export default function VisualizadorEstadisticaInferencial() {
 
             <div className={styles.warningBox}>
               <strong>El problema de los estudios con baja potencia:</strong> Cuando n es pequeño
-              y el efecto es sutil, el test casi nunca lo detecta. Si el resultado sale p&gt;0.05,
+              y el efecto es sutil, el test casi nunca lo detecta. Si el resultado sale p&gt;0,05,
               no podemos concluir que el efecto no existe — solo que el estudio no tenía poder
               para detectarlo. Muchos &ldquo;estudios negativos&rdquo; son simplemente estudios mal diseñados.
             </div>
@@ -825,7 +828,7 @@ export default function VisualizadorEstadisticaInferencial() {
             <h3>H₀ y H₁: las dos hipótesis</h3>
             <p>
               La <strong>hipótesis nula H₀</strong> es siempre la del &ldquo;no efecto&rdquo;: &ldquo;no hay diferencia entre
-              grupos&rdquo;, &ldquo;el coeficiente es cero&rdquo;, &ldquo;la proporción es 0.5&rdquo;. La{' '}
+              grupos&rdquo;, &ldquo;el coeficiente es cero&rdquo;, &ldquo;la proporción es 0,5&rdquo;. La{' '}
               <strong>hipótesis alternativa H₁</strong> es lo que el investigador quiere demostrar.
               El test de hipótesis pregunta: ¿son los datos compatibles con H₀, o son tan extremos
               que hacen dudar de ella?
@@ -836,33 +839,33 @@ export default function VisualizadorEstadisticaInferencial() {
             <h3>El p-valor: qué es y qué NO es</h3>
             <p>
               El p-valor es la probabilidad de obtener un resultado <em>igual o más extremo</em> que
-              el observado, <em>asumiendo que H₀ es cierta</em>. Un p-valor pequeño (p.ej., p=0.02)
-              significa que si H₀ fuera cierta, veríamos estos datos solo el 2% de las veces.
+              el observado, <em>asumiendo que H₀ es cierta</em>. Un p-valor pequeño (p.ej., p = 0,02)
+              significa que si H₀ fuera cierta, veríamos estos datos solo el 2&nbsp;% de las veces.
             </p>
             <p><strong>Tres malentendidos frecuentes:</strong></p>
             <ul>
               <li>
-                <strong>Error 1:</strong> &ldquo;p=0.03 significa que hay 3% de probabilidad de que H₀ sea cierta.&rdquo;
+                <strong>Error 1:</strong> &ldquo;p = 0,03 significa que hay un 3&nbsp;% de probabilidad de que H₀ sea cierta.&rdquo;
                 — Falso. El p-valor no dice nada sobre la probabilidad de que H₀ sea verdad.
               </li>
               <li>
-                <strong>Error 2:</strong> &ldquo;p&lt;0.05 significa que el efecto es grande o importante.&rdquo;
-                — Falso. Con n suficientemente grande, cualquier diferencia mínima produce p&lt;0.05.
+                <strong>Error 2:</strong> &ldquo;p&lt;0,05 significa que el efecto es grande o importante.&rdquo;
+                — Falso. Con n suficientemente grande, cualquier diferencia mínima produce p&lt;0,05.
               </li>
               <li>
-                <strong>Error 3:</strong> &ldquo;p=0.06 significa que casi hay efecto.&rdquo;
-                — Falso. 0.06 y 0.05 son prácticamente lo mismo; el umbral 0.05 es una convención arbitraria.
+                <strong>Error 3:</strong> &ldquo;p = 0,06 significa que casi hay efecto.&rdquo;
+                — Falso. 0,06 y 0,05 son prácticamente lo mismo; el umbral 0,05 es una convención arbitraria.
               </li>
             </ul>
           </section>
 
           <section>
-            <h3>Nivel de significación α: ¿por qué 0.05?</h3>
+            <h3>Nivel de significación α: ¿por qué 0,05?</h3>
             <p>
-              Ronald Fisher propuso α=0.05 en 1925 como umbral de conveniencia, no como ley científica.
-              El nivel α es la tasa de error tipo I que estamos dispuestos a tolerar: si usamos α=0.05,
-              rechazaremos H₀ incorrectamente el 5% de las veces, incluso cuando H₀ sea verdad.
-              Algunos campos (física de partículas) exigen α=0.0000003 (5 sigmas) para declarar un descubrimiento.
+              Ronald Fisher propuso α = 0,05 en 1925 como umbral de conveniencia, no como ley científica.
+              El nivel α es la tasa de error tipo I que estamos dispuestos a tolerar: si usamos α = 0,05,
+              rechazaremos H₀ incorrectamente el 5&nbsp;% de las veces, incluso cuando H₀ sea verdad.
+              Algunos campos (física de partículas) exigen α = 0,0000003 (5 sigmas) para declarar un descubrimiento.
             </p>
           </section>
 
@@ -901,7 +904,7 @@ export default function VisualizadorEstadisticaInferencial() {
               psicología. Solo el 39% obtuvo resultados similares. Las causas principales:
             </p>
             <ul>
-              <li><strong>p-hacking:</strong> probar múltiples hipótesis hasta encontrar p&lt;0.05</li>
+              <li><strong>p-hacking:</strong> probar múltiples hipótesis hasta encontrar p&lt;0,05</li>
               <li><strong>HARKing:</strong> formular la hipótesis después de ver los datos</li>
               <li><strong>Baja potencia:</strong> muestras demasiado pequeñas que solo detectan efectos grandes</li>
               <li><strong>Sesgo de publicación:</strong> los resultados positivos se publican más que los negativos</li>

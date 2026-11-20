@@ -66,6 +66,17 @@
   display: flex; justify-content: space-between; align-items: baseline;
 }
 .sliderValor { font-size: 1rem; font-weight: 700; color: var(--primary-texto); }
+/* El color de la luz elegida va en una muestra junto al texto, no en el texto: el verde-amarillo de
+   550 nm sobre la tarjeta clara daba 1,22:1 (C0858) */
+.muestraLuz {
+  display: inline-block; width: 0.8em; height: 0.8em; border-radius: 50%;
+  margin-right: 0.35em; vertical-align: -0.05em;
+  border: 1px solid var(--border);
+}
+/* Tonos de TEXTO del estado (C0858): el verde, naranja y rojo puros iban con style (2,19-2,64:1) */
+.textoBueno { color: var(--verde-texto, #136E35); }
+.textoMedio { color: var(--naranja-texto, #B93E0B); }
+.textoMalo { color: var(--rojo-texto, #B91C1C); }
 .sliderDesc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
 
 .sliderInput {
@@ -150,7 +161,7 @@
 .infoFila strong { color: var(--text-primary); font-weight: 700; }
 .infoFila code {
   background: var(--border); padding: 0.1rem 0.3rem;
-  border-radius: 4px; font-size: 0.82rem; color: var(--primary-texto);
+  border-radius: 4px; font-size: 0.82rem; color: var(--text-primary);
 }
 
 /* Botones */

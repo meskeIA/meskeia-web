@@ -11,6 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { formatNumber } from '@/lib';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -94,7 +95,7 @@ function TabInterferencia() {
   const anchoFranja = useMemo(() => {
     const lambdaM = lambda * 1e-9;
     const dM = d * 1e-3;
-    return (lambdaM * D / dM * 1000).toFixed(2);
+    return formatNumber(lambdaM * D / dM * 1000, 2);
   }, [d, lambda, D]);
 
   // Animación canvas ondas circulares
@@ -175,7 +176,7 @@ function TabInterferencia() {
         <div className={styles.sliderGroup}>
           <label htmlFor="separacion-rendijas" className={styles.sliderLabel}>
             Separación rendijas <em>d</em>
-            <span className={styles.sliderValor}>{d.toFixed(1)} mm</span>
+            <span className={styles.sliderValor}>{formatNumber(d, 1)} mm</span>
           </label>
           <input
             id="separacion-rendijas"
@@ -190,7 +191,10 @@ function TabInterferencia() {
         <div className={styles.sliderGroup}>
           <label htmlFor="lambda-interferencia" className={styles.sliderLabel}>
             Longitud de onda <em>λ</em>
-            <span className={styles.sliderValor} style={{ color }}>{lambda} nm ({nombreColor})</span>
+            <span className={styles.sliderValor}>
+              <span className={styles.muestraLuz} style={{ background: color }} aria-hidden="true" />
+              {lambda} nm ({nombreColor})
+            </span>
           </label>
           <input
             id="lambda-interferencia"
@@ -204,7 +208,7 @@ function TabInterferencia() {
         <div className={styles.sliderGroup}>
           <label htmlFor="distancia-pantalla" className={styles.sliderLabel}>
             Distancia pantalla <em>D</em>
-            <span className={styles.sliderValor}>{D.toFixed(1)} m</span>
+            <span className={styles.sliderValor}>{formatNumber(D, 1)} m</span>
           </label>
           <input
             id="distancia-pantalla"
@@ -227,7 +231,7 @@ function TabInterferencia() {
           </div>
           <div className={styles.infoFila}>
             <span>Franja central:</span>
-            <strong style={{ color: '#27ae60' }}>Siempre brillante</strong>
+            <strong className={styles.textoBueno}>Siempre brillante</strong>
           </div>
         </div>
       </div>
@@ -347,7 +351,7 @@ function TabDifraccion() {
         <div className={styles.sliderGroup}>
           <label htmlFor="apertura-rendija" className={styles.sliderLabel}>
             Apertura <em>a</em>
-            <span className={styles.sliderValor}>{a.toFixed(1)} mm</span>
+            <span className={styles.sliderValor}>{formatNumber(a, 1)} mm</span>
           </label>
           <input
             id="apertura-rendija"
@@ -362,7 +366,10 @@ function TabDifraccion() {
         <div className={styles.sliderGroup}>
           <label htmlFor="lambda-difraccion" className={styles.sliderLabel}>
             Longitud de onda <em>λ</em>
-            <span className={styles.sliderValor} style={{ color }}>{lambda} nm ({nombreColor})</span>
+            <span className={styles.sliderValor}>
+              <span className={styles.muestraLuz} style={{ background: color }} aria-hidden="true" />
+              {lambda} nm ({nombreColor})
+            </span>
           </label>
           <input
             id="lambda-difraccion"
@@ -377,7 +384,7 @@ function TabDifraccion() {
       <div className={styles.infoBox} style={{ marginBottom: '1rem' }}>
         <div className={styles.infoFila}>
           <span>Relación a/λ:</span>
-          <strong>{ratio.toFixed(0)}</strong>
+          <strong>{formatNumber(ratio, 0)}</strong>
         </div>
         <div className={styles.infoFila}>
           <span>Régimen:</span>
@@ -385,7 +392,7 @@ function TabDifraccion() {
         </div>
         <div className={styles.infoFila}>
           <span>1.er mínimo a:</span>
-          <strong>θ = ±{(Math.asin(lambda * 1e-9 / (a * 1e-3)) * 180 / Math.PI).toFixed(2)}°</strong>
+          <strong>θ = ±{formatNumber(Math.asin(lambda * 1e-9 / (a * 1e-3)) * 180 / Math.PI, 2)}°</strong>
         </div>
       </div>
 
@@ -397,8 +404,8 @@ function TabDifraccion() {
           <line x1={padX} y1={padY} x2={padX} y2={padY + plotH} stroke="var(--border, #ddd)" strokeWidth="1" />
           <line x1={padX} y1={padY + plotH} x2={padX + plotW} y2={padY + plotH} stroke="var(--border, #ddd)" strokeWidth="1" />
           {/* Etiquetas eje */}
-          <text x={padX - 5} y={padY + 4} fill="var(--text-muted,#999)" fontSize="10" textAnchor="end">1.0</text>
-          <text x={padX - 5} y={padY + plotH / 2 + 4} fill="var(--text-muted,#999)" fontSize="10" textAnchor="end">0.5</text>
+          <text x={padX - 5} y={padY + 4} fill="var(--text-muted,#999)" fontSize="10" textAnchor="end">1,0</text>
+          <text x={padX - 5} y={padY + plotH / 2 + 4} fill="var(--text-muted,#999)" fontSize="10" textAnchor="end">0,5</text>
           <text x={padX + plotW / 2} y={SVG_H - 4} fill="var(--text-muted,#999)" fontSize="10" textAnchor="middle">ángulo θ (centro)</text>
           <text x={padX} y={SVG_H - 4} fill="var(--text-muted,#999)" fontSize="10" textAnchor="middle">−</text>
           <text x={padX + plotW} y={SVG_H - 4} fill="var(--text-muted,#999)" fontSize="10" textAnchor="middle">+</text>
@@ -412,7 +419,7 @@ function TabDifraccion() {
 
       <div className={styles.ejemploBox}>
         <strong>Ejemplo: CD como red de difracción</strong>
-        <p>Un CD tiene surcos separados 1.6 μm. Con luz blanca, cada color difracta a un ángulo distinto: rojo (700 nm) a ~26°, verde (550 nm) a ~20°, violeta (400 nm) a ~14.5°. Por eso ves el arcoíris al reflejar luz en un CD.</p>
+        <p>Un CD tiene surcos separados 1,6 μm. Con luz blanca, cada color difracta a un ángulo distinto: rojo (700 nm) a ~26°, verde (550 nm) a ~20°, violeta (400 nm) a ~14,5°. Por eso ves el arcoíris al reflejar luz en un CD.</p>
       </div>
     </div>
   );
@@ -536,13 +543,13 @@ function TabPolarizacion() {
           <div className={styles.infoBox}>
             <div className={styles.infoFila}>
               <span>I = I₀·cos²({angulo}°) =</span>
-              <strong style={{ color: intensidad > 0.5 ? '#27ae60' : intensidad > 0.2 ? '#f39c12' : '#e74c3c' }}>
-                {pct}% I₀
+              <strong className={intensidad > 0.5 ? styles.textoBueno : intensidad > 0.2 ? styles.textoMedio : styles.textoMalo}>
+                {pct}&nbsp;% I₀
               </strong>
             </div>
             {angulo === 0 && <p className={styles.sliderDesc}>Polarizadores paralelos → máxima transmisión</p>}
             {angulo === 90 && <p className={styles.sliderDesc}>Polarizadores cruzados → extinción total</p>}
-            {angulo === 45 && <p className={styles.sliderDesc}>45° → se transmite el 50% de la intensidad</p>}
+            {angulo === 45 && <p className={styles.sliderDesc}>45° → se transmite el 50&nbsp;% de la intensidad</p>}
           </div>
 
           <label className={styles.toggleLabel}>
@@ -555,7 +562,7 @@ function TabPolarizacion() {
             <span>Filtro λ/4 (retardador)</span>
           </label>
           {filtroLambda4 && (
-            <p className={styles.sliderDesc}>El filtro λ/4 convierte luz lineal en circular → transmite el 50% independientemente del ángulo del analizador.</p>
+            <p className={styles.sliderDesc}>El filtro λ/4 convierte luz lineal en circular → transmite el 50&nbsp;% independientemente del ángulo del analizador.</p>
           )}
 
           <div className={styles.aplicacionesBox}>
@@ -585,7 +592,7 @@ function TabPolarizacion() {
             <text key={deg} x={padX + (deg / 360) * plotW} y={SVG_H - 3}
               textAnchor="middle" fontSize="9" fill="var(--text-muted,#999)">{deg}°</text>
           ))}
-          <text x={padX - 5} y={padY + 4} textAnchor="end" fontSize="9" fill="var(--text-muted,#999)">1.0</text>
+          <text x={padX - 5} y={padY + 4} textAnchor="end" fontSize="9" fill="var(--text-muted,#999)">1,0</text>
           <text x={padX - 5} y={padY + plotH + 4} textAnchor="end" fontSize="9" fill="var(--text-muted,#999)">0</text>
         </svg>
       </div>
@@ -643,7 +650,7 @@ function TabCoherencia() {
         <div className={styles.sliderGroup} style={{ gridColumn: '1 / -1' }}>
           <label htmlFor="longitud-coherencia" className={styles.sliderLabel}>
             Longitud de coherencia
-            <span className={styles.sliderValor}>{longitudCoh < 1 ? `${(longitudCoh * 1000).toFixed(0)} μm` : longitudCoh < 1000 ? `${longitudCoh.toFixed(0)} mm` : `${(longitudCoh / 1000).toFixed(0)} m`}</span>
+            <span className={styles.sliderValor}>{longitudCoh < 1 ? `${formatNumber(longitudCoh * 1000, 0)} μm` : longitudCoh < 1000 ? `${formatNumber(longitudCoh, 0)} mm` : `${formatNumber(longitudCoh / 1000, 0)} m`}</span>
           </label>
           <input
             id="longitud-coherencia"
@@ -947,7 +954,7 @@ export default function OpticaOndulatoria() {
           <ul className={styles.warningList}>
             <li><strong>Difracción ≠ refracción</strong> — La refracción cambia la velocidad y dirección de la luz al cambiar de medio. La difracción curva la luz en bordes sin cambiar de medio. Son fenómenos distintos.</li>
             <li><strong>Las franjas de Young no son sombras geométricas</strong> — Las zonas oscuras ocurren donde las ondas se cancelan por interferencia destructiva (diferencia de fase π). No son zonas sin luz por oclusión.</li>
-            <li><strong>La ley de Malus asume polarización perfecta</strong> — I = I₀·cos²θ aplica a luz 100% polarizada linealmente. La luz solar refleja parcialmente polarizada; el factor real es menor.</li>
+            <li><strong>La ley de Malus asume polarización perfecta</strong> — I = I₀·cos²θ aplica a luz 100&nbsp;% polarizada linealmente. La luz solar refleja parcialmente polarizada; el factor real es menor.</li>
             <li><strong>Mayor apertura no siempre da mejor imagen</strong> — En óptica, aberraciones como la esférica y la cromática aumentan con la apertura. El límite de difracción es teórico; las aberraciones pueden dominar.</li>
             <li><strong>La coherencia no es lo mismo que la monocromaticidad</strong> — Pueden coexistir fuentes monocromáticas poco coherentes (si tienen ruido de fase). Un láser bien estabilizado tiene ambas propiedades.</li>
           </ul>

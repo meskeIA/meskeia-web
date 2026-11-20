@@ -207,6 +207,17 @@
   color: var(--verde-texto, #38a169);
 }
 
+/* Tonos de TEXTO de alfa, beta y la potencia (C0857): iban en rojo, naranja y verde puros con style
+   (la potencia del 78 % en DD6B20, 3,39:1 en claro). Con .contenido delante para ganar a
+   .resultadoItem .valor y a .icContador span */
+.contenido .textoRojo { color: var(--rojo-texto, #B91C1C); }
+.contenido .textoNaranja { color: var(--naranja-texto, #B93E0B); }
+.contenido .textoVerde { color: var(--verde-texto, #136E35); }
+.resultadoItem .valorSecundario {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
 /* ─── Mensaje interpretativo ─── */
 .mensajeInterpretacion {
   background: rgba(46, 134, 171, 0.08);
