@@ -495,6 +495,9 @@ const APPS: App[] = [
   // «Plasma» y «55 %» sobre el oro del plasma translúcido (4,31 y 3,19). Las capas del tubo y los pasos de
   // la cascada, como subestados
   { slug: 'visualizador-sangre-componentes', secciones: SECCIONES, subestados: "svg [aria-pressed]" },
+  // 20/11/2026 (tanda 4): en el climograma, los meses y la leyenda en #888 fijo (3,51:1 en claro, 4,05
+  // en oscuro)
+  { slug: 'visualizador-biomas-terrestres', secciones: SECCIONES },
 ];
 
 interface TextoSvg {

@@ -518,7 +518,7 @@ function Climograma({ biomaId }: { biomaId: string }) {
               y={margenSup + altoGrafico + 14}
               textAnchor="middle"
               fontSize="9"
-              fill="#888"
+              fill="var(--text-secondary)"
             >
               {m}
             </text>
@@ -552,11 +552,11 @@ function Climograma({ biomaId }: { biomaId: string }) {
 
           {/* Leyenda */}
           <rect x={margenIzq + 4} y={margenSup + 4} width="10" height="4" fill="#E74C3C" />
-          <text x={margenIzq + 18} y={margenSup + 9} fontSize="8" fill="#888">
+          <text x={margenIzq + 18} y={margenSup + 9} fontSize="8" fill="var(--text-secondary)">
             Temperatura (°C)
           </text>
           <rect x={margenIzq + 4} y={margenSup + 12} width="10" height="8" fill="#2E86AB" opacity="0.55" />
-          <text x={margenIzq + 18} y={margenSup + 19} fontSize="8" fill="#888">
+          <text x={margenIzq + 18} y={margenSup + 19} fontSize="8" fill="var(--text-secondary)">
             Precipitación (mm)
           </text>
         </svg>
