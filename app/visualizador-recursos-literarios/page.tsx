@@ -188,7 +188,8 @@ export default function VisualizadorRecursosLiterariosPage() {
         {/* ── Estadísticas rápidas ── */}
         <div className={styles.statsRow}>
           <div className={styles.statCard}>
-            <span className={styles.statNum}>27</span>
+            {/* Decía 27 escrito a mano con 26 en el banco: la otra mitad del hallazgo 3646 */}
+            <span className={styles.statNum}>{figurasRetorica.length}</span>
             <span className={styles.statLabel}>figuras totales</span>
           </div>
           <div className={styles.statCard} style={{ borderColor: NIVEL_COLOR.basico }}>
@@ -482,7 +483,7 @@ export default function VisualizadorRecursosLiterariosPage() {
                   <span className={styles.escenarioIcono} aria-hidden="true">🏆</span>
                   <h4>Preparando Selectividad</h4>
                 </div>
-                <p>Domina las 7 figuras avanzadas (alegoría, apóstrofe, lítotes, quiasmo, paronomasia, zeugma) y repasa los pares confundidos que más aparecen en los exámenes.</p>
+                <p>Domina las {totalPorNivel.avanzado} figuras avanzadas (alegoría, apóstrofe, lítotes, quiasmo, paronomasia, zeugma) y repasa los pares confundidos que más aparecen en los exámenes.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
@@ -498,7 +499,7 @@ export default function VisualizadorRecursosLiterariosPage() {
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
                 <h4>¿Cuántas figuras retóricas existen en total?</h4>
-                <p>La retórica clásica cataloga más de 200 figuras, pero en la práctica educativa española se trabajan entre 20 y 30. Esta guía cubre las 27 más frecuentes en los currículos de ESO, Bachillerato y Selectividad.</p>
+                <p>La retórica clásica cataloga más de 200 figuras, pero en la práctica educativa española se trabajan entre 20 y 30. Esta guía cubre las {figurasRetorica.length} más frecuentes en los currículos de ESO, Bachillerato y Selectividad.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4>¿Cuál es la diferencia entre figura retórica y recurso literario?</h4>

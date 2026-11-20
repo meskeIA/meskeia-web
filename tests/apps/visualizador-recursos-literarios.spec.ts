@@ -32,6 +32,23 @@ test.describe('Recursos Literarios · promesas sobre el banco', () => {
     expect(String(metadata.description)).toContain(`${n} figuras`);
   });
 
+  test('la tarjeta de totales, la FAQ y el escenario de nivel avanzado cuentan las figuras del banco', async ({ page }) => {
+    // /reparar 20/11/2026: el 3646 se reparó en el subtítulo y la metadata, pero quedaban tres
+    // cifras escritas a mano: «27 figuras totales» en la tarjeta, «cubre las 27 más frecuentes» en
+    // la FAQ visible y «Domina las 7 figuras avanzadas», que luego lista seis. El banco tiene 26
+    // figuras, 6 de ellas de nivel avanzado.
+    const n = figurasRetorica.length;
+    const avanzadas = figurasRetorica.filter((f) => f.nivel === 'avanzado').length;
+    expect([n, avanzadas]).toEqual([26, 6]);
+    await page.goto('/visualizador-recursos-literarios/');
+    await esperarPaginaAsentada(page);
+    await expect(page.getByText('figuras totales').locator('xpath=preceding-sibling::*[1]')).toHaveText(String(n));
+    const cuerpo = await page.locator('body').textContent();
+    expect(cuerpo).toContain(`cubre las ${n} más frecuentes`);
+    expect(cuerpo).toContain(`Domina las ${avanzadas} figuras avanzadas`);
+    expect(cuerpo).not.toMatch(/\b27 más frecuentes|\b7 figuras avanzadas/);
+  });
+
   test('no llama «reales» a ejemplos que en su mayoría están escritos para la guía', async ({ page }) => {
     await page.goto('/visualizador-recursos-literarios/');
     await esperarPaginaAsentada(page);
