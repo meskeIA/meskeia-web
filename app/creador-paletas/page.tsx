@@ -570,10 +570,10 @@ export default function CreadorPaletasPage() {
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué es el contraste de accesibilidad y por qué importa?</h4>
               <p>
-                La WCAG 2.1 establece ratios mínimos de contraste entre texto y fondo: 4.5:1 para texto normal (AA) y 7:1 para texto normal (AAA). Diversas normativas obligan a cumplir AA en webs del sector público (RD 1112/2018 en España, ADA Title III en EE.UU., AODA en Canadá, EAA en la UE desde 2025). Un texto gris claro sobre fondo blanco puede ser bonito pero completamente ilegible para personas con visión reducida o en pantallas con mucha luz.
+                La WCAG 2.1 establece ratios mínimos de contraste entre texto y fondo: 4,5:1 para texto normal (AA) y 7:1 para texto normal (AAA). En la UE, el nivel AA es obligatorio en las webs del sector público (en España, RD 1112/2018) y, desde 2025, también en muchos productos y servicios digitales de empresas privadas (Acta Europea de Accesibilidad, EAA); fuera de Europa hay marcos parecidos, como la ADA en EE. UU. o la AODA en Ontario (Canadá). Un texto gris claro sobre fondo blanco puede ser bonito pero completamente ilegible para personas con visión reducida o en pantallas con mucha luz.
               </p>
               <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> <strong>Cómo verificar:</strong> Usa el WebAIM Contrast Checker (webaim.org/resources/contrastchecker) con los HEX de tu paleta. Como mínimo, texto de cuerpo y fondo deben superar 4.5:1. Los tonos 700-900 de la escala suelen funcionar bien sobre fondos claros.
+                <span aria-hidden="true">💡</span> <strong>Cómo verificar:</strong> Usa el WebAIM Contrast Checker (webaim.org/resources/contrastchecker) con los HEX de tu paleta. Como mínimo, texto de cuerpo y fondo deben superar 4,5:1. Los tonos 700-900 de la escala suelen funcionar bien sobre fondos claros.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -624,10 +624,10 @@ export default function CreadorPaletasPage() {
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cómo saber si una paleta es accesible para personas daltónicas?</h4>
               <p>
-                El 8% de los hombres y el 0,5% de las mujeres tienen algún tipo de daltonismo (más común: deuteranopía, que confunde rojo y verde). Para paletas accesibles: evita depender solo del rojo/verde para transmitir información (éxito/error); añade iconos o texto. Los azules y amarillos son los más seguros porque son distinguibles por la mayoría de tipos de daltonismo. Herramientas como Stark (plugin de Figma) o Colour Contrast Analyser simulan cómo ve un daltónico tu diseño.
+                El daltonismo rojo-verde afecta a cerca del 8&nbsp;% de los hombres y al 0,4&nbsp;% de las mujeres de ascendencia europea (Birch, 2012), con cifras menores en otras poblaciones; la forma más común es la deuteranomalía, que confunde rojos y verdes. Para paletas accesibles: evita depender solo del rojo/verde para transmitir información (éxito/error); añade iconos o texto. Los azules y amarillos son los más seguros porque son distinguibles por la mayoría de tipos de daltonismo. Herramientas como Stark (plugin de Figma) o Colour Contrast Analyser simulan cómo ve un daltónico tu diseño.
               </p>
               <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> <strong>Regla del "daltonismo-safe":</strong> Si tu diseño sigue siendo comprensible en escala de grises, es accesible para la mayoría de personas con daltonismo. Prueba captura de pantalla + desaturación 100% en Photoshop.
+                <span aria-hidden="true">💡</span> <strong>Regla del "daltonismo-safe":</strong> Si tu diseño sigue siendo comprensible en escala de grises, es accesible para la mayoría de personas con daltonismo. Prueba captura de pantalla + desaturación 100&nbsp;% en Photoshop.
               </p>
             </div>
           </div>
