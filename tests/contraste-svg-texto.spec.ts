@@ -531,6 +531,9 @@ const APPS: App[] = [
   // en la marca (3,12-3,80) y, con el tramo corto, la distancia «0,5 m» encima del fulcro en la marca (1,48
   // en oscuro)
   { slug: 'visualizador-maquinas-simples', secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']", extremos: true },
+  // 20/11/2026 (tanda 4): «n=0» en blanco directamente sobre la franja central, del color de la luz (1,28:1
+  // con el verde, 4,02 con el rojo)
+  { slug: 'visualizador-optica-ondulatoria', secciones: SECCIONES, extremos: true },
 ];
 
 interface TextoSvg {

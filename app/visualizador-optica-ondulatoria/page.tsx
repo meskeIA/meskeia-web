@@ -253,6 +253,9 @@ function TabInterferencia() {
               );
             })}
             {/* Etiqueta franja central */}
+            {/* Sobre una placa del fondo de la pantalla (C0297): el blanco directamente sobre la
+                franja central daba 1,28:1 con el verde y 4,02 con el rojo */}
+            <rect x={pantallasX - 30} y={SVG_H / 2 - 7} width={28} height={14} rx={3} fill="#111" />
             <text x={pantallasX - 5} y={SVG_H / 2 + 4} fill="white" fontSize="10" textAnchor="end">n=0</text>
           </svg>
         </div>
