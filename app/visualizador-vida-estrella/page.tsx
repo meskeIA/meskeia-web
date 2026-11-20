@@ -46,11 +46,13 @@ interface ElementoInfo {
   dato: string;
 }
 
-const ORIGENES: Record<OrigenEstelar, { label: string; color: string; colorDark: string }> = {
-  bigbang: { label: 'Big Bang', color: '#E8D44D', colorDark: '#B8A420' },
-  pequenas: { label: 'Estrellas pequeñas/medianas', color: '#48A9A6', colorDark: '#3A8A88' },
-  supernovas: { label: 'Supernovas', color: '#E74C3C', colorDark: '#C0392B' },
-  fusiones: { label: 'Fusión de estrellas de neutrones', color: '#9B59B6', colorDark: '#7D3C98' },
+// `tono`: la clase con el tono de TEXTO del origen por tema. El color puro se queda en el borde y la
+// leyenda: como texto, el oro del Big Bang daba 1,50:1 y el teal 2,80 en claro (cabo C0798, 20/11/2026)
+const ORIGENES: Record<OrigenEstelar, { label: string; color: string; tono: string }> = {
+  bigbang: { label: 'Big Bang', color: '#E8D44D', tono: styles.tonoOro },
+  pequenas: { label: 'Estrellas pequeñas/medianas', color: '#48A9A6', tono: styles.tonoTeal },
+  supernovas: { label: 'Supernovas', color: '#E74C3C', tono: styles.tonoRojo },
+  fusiones: { label: 'Fusión de estrellas de neutrones', color: '#9B59B6', tono: styles.tonoVioleta },
 };
 
 const ELEMENTOS: ElementoInfo[] = [
@@ -216,7 +218,7 @@ function SeccionAdulta({ masaSolar }: { masaSolar: number }) {
         </div>
         <div className={styles.statCard}>
           <span className={styles.statLabel}>Esperanza de vida</span>
-          <span className={styles.statValor} style={{ color: datos.vidaAnios < 1_000_000_000 ? '#e74c3c' : '#27ae60' }}>
+          <span className={`${styles.statValor} ${datos.vidaAnios < 1_000_000_000 ? styles.tonoRojo : styles.tonoVerde}`}>
             {formatVida(datos.vidaAnios)}
           </span>
         </div>
@@ -428,7 +430,7 @@ function SeccionPolvo() {
               style={{ borderColor: ORIGENES[el.origen].color, borderLeftWidth: 4 }}
               title={`${el.nombre}: ${el.dato}`}
             >
-              <span className={styles.tablaSimbolo} style={{ color: ORIGENES[el.origen].color }}>
+              <span className={`${styles.tablaSimbolo} ${ORIGENES[el.origen].tono}`}>
                 {el.simbolo}
               </span>
               <span className={styles.tablaNombre}>{el.nombre}</span>

@@ -237,6 +237,9 @@ const APPS: App[] = [
   // en el color puro del partido con style (el naranja 2,01:1, el verde 2,64 en claro; la marca 3,08
   // en oscuro) y el blanco de las barras de escaños sobre ese color (2,19-4,11)
   { slug: 'visualizador-sistema-electoral', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 20/11/2026 (C0798): la vida de la estrella en #27ae60 con style (2,87:1 en claro) y los símbolos de
+  // la tabla periódica en el color de su origen (el oro del Big Bang 1,50, el teal 2,80 en claro)
+  { slug: 'visualizador-vida-estrella', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
   // 13/11/2026: el título del panel de la capa en su color con style (el núcleo interno en oro, 1,73:1)
   { slug: 'visualizador-capas-tierra', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
   // 13/11/2026: «Producción de bilis» en amarillo (1,52:1), «FASE 2» en verde (2,56-2,75) y el título del

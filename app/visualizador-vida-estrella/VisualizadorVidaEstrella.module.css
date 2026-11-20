@@ -122,6 +122,16 @@
 .tablaElemento { background: var(--bg-card); border: 1px solid var(--border); border-left-style: solid; border-radius: var(--radius); padding: var(--spacing-sm) var(--spacing-md); text-align: left; transition: transform 0.2s, box-shadow 0.2s; }
 .tablaElemento:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 .tablaSimbolo { display: block; font-size: 1.3rem; font-weight: 800; margin-bottom: 0.1rem; }
+
+/* Tonos de texto por color de dato y tema (cabo C0798, 20/11/2026): los símbolos de la tabla
+   periódica en el color de su origen (oro 1,50:1, teal 2,80 en claro) y la vida de la estrella en
+   #27ae60 (2,87) o #e74c3c. El compuesto pesa más que «.statValor», que pone --text-primary */
+.tonoOro { color: var(--ambar-texto, #8A5A00); }
+.tonoTeal { color: var(--secondary-texto); }
+.tonoRojo, .statValor.tonoRojo { color: var(--rojo-texto, #B91C1C); }
+.tonoVerde, .statValor.tonoVerde { color: var(--verde-texto, #136E35); }
+.tonoVioleta { color: #6D28D9; }
+[data-theme='dark'] .tonoVioleta { color: #C4B5FD; }
 .tablaNombre { display: block; font-size: 0.78rem; color: var(--text-primary); font-weight: 600; }
 .tablaDato { display: block; font-size: 0.7rem; color: var(--text-muted); margin-top: 0.1rem; }
 
