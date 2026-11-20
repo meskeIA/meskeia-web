@@ -486,6 +486,10 @@ const APPS: App[] = [
   // «No llega» en currentColor al 50-60 % (2,10-2,51:1 en claro, 2,70-3,25 en oscuro), los rótulos de la
   // curva en el teal (2,78) y «↓ frustración» en E07070 (3,10). Cada paso del circuito, como subestado
   { slug: 'visualizador-dopamina', subestados: "[aria-label='Pasos del circuito de recompensa'] [role='tab']" },
+  // 20/11/2026 (tanda 4): «Observador (nosotros)» en blanco al 40 % sobre el fondo espacial (3,77:1 en los
+  // dos temas) y, en la curva de velocidad radial, «hacia nosotros» en 4A9EFF y «alejándose» en FF6B6B
+  // sobre la tarjeta (2,73 y 2,75 en claro). Cada tipo de estrella de la zona habitable, como subestado
+  { slug: 'visualizador-exoplanetas', extremos: true, subestados: "button[aria-pressed]" },
 ];
 
 interface TextoSvg {

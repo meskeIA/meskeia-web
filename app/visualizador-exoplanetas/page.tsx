@@ -462,7 +462,7 @@ export default function VisualizadorExoplanetas() {
                 <circle key={i} cx={x} cy={y} r="0.8" fill="white" opacity="0.4" />
               ))}
               {/* Observador */}
-              <text x="150" y="148" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.4)">
+              <text x="150" y="148" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.75)">
                 <tspan aria-hidden="true">👁</tspan> Observador (nosotros)
               </text>
               {/* Flechas blueshift/redshift */}
@@ -505,8 +505,9 @@ export default function VisualizadorExoplanetas() {
                 strokeLinejoin="round"
               />
               {/* Zonas blueshift / redshift */}
-              <text x="10" y="38" fontSize="9" fill="#4A9EFF">← hacia nosotros</text>
-              <text x="10" y="75" fontSize="9" fill="#FF6B6B">← alejándose</text>
+              {/* Rótulos en un tono de texto por tema: el azul y el rojo de la leyenda no llegan a 4,5:1 sobre la tarjeta clara */}
+              <text x="10" y="38" fontSize="9" className={styles.svgAzul}>← hacia nosotros</text>
+              <text x="10" y="75" fontSize="9" className={styles.svgRojo}>← alejándose</text>
             </svg>
           </div>
 

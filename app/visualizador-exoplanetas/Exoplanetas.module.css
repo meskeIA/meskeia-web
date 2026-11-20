@@ -171,6 +171,19 @@
   align-items: center;
 }
 
+/* Rótulos de la curva de velocidad radial sobre la tarjeta: tono de texto por tema (C0297) */
+.svgAzul {
+  fill: #1D5FB8;
+}
+
+.svgRojo {
+  fill: var(--rojo-texto, #B91C1C);
+}
+
+[data-theme='dark'] .svgAzul {
+  fill: #7FB8FF;
+}
+
 .leyendaRadial {
   display: flex;
   gap: 2rem;
