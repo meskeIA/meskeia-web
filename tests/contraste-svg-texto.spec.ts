@@ -436,6 +436,10 @@ const APPS: App[] = [
   // #475569 fijo (1,92 en oscuro) y, en los tipos con ácido o base débil, «pKa» en #b45309 fijo (en
   // oscuro). Cada tipo de titulación, como subestado
   { slug: 'simulador-titulacion', extremos: true, subestados: "button[class*='tabBtn']" },
+  // 20/11/2026 (tanda 3): los límites de tramo en el color claro de su línea (12k ámbar 1,60:1, 20k
+  // naranja 2,17, 35k rojo 2,65, 60k violeta 2,61 en claro), «Después» en verde (3,16 en claro),
+  // «Antes» en rojo (3,60 en oscuro) y los ejes en #6b7280 fijo (3,60 en oscuro)
+  { slug: 'simulador-mito-tramo-superior', extremos: true },
 ];
 
 interface TextoSvg {

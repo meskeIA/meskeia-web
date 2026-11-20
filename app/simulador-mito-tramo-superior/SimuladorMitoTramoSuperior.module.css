@@ -504,6 +504,21 @@
   pointer-events: none;
 }
 
+/* Rótulos del gráfico (cabo C0297, 20/11/2026): los límites de tramo en el color claro de su línea
+   (12k ámbar 1,60:1, 20k naranja 2,17, 35k rojo 2,65 y 60k violeta 2,61 en claro), «Después» en
+   verde 16a34a (3,16 en claro), «Antes» en dc2626 (3,60 en oscuro) y los ejes en #6b7280 fijo (3,60
+   en oscuro); el color se queda en líneas y puntos, y el texto toma su tono por tema (el fill por
+   CSS manda sobre el atributo) */
+.tonoAmbar { fill: var(--ambar-texto, #8A5A00); }
+.tonoNaranja { fill: var(--naranja-texto, #B93E0B); }
+.tonoRojo { fill: var(--rojo-texto, #B91C1C); }
+.tonoVerde { fill: var(--verde-texto, #136E35); }
+.tonoVioleta { fill: #6D28D9; }
+.tonoRosa { fill: #BE185D; }
+
+[data-theme='dark'] .tonoVioleta { fill: #C4B5FD; }
+[data-theme='dark'] .tonoRosa { fill: #F9A8D4; }
+
 .graficoLeyenda {
   display: flex;
   justify-content: center;

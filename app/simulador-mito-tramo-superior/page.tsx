@@ -413,6 +413,9 @@ export default function SimuladorMitoTramoSuperiorPage() {
                 const x = grafico.sx(limite);
                 const colores = ['#fbbf24', '#fb923c', '#f87171', '#a78bfa', '#ec4899'];
                 const color = colores[i % colores.length];
+                // El color claro se queda en la línea; el rótulo, en el tono de texto de ese color
+                const tonos = [styles.tonoAmbar, styles.tonoNaranja, styles.tonoRojo, styles.tonoVioleta, styles.tonoRosa];
+                const tono = tonos[i % tonos.length];
                 return (
                   <g key={limite}>
                     <line
@@ -430,11 +433,11 @@ export default function SimuladorMitoTramoSuperiorPage() {
                       x={x}
                       y={grafico.padY - 8}
                       fontSize={10}
-                      fill={color}
+                      className={tono}
                       textAnchor="middle"
                       fontWeight={600}
                     >
-                      {(limite / 1000).toFixed(0)}k
+                      {formatNumber(limite / 1000, 0)}k
                     </text>
                   </g>
                 );
@@ -463,7 +466,7 @@ export default function SimuladorMitoTramoSuperiorPage() {
                     x={grafico.sx(antes.bruto)}
                     y={grafico.sy(antes.neto) - 12}
                     fontSize={10}
-                    fill="#dc2626"
+                    className={styles.tonoRojo}
                     textAnchor="middle"
                     fontWeight={700}
                   >
@@ -487,7 +490,7 @@ export default function SimuladorMitoTramoSuperiorPage() {
                     x={grafico.sx(despues.bruto)}
                     y={grafico.sy(despues.neto) - 12}
                     fontSize={10}
-                    fill="#16a34a"
+                    className={styles.tonoVerde}
                     textAnchor="middle"
                     fontWeight={700}
                   >
@@ -501,7 +504,7 @@ export default function SimuladorMitoTramoSuperiorPage() {
                 x={grafico.padX + grafico.innerW / 2}
                 y={grafico.alto - 4}
                 fontSize={11}
-                fill="#6b7280"
+                fill="var(--text-secondary)"
                 textAnchor="middle"
               >
                 Bruto anual (€)
@@ -510,7 +513,7 @@ export default function SimuladorMitoTramoSuperiorPage() {
                 x={12}
                 y={grafico.padY + grafico.innerH / 2}
                 fontSize={11}
-                fill="#6b7280"
+                fill="var(--text-secondary)"
                 textAnchor="middle"
                 transform={`rotate(-90 12 ${grafico.padY + grafico.innerH / 2})`}
               >
