@@ -455,6 +455,10 @@ const APPS: App[] = [
     extremos: true,
     subestados: "button[class*='toggleBtn']",
   },
+  // 20/11/2026 (tanda 3): «λ ≈ 12,5 cm» en el color de la onda (la marca 4,07:1 en claro, 3,50 en
+  // oscuro), las habitaciones del plano y los canales no recomendados en currentColor al 50 % (3,33
+  // en claro) y los canales 1, 6 y 11 y sus «CH» en la marca pura. Las dos frecuencias, como subestados
+  { slug: 'visualizador-como-funciona-wifi', secciones: SECCIONES, subestados: "button[class*='frecuenciaBtn']" },
 ];
 
 interface TextoSvg {

@@ -47,6 +47,10 @@ function SeccionOndas() {
       penetracion: 'Alta',
       canales: '14 (3 sin solape)',
       color: '#2E86AB',
+      // El color de la onda, como texto, no llega a 4,5:1 (4,07 en claro, 3,50 en oscuro; cabo C0297):
+      // el rótulo λ usa su tono de texto, y el botón activo su relleno de botón bajo el blanco
+      tonoTexto: 'var(--primary-texto)',
+      relleno: 'var(--primary-boton)',
       descripcion: 'Ondas más largas que atraviesan paredes mejor, pero con menos velocidad y más interferencias (microondas, Bluetooth, vecinos).',
     },
     '5': {
@@ -56,6 +60,8 @@ function SeccionOndas() {
       penetracion: 'Baja',
       canales: '25+ (sin solape)',
       color: '#48A9A6',
+      tonoTexto: 'var(--secondary-texto)',
+      relleno: 'var(--secondary-boton)',
       descripcion: 'Ondas más cortas y rápidas, pero se debilitan más con los obstáculos. Ideal para la misma habitación del router.',
     },
   };
@@ -82,7 +88,7 @@ function SeccionOndas() {
             strokeWidth="3"
             className={styles.ondaPath}
           />
-          <text x="200" y="110" textAnchor="middle" fill={activa.color} fontSize="12" fontWeight="600">
+          <text x="200" y="110" textAnchor="middle" fill={activa.tonoTexto} fontSize="12" fontWeight="600">
             {frecuenciaActiva === '2.4' ? 'λ ≈ 12,5 cm (onda más larga)' : 'λ ≈ 6 cm (onda más corta)'}
           </text>
         </svg>
@@ -93,7 +99,7 @@ function SeccionOndas() {
             className={`${styles.frecuenciaBtn} ${frecuenciaActiva === '2.4' ? styles.frecuenciaBtnActivo : ''}`}
             onClick={() => setFrecuenciaActiva('2.4')}
             aria-pressed={frecuenciaActiva === '2.4'}
-            style={frecuenciaActiva === '2.4' ? { background: '#2E86AB', borderColor: '#2E86AB' } : {}}
+            style={frecuenciaActiva === '2.4' ? { background: comparativa['2.4'].relleno, borderColor: comparativa['2.4'].relleno } : {}}
           >
             2,4 GHz
           </button>
@@ -102,7 +108,7 @@ function SeccionOndas() {
             className={`${styles.frecuenciaBtn} ${frecuenciaActiva === '5' ? styles.frecuenciaBtnActivo : ''}`}
             onClick={() => setFrecuenciaActiva('5')}
             aria-pressed={frecuenciaActiva === '5'}
-            style={frecuenciaActiva === '5' ? { background: '#48A9A6', borderColor: '#48A9A6' } : {}}
+            style={frecuenciaActiva === '5' ? { background: comparativa['5'].relleno, borderColor: comparativa['5'].relleno } : {}}
           >
             5 GHz
           </button>
@@ -188,10 +194,10 @@ function SeccionPropagacion() {
           <line x1="280" y1="160" x2="280" y2="280" stroke="currentColor" strokeWidth="3" opacity="0.3" />
 
           {/* Etiquetas de habitaciones */}
-          <text x="100" y="95" textAnchor="middle" fontSize="11" fill="currentColor" opacity="0.5">Salón</text>
-          <text x="300" y="95" textAnchor="middle" fontSize="11" fill="currentColor" opacity="0.5">Dormitorio</text>
-          <text x="140" y="225" textAnchor="middle" fontSize="11" fill="currentColor" opacity="0.5">Cocina</text>
-          <text x="340" y="225" textAnchor="middle" fontSize="11" fill="currentColor" opacity="0.5">Baño</text>
+          <text x="100" y="95" textAnchor="middle" fontSize="11" fill="var(--text-secondary)">Salón</text>
+          <text x="300" y="95" textAnchor="middle" fontSize="11" fill="var(--text-secondary)">Dormitorio</text>
+          <text x="140" y="225" textAnchor="middle" fontSize="11" fill="var(--text-secondary)">Cocina</text>
+          <text x="340" y="225" textAnchor="middle" fontSize="11" fill="var(--text-secondary)">Baño</text>
 
           {/* Círculos de señal - degradándose */}
           <circle cx="200" cy="150" r="40" fill="none" stroke="#27ae60" strokeWidth="2" opacity="0.7" />
@@ -308,8 +314,7 @@ function SeccionCanales() {
                     textAnchor="middle"
                     fontSize="10"
                     fontWeight={esRecomendado ? '700' : '400'}
-                    fill={esRecomendado ? '#2E86AB' : 'currentColor'}
-                    opacity={esRecomendado ? 1 : 0.5}
+                    fill={esRecomendado ? 'var(--primary-texto)' : 'var(--text-secondary)'}
                   >
                     {c.numero}
                   </text>
@@ -318,9 +323,9 @@ function SeccionCanales() {
             })}
 
             {/* Etiquetas recomendados */}
-            <text x="53" y="18" textAnchor="middle" fontSize="9" fill="#2E86AB" fontWeight="600">CH 1</text>
-            <text x="165" y="18" textAnchor="middle" fontSize="9" fill="#2E86AB" fontWeight="600">CH 6</text>
-            <text x="277" y="18" textAnchor="middle" fontSize="9" fill="#2E86AB" fontWeight="600">CH 11</text>
+            <text x="53" y="18" textAnchor="middle" fontSize="9" fill="var(--primary-texto)" fontWeight="600">CH 1</text>
+            <text x="165" y="18" textAnchor="middle" fontSize="9" fill="var(--primary-texto)" fontWeight="600">CH 6</text>
+            <text x="277" y="18" textAnchor="middle" fontSize="9" fill="var(--primary-texto)" fontWeight="600">CH 11</text>
           </svg>
         </div>
 
