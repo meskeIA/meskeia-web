@@ -102,7 +102,8 @@ const PIRAMIDE: NivelPiramide[] = [
   {
     nombre: 'Clase Media',
     porcentaje: 50,
-    color: '#2E86AB',
+    // Marca y teal oscurecidos lo justo para el blanco del rótulo: puros daban 4,11 y 2,77:1 (C0297)
+    color: '#26718F',
     desc: 'Empleados de cuello blanco, autónomos, técnicos, pequeños empresarios.',
     economia: 'Salarios medios, hipoteca o alquiler, ahorro limitado.',
     cultura: 'Consumo cultural moderado, educación obligatoria + algo de formación.',
@@ -111,7 +112,7 @@ const PIRAMIDE: NivelPiramide[] = [
   {
     nombre: 'Clase Baja',
     porcentaje: 30,
-    color: '#48A9A6',
+    color: '#327874',
     desc: 'Trabajadores manuales, empleos precarios, desempleados estructurales.',
     economia: 'Ingresos bajos e inestables, dependencia de prestaciones, sin ahorro.',
     cultura: 'Capital cultural escaso, abandono escolar frecuente.',
@@ -374,7 +375,7 @@ export default function VisualizadorEstrategicacionSocial() {
                   opacity={nivelSeleccionado !== null && !isSelected ? 0.5 : 1} />
                 <text x={anchoTotal / 2} y={y + altura / 2 + 1} textAnchor="middle" fill="#fff"
                   fontSize={11} fontWeight="600" dominantBaseline="middle">
-                  {nivel.nombre} ({nivel.porcentaje}%)
+                  {nivel.nombre} ({nivel.porcentaje}&nbsp;%)
                 </text>
               </g>
             );
@@ -405,7 +406,8 @@ export default function VisualizadorEstrategicacionSocial() {
       { nombre: 'Media-baja', pct: 18, w: 140 },
       { nombre: 'Clase baja', pct: 7, w: 60 },
     ];
-    const colores = ['#1a1a2e', '#16213e', '#2E86AB', '#48A9A6', '#7FB3D3'];
+    // Oscurecidos lo justo para el blanco del rótulo (el acento 7FB3D3 daba 2,2:1; C0297)
+    const colores = ['#1a1a2e', '#16213e', '#26718F', '#327874', '#3D6E8C'];
     const alturaFila = 42;
     return (
       <div className={styles.piramideSvgWrapper}>
@@ -418,7 +420,7 @@ export default function VisualizadorEstrategicacionSocial() {
                 <rect x={x} y={y} width={n.w} height={alturaFila - 2} fill={colores[i]} rx={3} />
                 <text x={130} y={y + alturaFila / 2} textAnchor="middle" fill="#fff"
                   fontSize={10} fontWeight="600" dominantBaseline="middle">
-                  {n.nombre} ({n.pct}%)
+                  {n.nombre} ({n.pct}&nbsp;%)
                 </text>
               </g>
             );
@@ -711,14 +713,14 @@ export default function VisualizadorEstrategicacionSocial() {
                   {/* Columna padre */}
                   {['Alta', 'Media-Alta', 'Media-Baja', 'Baja'].map((clase, i) => (
                     <g key={clase}>
-                      <rect x={10} y={i * 40 + 10} width={80} height={32} fill={['#1a1a2e', '#16213e', '#2E86AB', '#48A9A6'][i]} rx={4} />
+                      <rect x={10} y={i * 40 + 10} width={80} height={32} fill={['#1a1a2e', '#16213e', '#26718F', '#327874'][i]} rx={4} />
                       <text x={50} y={i * 40 + 30} textAnchor="middle" fill="#fff" fontSize={9} fontWeight="600">{clase}</text>
                     </g>
                   ))}
                   {/* Columna hijo */}
                   {['Alta', 'Media-Alta', 'Media-Baja', 'Baja'].map((clase, i) => (
                     <g key={clase}>
-                      <rect x={310} y={i * 40 + 10} width={80} height={32} fill={['#1a1a2e', '#16213e', '#2E86AB', '#48A9A6'][i]} rx={4} />
+                      <rect x={310} y={i * 40 + 10} width={80} height={32} fill={['#1a1a2e', '#16213e', '#26718F', '#327874'][i]} rx={4} />
                       <text x={350} y={i * 40 + 30} textAnchor="middle" fill="#fff" fontSize={9} fontWeight="600">{clase}</text>
                     </g>
                   ))}
