@@ -1400,6 +1400,42 @@ test.describe('simulador-vsepr · re-inspección 08/11/2026 · con la página tr
     }
     expect(errores).toEqual([]);
   });
+
+  test('C0824 · traducida, al volver a un caso comprobado la ficha, la partida y el veredicto son los suyos', async ({ page }) => {
+    // REPARADO el 20/11/2026 (cabo C0824, la forma del hallazgo 3907 de simulador-ecosistema-trofico):
+    // «Parte de: {molécula}», «X = {n} · E = {n}», «Punto de partida: …» y el texto del veredicto
+    // eran nodos de texto con hermanos; con la página traducida React escribía en los que el
+    // traductor había retirado y se quedaba lo del caso anterior. Ahora cada uno es hijo único.
+    // Caso 1 acertado (CH₄ → «Pirámide trigonal», A_MANO_AULA), caso 6 fallado (H₂O), traducir y
+    // volver al caso 1: lo esperado es lo del caso 1 sin traducir.
+    const caso1 = CASOS_AULA[0];
+    const caso6 = CASOS_AULA[5];
+    const g1 = geometriaDe(caso1.datos.inicio.enlaces, caso1.datos.inicio.libres);
+    expect(caso6.datos.inicio.molecula).not.toBe(caso1.datos.inicio.molecula);
+    const fallo = caso6.opciones.find((o) => o.valor !== caso6.respuesta);
+    if (!g1 || !fallo) throw new Error('casos de aula sin la forma esperada');
+
+    await seccion(page).getByRole('button', { name: /^Caso 1:/ }).click();
+    await seccion(page).getByRole('radio', { name: 'Pirámide trigonal', exact: true }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await seccion(page).getByRole('button', { name: /^Caso 6:/ }).click();
+    await seccion(page).getByRole('radio', { name: fallo.texto, exact: true }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await expect(seccion(page).locator('p[role="alert"]')).toContainText('No. Predijiste');
+
+    await traducirPagina(page);
+    await expect(seccion(page).locator('font').first(), 'la sección quedó traducida').toBeAttached();
+    await seccion(page).getByRole('button', { name: /^Caso 1:/ }).click();
+
+    const caso = seccion(page).locator('article');
+    await expect(caso).toContainText(`Parte de: ${caso1.datos.inicio.molecula}`);
+    await expect(caso).toContainText(`X = ${caso1.datos.inicio.enlaces} · E = ${caso1.datos.inicio.libres}`);
+    await expect(caso).toContainText(`Punto de partida: ${g1.notacion} ·`);
+    await expect(caso).not.toContainText(`Parte de: ${caso6.datos.inicio.molecula}`);
+    await expect(seccion(page).locator('p[role="alert"]')).toContainText('¡Correcto! La respuesta es «Pirámide trigonal».');
+    await expect(seccion(page).locator('p[role="alert"]')).not.toContainText('Predijiste');
+    expect(errores).toEqual([]);
+  });
 });
 
 test.describe('simulador-vsepr · re-inspección 08/11/2026 · a 390 px con la guía abierta', () => {

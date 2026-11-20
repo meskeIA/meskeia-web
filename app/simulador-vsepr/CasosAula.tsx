@@ -219,10 +219,11 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
         </h3>
 
         <p className={styles.aulaFicha}>
-          <span className={styles.aulaFichaDato}>Parte de: {inicio.molecula}</span>
-          <span className={styles.aulaFichaDato}>
-            X = {inicio.enlaces} · E = {inicio.libres}
-          </span>
+          {/* Cada texto variable, hijo único de su elemento: junto a texto fijo, con la página
+              traducida React escribía en un nodo que el traductor ya había retirado y se quedaba el
+              del caso anterior (C0824, la forma del hallazgo 3907 de simulador-ecosistema-trofico) */}
+          <span className={styles.aulaFichaDato}>{`Parte de: ${inicio.molecula}`}</span>
+          <span className={styles.aulaFichaDato}>{`X = ${inicio.enlaces} · E = ${inicio.libres}`}</span>
           <span className={styles.aulaFichaDato}>{cambioCorto(datos.cambio)}</span>
         </p>
 
@@ -233,9 +234,7 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
 
         {geometriaInicio && (
           <p className={styles.aulaPartida}>
-            Punto de partida: {geometriaInicio.notacion} · geometría electrónica{' '}
-            {geometriaInicio.geomElectronica.toLowerCase()} · geometría molecular{' '}
-            {geometriaInicio.geomMolecular.toLowerCase()}
+            {`Punto de partida: ${geometriaInicio.notacion} · geometría electrónica ${geometriaInicio.geomElectronica.toLowerCase()} · geometría molecular ${geometriaInicio.geomMolecular.toLowerCase()}`}
           </p>
         )}
 
@@ -309,13 +308,15 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
             <span aria-hidden="true">
               {veredicto.correcto ? '✅' : veredicto.motivo === 'vacia' ? '✏️' : '❌'}
             </span>{' '}
-            {veredicto.correcto
-              ? `¡Correcto! La respuesta es «${pregunta.respuestaTexto}».`
-              : veredicto.motivo === 'vacia'
-                ? 'Elige una de las opciones antes de comprobar.'
-                : veredicto.motivo === 'no-disponible'
-                  ? 'Este caso no está disponible.'
-                  : `No. Predijiste «${textoElegido}» y la respuesta es «${pregunta.respuestaTexto}». Carga el punto de partida, haz el cambio y mira por qué.`}
+            <span>
+              {veredicto.correcto
+                ? `¡Correcto! La respuesta es «${pregunta.respuestaTexto}».`
+                : veredicto.motivo === 'vacia'
+                  ? 'Elige una de las opciones antes de comprobar.'
+                  : veredicto.motivo === 'no-disponible'
+                    ? 'Este caso no está disponible.'
+                    : `No. Predijiste «${textoElegido}» y la respuesta es «${pregunta.respuestaTexto}». Carga el punto de partida, haz el cambio y mira por qué.`}
+            </span>
           </p>
         )}
 

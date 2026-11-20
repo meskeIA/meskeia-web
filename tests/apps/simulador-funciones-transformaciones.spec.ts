@@ -1,5 +1,11 @@
 import { test, expect, Page, Locator } from '@playwright/test';
-import { esperarHidratacion, esperarPaginaAsentada, leerValorEnReact, sembrarValor } from './_hidratacion';
+import {
+  asentarAntesDeTraducir,
+  esperarHidratacion,
+  esperarPaginaAsentada,
+  leerValorEnReact,
+  sembrarValor,
+} from './_hidratacion';
 
 /**
  * simulador-funciones-transformaciones · casos para clase (tarea de tipo C, 28/09/2026)
@@ -218,7 +224,63 @@ test.describe('simulador-funciones-transformaciones · la sección de casos en e
     await expect(veredicto).not.toContainText('Correcto');
     await expect(veredicto).toContainText('No se mueve');
   });
+
+  test('C0824 · traducida, al volver a un caso comprobado la ficha y el veredicto son los suyos', async ({ page }) => {
+    // REPARADO el 20/11/2026 (cabo C0824, la forma del hallazgo 3907 de simulador-ecosistema-trofico):
+    // «Función base: …», «Deslizador: …», «De … a …» y el texto del veredicto eran nodos de texto con
+    // hermanos; con la página traducida React escribía en los que el traductor había retirado y se
+    // quedaba lo del caso anterior. Ahora cada uno es hijo único de su elemento.
+    // Caso 1 acertado, caso 4 fallado, traducir y volver al caso 1: lo esperado es la ficha que el
+    // caso 1 enseñaba antes de traducir. El veredicto aquí no se conserva por caso (se desmonta al
+    // cambiar de caso y nace nuevo, sin traducir), así que no podía quedarse viejo: se comprueba
+    // solo que al volver no queda ninguno del caso 4.
+    const ficha = seccion(page).locator('article > p').first();
+    const veredicto = seccion(page).getByRole('alert');
+    const limpio = async (l: Locator) => ((await l.textContent()) ?? '').replace(/\s+/g, ' ').trim();
+
+    await seccion(page).getByRole('button', { name: /^Caso 1:/ }).click();
+    await seccion(page).getByRole('radio', { name: 'Se desplaza a la derecha' }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto).toContainText('¡Correcto!');
+    const fichaCaso1 = await limpio(ficha);
+
+    await seccion(page).getByRole('button', { name: /^Caso 4:/ }).click();
+    await seccion(page).getByRole('radio', { name: 'Se desplaza a la derecha' }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto).toContainText('No. Predijiste');
+    expect(await limpio(ficha), 'el caso 4 tiene otra ficha').not.toBe(fichaCaso1);
+
+    await traducirPagina(page);
+    await expect(seccion(page).locator('font').first(), 'la sección quedó traducida').toBeAttached();
+    await seccion(page).getByRole('button', { name: /^Caso 1:/ }).click();
+    await expect.poll(() => limpio(ficha)).toBe(fichaCaso1);
+    await expect(veredicto).toHaveCount(0);
+  });
 });
+
+/** Traductor simulado de los testigos C0243 / C0312: cada nodo de texto visible, a <font><font>. */
+async function traducirPagina(page: Page): Promise<void> {
+  await asentarAntesDeTraducir(page);
+  await page.evaluate(() => {
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════════
  * INSPECTOR 28/09/2026 — primera inspección (segmento cálculo, riesgo 3)

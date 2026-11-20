@@ -209,10 +209,13 @@ export default function CasosAula({ onCargar }: Props) {
         </h3>
 
         <p className={styles.aulaFicha}>
-          <span className={styles.aulaFichaDato}>Función base: {nombreFuncion(datos.funcion)}</span>
-          <span className={styles.aulaFichaDato}>Deslizador: {datos.parametro}</span>
+          {/* Cada texto variable, hijo único de su elemento: junto a texto fijo, con la página
+              traducida React escribía en un nodo que el traductor ya había retirado y se quedaba el
+              del caso anterior (C0824, la forma del hallazgo 3907 de simulador-ecosistema-trofico) */}
+          <span className={styles.aulaFichaDato}>{`Función base: ${nombreFuncion(datos.funcion)}`}</span>
+          <span className={styles.aulaFichaDato}>{`Deslizador: ${datos.parametro}`}</span>
           <span className={styles.aulaFichaDato}>
-            De {cifra(datos.antes[datos.parametro])} a {cifra(datos.nuevoValor)}
+            {`De ${cifra(datos.antes[datos.parametro])} a ${cifra(datos.nuevoValor)}`}
           </span>
         </p>
 
@@ -277,13 +280,15 @@ export default function CasosAula({ onCargar }: Props) {
             aria-live="polite"
           >
             <span aria-hidden="true">{veredicto.correcto ? '✅' : '❌'}</span>{' '}
-            {veredicto.correcto
-              ? `¡Correcto! La respuesta es «${textoCorrecto}».`
-              : veredicto.motivo === 'vacia'
-                ? 'Elige una de las tres opciones antes de comprobar.'
-                : veredicto.motivo === 'no-disponible'
-                  ? 'Este caso no está disponible.'
-                  : `No. Predijiste «${textoElegido}» y la respuesta es «${textoCorrecto}». Lee por qué y compruébalo en el simulador.`}
+            <span>
+              {veredicto.correcto
+                ? `¡Correcto! La respuesta es «${textoCorrecto}».`
+                : veredicto.motivo === 'vacia'
+                  ? 'Elige una de las tres opciones antes de comprobar.'
+                  : veredicto.motivo === 'no-disponible'
+                    ? 'Este caso no está disponible.'
+                    : `No. Predijiste «${textoElegido}» y la respuesta es «${textoCorrecto}». Lee por qué y compruébalo en el simulador.`}
+            </span>
           </p>
         )}
 
