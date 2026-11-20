@@ -334,10 +334,10 @@ test.describe('Foco, anuncios y selector', () => {
     expect(await page.locator('[class$="_seguirWrapper"]').ariaSnapshot()).not.toContain('🚿');
   });
 
-  test('HALLAZGO (19/11/2026, ABIERTO) · 🗑️ borra la rutina al instante, sin confirmar ni deshacer', async ({ page }) => {
+  test('HALLAZGO 5294 (19/11/2026, REPARADO 20/11/2026) · 🗑️ borraba la rutina al instante, sin confirmar ni deshacer', async ({ page }) => {
     // La guía avisa de «Borrar las rutinas guardadas accidentalmente», pero el borrado está en la
-    // lista, junto a «Iniciar», y no pide confirmación ni deja deshacer.
-    test.fail();
+    // lista, junto a «Iniciar», y no pedía confirmación ni dejaba deshacer. Decidido por el usuario
+    // (C0853): «Deshacer» unos segundos, sin diálogo.
     let dialogo = false;
     page.on('dialog', (d) => {
       dialogo = true;
@@ -349,6 +349,49 @@ test.describe('Foco, anuncios y selector', () => {
     await page.getByRole('button', { name: 'Eliminar rutina Tarde' }).click();
     const salvavidas = page.getByRole('button', { name: /deshacer|confirmar|sí, eliminar|eliminar definitivamente/i });
     expect(dialogo || (await salvavidas.count()) > 0).toBe(true);
+  });
+
+  test('REPARADO 5294 · «Deshacer» devuelve la rutina a SU sitio, con el foco en su nombre, y lo guarda', async ({ page }) => {
+    await abrir(page);
+    await crearRutina(page, 'Tarde', [['Merendar', 15]]);
+    await page.getByRole('button', { name: /Guardar rutina/ }).click();
+    await expect(nombresTarjetas(page)).toHaveText(['Mañana', 'Tarde']);
+
+    // Se borra la PRIMERA: al deshacer tiene que volver delante, no al final
+    await page.getByRole('button', { name: 'Eliminar rutina Mañana' }).click();
+    await expect(nombresTarjetas(page)).toHaveText(['Tarde']);
+    const aviso = page.getByRole('status').filter({ hasText: 'borrada' });
+    await expect(aviso).toContainText('Rutina «Mañana» borrada.');
+    const deshacer = page.getByRole('button', { name: 'Deshacer', exact: true });
+    await expect(deshacer).toBeFocused();
+    expect((await leerGuardado(page)).map((r) => r.nombre)).toEqual(['Tarde']);
+
+    await deshacer.click();
+    await expect(nombresTarjetas(page)).toHaveText(['Mañana', 'Tarde']);
+    await expect(nombresTarjetas(page).first()).toBeFocused();
+    await expect(deshacer).toHaveCount(0);
+    expect((await leerGuardado(page)).map((r) => r.nombre)).toEqual(['Mañana', 'Tarde']);
+    expect((await leerGuardado(page))[0].tareas).toHaveLength(6);
+  });
+
+  test('REPARADO 5294 · el aviso caduca a los 8 s sin el foco, pero no mientras «Deshacer» lo tiene', async ({ page }) => {
+    await page.clock.install();
+    await abrir(page);
+    await page.getByRole('button', { name: 'Eliminar rutina Mañana' }).click();
+    const deshacer = page.getByRole('button', { name: 'Deshacer', exact: true });
+    await expect(deshacer).toBeFocused();
+
+    // Con el foco en «Deshacer» (el teclado llega ahí solo), el plazo no corre
+    await page.clock.runFor(20_000);
+    await expect(deshacer).toBeVisible();
+
+    // Sin el foco, a los 8 s se retira y el borrado se queda
+    await page.locator('h2', { hasText: 'Mis rutinas' }).focus();
+    await page.clock.runFor(7_000);
+    await expect(deshacer).toBeVisible();
+    await page.clock.runFor(1_500);
+    await expect(deshacer).toHaveCount(0);
+    expect(await leerGuardado(page)).toEqual([]);
   });
 });
 

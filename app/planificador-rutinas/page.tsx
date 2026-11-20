@@ -93,6 +93,9 @@ const guardarRutinas = (rutinas: Rutina[]) => {
 
 type Vista = 'lista' | 'editor' | 'seguir';
 
+/** Lo que dura el aviso «Deshacer» tras borrar una rutina, sin contar el rato que tiene el foco */
+const SEGUNDOS_DESHACER = 8;
+
 export default function PlanificadorRutinasPage() {
   const [rutinas, setRutinas] = useState<Rutina[]>([]);
   const [rutinaActiva, setRutinaActiva] = useState<Rutina | null>(null);
@@ -108,6 +111,13 @@ export default function PlanificadorRutinasPage() {
   const [mostrarPicker, setMostrarPicker] = useState(false);
   const [modoEdicion, setModoEdicion] = useState<'nueva' | string>('nueva'); // 'nueva' o id de rutina
   const [cargado, setCargado] = useState(false);
+
+  // Borrar una rutina deja unos segundos «Deshacer» (hallazgo 5294; decidido por el usuario el
+  // 20/11/2026, cabo C0853): no frena a quien borra a propósito y salva el toque accidental. El
+  // plazo no corre mientras «Deshacer» tiene el foco, para que con teclado no desaparezca bajo él.
+  const [borrada, setBorrada] = useState<{ rutina: Rutina; indice: number } | null>(null);
+  const [deshacerConFoco, setDeshacerConFoco] = useState(false);
+  const deshacerRef = useRef<HTMLButtonElement>(null);
 
   // Las tres vistas son ramas del mismo componente: al pasar de una a otra el control pulsado
   // desaparece (el foco caía a <body>) y la vista nueva heredaba el desplazamiento de la anterior
@@ -133,6 +143,18 @@ export default function PlanificadorRutinasPage() {
     enfocarALaVista(destino());
   });
 
+  useEffect(() => {
+    if (!borrada || deshacerConFoco) return;
+    const plazo = window.setTimeout(() => setBorrada(null), SEGUNDOS_DESHACER * 1000);
+    return () => window.clearTimeout(plazo);
+  }, [borrada, deshacerConFoco]);
+
+  // Al salir de la lista, el aviso se retira: «Deshacer» deja de estar montado y su blur no llega
+  const olvidarBorrado = () => {
+    setBorrada(null);
+    setDeshacerConFoco(false);
+  };
+
   // Cargar desde localStorage
   useEffect(() => {
     setRutinas(cargarRutinas());
@@ -154,6 +176,7 @@ export default function PlanificadorRutinasPage() {
   // ——— EDITOR ———
 
   const abrirNuevaRutina = () => {
+    olvidarBorrado();
     setNombreRutina('Nueva rutina');
     setTareas([]);
     setNuevoEmoji('⭐');
@@ -166,6 +189,7 @@ export default function PlanificadorRutinasPage() {
   };
 
   const abrirEditorRutina = (rutina: Rutina) => {
+    olvidarBorrado();
     setNombreRutina(rutina.nombre);
     setTareas(rutina.tareas.map(t => ({ ...t, completada: false })));
     setNuevoEmoji('⭐');
@@ -241,13 +265,30 @@ export default function PlanificadorRutinasPage() {
   };
 
   const eliminarRutina = (id: string) => {
+    const indice = rutinas.findIndex(r => r.id === id);
+    if (indice < 0) return;
+    setBorrada({ rutina: rutinas[indice], indice });
     setRutinas(prev => prev.filter(r => r.id !== id));
-    pedirFoco(() => misRutinasRef.current);
+    pedirFoco(() => deshacerRef.current);
+  };
+
+  const deshacerBorrado = () => {
+    if (!borrada) return;
+    const { rutina, indice } = borrada;
+    setRutinas(prev => {
+      const copia = [...prev];
+      copia.splice(Math.min(indice, copia.length), 0, rutina);
+      return copia;
+    });
+    olvidarBorrado();
+    // La tarjeta recuperada, en su sitio, a la vista y con el foco en su nombre
+    pedirFoco(() => document.querySelector<HTMLElement>(`[data-rutina-id="${rutina.id}"] h3`));
   };
 
   // ——— MODO SEGUIR ———
 
   const iniciarRutina = (rutina: Rutina) => {
+    olvidarBorrado();
     setRutinaActiva({
       ...rutina,
       tareas: rutina.tareas.map(t => ({ ...t, completada: false })),
@@ -663,6 +704,25 @@ export default function PlanificadorRutinasPage() {
           </div>
         )}
 
+        {/* Región viva siempre montada: el aviso entra y sale dentro de ella */}
+        <div role="status" aria-live="polite">
+          {borrada && (
+            <p className={styles.avisoBorrado}>
+              <span>Rutina «{borrada.rutina.nombre}» borrada.</span>
+              <button
+                type="button"
+                ref={deshacerRef}
+                className={styles.btnDeshacer}
+                onClick={deshacerBorrado}
+                onFocus={() => setDeshacerConFoco(true)}
+                onBlur={() => setDeshacerConFoco(false)}
+              >
+                Deshacer
+              </button>
+            </p>
+          )}
+        </div>
+
         <div className={styles.rutinasGrid}>
           {rutinas.map(rutina => (
             <div key={rutina.id} className={styles.rutinaCard} data-rutina-id={rutina.id}>
@@ -958,7 +1018,7 @@ export default function PlanificadorRutinasPage() {
               <li><strong>Cambiar los emojis sin avisar:</strong> para muchos usuarios con TEA, el emoji específico es parte de la rutina. Cambiar <span role="img" aria-label="vaso de leche">🥛</span> por <span role="img" aria-label="biberón">🍼</span> para representar el desayuno puede generar confusión o rechazo. Si necesitas cambiar un emoji, hazlo de forma gradual y explicada.</li>
               <li><strong>No dejar tiempo suficiente entre tareas:</strong> las personas con TEA o DI pueden necesitar más tiempo para completar cada paso. Una rutina ajustada al tiempo del adulto puede generar estrés en lugar de reducirlo.</li>
               <li><strong>Usar la app como castigo o presión:</strong> &quot;Si no pulsas HECHO, no salimos&quot; convierte una herramienta de apoyo en una fuente de estrés. La agenda visual debe asociarse con seguridad y autonomía, nunca con control o castigo.</li>
-              <li><strong>Borrar las rutinas guardadas accidentalmente:</strong> si vas a dejar que el usuario use el dispositivo de forma autónoma, considera restringir el acceso al modo editor. Los datos se guardan localmente y si se borran, hay que volver a crearlos.</li>
+              <li><strong>Borrar las rutinas guardadas accidentalmente:</strong> si vas a dejar que el usuario use el dispositivo de forma autónoma, considera restringir el acceso al modo editor. Al borrar una rutina, «Deshacer» la recupera durante unos segundos; pasado ese rato, o si se borran los datos del navegador, hay que volver a crearla.</li>
               <li><strong>Esta app no es un sistema de gestión conductual:</strong> el planificador visual apoya las rutinas, pero no reemplaza un plan de intervención conductual diseñado por un especialista (psicólogo, terapeuta ocupacional, educador especial).</li>
             </ul>
           </div>
