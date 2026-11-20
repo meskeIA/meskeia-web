@@ -82,6 +82,15 @@ const COLORES_GRUPO: Record<string, string> = {
   royalty: '#8e44ad',
 };
 
+/** La clase con el tono de TEXTO de cada grupo, legible en los dos temas (C0297) */
+const TONO_GRUPO: Record<string, string> = {
+  animales: styles.tonoAnimales,
+  colores: styles.tonoColores,
+  verbos: styles.tonoVerbos,
+  comida: styles.tonoComida,
+  royalty: styles.tonoRoyalty,
+};
+
 // Similitud aproximada: distancia euclidiana inversa
 function similitudCercanos(origen: Punto, todos: Punto[]): Punto[] {
   return todos
@@ -482,7 +491,7 @@ export default function VisualizadorLlmFuncionamiento() {
                 <g opacity="0.7">
                   <line x1="30" y1="48" x2="37" y2="42" stroke="#8e44ad" strokeWidth="0.8" strokeDasharray="1.5 1" markerEnd="url(#arrowhead)" />
                   <line x1="28" y1="55" x2="35" y2="50" stroke="#8e44ad" strokeWidth="0.8" strokeDasharray="1.5 1" />
-                  <text x="22" y="38" fontSize="2.8" fill="#8e44ad" fontWeight="700">Rey − Hombre + Mujer ≈ Reina</text>
+                  <text x="22" y="38" fontSize="2.8" className={styles.tonoRoyalty} fontWeight="700">Rey − Hombre + Mujer ≈ Reina</text>
                 </g>
               )}
               <defs>
@@ -533,7 +542,7 @@ export default function VisualizadorLlmFuncionamiento() {
                       x={p.x + 2.5}
                       y={p.y - 1.5}
                       fontSize="3.2"
-                      fill={COLORES_GRUPO[p.grupo]}
+                      className={TONO_GRUPO[p.grupo]}
                       fontWeight={esSeleccionado || esCercano ? '700' : '400'}
                       opacity={puntoSeleccionado && !esSeleccionado && !esCercano ? 0.4 : 1}
                     >
@@ -553,7 +562,7 @@ export default function VisualizadorLlmFuncionamiento() {
               <div className={styles.cercanosList}>
                 {cercanos.map((c, i) => (
                   <span key={c.palabra} className={styles.cercanoPill} style={{ borderColor: COLORES_GRUPO[c.grupo] }}>
-                    <span style={{ color: COLORES_GRUPO[c.grupo] }}>#{i + 1}</span> {c.palabra}
+                    <span className={TONO_GRUPO[c.grupo]}>#{i + 1}</span> {c.palabra}
                   </span>
                 ))}
               </div>

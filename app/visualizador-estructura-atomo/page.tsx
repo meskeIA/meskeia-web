@@ -277,8 +277,18 @@ function AtomoSVG({ elemento }: { elemento: Elemento }) {
         });
       })}
 
-      {/* Etiqueta del elemento */}
-      <text x={cx} y={cy + 2} textAnchor="middle" dominantBaseline="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">
+      {/* Etiqueta del elemento bajo el núcleo, sobre una placa del color de la tarjeta (C0297): el
+          texto del tema iba encima de los protones rojos y los neutrones grises (4,16:1 en claro,
+          2,66-3,41 en oscuro), y una placa en el centro taparía el núcleo del hidrógeno */}
+      <rect
+        x={cx - (elemento.simbolo.length * 8 + 8) / 2}
+        y={cy + nucleoR + 3}
+        width={elemento.simbolo.length * 8 + 8}
+        height={16}
+        rx={4}
+        fill="var(--bg-card)"
+      />
+      <text x={cx} y={cy + nucleoR + 12} textAnchor="middle" dominantBaseline="middle" fill="var(--text-primary)" fontSize="11" fontWeight="bold">
         {elemento.simbolo}
       </text>
     </svg>
@@ -618,7 +628,7 @@ export default function EstructuraAtomoPage() {
                       <text x="150" y="78" textAnchor="middle" fill="var(--text-primary)" fontSize="9" fontWeight="bold">Núcleo</text>
                       {/* Electrón en las gradas */}
                       <circle cx="280" cy="50" r="3" fill="#2E86AB" />
-                      <text x="270" y="40" textAnchor="middle" fill="#2E86AB" fontSize="8">e⁻</text>
+                      <text x="270" y="40" textAnchor="middle" fill="var(--primary-texto)" fontSize="8">e⁻</text>
                     </svg>
                   </div>
                   <p className={styles.analogiaTexto}>

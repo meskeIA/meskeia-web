@@ -11,6 +11,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 import styles from './SimuladorGrafos.module.css';
 import { RESPUESTA_FAQ_BFS_DFS } from './metadata';
 
@@ -1824,7 +1825,9 @@ export default function SimuladorGrafosPage() {
                 {/* Nodos */}
                 {nodos.map((n) => {
                   const estado = estadoVisualNodo(n);
-                  const color = colorDeEstado(estado);
+                  // Relleno y tinta del mismo color (C0297): el blanco fijo daba 2,57:1 sobre el gris
+                  // de los no visitados y 3,33 sobre el verde del origen
+                  const { relleno: color, tinta } = rellenoConTinta(colorDeEstado(estado));
                   return (
                     <g
                       key={n.id}
@@ -1846,7 +1849,7 @@ export default function SimuladorGrafosPage() {
                         strokeWidth={(seleccionAristaFrom === n.id ? 4 : 2) * dim.trazo}
                         className={styles.nodoCircle}
                       />
-                      <text x={n.x} y={n.y} className={styles.nodoLabel} fill="white">
+                      <text x={n.x} y={n.y} className={styles.nodoLabel} fill={tinta}>
                         {n.id}
                       </text>
                     </g>
@@ -1858,7 +1861,7 @@ export default function SimuladorGrafosPage() {
                     x={SVG_WIDTH / 2}
                     y={SVG_HEIGHT / 2}
                     textAnchor="middle"
-                    fill={COLOR_NO_VISITADO}
+                    fill="var(--text-secondary)"
                     fontSize={Math.max(16, FUENTE_NODO_MIN_PX / pxPorUnidad)}
                     style={{ pointerEvents: 'none' }}
                   >

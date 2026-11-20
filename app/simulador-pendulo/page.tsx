@@ -270,7 +270,7 @@ export default function SimuladorPenduloPage() {
   function renderChart(historial: number[], color: string) {
     if (historial.length < 2) {
       return (
-        <text x={chartW / 2} y={chartH / 2} textAnchor="middle" fill="#9ca3af" fontSize="12">
+        <text x={chartW / 2} y={chartH / 2} textAnchor="middle" fill="var(--text-secondary)" fontSize="12">
           Esperando datos…
         </text>
       );

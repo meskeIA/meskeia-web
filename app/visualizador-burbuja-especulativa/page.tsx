@@ -417,12 +417,14 @@ export default function VisualizadorBurbujaEspeculativa() {
 
                 {/* Punto de pico */}
                 <circle cx="440" cy="30" r="5" fill="#EF4444" />
-                <text x="440" y="20" textAnchor="middle" fontSize="10" fill="#EF4444" fontWeight="bold">
+                {/* Rótulos en tono de texto (C0297): el rojo puro daba 3,61:1 en claro y 3,21 en oscuro, y
+                    PRECIO al 50 % de opacidad 3,30 */}
+                <text x="440" y="20" textAnchor="middle" fontSize="10" fill="var(--rojo-texto, #B91C1C)" fontWeight="bold">
                   PICO
                 </text>
 
                 {/* Eje Y label */}
-                <text x="8" y="20" fontSize="10" fill="currentColor" opacity="0.5" writingMode="tb">
+                <text x="8" y="20" fontSize="10" fill="currentColor" opacity="0.8" writingMode="tb">
                   PRECIO
                 </text>
               </svg>

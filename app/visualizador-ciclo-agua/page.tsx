@@ -102,6 +102,19 @@ const DATOS_FASCINANTES: DatoFascinante[] = [
   { icono: '\u26A1', texto: 'Una nube de tormenta (cumulonimbo) contiene unas 500.000 toneladas de agua en suspension.' },
 ];
 
+// Rótulo del diagrama sobre una placa oscura (C0297): el blanco con un halo translúcido iba directo
+// sobre el cielo claro (1,75:1 en Condensacion y Precipitacion) y el del acuífero, al 60 %, sobre el
+// subsuelo (3,16). La placa sigue al texto: ancho estimado por número de letras a 12 px en negrita.
+function RotuloDiagrama({ x, y, texto }: { x: number; y: number; texto: string }) {
+  const ancho = texto.length * 7.4 + 10;
+  return (
+    <g>
+      <rect x={x - ancho / 2} y={y - 13} width={ancho} height={18} rx={5} fill="rgba(0,0,0,0.6)" />
+      <text x={x} y={y} className={styles.etapaLabelText}>{texto}</text>
+    </g>
+  );
+}
+
 // ─────────────────────────────────────────────
 // Seccion 1: El Ciclo Completo
 // ─────────────────────────────────────────────
@@ -137,8 +150,9 @@ function SeccionCiclo() {
 
           {/* Subsuelo */}
           <rect x="0" y="400" width="800" height="100" fill="#8B7355" opacity="0.4" />
-          <text x="200" y="450" fontSize="11" fill="white" fontWeight="600" opacity="0.6" textAnchor="middle">Acuifero subterraneo</text>
           <ellipse cx="200" cy="460" rx="100" ry="20" fill="#3498db" opacity="0.3" />
+          {/* Después del acuífero, que se pintaba encima del rótulo y lo teñía de azul */}
+          <RotuloDiagrama x={200} y={450} texto="Acuifero subterraneo" />
 
           {/* Nubes */}
           <g>
@@ -181,12 +195,12 @@ function SeccionCiclo() {
           <circle className={styles.flechaAbajo} cx="220" cy="390" r="3" style={{ animationDelay: '1.0s' }} opacity="0.7" />
 
           {/* Etiquetas */}
-          <text x="690" y="280" className={styles.etapaLabelText}>Evaporacion</text>
-          <text x="360" y="305" className={styles.etapaLabelText}>Transpiracion</text>
-          <text x="440" y="60" className={styles.etapaLabelText}>Condensacion</text>
-          <text x="310" y="155" className={styles.etapaLabelText}>Precipitacion</text>
-          <text x="450" y="395" className={styles.etapaLabelText}>Escorrentia</text>
-          <text x="120" y="430" className={styles.etapaLabelText}>Infiltracion</text>
+          <RotuloDiagrama x={690} y={280} texto="Evaporacion" />
+          <RotuloDiagrama x={360} y={305} texto="Transpiracion" />
+          <RotuloDiagrama x={440} y={60} texto="Condensacion" />
+          <RotuloDiagrama x={310} y={155} texto="Precipitacion" />
+          <RotuloDiagrama x={450} y={395} texto="Escorrentia" />
+          <RotuloDiagrama x={120} y={430} texto="Infiltracion" />
 
           {/* Sol */}
           <circle cx="740" cy="50" r="35" fill="#f1c40f" opacity="0.9" />

@@ -231,12 +231,13 @@ function BTreeSVG() {
       ))}
       {nodos.map((n, i) => (
         <g key={i}>
+          {/* El relleno de botón bajo el blanco (C0297): sobre --primary daba 4,11:1 en claro y 2,77 en oscuro */}
           <circle
             cx={n.x}
             cy={n.y}
             r="13"
-            fill={resaltados.includes(i) ? 'var(--primary)' : 'var(--bg-card)'}
-            stroke={resaltados.includes(i) ? 'var(--primary)' : 'var(--text-muted)'}
+            fill={resaltados.includes(i) ? 'var(--primary-boton)' : 'var(--bg-card)'}
+            stroke={resaltados.includes(i) ? 'var(--primary-boton)' : 'var(--text-muted)'}
             strokeWidth="1.5"
           />
           <text
@@ -252,7 +253,7 @@ function BTreeSVG() {
         </g>
       ))}
       {/* Leyenda */}
-      <circle cx="16" cy="148" r="7" fill="var(--primary)" />
+      <circle cx="16" cy="148" r="7" fill="var(--primary-boton)" />
       <text x="28" y="152" fontSize="9" fill="var(--text-secondary)">Camino de búsqueda</text>
       <circle cx="120" cy="148" r="7" fill="var(--bg-card)" stroke="var(--text-muted)" strokeWidth="1.5" />
       <text x="132" y="152" fontSize="9" fill="var(--text-secondary)">Nodo no visitado</text>

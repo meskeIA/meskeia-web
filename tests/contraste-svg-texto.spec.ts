@@ -501,6 +501,36 @@ const APPS: App[] = [
   // 20/11/2026 (tanda 4): el nombre de cada nota de la escala en blanco sobre la tecla activa y sobre la
   // nota del mástil en la marca pura (4,11:1 en los dos temas)
   { slug: 'visualizador-escalas-musicales' },
+  // 20/11/2026 (tanda 5): el rótulo blanco fijo de cada nodo sobre el gris de los no visitados
+  // (2,57:1) y el verde del origen (3,33), y el peso de las aristas en la marca (4,07 en claro)
+  { slug: 'simulador-grafos', extremos: true },
+  // 20/11/2026 (tanda 5): «Esperando datos…» de las gráficas en 9CA3AF fijo (2,43:1 en claro)
+  { slug: 'simulador-pendulo', extremos: true },
+  // 20/11/2026 (tanda 5): en el índice B, la letra blanca de los nodos del camino sobre --primary (4,11:1
+  // en claro, 2,77 en oscuro)
+  { slug: 'visualizador-base-datos-relacional', secciones: SECCIONES, extremos: true },
+  // 20/11/2026 (tanda 5): «PICO» en el rojo puro (3,61:1 en claro, 3,21 en oscuro) y «PRECIO» en
+  // currentColor al 50 % (3,30 en claro)
+  { slug: 'visualizador-burbuja-especulativa', secciones: SECCIONES, extremos: true },
+  // 20/11/2026 (tanda 5): los rótulos blancos con halo translúcido directamente sobre el cielo claro
+  // (Condensacion y Precipitacion, 1,75:1) y «Acuifero subterraneo» al 60 % sobre el subsuelo (3,16-3,78)
+  { slug: 'visualizador-ciclo-agua', secciones: SECCIONES, extremos: true },
+  // 20/11/2026 (tanda 5): en el árbol, el blanco de la ruta sobre la marca (4,11:1) y un «3» gris debajo
+  // de un nodo azul (1,84), porque los hijos de padres distintos caían en la misma x; en el triángulo de
+  // Pascal, el blanco fijo sobre cada celda al 85 % (y sobre las pares del Sierpinski al 15 %). Cada
+  // patrón del triángulo, como subestado
+  { slug: 'visualizador-combinatoria', secciones: "[role='tablist'] [role='tab']", extremos: true, subestados: "[aria-label='Seleccionar patrón'] button" },
+  // 20/11/2026 (tanda 5): los ejes de la curva diaria en currentColor al 50 % (3,33:1 en claro, 4,02 en
+  // oscuro) y «CAR» en la marca al 80 % sobre su franja (2,67 en claro, 2,44 en oscuro)
+  { slug: 'visualizador-cortisol', secciones: SECCIONES, extremos: true },
+  // 20/11/2026 (tanda 5): el símbolo del elemento con el texto del tema encima de los protones rojos y los
+  // neutrones grises (4,16:1 en claro, 2,66-3,41 en oscuro) y «e⁻» de la analogía en la marca (4,07 y 3,31)
+  { slug: 'visualizador-estructura-atomo', secciones: SECCIONES, extremos: true },
+  // 20/11/2026 (tanda 5): cada palabra del espacio de embeddings en el color puro de su grupo (el teal
+  // 2,47:1, el naranja 2,51 y el verde 2,54 en claro; el violeta 2,62 en oscuro)
+  { slug: 'visualizador-llm-funcionamiento', extremos: true },
+  // 20/11/2026 (tanda 5): la «A» de la amplitud en el rojo de su flecha (3,79:1 en claro, 3,76 en oscuro)
+  { slug: 'visualizador-sonido-ondas', extremos: true },
   // 20/11/2026 (tanda 4): el eje z de la normal en currentColor al 55 % (3,85:1 en claro), «z=…» en la
   // marca (3,93) o en rojo E53E3E (3,95 en claro, 4,22 en oscuro) y, en los errores, «H₀» en la marca
   // (3,93 y 4,24) y «H₁» en el teal (2,68 en claro)

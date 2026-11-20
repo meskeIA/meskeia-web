@@ -382,7 +382,7 @@
   font-family: 'SF Mono', Monaco, monospace;
   font-size: var(--fuente-peso, 11px);
   font-weight: 700;
-  fill: var(--primary);
+  fill: var(--primary-texto);
   text-anchor: middle;
   dominant-baseline: central;
   paint-order: stroke;

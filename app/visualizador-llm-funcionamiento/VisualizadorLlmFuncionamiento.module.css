@@ -339,6 +339,17 @@
   cursor: crosshair;
 }
 
+/* Tono de TEXTO de cada grupo semántico por tema (C0297): las palabras iban en el color puro de su
+   punto, el teal 2,47:1, el naranja 2,51 y el verde 2,54 sobre el fondo del espacio en claro, y el
+   violeta 2,62 en oscuro. El punto conserva su color de dato. Fill por CSS (manda sobre el atributo)
+   y color para el número de la píldora de cercanos */
+.tonoAnimales { fill: var(--primary-texto); color: var(--primary-texto); }
+.tonoColores { fill: var(--secondary-texto); color: var(--secondary-texto); }
+.tonoVerbos { fill: var(--naranja-texto, #B93E0B); color: var(--naranja-texto, #B93E0B); }
+.tonoComida { fill: var(--verde-texto, #136E35); color: var(--verde-texto, #136E35); }
+.tonoRoyalty { fill: #6C3483; color: #6C3483; }
+[data-theme='dark'] .tonoRoyalty { fill: #D2B4DE; color: #D2B4DE; }
+
 .embeddingPoint {
   cursor: pointer;
 }

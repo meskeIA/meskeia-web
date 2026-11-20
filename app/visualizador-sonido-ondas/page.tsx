@@ -400,7 +400,8 @@ export default function SonidoOndasPage() {
             <path d={pathOnda} fill="none" stroke="#2E86AB" strokeWidth="3" strokeLinecap="round" />
             {/* Flecha amplitud */}
             <line x1={SVG_W - 60} y1={SVG_H / 2} x2={SVG_W - 60} y2={SVG_H / 2 - amplitud * (SVG_H * 0.4) / 100} stroke="#e74c3c" strokeWidth="2" markerEnd="url(#arrowRed)" />
-            <text x={SVG_W - 50} y={SVG_H / 2 - 10} fill="#e74c3c" fontSize="11" fontWeight="600">A</text>
+            {/* El rótulo en el rojo de texto del tema (C0297): el rojo de la flecha daba 3,79:1 en claro y 3,76 en oscuro */}
+            <text x={SVG_W - 50} y={SVG_H / 2 - 10} fill="var(--rojo-texto, #B91C1C)" fontSize="11" fontWeight="600">A</text>
             <defs>
               <marker id="arrowRed" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
                 <path d="M0,0 L6,3 L0,6 Z" fill="#e74c3c" />

@@ -270,14 +270,15 @@ function SeccionRitmo() {
             />
           ))}
 
-          {/* Etiquetas eje Y */}
+          {/* Etiquetas de los ejes con el texto secundario del tema (C0297): currentColor al 50 %
+              daba 3,33:1 en claro y 4,02 en oscuro */}
           {[0, 25, 50, 75, 100].map(n => (
-            <text key={n} x={margenX - 5} y={yParaNivel(n) + 4} textAnchor="end" fontSize="8" fill="currentColor" opacity="0.5">{n}%</text>
+            <text key={n} x={margenX - 5} y={yParaNivel(n) + 4} textAnchor="end" fontSize="8" fill="var(--text-secondary)">{n}&nbsp;%</text>
           ))}
 
           {/* Etiquetas eje X (horas) */}
           {[0, 6, 8, 12, 17, 22].map(h => (
-            <text key={h} x={xParaHora(h)} y={altoSvg - 4} textAnchor="middle" fontSize="8" fill="currentColor" opacity="0.5">{h}h</text>
+            <text key={h} x={xParaHora(h)} y={altoSvg - 4} textAnchor="middle" fontSize="8" fill="var(--text-secondary)">{h}&nbsp;h</text>
           ))}
 
           {/* Zona CAR destacada */}
@@ -289,7 +290,7 @@ function SeccionRitmo() {
             fill="#2E86AB"
             opacity="0.07"
           />
-          <text x={(xParaHora(7) + xParaHora(9)) / 2} y={margenY + 12} textAnchor="middle" fontSize="7" fill="#2E86AB" fontWeight="600" opacity="0.8">CAR</text>
+          <text x={(xParaHora(7) + xParaHora(9)) / 2} y={margenY + 12} textAnchor="middle" fontSize="7" fill="var(--text-primary)" fontWeight="600">CAR</text>
 
           {/* Curva con mal sueño (si activa) */}
           {mostrarMalSueno && (
