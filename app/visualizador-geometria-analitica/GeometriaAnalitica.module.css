@@ -161,6 +161,18 @@
   background: #1e2a35;
 }
 
+/*
+ * Tono de TEXTO de los rótulos del plano (C0297, 20/11/2026): los ejes iban en #888 (3,51:1 en
+ * claro, 4,11 en oscuro), las marcas en #bbb y #999 (1,90-2,82 en claro), el centro y el vértice
+ * en el teal 48A9A6 (2,78) y los focos en E84A5F. El fill por CSS manda sobre el atributo.
+ */
+.svgEje { fill: #666666; }
+.svgMarcaEje { fill: #707070; }
+.svgCentro { fill: var(--secondary-texto); }
+.svgFoco { fill: var(--rojo-texto, #B91C1C); }
+[data-theme='dark'] .svgEje { fill: #B4BEC8; }
+[data-theme='dark'] .svgMarcaEje { fill: #9AA8B5; }
+
 /* ─────────────────────────────────────────────
    Panel de ecuación
 ───────────────────────────────────────────── */

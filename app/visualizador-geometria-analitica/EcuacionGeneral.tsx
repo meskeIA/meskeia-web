@@ -162,10 +162,12 @@ function GraficaConica({ an }: GraficaProps) {
     );
   }
 
+  // El color del punto queda en el círculo; el rótulo, en su tono de texto por tema (C0297)
+  const TONO_ROTULO: Record<string, string> = { '#48A9A6': styles.svgCentro, '#E84A5F': styles.svgFoco };
   const punto = (p: Punto, color: string, etiqueta: string, clave: string) => (
     <g key={clave}>
       <circle cx={sx(p.x)} cy={sy(p.y)} r={4} fill={color} />
-      <text x={sx(p.x) + 6} y={sy(p.y) - 6} fontSize="10" fill={color} fontWeight="600">{etiqueta}</text>
+      <text x={sx(p.x) + 6} y={sy(p.y) - 6} fontSize="10" fill={color} className={TONO_ROTULO[color]} fontWeight="600">{etiqueta}</text>
     </g>
   );
 
@@ -187,13 +189,13 @@ function GraficaConica({ an }: GraficaProps) {
         ))}
         <line x1={0} y1={ORIGEN} x2={SVG_SIZE} y2={ORIGEN} stroke="#999" strokeWidth="1.2" />
         <line x1={ORIGEN} y1={0} x2={ORIGEN} y2={SVG_SIZE} stroke="#999" strokeWidth="1.2" />
-        <text x={SVG_SIZE - 4} y={ORIGEN - 8} fontSize="11" fill="#888" textAnchor="end">x</text>
-        <text x={ORIGEN + 6} y={10} fontSize="11" fill="#888">y</text>
+        <text x={SVG_SIZE - 4} y={ORIGEN - 8} fontSize="11" fill="#888" className={styles.svgEje} textAnchor="end">x</text>
+        <text x={ORIGEN + 6} y={10} fontSize="11" fill="#888" className={styles.svgEje}>y</text>
         {/* Sin rótulo en los bordes (±rango): se cortaría contra el marco. */}
         {marcas.filter((t) => Math.round(t / paso) % 2 === 0 && Math.abs(t) < rango).map((t) => (
           <g key={`n${t}`}>
-            <text x={sx(t)} y={ORIGEN + 14} fontSize="9" fill="#999" textAnchor="middle">{cifra(t)}</text>
-            <text x={ORIGEN - 5} y={sy(t) + 3} fontSize="9" fill="#999" textAnchor="end">{cifra(t)}</text>
+            <text x={sx(t)} y={ORIGEN + 14} fontSize="9" fill="#999" className={styles.svgMarcaEje} textAnchor="middle">{cifra(t)}</text>
+            <text x={ORIGEN - 5} y={sy(t) + 3} fontSize="9" fill="#999" className={styles.svgMarcaEje} textAnchor="end">{cifra(t)}</text>
           </g>
         ))}
       </g>
@@ -211,7 +213,7 @@ function GraficaConica({ an }: GraficaProps) {
       {an.tipo !== 'parabola' && an.vertices.map((v, i) => punto(v, '#5B9BC4', '', `v${i}`))}
       {an.focos.map((f, i) => punto(f, '#E84A5F', an.focos.length > 1 ? `F${i === 0 ? '₁' : '₂'}` : 'F', `f${i}`))}
       {an.tipo === 'vacia' && (
-        <text x={ORIGEN} y={40} fontSize="12" fill="#888" textAnchor="middle">Ningún punto que dibujar</text>
+        <text x={ORIGEN} y={40} fontSize="12" fill="#888" className={styles.svgEje} textAnchor="middle">Ningún punto que dibujar</text>
       )}
     </svg>
   );

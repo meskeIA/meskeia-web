@@ -104,13 +104,13 @@ function EjesCartesianos() {
       <polygon points={`${SVG_SIZE},${ORIGIN} ${SVG_SIZE - 7},${ORIGIN - 4} ${SVG_SIZE - 7},${ORIGIN + 4}`} fill="#999" />
       <polygon points={`${ORIGIN},0 ${ORIGIN - 4},7 ${ORIGIN + 4},7`} fill="#999" />
       {/* Etiquetas */}
-      <text x={SVG_SIZE - 4} y={ORIGIN - 8} fontSize="11" fill="#888" textAnchor="end">x</text>
-      <text x={ORIGIN + 6} y={10} fontSize="11" fill="#888">y</text>
+      <text x={SVG_SIZE - 4} y={ORIGIN - 8} fontSize="11" fill="#888" className={styles.svgEje} textAnchor="end">x</text>
+      <text x={ORIGIN + 6} y={10} fontSize="11" fill="#888" className={styles.svgEje}>y</text>
       {/* Marcas de escala */}
       {ticks.filter((t) => t % 2 === 0).map((t) => (
         <g key={`label-${t}`}>
-          <text x={toSvgX(t)} y={ORIGIN + 14} fontSize="9" fill="#bbb" textAnchor="middle">{t}</text>
-          <text x={ORIGIN - 5} y={toSvgY(t) + 3} fontSize="9" fill="#bbb" textAnchor="end">{t}</text>
+          <text x={toSvgX(t)} y={ORIGIN + 14} fontSize="9" fill="#bbb" className={styles.svgMarcaEje} textAnchor="middle">{t}</text>
+          <text x={ORIGIN - 5} y={toSvgY(t) + 3} fontSize="9" fill="#bbb" className={styles.svgMarcaEje} textAnchor="end">{t}</text>
         </g>
       ))}
     </g>
@@ -134,7 +134,7 @@ function PuntoFocal({ x, y, label }: PuntoFocalProps) {
   return (
     <g>
       <circle cx={sx} cy={sy} r={4} fill="#E84A5F" opacity={0.9} />
-      <text x={sx + 6} y={sy - 6} fontSize="10" fill="#E84A5F" fontWeight="600">{label}</text>
+      <text x={sx + 6} y={sy - 6} fontSize="10" fill="#E84A5F" className={styles.svgFoco} fontWeight="600">{label}</text>
     </g>
   );
 }
@@ -171,7 +171,7 @@ function VisualizadorCircunferencia({ params, onChange }: VisualizadorCircunfere
         />
         {/* Centro */}
         <circle cx={cx} cy={cy} r={4} fill="#48A9A6" opacity={0.85} />
-        <text x={cx + 6} y={cy - 6} fontSize="10" fill="#48A9A6" fontWeight="600">
+        <text x={cx + 6} y={cy - 6} fontSize="10" fill="#48A9A6" className={styles.svgCentro} fontWeight="600">
           C({h},{k})
         </text>
       </svg>
@@ -405,7 +405,7 @@ function VisualizadorParabola({ params, onChange }: VisualizadorParabolaProps) {
         />
         {/* Vértice */}
         <circle cx={toSvgX(h)} cy={toSvgY(k)} r={4} fill="#48A9A6" />
-        <text x={toSvgX(h) + 6} y={toSvgY(k) - 6} fontSize="10" fill="#48A9A6" fontWeight="600">V({h},{k})</text>
+        <text x={toSvgX(h) + 6} y={toSvgY(k) - 6} fontSize="10" fill="#48A9A6" className={styles.svgCentro} fontWeight="600">V({h},{k})</text>
         {/* Foco */}
         <PuntoFocal x={focoX} y={focoY} label="F" />
       </svg>
