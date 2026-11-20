@@ -211,6 +211,12 @@ const APPS: App[] = [
   // blanco del tipo activo sobre la marca (4,11). Los cuatro tipos como secciones. El naranja del
   // determinante, en tests/apps/visualizador-matrices.spec.ts
   { slug: 'visualizador-matrices', todo: true, secciones: "[class*='tiposGrid'] button" },
+  // 20/11/2026 (C0798): el nombre de la fase en la marca (4,11:1 en claro, 3,35 en oscuro), «Adelanta
+  // el reloj» en verde (2,75) y «Retrasa» en rojo (3,60-3,66), la leyenda de la curva en el color del
+  // cronotipo, el blanco de las proteínas, los picos, las cajas del diagrama y la insignia «Mañana»
+  // sobre el color puro (2,19-4,11), el porcentaje del cronotipo activo en --text-muted sobre su tinte
+  // (4,44) y en oscuro la pestaña activa sobre su tinte (4,25)
+  { slug: 'visualizador-cronobiologia', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
   // 13/11/2026: el título del panel de la capa en su color con style (el núcleo interno en oro, 1,73:1)
   { slug: 'visualizador-capas-tierra', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
   // 13/11/2026: «Producción de bilis» en amarillo (1,52:1), «FASE 2» en verde (2,56-2,75) y el título del

@@ -11,6 +11,32 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
+import { rellenoConTinta } from '@/lib/tintaLegible';
+
+/*
+ * Los colores de datos no se leen como TEXTO ni bajo texto blanco (C0798, 20/11/2026): el nombre
+ * de la fase en la marca (4,11:1 en claro, 3,35 en oscuro), «Adelanta el reloj» en verde (2,75),
+ * la leyenda de la curva en el color del cronotipo, y el blanco de las proteínas, los picos, las
+ * cajas del diagrama y la insignia «Mañana» sobre el color puro (2,19-4,11). El color de dato se
+ * queda en bordes, barras y curvas; como texto va su tono por tema (tonoDe), y bajo el texto, el
+ * relleno con la tinta que le llega (rellenoTexto), igual en los dos temas.
+ */
+const TONOS: Record<string, string> = {
+  '#2E86AB': 'var(--primary-texto)',
+  '#27AE60': 'var(--verde-texto, #136E35)',
+  '#E67E22': 'var(--naranja-texto, #B93E0B)',
+  '#F39C12': 'var(--ambar-texto, #8A5A00)',
+  '#E74C3C': 'var(--rojo-texto, #B91C1C)',
+  '#C0392B': 'var(--rojo-texto, #B91C1C)',
+  '#9B59B6': 'var(--cb-violeta-texto)',
+  '#8E44AD': 'var(--cb-violeta-texto)',
+};
+const tonoDe = (color: string): string => TONOS[color.toUpperCase()] ?? 'var(--text-primary)';
+
+function rellenoTexto(color: string): { background: string; color: string } {
+  const { relleno, tinta } = rellenoConTinta(color);
+  return { background: relleno, color: tinta };
+}
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -450,7 +476,7 @@ function TabReloj() {
         <div className={styles.faseInfo} role="status" aria-live="polite" aria-atomic="true">
           <h3 className={styles.faseInfoTitulo}>Fase activa a las {horaSeleccionada}:00h</h3>
           <div className={styles.faseInfoFase} style={{ borderLeftColor: FASES_RELOJ[faseActiva].color }}>
-            <span className={styles.faseInfoNombre} style={{ color: FASES_RELOJ[faseActiva].color }}>
+            <span className={styles.faseInfoNombre} style={{ color: tonoDe(FASES_RELOJ[faseActiva].color) }}>
               {FASES_RELOJ[faseActiva].nombre}
             </span>
             <div className={styles.faseInfoProteinas}>
@@ -458,7 +484,7 @@ function TabReloj() {
                 <span
                   key={p}
                   className={styles.proteinaTag}
-                  style={{ background: FASES_RELOJ[faseActiva].colorProteinas[i] }}
+                  style={rellenoTexto(FASES_RELOJ[faseActiva].colorProteinas[i])}
                 >
                   {p}
                 </span>
@@ -496,7 +522,7 @@ function TabReloj() {
           <div key={ef.nombre} className={styles.efectoCard}>
             <div className={styles.efectoHeader}>
               <span className={styles.efectoNombre}>{ef.nombre}</span>
-              <span className={styles.efectoPico} style={{ background: ef.color }}>{ef.valor}</span>
+              <span className={styles.efectoPico} style={rellenoTexto(ef.color)}>{ef.valor}</span>
             </div>
             <div className={styles.efectoBarra}>
               {Array.from({ length: 24 }, (_, h) => {
@@ -570,11 +596,11 @@ function TabSincronizadores() {
                   <p className={styles.zeitgeberMecanismo}>{z.mecanismo}</p>
                   <div className={styles.zeitgeberEfectos}>
                     <div className={styles.zeitgeberEfecto} style={{ borderLeftColor: '#27AE60' }}>
-                      <span className={styles.zeitgeberEfectoLabel} style={{ color: '#27AE60' }}>Adelanta el reloj</span>
+                      <span className={styles.zeitgeberEfectoLabel} style={{ color: tonoDe('#27AE60') }}>Adelanta el reloj</span>
                       <span>{z.efectoAdelanta}</span>
                     </div>
                     <div className={styles.zeitgeberEfecto} style={{ borderLeftColor: '#E74C3C' }}>
-                      <span className={styles.zeitgeberEfectoLabel} style={{ color: '#E74C3C' }}>Retrasa el reloj</span>
+                      <span className={styles.zeitgeberEfectoLabel} style={{ color: tonoDe('#E74C3C') }}>Retrasa el reloj</span>
                       <span>{z.efectoRetrasa}</span>
                     </div>
                   </div>
@@ -594,21 +620,21 @@ function TabSincronizadores() {
       <div className={styles.diagramaNsq}>
         <h4 className={styles.diagramaNsqTitulo}>La jerarquía circadiana</h4>
         <div className={styles.diagramaNsqFlow}>
-          <div className={styles.diagramaBox} style={{ background: '#F39C12' }}>
+          <div className={styles.diagramaBox} style={rellenoTexto('#F39C12')}>
             <span className={styles.diagramaBoxIcono} aria-hidden="true">☀️</span>
             <span>Luz (retina)</span>
           </div>
           <div className={styles.diagramaFlecha} aria-hidden="true">→</div>
-          <div className={styles.diagramaBox} style={{ background: '#2E86AB' }}>
+          <div className={styles.diagramaBox} style={rellenoTexto('#2E86AB')}>
             <span className={styles.diagramaBoxIcono} aria-hidden="true">🧠</span>
             <span>NSQ</span>
           </div>
           <div className={styles.diagramaFlecha} aria-hidden="true">→</div>
           <div className={styles.diagramaRelojes}>
-            <div className={styles.diagramaBox} style={{ background: '#27AE60', fontSize: '0.8rem' }}><span aria-hidden="true">🫀</span> Corazón</div>
-            <div className={styles.diagramaBox} style={{ background: '#8E44AD', fontSize: '0.8rem' }}><span aria-hidden="true">🫁</span> Pulmón</div>
-            <div className={styles.diagramaBox} style={{ background: '#E74C3C', fontSize: '0.8rem' }}><span aria-hidden="true">🫀</span> Hígado</div>
-            <div className={styles.diagramaBox} style={{ background: '#E67E22', fontSize: '0.8rem' }}><span aria-hidden="true">🧫</span> Páncreas</div>
+            <div className={styles.diagramaBox} style={{ ...rellenoTexto('#27AE60'), fontSize: '0.8rem' }}><span aria-hidden="true">🫀</span> Corazón</div>
+            <div className={styles.diagramaBox} style={{ ...rellenoTexto('#8E44AD'), fontSize: '0.8rem' }}><span aria-hidden="true">🫁</span> Pulmón</div>
+            <div className={styles.diagramaBox} style={{ ...rellenoTexto('#E74C3C'), fontSize: '0.8rem' }}><span aria-hidden="true">🫀</span> Hígado</div>
+            <div className={styles.diagramaBox} style={{ ...rellenoTexto('#E67E22'), fontSize: '0.8rem' }}><span aria-hidden="true">🧫</span> Páncreas</div>
           </div>
         </div>
         <p className={styles.diagramaNsqNota}>Los relojes periféricos también responden directamente a la alimentación y el ejercicio, pudiendo desincronizarse del NSQ.</p>
@@ -646,7 +672,7 @@ function TabCronotipos() {
           >
             <span className={styles.cronotipoIcono} aria-hidden="true">{c.icono}</span>
             <span className={styles.cronotipoNombre}>{c.nombre}</span>
-            <span className={styles.cronotipoPct}>{c.porcentaje}%</span>
+            <span className={styles.cronotipoPct}>{c.porcentaje}{' '}%</span>
           </button>
         ))}
       </div>
@@ -718,7 +744,7 @@ function TabCronotipos() {
           ))}
         </svg>
         <div className={styles.curvaLeyenda}>
-          <span className={styles.curvaLeyendaItem} style={{ color: cronotipo.color }}>— Alerta ({cronotipo.nombre})</span>
+          <span className={styles.curvaLeyendaItem} style={{ color: tonoDe(cronotipo.color) }}>— Alerta ({cronotipo.nombre})</span>
         </div>
       </div>
 

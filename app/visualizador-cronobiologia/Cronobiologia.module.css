@@ -511,9 +511,10 @@
   color: var(--text-primary);
 }
 
+/* --text-muted daba 4,44:1 sobre el tinte del cronotipo activo (C0798) */
 .cronotipoPct {
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 /* ─── Info del cronotipo ─── */
@@ -755,8 +756,10 @@
   white-space: nowrap;
 }
 
+/* El blanco sobre el ámbar daba 2,19:1; la tinta oscura llega a 7,9 (C0798) */
 .farmaBadgeManana {
   background: #F39C12;
+  color: #1A1A1A;
 }
 
 .farmaBadgeNoche {
@@ -1241,9 +1244,13 @@
 }
 
 /* ─── Dark mode overrides ─── */
+/* Violeta de TEXTO para las fases y cronotipos violetas, que en su color puro no llegan (C0798) */
+.container { --cb-violeta-texto: #6C3483; }
+
 [data-theme='dark'] .container {
   background: var(--bg-primary);
   color: var(--text-primary);
+  --cb-violeta-texto: #D2B4DE;
 }
 
 [data-theme='dark'] .tabBar {
@@ -1251,9 +1258,11 @@
   border-bottom-color: #333;
 }
 
+/* --primary-texto sobre el tinte de la pestaña activa daba 4,25:1 en oscuro (C0798) */
 [data-theme='dark'] .tabActive {
   background: #2E86AB22;
   border-color: #2E86AB;
+  color: #7CC4E4;
 }
 
 [data-theme='dark'] .zeitgeberCard,
