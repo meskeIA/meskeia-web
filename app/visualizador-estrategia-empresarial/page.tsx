@@ -175,6 +175,19 @@ const MODULOS: Modulo[] = [
 // Visual 1 — 5 Fuerzas de Porter (presets por sector)
 // ─────────────────────────────────────────────
 
+/*
+ * El verde, el naranja y el rojo de los semáforos se pintaban también como TEXTO, con su color
+ * puro (C0798, 20/11/2026): las cifras de las fuerzas y del foso, el veredicto, el riesgo de cada
+ * celda de Ansoff y la letra del VRIO a 2,28-3,82:1 en claro. El color puro se queda en las
+ * barras; como texto, su tono por tema (los -texto de globals, con su reserva).
+ */
+const TONOS_SEMAFORO: Record<string, string> = {
+  '#27ae60': 'var(--verde-texto, #136E35)',
+  '#e67e22': 'var(--naranja-texto, #B93E0B)',
+  '#e74c3c': 'var(--rojo-texto, #B91C1C)',
+};
+const tono = (color: string): string => TONOS_SEMAFORO[color.toLowerCase()] ?? 'var(--text-primary)';
+
 const FUERZAS = ['Rivalidad', 'Nuevos entrantes', 'Poder proveedores', 'Poder clientes', 'Sustitutos'];
 
 type SectorId = 'cafeteria' | 'farmaceutica' | 'aerolineas' | 'plataforma';
@@ -219,13 +232,13 @@ function Vis5Fuerzas() {
               <div className={styles.meterTrack}>
                 <div className={styles.meterFill} style={{ width: `${v}%`, background: color }} />
               </div>
-              <div className={styles.meterValor} style={{ color }}>{v}/100</div>
+              <div className={styles.meterValor} style={{ color: tono(color) }}>{v}/100</div>
             </div>
           );
         })}
       </div>
       <div className={styles.veredictoBox} style={{ background: `${colorVeredicto}1a`, marginTop: '1rem' }}>
-        <div className={styles.veredictoTitulo} style={{ color: colorVeredicto }}>Sector {atractivo}</div>
+        <div className={styles.veredictoTitulo} style={{ color: tono(colorVeredicto) }}>Sector {atractivo}</div>
         <p className={styles.veredictoTexto}>
           Fuerzas medias en {media}/100: cuanto más altas, más se aprietan los márgenes de todos los que compiten aquí.
         </p>
@@ -287,7 +300,7 @@ function VisVRIO() {
             aria-pressed={estado[idx]}
             onClick={() => toggle(idx)}
           >
-            <span className={styles.vrioLetra} style={{ color: estado[idx] ? '#27ae60' : 'var(--text-muted)' }}>{item.letra}</span>
+            <span className={styles.vrioLetra} style={{ color: estado[idx] ? tono('#27ae60') : 'var(--text-muted)' }}>{item.letra}</span>
             <span className={styles.vrioNombre}>{item.nombre}</span>
             <span className={styles.vrioCheck} aria-hidden="true">{estado[idx] ? '✓' : '○'}</span>
           </button>
@@ -297,7 +310,7 @@ function VisVRIO() {
         Activa las características que cumple tu recurso (marca, datos, ubicación, talento…) y mira el veredicto.
       </p>
       <div className={styles.veredictoBox} style={{ background: `${color}1a` }}>
-        <div className={styles.veredictoTitulo} style={{ color }}>{titulo}</div>
+        <div className={styles.veredictoTitulo} style={{ color: tono(color) }}>{titulo}</div>
         <p className={styles.veredictoTexto}>{texto}</p>
       </div>
     </div>
@@ -344,7 +357,7 @@ function VisMoat() {
         <div className={styles.meterTrack}>
           <div className={styles.meterFill} style={{ width: `${m.anchura}%`, background: color }} />
         </div>
-        <div className={styles.meterValor} style={{ color }}>{m.anchura}/100</div>
+        <div className={styles.meterValor} style={{ color: tono(color) }}>{m.anchura}/100</div>
       </div>
       <p className={styles.visualLeyenda} style={{ marginTop: '0.8rem' }}>{m.desc}</p>
     </div>
@@ -418,7 +431,7 @@ function VisAnsoff() {
       onClick={() => setCelda(id)}
     >
       <span className={styles.matrizCeldaTitulo}>{ANSOFF[id].nombre}</span>
-      <span className={styles.matrizCeldaRiesgo} style={{ color: ANSOFF[id].color }}>{ANSOFF[id].riesgo}</span>
+      <span className={styles.matrizCeldaRiesgo} style={{ color: tono(ANSOFF[id].color) }}>{ANSOFF[id].riesgo}</span>
     </button>
   );
 
@@ -436,7 +449,7 @@ function VisAnsoff() {
         <Boton id="diversificacion" />
       </div>
       <div className={styles.matrizDetalle}>
-        <div className={styles.veredictoTitulo} style={{ color: c.color, fontSize: '0.95rem' }}>{c.nombre} · {c.riesgo}</div>
+        <div className={styles.veredictoTitulo} style={{ color: tono(c.color), fontSize: '0.95rem' }}>{c.nombre} · {c.riesgo}</div>
         <p className={styles.miniCardTexto}>{c.desc}</p>
       </div>
     </div>
@@ -476,14 +489,14 @@ function VisEjecucion() {
           <div className={styles.meterTrack}>
             <div className={styles.meterFill} style={{ width: `${planificar}%`, background: '#2E86AB' }} />
           </div>
-          <div className={styles.meterValor}>{planificar}%</div>
+          <div className={styles.meterValor}>{planificar}{' '}%</div>
         </div>
         <div className={styles.meterBox}>
           <div className={styles.meterTitulo}>Experimentar y adaptar</div>
           <div className={styles.meterTrack}>
             <div className={styles.meterFill} style={{ width: `${experimentar}%`, background: '#48A9A6' }} />
           </div>
-          <div className={styles.meterValor} style={{ color: 'var(--secondary-texto)' }}>{experimentar}%</div>
+          <div className={styles.meterValor} style={{ color: 'var(--secondary-texto)' }}>{experimentar}{' '}%</div>
         </div>
       </div>
       <p className={styles.visualLeyenda} style={{ marginTop: '0.8rem' }}>{recomendacion}</p>

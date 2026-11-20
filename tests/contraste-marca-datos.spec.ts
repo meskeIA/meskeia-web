@@ -217,6 +217,10 @@ const APPS: App[] = [
   // sobre el color puro (2,19-4,11), el porcentaje del cronotipo activo en --text-muted sobre su tinte
   // (4,44) y en oscuro la pestaña activa sobre su tinte (4,25)
   { slug: 'visualizador-cronobiologia', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 20/11/2026 (C0798): las cifras de las fuerzas y del foso, el veredicto, el riesgo de cada celda
+  // de Ansoff y la letra del VRIO en el verde, naranja o rojo puro del semáforo con style. Los seis
+  // módulos como secciones (cada uno con su visual en su estado inicial)
+  { slug: 'visualizador-estrategia-empresarial', todo: true, secciones: "button[role='listitem']" },
   // 13/11/2026: el título del panel de la capa en su color con style (el núcleo interno en oro, 1,73:1)
   { slug: 'visualizador-capas-tierra', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
   // 13/11/2026: «Producción de bilis» en amarillo (1,52:1), «FASE 2» en verde (2,56-2,75) y el título del
