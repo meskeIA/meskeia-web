@@ -498,6 +498,9 @@ const APPS: App[] = [
   // 20/11/2026 (tanda 4): en el climograma, los meses y la leyenda en #888 fijo (3,51:1 en claro, 4,05
   // en oscuro)
   { slug: 'visualizador-biomas-terrestres', secciones: SECCIONES },
+  // 20/11/2026 (tanda 4): el nombre de cada nota de la escala en blanco sobre la tecla activa y sobre la
+  // nota del mástil en la marca pura (4,11:1 en los dos temas)
+  { slug: 'visualizador-escalas-musicales' },
 ];
 
 interface TextoSvg {

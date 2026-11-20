@@ -418,8 +418,9 @@ button.notaChipSonando:hover {
   cursor: default;
 }
 
+/* --primary-boton y no la marca pura: el nombre de la nota va en blanco encima (4,11:1 con #2E86AB) */
 .teclaBlancaActiva {
-  fill: #2E86AB;
+  fill: var(--primary-boton);
   stroke: #1a5278;
   stroke-width: 1;
   cursor: default;
@@ -545,7 +546,7 @@ button.notaChipSonando:hover {
 }
 
 .mastilNota {
-  fill: #2E86AB;
+  fill: var(--primary-boton);
   stroke: #1a5278;
   stroke-width: 1;
 }
@@ -995,7 +996,7 @@ details[open] .faqPregunta::before {
 }
 
 [data-theme='dark'] .teclaBlancaActiva {
-  fill: #2E86AB;
+  fill: var(--primary-boton);
   stroke: #1a5278;
 }
 
