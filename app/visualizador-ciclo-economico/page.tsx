@@ -174,7 +174,7 @@ const INDICADORES: Indicador[] = [
     descripcion:
       'La diferencia entre los tipos de bonos a 10 años y a 2 años. Si se invierte (2 años > 10 años), señal de alerta.',
     porQue:
-      'Cuando los inversores exigen más rentabilidad a corto que a largo plazo, anticipan que los tipos bajarán (porque vendrá una recesión). Todas las recesiones de EEUU desde 1970 fueron precedidas por inversión de la curva 2a-10a.',
+      'Cuando los inversores exigen más rentabilidad a corto que a largo plazo, anticipan que los tipos bajarán (porque esperan una recesión). Las recesiones de EEUU desde 1970 vinieron precedidas por una inversión de la curva 2a-10a, aunque no toda inversión ha ido seguida de recesión: tras la de 2022, EEUU no entró en recesión.',
     datoEspana: 'Diferencial Bono España 10a - 2a (abr. 2024): +0,35% (positivo)',
     datoEurozona: 'Diferencial Bund Alemania 10a - 2a (abr. 2024): +0,12% (casi plana)',
   },
@@ -860,7 +860,7 @@ export default function VisualizadorCicloEconomicoPage() {
             <div>
               <h2 className={styles.sectionTitle}>La curva de rendimientos (yield curve)</h2>
               <p className={styles.sectionSubtitle}>
-                El predictor más fiable de recesiones — invierte 6-24 meses antes
+                Uno de los indicadores adelantados más seguidos — suele invertirse 6-24 meses antes de una recesión
               </p>
             </div>
           </div>
@@ -968,12 +968,13 @@ export default function VisualizadorCicloEconomicoPage() {
               )}
               {curvaEstado === 'invertida' && (
                 <>
-                  <h4><span aria-hidden="true">🚨</span> Curva invertida — predictor de recesión</h4>
+                  <h4><span aria-hidden="true">🚨</span> Curva invertida — señal de alerta de recesión</h4>
                   <p>
                     Los tipos a corto plazo superan a los de largo plazo. Los inversores anticipan que los bancos
-                    centrales tendrán que bajar tipos (porque vendrá una recesión). <strong>Dato clave:</strong> la curva
-                    2a-10a de EEUU se invirtió en julio 2022. Todas las recesiones de EEUU desde 1970 fueron precedidas
-                    por inversión de la curva con 6-24 meses de antelación.
+                    centrales tendrán que bajar tipos (porque esperan una recesión). <strong>Dato clave:</strong> la curva
+                    2a-10a de EEUU se invirtió en julio 2022. Las recesiones de EEUU desde 1970 vinieron precedidas
+                    por una inversión de la curva, con 6-24 meses de antelación; la de 2022, en cambio, no fue
+                    seguida de recesión en EEUU.
                   </p>
                 </>
               )}
@@ -989,7 +990,7 @@ export default function VisualizadorCicloEconomicoPage() {
               <li>2000: inversión → Recesión 2001 (dot-com)</li>
               <li>2006: inversión → Recesión 2008-09 (Gran Recesión)</li>
               <li>2019: inversión → Recesión 2020 (COVID)</li>
-              <li>Julio 2022: inversión → Desaceleración 2023 (recesión técnica en Eurozona)</li>
+              <li>Julio 2022: inversión → sin recesión en EEUU en 2023-2024</li>
             </ul>
             <p className={styles.warningBoxNota}>
               La curva 2a-10a de EEUU, que se invirtió en julio 2022, mostró el spread negativo más profundo desde 1981.
@@ -1092,12 +1093,13 @@ export default function VisualizadorCicloEconomicoPage() {
             <li>
               <strong>Joseph Schumpeter (1939):</strong> Los ciclos son el resultado de la «destrucción creativa»:
               las innovaciones tecnológicas impulsan expansiones, que generan burbujas que eventualmente colapsan.
-              Identificó ciclos cortos (Kitchin, 3-5 años), medios (Juglar, 7-11 años) y largos (Kondratiev, 45-60 años).
+              Propuso combinar ciclos cortos (Kitchin, 3-5 años), medios (Juglar, 7-11 años) y largos (Kondratiev, 45-60 años).
             </li>
             <li>
-              <strong>Ciclos de Kondratiev:</strong> Ondas largas de 45-60 años asociadas a grandes innovaciones
+              <strong>Ciclos de Kondratiev:</strong> Hipótesis de ondas largas de 45-60 años asociadas a grandes innovaciones
               tecnológicas: máquina de vapor (1780), ferrocarriles (1850), electricidad (1900), petroquímica (1950),
-              tecnología digital (1990). Estamos potencialmente en un nuevo ciclo Kondratiev con la IA.
+              tecnología digital (1990). Su existencia sigue discutida: con tan pocas ondas observadas es difícil
+              distinguirlas de la casualidad. Hay quien sitúa en la IA el arranque de una nueva.
             </li>
             <li>
               <strong>Teoría austríaca (Hayek):</strong> Los ciclos se deben a la expansión artificial del crédito
@@ -1113,7 +1115,7 @@ export default function VisualizadorCicloEconomicoPage() {
           <ul>
             <li><strong>Expansión media:</strong> ~5 años (60 meses). La más larga: 128 meses (2009-2020).</li>
             <li><strong>Recesión media:</strong> ~11 meses. La más larga en tiempos modernos: 18 meses (Gran Recesión, 2007-2009).</li>
-            <li><strong>Tendencia secular:</strong> Las recesiones son cada vez más cortas y las expansiones más largas gracias a mejores políticas monetarias y fiscales.</li>
+            <li><strong>Tendencia secular:</strong> Desde la Segunda Guerra Mundial, las recesiones de EEUU han sido más cortas y las expansiones más largas. Una de las explicaciones propuestas es la mejora de las políticas monetarias y fiscales; se discute también el peso de otros factores, como el paso a una economía de servicios.</li>
           </ul>
 
           <h3>¿Por qué se producen los ciclos?</h3>

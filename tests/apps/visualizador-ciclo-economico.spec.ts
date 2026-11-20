@@ -369,7 +369,7 @@ test.describe('Textos', () => {
       }
       return '';
     });
-    const subtitulo = await page.getByText(/El predictor más fiable de recesiones/).innerText();
+    const subtitulo = await page.getByText(/indicadores adelantados más seguidos/).innerText();
     const rango = (t: string): string | undefined => t.match(/(\d+)-24 meses/)?.[1];
     expect(rango(subtitulo)).toBe('6');
     // Hoy el FAQPage dice «un horizonte de 12-24 meses»
@@ -387,5 +387,35 @@ test.describe('Textos', () => {
     const textos = await page.locator('header, section').allTextContents();
     const pegados = textos.join(' ').match(/\d%/g) ?? [];
     expect(pegados, `pegados: ${pegados.length}`).toHaveLength(0);
+  });
+});
+
+test.describe('Neutralidad editorial', () => {
+  test('REPARADO 5128 (20/11/2026, C0848): la curva invertida, Kondratiev y la tendencia secular no se presentan como leyes', async ({ page }) => {
+    // Antes: «El predictor más fiable de recesiones», dos veces «Todas las recesiones de EEUU desde 1970
+    // fueron precedidas por inversión», la inversión de EEUU de julio de 2022 emparejada con una
+    // recesión técnica de la Eurozona, Kondratiev como hecho y «recesiones cada vez más cortas gracias a
+    // mejores políticas» como causa segura (regla 3 de neutralidad). Decidido por el usuario: matizar.
+    await abrir(page);
+    await page.getByRole('button', { name: 'Invertida', exact: true }).click();
+    const texto = (await page.locator('body').textContent()) ?? '';
+    for (const prohibido of [
+      'El predictor más fiable',
+      'Todas las recesiones de EEUU',
+      'recesión técnica en Eurozona',
+      'gracias a mejores políticas',
+      'Estamos potencialmente en un nuevo ciclo',
+    ]) {
+      expect(texto, prohibido).not.toContain(prohibido);
+    }
+    for (const matiz of [
+      'Uno de los indicadores adelantados más seguidos',
+      'no fue\n',
+      'Julio 2022: inversión → sin recesión en EEUU',
+      'Hipótesis de ondas largas',
+      'Una de las explicaciones propuestas',
+    ].map((m) => m.trim())) {
+      expect(texto.replace(/\s+/g, ' '), matiz).toContain(matiz);
+    }
   });
 });
