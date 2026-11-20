@@ -11,6 +11,7 @@ import {
   ShareCard,
 } from '@/components';
 import styles from './SimuladorVsepr.module.css';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 // La química (tabla VSEPR, átomos, moléculas famosas y el tope X + E ≤ 6) vive en motor.ts,
 // para que los casos para clase corrijan con las mismas reglas que pinta el simulador.
 import {
@@ -246,7 +247,7 @@ export default function SimuladorVseprPage() {
               >
                 <span
                   className={styles.atomoBtnDot}
-                  style={{ background: a.color, color: a.textColor }}
+                  style={{ background: rellenoConTinta(a.color).relleno, color: rellenoConTinta(a.color).tinta }}
                   aria-hidden="true"
                 >
                   {a.simbolo}
@@ -370,15 +371,18 @@ export default function SimuladorVseprPage() {
                 cy={CY}
                 r={28}
                 className={styles.atomoCentral}
-                fill={atomoInfo.color}
+                fill={rellenoConTinta(atomoInfo.color).relleno}
               />
+              {/* Relleno CPK y tinta con rellenoConTinta (C0297): la tinta fija de cada átomo dejaba
+                  el blanco a 2,50:1 sobre el fósforo, 3,10 sobre el xenón y 3,97 sobre el oxígeno,
+                  que con ninguna tinta llega a 4,5 y se oscurece lo justo */}
               <text
                 x={CX}
                 y={CY + 5}
                 textAnchor="middle"
                 fontSize={16}
                 fontWeight={700}
-                fill={atomoInfo.textColor}
+                fill={rellenoConTinta(atomoInfo.color).tinta}
                 pointerEvents="none"
               >
                 {atomoInfo.simbolo}
@@ -394,7 +398,9 @@ export default function SimuladorVseprPage() {
 
                 if (vertice.tipo === 'enlace') {
                   return (
-                    <g key={`v-${vertice.indice}`} opacity={opacidad}>
+                    // La profundidad, en la opacidad del enlace y en el radio: con la opacidad en todo
+                    // el grupo, el ligando dejaba ver el fondo oscuro y la «X» bajaba a 4,28:1 (C0297)
+                    <g key={`v-${vertice.indice}`}>
                       {rotado.z >= 0 && (
                         <line
                           x1={CX}
@@ -403,6 +409,7 @@ export default function SimuladorVseprPage() {
                           y2={y2}
                           className={styles.enlace}
                           strokeWidth={3}
+                          opacity={opacidad}
                         />
                       )}
                       <circle

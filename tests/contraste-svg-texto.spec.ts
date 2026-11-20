@@ -515,6 +515,10 @@ const APPS: App[] = [
   // 3,48:1 en claro y 3,03 en oscuro, el verde 2,35, el rojo 3,98 en claro y 2,29 en oscuro), las cuentas
   // y el Gini en #888 (2,59-3,52) y «Sí» y «No» de las ramas en #888 (3,51 en claro, 4,05 en oscuro)
   { slug: 'arbol-decision-ia', extremos: true },
+  // 20/11/2026 (tanda 4): el símbolo del átomo central con una tinta fija por elemento sobre su color
+  // CPK (blanco a 3,97:1 sobre el oxígeno, 2,50 sobre el fósforo y 3,10 sobre el xenón) y, en oscuro, la
+  // «X» del ligando con la opacidad de profundidad en todo el grupo (4,28-4,48). Cada átomo, como subestado
+  { slug: 'simulador-vsepr', subestados: 'button[aria-pressed]' },
 ];
 
 interface TextoSvg {

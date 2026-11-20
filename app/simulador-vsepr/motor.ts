@@ -25,8 +25,8 @@
 export interface AtomoInfo {
   simbolo: string;
   nombre: string;
+  /** Color CPK del elemento; la tinta del símbolo la decide la vista con rellenoConTinta */
   color: string;
-  textColor: string;
 }
 
 export interface MoleculaPreset {
@@ -50,16 +50,16 @@ export interface GeometriaInfo {
 // DATOS
 // ============================================
 export const ATOMOS: AtomoInfo[] = [
-  { simbolo: 'C', nombre: 'Carbono', color: '#404040', textColor: '#ffffff' },
-  { simbolo: 'N', nombre: 'Nitrógeno', color: '#3050f8', textColor: '#ffffff' },
-  { simbolo: 'O', nombre: 'Oxígeno', color: '#ff0d0d', textColor: '#ffffff' },
-  { simbolo: 'P', nombre: 'Fósforo', color: '#ff8000', textColor: '#ffffff' },
-  { simbolo: 'S', nombre: 'Azufre', color: '#ffd000', textColor: '#1a1a1a' },
-  { simbolo: 'Cl', nombre: 'Cloro', color: '#1ff01f', textColor: '#1a1a1a' },
-  { simbolo: 'Br', nombre: 'Bromo', color: '#a62929', textColor: '#ffffff' },
-  { simbolo: 'Xe', nombre: 'Xenón', color: '#429eb0', textColor: '#ffffff' },
-  { simbolo: 'Si', nombre: 'Silicio', color: '#daa520', textColor: '#1a1a1a' },
-  { simbolo: 'B', nombre: 'Boro', color: '#ffb5b5', textColor: '#1a1a1a' },
+  { simbolo: 'C', nombre: 'Carbono', color: '#404040' },
+  { simbolo: 'N', nombre: 'Nitrógeno', color: '#3050f8' },
+  { simbolo: 'O', nombre: 'Oxígeno', color: '#ff0d0d' },
+  { simbolo: 'P', nombre: 'Fósforo', color: '#ff8000' },
+  { simbolo: 'S', nombre: 'Azufre', color: '#ffd000' },
+  { simbolo: 'Cl', nombre: 'Cloro', color: '#1ff01f' },
+  { simbolo: 'Br', nombre: 'Bromo', color: '#a62929' },
+  { simbolo: 'Xe', nombre: 'Xenón', color: '#429eb0' },
+  { simbolo: 'Si', nombre: 'Silicio', color: '#daa520' },
+  { simbolo: 'B', nombre: 'Boro', color: '#ffb5b5' },
 ];
 
 export const MOLECULAS_PRESET: MoleculaPreset[] = [
