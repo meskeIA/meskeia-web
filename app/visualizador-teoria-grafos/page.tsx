@@ -4,6 +4,7 @@
 import { useState, useCallback, useRef } from 'react';
 import styles from './TeoriaGrafos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 // ======== TIPOS ========
 interface GraphNode {
@@ -442,10 +443,15 @@ function GraphSVG({
             cx={node.x}
             cy={node.y}
             r={24}
-            fill={getNodeColor(node.id)}
+            fill={rellenoConTinta(getNodeColor(node.id)).relleno}
             stroke={getNodeStroke(node.id)}
             strokeWidth={2.5}
           />
+          {/* Relleno y tinta salen del mismo color (C0297): la tinta se decidía con
+              nodeStates[id] === 'default', pero un nodo sin estado vale undefined, así que los
+              nodos blancos del grafo recién cargado llevaban el rótulo en blanco (1,01:1), y en
+              oscuro la regla .graphSvg text lo pintaba en E5E5E5 sobre el mismo blanco (1,25).
+              Va en style para ganar a esa regla. */}
           <text
             x={node.x}
             y={node.y + 1}
@@ -453,7 +459,7 @@ function GraphSVG({
             dominantBaseline="middle"
             fontSize={graph.id === 'ciudades' ? '8' : '12'}
             fontWeight="600"
-            fill={nodeStates[node.id] === 'default' ? '#1A1A1A' : '#FFFFFF'}
+            style={{ fill: rellenoConTinta(getNodeColor(node.id)).tinta }}
           >
             {node.label}
           </text>

@@ -534,6 +534,15 @@ const APPS: App[] = [
   // 20/11/2026 (tanda 4): «n=0» en blanco directamente sobre la franja central, del color de la luz (1,28:1
   // con el verde, 4,02 con el rojo)
   { slug: 'visualizador-optica-ondulatoria', secciones: SECCIONES, extremos: true },
+  // 20/11/2026 (tanda 4): el rótulo de los nodos blancos del grafo recién cargado en blanco (1,01:1): la
+  // tinta se decidía con nodeStates[id] === 'default' y un nodo sin estado vale undefined; en oscuro, la
+  // regla .graphSvg text lo pintaba en E5E5E5 sobre el mismo blanco (1,25). Cada grafo, como subestado, y
+  // cuatro pasos de Dijkstra
+  {
+    slug: 'visualizador-teoria-grafos',
+    subestados: "button[class*='graphBtn']",
+    avanzar: { boton: "button:text-matches('^(Iniciar|Siguiente)')", veces: 4 },
+  },
 ];
 
 interface TextoSvg {
