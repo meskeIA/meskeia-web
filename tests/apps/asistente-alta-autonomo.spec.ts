@@ -136,18 +136,20 @@ test('CASO 2 · límites: base máxima, y la personalizada se acota a [653,59 ; 
   expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('1606,88 €');
   expect(await texto(ahorro(page))).toBe('18.322,54 €');
 
-  // 9.000 € supera la base máxima: al salir del campo se acota a 5.101,20 → 1606,88 €
+  // 9.000 € supera la base máxima: al salir del campo se acota a 5.101,20 → 1606,88 €.
+  // El campo se reescribe con coma decimal y sin agrupar («5101,2»), como el resto de cifras
+  // del formulario; antes de cee6e57bd (C0850) salía en formato inglés («5101.2»).
   await elegirBase(page, 'personalizada');
   let campo = await escribirBase(page, '9000');
   await campo.blur();
-  await expect(campo).toHaveValue('5101.2');
+  await expect(campo).toHaveValue('5101,2');
   expect(await texto(filaCuota(page, 'Base de cotización elegida'))).toBe('5101,20 €');
   expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('1606,88 €');
 
   // 500 € queda por debajo de la base mínima: al salir se acota a 653,59 → 205,88 €
   campo = await escribirBase(page, '500');
   await campo.blur();
-  await expect(campo).toHaveValue('653.59');
+  await expect(campo).toHaveValue('653,59');
   expect(await texto(filaCuota(page, 'Base de cotización elegida'))).toBe('653,59 €');
   expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('205,88 €');
 });
@@ -160,7 +162,7 @@ test('CASO 3 · entradas que no son una base: negativa, texto y vacío acaban en
   // −100: al salir del campo se acota a la base mínima → 653,59 € y 205,88 €
   let campo = await escribirBase(page, '-100');
   await campo.blur();
-  await expect(campo).toHaveValue('653.59');
+  await expect(campo).toHaveValue('653,59');
   expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('205,88 €');
 
   // Texto: el control rechaza las letras, el campo se queda vacío y la app cae a la base
@@ -470,7 +472,7 @@ test('25/09 · tramo intermedio de 2026: 2.500 €/mes cae en el tramo 10', asyn
   const campo = await escribirBase(page, '1000');
   expect(await texto(filaCuota(page, 'Cuota mensual normal'))).toBe('427,21 €');
   await campo.blur();
-  await expect(campo).toHaveValue('1356.21');
+  await expect(campo).toHaveValue('1356,21');
 });
 
 test('25/09 · fronteras que cierran por arriba (≤ 670, ≤ 900, ≤ 6.000) y la de 1.166,69', async ({ page }) => {
