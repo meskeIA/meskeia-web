@@ -97,7 +97,7 @@ export default function OrientadorTramitesJubilacionPage() {
         variant="financial"
         severity="critical"
         collapsible={false}
-        context="Esta herramienta es solo orientativa: describe TIPOS de trámite, complemento o servicio relacionados con la jubilación (marcos normativos generales), no calcula cuantías, fechas ni la concesión de ningún complemento o prestación. Para una estimación con tus datos, usa las calculadoras de meskeIA enlazadas en cada categoría o el simulador 'Tu Seguridad Social'. Para iniciar cualquier trámite real, dirígete siempre a la Seguridad Social (INSS), la Agencia Tributaria o los Servicios Sociales de tu Comunidad Autónoma."
+        detalle="Esta herramienta es solo orientativa: describe TIPOS de trámite, complemento o servicio relacionados con la jubilación (marcos normativos generales), no calcula cuantías, fechas ni la concesión de ningún complemento o prestación. Para una estimación con tus datos, usa las calculadoras de meskeIA enlazadas en cada categoría o el simulador 'Tu Seguridad Social'. Para iniciar cualquier trámite real, dirígete siempre a la Seguridad Social (INSS), la Agencia Tributaria o los Servicios Sociales de tu Comunidad Autónoma."
       />
 
       <DataReference

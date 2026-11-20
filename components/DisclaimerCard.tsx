@@ -20,7 +20,20 @@ interface DisclaimerCardProps {
    * - severity "low" → si true, usa localStorage (persiste entre sesiones)
    */
   collapsible?: boolean;
-  context?: string; // Clave de storage (ej: 'planificador-menu')
+  /** Clave de storage del plegado (ej: 'planificador-menu'). NO es un texto: no se pinta. */
+  context?: string;
+  /**
+   * Texto propio de la app, que se pinta ENCIMA del contenido (el estándar de la variante o
+   * `children`), sin sustituirlo: añade el matiz de la app y conserva la cláusula de
+   * responsabilidad de la política.
+   *
+   * ── De dónde sale (hallazgo 5213 y cabo C0829, 18-20/11/2026) ──
+   * Nueve apps pasaban su aviso propio en `context`, que es la clave de almacenamiento: el texto
+   * no salía nunca y solo se veía el genérico (test-tolerancia-riesgo-detallado, siete
+   * orientadores de ayudas y trámites, simulador-bono-joven-alquiler y
+   * simulador-subvenciones-rehabilitacion).
+   */
+  detalle?: ReactNode;
 }
 
 const DEFAULT_TITLES: Record<DisclaimerVariant, string> = {
@@ -52,6 +65,7 @@ export default function DisclaimerCard({
   showTermsLink = false,
   collapsible = false,
   context,
+  detalle,
 }: DisclaimerCardProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -135,6 +149,7 @@ export default function DisclaimerCard({
 
       {isExpanded && (
         <div className={styles.content}>
+          {detalle && <p className={styles.detalle}>{detalle}</p>}
           {children || <DefaultContent variant={variant} severity={severity} />}
 
           {showTermsLink && (

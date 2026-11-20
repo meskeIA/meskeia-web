@@ -488,15 +488,15 @@ test.describe('hallazgos 18/11/2026', () => {
     await expect(page.getByText(/modelos académicos estándar/)).toHaveCount(0);
   });
 
-  test('ABIERTO (bajo) — el texto propio del aviso va en `context`, que es una clave de almacenamiento, y no se pinta', async ({
+  test('REPARADO (hallazgo 5213) — el texto propio del aviso se pinta', async ({
     page,
   }) => {
-    test.fail();
     await cargar(page);
-    // page.tsx pasa a <DisclaimerCard> context="Los resultados de este test son orientativos […] No
+    // page.tsx pasaba a <DisclaimerCard> context="Los resultados de este test son orientativos […] No
     // constituyen asesoramiento financiero personalizado. Consulta a un asesor financiero certificado
     // […]", pero `context` es la clave de sessionStorage/localStorage del plegado
-    // (components/DisclaimerCard.tsx): el texto no llega a la pantalla. Va como hijo del componente.
+    // (components/DisclaimerCard.tsx): el texto no llegaba a la pantalla. Ahora va en `detalle`,
+    // que se pinta encima del genérico (C0829, 20/11/2026; testigo tests/disclaimer-detalle.spec.ts).
     await expect(page.locator('[class*="disclaimer"]').first()).toContainText(
       'No constituyen asesoramiento financiero personalizado',
     );

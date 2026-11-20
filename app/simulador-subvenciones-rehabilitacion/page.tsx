@@ -266,7 +266,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
           variant="financial"
           severity="high"
           collapsible={false}
-          context="Las subvenciones dependen de la disponibilidad presupuestaria de cada CCAA y de la convocatoria vigente. Los importes y requisitos pueden variar. Esta herramienta es ORIENTATIVA. Consulta siempre con tu CCAA o un agente rehabilitador autorizado para confirmar la disponibilidad."
+          detalle="Las subvenciones dependen de la disponibilidad presupuestaria de cada CCAA y de la convocatoria vigente. Los importes y requisitos pueden variar. Esta herramienta es ORIENTATIVA. Consulta siempre con tu CCAA o un agente rehabilitador autorizado para confirmar la disponibilidad."
         />
 
         {/* 1. Tipo de actuación */}

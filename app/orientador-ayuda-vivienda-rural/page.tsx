@@ -94,7 +94,7 @@ export default function OrientadorAyudaViviendaRural() {
         variant="financial"
         severity="critical"
         collapsible={false}
-        context="Este orientador es informativo y no vinculante. El Plan Estatal 2026-2030 (RD 326/2026) establece el marco general, pero cada Comunidad Autónoma define sus propios requisitos, importes concretos y plazos en su convocatoria. Consulta siempre la convocatoria de tu CA antes de tomar decisiones de compra."
+        detalle="Este orientador es informativo y no vinculante. El Plan Estatal 2026-2030 (RD 326/2026) establece el marco general, pero cada Comunidad Autónoma define sus propios requisitos, importes concretos y plazos en su convocatoria. Consulta siempre la convocatoria de tu CA antes de tomar decisiones de compra."
       />
       <DataReference
         normativa={`Plan Estatal de Vivienda ${FISCAL_VIVIENDA_JOVEN_META.vigencia}`}

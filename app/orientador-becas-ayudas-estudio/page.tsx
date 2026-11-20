@@ -96,7 +96,7 @@ export default function OrientadorBecasAyudasEstudioPage() {
         variant="financial"
         severity="critical"
         collapsible={false}
-        context="Esta herramienta es solo orientativa: describe TIPOS de beca y ayuda al estudio (marcos normativos generales), no calcula la elegibilidad ni el importe que te correspondería. La concesión real depende de una valoración individual del organismo competente, a partir de tus datos concretos (renta, patrimonio, nota media, necesidad acreditada...). Además, la educación está mayoritariamente transferida a las Comunidades Autónomas: solo las becas generales (MEC) y las ayudas NEAE tienen criterios comunes en toda España (excepto País Vasco y Navarra); comedor, transporte y libros/material dependen de tu Comunidad Autónoma, ayuntamiento o centro educativo. Para una estimación con tus datos reales, usa siempre los simuladores y comprobadores oficiales enlazados."
+        detalle="Esta herramienta es solo orientativa: describe TIPOS de beca y ayuda al estudio (marcos normativos generales), no calcula la elegibilidad ni el importe que te correspondería. La concesión real depende de una valoración individual del organismo competente, a partir de tus datos concretos (renta, patrimonio, nota media, necesidad acreditada...). Además, la educación está mayoritariamente transferida a las Comunidades Autónomas: solo las becas generales (MEC) y las ayudas NEAE tienen criterios comunes en toda España (excepto País Vasco y Navarra); comedor, transporte y libros/material dependen de tu Comunidad Autónoma, ayuntamiento o centro educativo. Para una estimación con tus datos reales, usa siempre los simuladores y comprobadores oficiales enlazados."
       />
 
       <DataReference

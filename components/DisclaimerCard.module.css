@@ -249,6 +249,14 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+/* El texto propio de la app (prop `detalle`), encima del estándar: mismo color que el resto del
+   aviso en los dos temas, separado del contenido que le sigue por una línea */
+.detalle {
+  padding-bottom: var(--spacing-md, 1rem);
+  border-bottom: 1px solid currentColor;
+  border-bottom-color: color-mix(in srgb, currentColor 25%, transparent);
+}
+
 .limitation {
   font-size: 0.95rem;
   font-style: italic;

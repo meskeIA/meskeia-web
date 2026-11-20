@@ -101,7 +101,7 @@ export default function OrientadorAyudasPersonasFamiliasPage() {
         variant="financial"
         severity="critical"
         collapsible={false}
-        context="Esta herramienta es solo orientativa: describe TIPOS de ayuda y prestación (marcos normativos generales), no un cálculo de elegibilidad ni de cuantía. El acceso real a cada ayuda y su importe dependen de una valoración individual del organismo competente, a partir de tus datos concretos (ingresos, patrimonio, composición del hogar, cotizaciones...). Esta página no garantiza que tengas derecho a ninguna prestación. Para una estimación con tus datos reales, usa siempre los simuladores oficiales enlazados, y si tu situación es urgente acude a los Servicios Sociales de tu ayuntamiento."
+        detalle="Esta herramienta es solo orientativa: describe TIPOS de ayuda y prestación (marcos normativos generales), no un cálculo de elegibilidad ni de cuantía. El acceso real a cada ayuda y su importe dependen de una valoración individual del organismo competente, a partir de tus datos concretos (ingresos, patrimonio, composición del hogar, cotizaciones...). Esta página no garantiza que tengas derecho a ninguna prestación. Para una estimación con tus datos reales, usa siempre los simuladores oficiales enlazados, y si tu situación es urgente acude a los Servicios Sociales de tu ayuntamiento."
       />
 
       <DataReference

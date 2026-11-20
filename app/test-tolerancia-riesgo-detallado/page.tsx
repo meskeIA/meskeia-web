@@ -485,7 +485,7 @@ export default function TestToleranciaRiesgoDetallado() {
           variant="financial"
           severity="high"
           collapsible={false}
-          context="Los resultados de este test son orientativos y tienen fines exclusivamente educativos. No constituyen asesoramiento financiero personalizado. Consulta a un asesor financiero certificado antes de tomar decisiones de inversión."
+          detalle="Los resultados de este test son orientativos y tienen fines exclusivamente educativos. No constituyen asesoramiento financiero personalizado. Consulta a un asesor financiero certificado antes de tomar decisiones de inversión."
         />
 
         {/* INICIO */}

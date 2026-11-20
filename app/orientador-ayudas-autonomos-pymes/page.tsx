@@ -96,7 +96,7 @@ export default function OrientadorAyudasAutonomosPymesPage() {
         variant="financial"
         severity="critical"
         collapsible={false}
-        context="Esta herramienta describe TIPOS de ayuda (programas marco), no convocatorias activas concretas. Las convocatorias cambian varias veces al año y tienen presupuesto limitado: consulta siempre BDNS (infosubvenciones.es) y al organismo gestor antes de tomar decisiones, y valora contar con un gestor o asesor especializado."
+        detalle="Esta herramienta describe TIPOS de ayuda (programas marco), no convocatorias activas concretas. Las convocatorias cambian varias veces al año y tienen presupuesto limitado: consulta siempre BDNS (infosubvenciones.es) y al organismo gestor antes de tomar decisiones, y valora contar con un gestor o asesor especializado."
       />
 
       <DataReference
