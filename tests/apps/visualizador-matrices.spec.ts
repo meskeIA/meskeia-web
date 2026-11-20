@@ -21,6 +21,20 @@ async function abrirDeterminante(page: import('@playwright/test').Page): Promise
 }
 
 test.describe('Visualizador de matrices', () => {
+  test('«Escala ×0,5» aplica la matriz de una escala y la escribe con coma decimal', async ({ page }) => {
+    // A mano: escalar por 0,5 es [[0,5 0][0 0,5]]; el cuadrado de vértices (±1, ±1) pasa a (±0,5,
+    // ±0,5), que en el SVG (centro 150, 50 px por unidad, y hacia arriba) son 125 y 175. La matriz
+    // de antes, [[0,5 0][0,5 0,5]], llevaba (1, 1) a (0,5, 1): un rombo cizallado, no un cuadrado.
+    await page.goto('/visualizador-matrices/');
+    await esperarPaginaAsentada(page);
+    await page.getByRole('navigation', { name: 'Secciones' }).getByRole('button', { name: /Transformaciones/ }).click();
+    await page.getByRole('button', { name: /Escala ×0,5/ }).click();
+    const celdas = page.getByText('Matriz aplicada').locator('xpath=following-sibling::*[1]').locator('span');
+    await expect(celdas).toHaveText(['0,5', '0', '0', '0,5']);
+    const figura = page.locator('svg[aria-label^="Plano cartesiano"] polygon').last();
+    await expect(figura).toHaveAttribute('points', '175,125 175,175 125,175 125,125');
+  });
+
   test('b y c del determinante se leen en naranja en claro y en oscuro (C0798)', async ({ page }) => {
     await page.goto('/visualizador-matrices/');
     await esperarPaginaAsentada(page);

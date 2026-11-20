@@ -82,7 +82,9 @@ const TRANSFORMACIONES: TransformacionInfo[] = [
   { nombre: 'Rotación 90°', desc: 'Gira la figura 90° en sentido antihorario', matriz: [[0, -1], [1, 0]], icono: '↩️' },
   { nombre: 'Rotación 180°', desc: 'Gira la figura media vuelta', matriz: [[-1, 0], [0, -1]], icono: '🔃' },
   { nombre: 'Escala ×2', desc: 'Duplica el tamaño de la figura', matriz: [[2, 0], [0, 2]], icono: '🔍' },
-  { nombre: 'Escala ×0,5', desc: 'Reduce la figura a la mitad', matriz: [[0.5, 0], [0.5, 0.5]], icono: '🔎' },
+  // Era [[0.5, 0], [0.5, 0.5]]: el 0,5 de abajo a la izquierda cizallaba el cuadrado en vertical
+  // además de reducirlo, y la matriz mostrada no era la de una escala (/reparar 20/11/2026)
+  { nombre: 'Escala ×0,5', desc: 'Reduce la figura a la mitad', matriz: [[0.5, 0], [0, 0.5]], icono: '🔎' },
   { nombre: 'Reflexión eje X', desc: 'Refleja respecto al eje horizontal', matriz: [[1, 0], [0, -1]], icono: '↕️' },
   { nombre: 'Reflexión eje Y', desc: 'Refleja respecto al eje vertical', matriz: [[-1, 0], [0, 1]], icono: '↔️' },
   { nombre: 'Cizalladura', desc: 'Deforma la figura en horizontal', matriz: [[1, 1], [0, 1]], icono: '📐' },
@@ -511,10 +513,10 @@ function SeccionTransformaciones() {
           <div className={styles.matrizActiva}>
             <div className={styles.matrizLabel}>Matriz aplicada</div>
             <div className={styles.matrizGridPeq}>
-              <span className={styles.celdaPeq}>{matrizActiva[0][0]}</span>
-              <span className={styles.celdaPeq}>{matrizActiva[0][1]}</span>
-              <span className={styles.celdaPeq}>{matrizActiva[1][0]}</span>
-              <span className={styles.celdaPeq}>{matrizActiva[1][1]}</span>
+              {/* Con coma decimal: el 0,5 de la escala salía «0.5» */}
+              {matrizActiva.flat().map((v, i) => (
+                <span key={i} className={styles.celdaPeq}>{formatNumber(v, Number.isInteger(v) ? 0 : 1)}</span>
+              ))}
             </div>
           </div>
 
