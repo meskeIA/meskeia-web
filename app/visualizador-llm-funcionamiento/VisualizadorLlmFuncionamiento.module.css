@@ -979,12 +979,26 @@
   background: rgba(46, 134, 171, 0.07);
 }
 
-[data-theme='dark'] .token0 { background: rgba(46, 134, 171, 0.22); color: #7FB3D3; border-color: rgba(46, 134, 171, 0.35); }
-[data-theme='dark'] .token1 { background: rgba(72, 169, 166, 0.22); color: var(--secondary-texto); border-color: rgba(72, 169, 166, 0.35); }
-[data-theme='dark'] .token2 { background: rgba(230, 126, 34, 0.2); color: #e67e22; border-color: rgba(230, 126, 34, 0.32); }
-[data-theme='dark'] .token3 { background: rgba(39, 174, 96, 0.18); color: #27ae60; border-color: rgba(39, 174, 96, 0.32); }
-[data-theme='dark'] .token4 { background: rgba(142, 68, 173, 0.18); color: #8e44ad; border-color: rgba(142, 68, 173, 0.32); }
-[data-theme='dark'] .token5 { background: rgba(231, 76, 60, 0.17); color: #e74c3c; border-color: rgba(231, 76, 60, 0.3); }
+/*
+ * En oscuro cada token iba en su color de dato puro sobre su tinte (C0798, 20/11/2026): violeta
+ * 1,95:1, rojo 2,87, naranja 3,39, verde 3,45, teal 4,09, acento 4,49. Ahora un tono claro de cada
+ * color, de 5,5 a 7,4 sobre su tinte.
+ */
+[data-theme='dark'] .token0 { background: rgba(46, 134, 171, 0.22); color: #A8D4EC; border-color: rgba(46, 134, 171, 0.35); }
+[data-theme='dark'] .token1 { background: rgba(72, 169, 166, 0.22); color: #8FD6D2; border-color: rgba(72, 169, 166, 0.35); }
+[data-theme='dark'] .token2 { background: rgba(230, 126, 34, 0.2); color: #FDBA74; border-color: rgba(230, 126, 34, 0.32); }
+[data-theme='dark'] .token3 { background: rgba(39, 174, 96, 0.18); color: #86EFAC; border-color: rgba(39, 174, 96, 0.32); }
+[data-theme='dark'] .token4 { background: rgba(142, 68, 173, 0.18); color: #D2B4DE; border-color: rgba(142, 68, 173, 0.32); }
+[data-theme='dark'] .token5 { background: rgba(231, 76, 60, 0.17); color: #FCA5A5; border-color: rgba(231, 76, 60, 0.3); }
+
+/* El tema oscuro pisaba el blanco de los botones activos con el gris del botón (2,52 y 4,46:1) */
+[data-theme='dark'] .contextoBtn.contextoBtnActivo,
+[data-theme='dark'] .tokenAtencion.tokenAtencionActivo { color: #fff; }
+
+/* --primary-texto sobre el tinte de marca: 4,18 en las cabeceras de la matriz y 4,32 en el núcleo */
+[data-theme='dark'] .atencionCabecera,
+[data-theme='dark'] .nucleoFilaActiva .probPorcentaje,
+[data-theme='dark'] .nucleoFilaActiva .nucleoBadge { color: #A8D4EC; }
 
 [data-theme='dark'] .tarjetaDato {
   background: rgba(46, 134, 171, 0.1);

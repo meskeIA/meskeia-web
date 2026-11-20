@@ -221,6 +221,11 @@ const APPS: App[] = [
   // de Ansoff y la letra del VRIO en el verde, naranja o rojo puro del semáforo con style. Los seis
   // módulos como secciones (cada uno con su visual en su estado inicial)
   { slug: 'visualizador-estrategia-empresarial', todo: true, secciones: "button[role='listitem']" },
+  // 20/11/2026 (C0798): el porcentaje de cada celda de la matriz de atención en blanco sobre el tono
+  // de su intensidad (1,52-3,57:1) o sobre un tinte casi blanco en las filas no destacadas (1,03-1,31);
+  // en oscuro, cada token en su color puro sobre su tinte (1,95-4,49), el blanco de los botones
+  // activos pisado por el gris del botón (2,52 y 4,46) y --primary-texto sobre el tinte (4,18-4,32)
+  { slug: 'visualizador-llm-funcionamiento', todo: true },
   // 13/11/2026: el título del panel de la capa en su color con style (el núcleo interno en oro, 1,73:1)
   { slug: 'visualizador-capas-tierra', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
   // 13/11/2026: «Producción de bilis» en amarillo (1,52:1), «FASE 2» en verde (2,56-2,75) y el título del

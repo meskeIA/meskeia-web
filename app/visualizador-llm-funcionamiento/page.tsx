@@ -9,6 +9,7 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -299,9 +300,16 @@ export default function VisualizadorLlmFuncionamiento() {
     setTextoGenerado('El cielo es...');
   }, []);
 
-  const getIntensidadColor = (valor: number): string => {
-    const v = Math.round(valor * 255);
-    return `rgb(46, ${Math.round(134 + (255 - 134) * (1 - valor))}, ${Math.round(171 + (255 - 171) * (1 - valor))})`;
+  /*
+   * Celda de la fila destacada: el color de su intensidad con la tinta que le llega. Antes el texto
+   * era blanco siempre, y sobre los tonos claros (atención baja) quedaba a 1,5-3,6:1; las filas no
+   * destacadas, blanco sobre un tinte casi blanco a opacidad 0,55, no se leían (1,03-1,31). C0798.
+   */
+  const getIntensidadCelda = (valor: number): { relleno: string; tinta: string } => {
+    const g = Math.round(134 + (255 - 134) * (1 - valor));
+    const b = Math.round(171 + (255 - 171) * (1 - valor));
+    const hex = `#${[46, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+    return rellenoConTinta(hex);
   };
 
   const getEtiquetaTemp = (t: number): string => {
@@ -637,17 +645,14 @@ export default function VisualizadorLlmFuncionamiento() {
                   {FRASE_ATENCION.map((_, ci) => {
                     const valor = matrizActual[fi][ci];
                     const esDestacado = tokenAtencionIdx === fi;
+                    const celda = esDestacado ? getIntensidadCelda(valor) : null;
                     return (
                       <div
                         key={`cell-${fi}-${ci}`}
                         className={styles.atencionCelda}
-                        style={{
-                          backgroundColor: esDestacado
-                            ? getIntensidadColor(valor)
-                            : `rgba(46, 134, 171, ${valor * 0.25})`,
-                          opacity: esDestacado ? 1 : 0.55,
-                          fontWeight: esDestacado ? 700 : 400,
-                        }}
+                        style={celda
+                          ? { backgroundColor: celda.relleno, color: celda.tinta, fontWeight: 700 }
+                          : { backgroundColor: `rgba(46, 134, 171, ${valor * 0.25})`, color: 'var(--text-primary)', fontWeight: 400 }}
                         role="gridcell"
                         aria-label={`Atención de "${FRASE_ATENCION[fi]}" hacia "${FRASE_ATENCION[ci]}": ${Math.round(valor * 100)}%`}
                         title={`${Math.round(valor * 100)}%`}
