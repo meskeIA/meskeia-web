@@ -508,6 +508,9 @@ const APPS: App[] = [
   // 20/11/2026 (tanda 4): en la curva de glucemia, las cifras de los ejes en #9CA3AF fijo (2,52:1 en
   // claro) y «Glucosa (mg/dL)» en #6B7280 fijo (2,81 en oscuro)
   { slug: 'visualizador-indice-glucemico', secciones: SECCIONES },
+  // 20/11/2026 (tanda 4): el nombre y la cifra de cada región con el texto del tema (la regla .mapaSvg
+  // text) sobre su círculo al 82 %: 4,22-4,26:1 en claro y 3,09-4,37 en oscuro
+  { slug: 'visualizador-migracion-global' },
 ];
 
 interface TextoSvg {

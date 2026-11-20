@@ -11,6 +11,7 @@ import {
   EducationalSection,
 } from '@/components';
 import styles from './MigracionGlobal.module.css';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 // --- Tipos ---
 type TipoFlujo = 'refugiados' | 'economica' | 'mixto';
@@ -224,6 +225,16 @@ const MARKER_COLORS: Record<TipoFlujo, string> = {
   mixto: '#9B59B6',
 };
 
+/**
+ * Tinta de la insignia del tipo de flujo, sobre su tinte claro fijo (igual en los dos temas): el
+ * color de la flecha como texto daba 3,4-4,1:1. Estos llegan a 6,3-7,5:1 sobre su tinte (C0645).
+ */
+const TINTA_INSIGNIA: Record<TipoFlujo, string> = {
+  refugiados: '#A61B1B',
+  economica: '#1F5F7A',
+  mixto: '#6B2E8C',
+};
+
 export default function MigracionGlobalPage() {
   const [regionActiva, setRegionActiva] = useState<string | null>(null);
   const [flujoActivo, setFlujoActivo] = useState<string | null>(null);
@@ -303,7 +314,12 @@ export default function MigracionGlobalPage() {
             ))}
 
             {/* Nodos de regiones */}
-            {REGIONES.map((region) => (
+            {/* Círculo OPACO con la tinta que le llega (C0297): al 82 % y con el texto del tema
+                encima (la regla .mapaSvg text), daba 4,2:1 en claro y 3,1-3,7 en oscuro. La región
+                elegida se marca con el anillo, no con la opacidad. */}
+            {REGIONES.map((region) => {
+              const { relleno, tinta } = rellenoConTinta(region.color);
+              return (
               <g
                 key={region.id}
                 onClick={() => handleRegionClick(region.id)}
@@ -316,9 +332,8 @@ export default function MigracionGlobalPage() {
                   cx={region.x}
                   cy={region.y}
                   r={40}
-                  fill={region.color}
-                  opacity={regionActiva === region.id ? 1 : 0.82}
-                  stroke={regionActiva === region.id ? '#ffffff' : 'transparent'}
+                  fill={relleno}
+                  stroke={regionActiva === region.id ? 'var(--text-primary)' : 'transparent'}
                   strokeWidth={3}
                 />
                 <text
@@ -327,8 +342,7 @@ export default function MigracionGlobalPage() {
                   textAnchor="middle"
                   fontSize={11}
                   fontWeight="700"
-                  fill="#ffffff"
-                  style={{ pointerEvents: 'none', userSelect: 'none' }}
+                  style={{ fill: tinta, pointerEvents: 'none', userSelect: 'none' }}
                 >
                   {region.label.split(' ').length > 2
                     ? region.label.split(' ').slice(0, 2).join(' ')
@@ -341,8 +355,7 @@ export default function MigracionGlobalPage() {
                     textAnchor="middle"
                     fontSize={11}
                     fontWeight="700"
-                    fill="#ffffff"
-                    style={{ pointerEvents: 'none', userSelect: 'none' }}
+                    style={{ fill: tinta, pointerEvents: 'none', userSelect: 'none' }}
                   >
                     {region.label.split(' ').slice(2).join(' ')}
                   </text>
@@ -353,13 +366,13 @@ export default function MigracionGlobalPage() {
                   textAnchor="middle"
                   fontSize={12}
                   fontWeight="600"
-                  fill="#ffffff"
-                  style={{ pointerEvents: 'none', userSelect: 'none' }}
+                  style={{ fill: tinta, pointerEvents: 'none', userSelect: 'none' }}
                 >
                   {region.migrantes}
                 </text>
               </g>
-            ))}
+              );
+            })}
           </svg>
         </div>
 
@@ -391,7 +404,9 @@ export default function MigracionGlobalPage() {
           >
             ✕
           </button>
-          <h3 style={{ color: regionDetalle.color }}>{regionDetalle.label}</h3>
+          {/* El color de la región, en la marca del borde y no en el texto: como texto daba
+              2,35-4,20:1 (C0645) */}
+          <h3 className={styles.tituloRegion} style={{ borderLeftColor: regionDetalle.color }}>{regionDetalle.label}</h3>
           <p className={styles.cifraDestacada}>{regionDetalle.migrantes} migrantes internacionales</p>
           <p>{regionDetalle.descripcion}</p>
         </div>
@@ -420,7 +435,7 @@ export default function MigracionGlobalPage() {
                   : flujoDetalle.tipo === 'economica'
                   ? '#e8f4f8'
                   : '#f3e8ff',
-              color: MARKER_COLORS[flujoDetalle.tipo],
+              color: TINTA_INSIGNIA[flujoDetalle.tipo],
             }}
           >
             {flujoDetalle.tipo === 'refugiados'

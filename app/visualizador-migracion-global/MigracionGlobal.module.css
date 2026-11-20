@@ -127,6 +127,13 @@
   margin: 0 0 8px;
 }
 
+/* Título de la región: texto del tema y el color de la región en la marca del borde (C0645) */
+.tituloRegion {
+  color: var(--text-primary);
+  border-left: 6px solid var(--primary);
+  padding-left: 10px;
+}
+
 .panelDetalle p {
   margin: 0 0 8px;
   color: var(--text-secondary);

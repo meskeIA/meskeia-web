@@ -269,6 +269,10 @@ const APPS: App[] = [
   // 17/11/2026 (de paso por C0297): el botón activo del estado de la curva de rendimientos, blanco
   // sobre el color puro del estado con style (Normal en 22c55e, 2,28:1)
   { slug: 'visualizador-ciclo-economico', todo: true },
+  // 20/11/2026 (de paso por C0297): el título del panel de cada región en su color con style (África
+  // 2,85:1 y América del Norte 2,87 en claro; América Latina 2,35 y Oriente Medio 2,53 en oscuro). Cada
+  // región del mapa, abierta una a una
+  { slug: 'visualizador-migracion-global', todo: true, secciones: "svg g[role='button']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
