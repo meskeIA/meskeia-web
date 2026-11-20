@@ -224,7 +224,7 @@ const INDICADORES: Indicador[] = [
       'Número de afiliados a la Seguridad Social y variación mensual del empleo. Dato más inmediato del mercado laboral.',
     porQue:
       'Las afiliaciones suben cuando la economía crece y bajan al inicio de una recesión. Es coincident porque las empresas contratan o despiden al ritmo de la economía actual, sin mucho lag.',
-    datoEspana: 'Afiliados SS España (abr. 2024): 21,2 millones (+3,1% interanual)',
+    datoEspana: 'Afiliados SS España (abr. 2024): 21,1 millones (+2,4 % interanual, afiliación media)',
     datoEurozona: 'Empleo Eurozona Q4 2023: +0,3% trimestral',
   },
   // LAGGING

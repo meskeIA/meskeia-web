@@ -281,7 +281,9 @@ test.describe('Datos de los indicadores frente a su fuente (cabo C0825)', () => 
     await abrir(page);
   });
 
-  test.fail('HALLAZGO ABIERTO (C0825): los afiliados de abril de 2024 son los de la Seguridad Social, 21,1 millones (+2,4 %)', async ({ page }) => {
+  test('HALLAZGO 5216 (C0825, REPARADO 20/11/2026): los afiliados de abril de 2024 son los de la Seguridad Social, 21,1 millones (+2,4 %)', async ({ page }) => {
+    // Decidido por el usuario en /reparar pendientes del 20/11/2026 (C0847) con la nota oficial del
+    // Ministerio de Inclusión (afiliación media de abril de 2024: 21.101.505, +2,4 %, +486.516).
     // www.seg-social.es, serie de afiliación media (Total Sistema): abril 2024 21.101.504,9 frente a
     // abril 2023 20.614.988,6 → +2,36 %. A último día del mes, 21.082.893 → +1,96 %. Hoy la app
     // pinta «21,2 millones (+3,1% interanual)». Si la reparación del 5127 cambia la fecha del dato,
