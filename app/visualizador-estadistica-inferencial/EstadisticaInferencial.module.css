@@ -419,6 +419,19 @@
   line-height: 1.5;
 }
 
+/* Rótulos de los SVG: tono de TEXTO por tema; el color puro de la curva se queda en el trazo (C0297) */
+.svgMarca {
+  fill: var(--primary-texto);
+}
+
+.svgTeal {
+  fill: var(--secondary-texto);
+}
+
+.svgRojo {
+  fill: var(--rojo-texto, #C53030);
+}
+
 /* ─── Dark mode ─── */
 [data-theme='dark'] .bloqueCard {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);

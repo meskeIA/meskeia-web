@@ -501,6 +501,10 @@ const APPS: App[] = [
   // 20/11/2026 (tanda 4): el nombre de cada nota de la escala en blanco sobre la tecla activa y sobre la
   // nota del mástil en la marca pura (4,11:1 en los dos temas)
   { slug: 'visualizador-escalas-musicales' },
+  // 20/11/2026 (tanda 4): el eje z de la normal en currentColor al 55 % (3,85:1 en claro), «z=…» en la
+  // marca (3,93) o en rojo E53E3E (3,95 en claro, 4,22 en oscuro) y, en los errores, «H₀» en la marca
+  // (3,93 y 4,24) y «H₁» en el teal (2,68 en claro)
+  { slug: 'visualizador-estadistica-inferencial', secciones: "nav[aria-label*='ecciones'] button", extremos: true },
 ];
 
 interface TextoSvg {

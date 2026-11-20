@@ -11,6 +11,7 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
+import { formatNumber } from '@/lib';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -214,22 +215,21 @@ function SvgPValor({ estadistico, pvalor, alpha: _alpha }: SvgPValorProps) {
           y={baseY + 16}
           textAnchor="middle"
           fontSize="11"
-          fill="currentColor"
-          opacity="0.55"
+          fill="var(--text-secondary)"
         >
           {val}
         </text>
       ))}
-      {/* Etiqueta estadístico */}
+      {/* Etiqueta estadístico: tono de texto por tema (el rojo y la marca puros no llegaban a 4,5:1) */}
       <text
         x={xZDer.toFixed(1)}
         y={PAD_T - 2}
         textAnchor="middle"
         fontSize="11"
-        fill={rechaza ? '#e53e3e' : '#2E86AB'}
+        className={rechaza ? styles.svgRojo : styles.svgMarca}
         fontWeight="700"
       >
-        z={estadistico.toFixed(2)}
+        z={formatNumber(estadistico, 2)}
       </text>
     </svg>
   );
@@ -317,10 +317,10 @@ function SvgErrores({ alpha, efectoDesv }: SvgErroresProps) {
         stroke="#718096" strokeWidth="1.5" strokeDasharray="5,3"
       />
       {/* Etiquetas */}
-      <text x="20" y={PAD_T + 12} fontSize="11" fill="#2E86AB" fontWeight="700">H₀</text>
-      <text x={escalarX(efectoDesv, X_MIN, X_MAX, SVG_W) + 6} y={PAD_T + 12} fontSize="11" fill="#48A9A6" fontWeight="700">H₁</text>
-      <text x={xCritico.toFixed(1)} y={baseY + 15} textAnchor="middle" fontSize="10" fill="currentColor" opacity="0.6">
-        z_crit={zAlpha.toFixed(2)}
+      <text x="20" y={PAD_T + 12} fontSize="11" className={styles.svgMarca} fontWeight="700">H₀</text>
+      <text x={escalarX(efectoDesv, X_MIN, X_MAX, SVG_W) + 6} y={PAD_T + 12} fontSize="11" className={styles.svgTeal} fontWeight="700">H₁</text>
+      <text x={xCritico.toFixed(1)} y={baseY + 15} textAnchor="middle" fontSize="10" fill="var(--text-secondary)">
+        z_crit={formatNumber(zAlpha, 2)}
       </text>
     </svg>
   );
