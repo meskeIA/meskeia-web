@@ -40,15 +40,21 @@ const SECCIONES: SeccionInfo[] = [
 interface Partido {
   nombre: string;
   votos: number;
+  /** Relleno de la barra y del punto: oscurecido para que el blanco de encima llegue a 4,5:1 */
   color: string;
+  /** Clase del módulo con el tono de TEXTO del partido en cada tema */
+  tono: string;
   siglas: string;
 }
 
+// Cabo C0798 (20/11/2026): con los colores puros (#2E86AB, #e74c3c, #27ae60, #f39c12) el blanco de
+// las barras daba 2,19-4,11:1 y las siglas y «→ Escaño para…» en ese color, 2,01-4,11 en claro y
+// 3,08-3,76 en oscuro
 const PARTIDOS: Partido[] = [
-  { nombre: 'Partido Azul', votos: 340000, color: '#2E86AB', siglas: 'PA' },
-  { nombre: 'Partido Rojo', votos: 280000, color: '#e74c3c', siglas: 'PR' },
-  { nombre: 'Partido Verde', votos: 160000, color: '#27ae60', siglas: 'PV' },
-  { nombre: 'Partido Naranja', votos: 120000, color: '#f39c12', siglas: 'PN' },
+  { nombre: 'Partido Azul', votos: 340000, color: '#26718F', tono: styles.tonoAzul, siglas: 'PA' },
+  { nombre: 'Partido Rojo', votos: 280000, color: '#B91C1C', tono: styles.tonoRojo, siglas: 'PR' },
+  { nombre: 'Partido Verde', votos: 160000, color: '#1E7B45', tono: styles.tonoVerde, siglas: 'PV' },
+  { nombre: 'Partido Naranja', votos: 120000, color: '#C2410C', tono: styles.tonoNaranja, siglas: 'PN' },
 ];
 
 const TOTAL_VOTOS = PARTIDOS.reduce((sum, p) => sum + p.votos, 0);
@@ -215,7 +221,7 @@ function SeccionDhondt() {
             <tr>
               <th>Divisor</th>
               {PARTIDOS.map((p, i) => (
-                <th key={i} style={{ color: p.color }}>{p.siglas}</th>
+                <th key={i} className={p.tono}>{p.siglas}</th>
               ))}
             </tr>
           </thead>
@@ -261,7 +267,7 @@ function SeccionDhondt() {
           <div key={r.ronda} className={styles.rondaItem}>
             <span className={styles.rondaNum}>Ronda {r.ronda}</span>
             <div className={styles.rondaContenido}>
-              <span className={styles.rondaGanador} style={{ color: PARTIDOS[r.ganador].color }}>
+              <span className={`${styles.rondaGanador} ${PARTIDOS[r.ganador].tono}`}>
                 → Escaño para {PARTIDOS[r.ganador].siglas}
               </span>
               <span className={styles.rondaCociente}>

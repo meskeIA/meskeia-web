@@ -88,6 +88,13 @@
 .rondaNum { font-size: 0.75rem; color: var(--text-muted); min-width: 60px; font-weight: 600; }
 .rondaContenido { display: flex; align-items: center; gap: var(--spacing-sm); flex: 1; }
 .rondaGanador { font-size: 0.88rem; font-weight: 700; }
+
+/* Tono de texto de cada partido por tema (cabo C0798): siglas de la tabla y «→ Escaño para…».
+   El selector compuesto pesa más que «.tablaDhondt th», que pone --text-primary */
+.tonoAzul, .tablaDhondt th.tonoAzul { color: var(--primary-texto); }
+.tonoRojo, .tablaDhondt th.tonoRojo { color: var(--rojo-texto, #B91C1C); }
+.tonoVerde, .tablaDhondt th.tonoVerde { color: var(--verde-texto, #136E35); }
+.tonoNaranja, .tablaDhondt th.tonoNaranja { color: var(--naranja-texto, #B93E0B); }
 .rondaCociente { font-size: 0.75rem; color: var(--text-muted); }
 
 /* Hemiciclo / barra de escaños */
