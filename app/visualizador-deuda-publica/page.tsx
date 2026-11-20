@@ -206,7 +206,9 @@ export default function VisualizadorDeudaPublica() {
               },
             ].map((inst) => (
               <div key={inst.nombre} className={styles.cardInstrumento} style={{ borderTopColor: inst.color }}>
-                <h3 style={{ color: inst.color }}>{inst.nombre}</h3>
+                {/* El color del instrumento va en el borde: como texto, el teal y el acento no
+                    llegaban a 4,5:1 sobre la tarjeta (2,80 y 2,26 en claro; cabo C0798) */}
+                <h3>{inst.nombre}</h3>
                 <div className={styles.chipGrid}>
                   <span className={styles.chip}><span aria-hidden="true">⏱</span> {inst.plazo}</span>
                   <span className={styles.chip}><span aria-hidden="true">💶</span> {inst.tipo}</span>
@@ -368,9 +370,7 @@ export default function VisualizadorDeudaPublica() {
 
           {tenedorSeleccionado !== null && (
             <div className={styles.tenedorDetalle} style={{ borderLeftColor: TENEDORES[tenedorSeleccionado].color }}>
-              <h3 style={{ color: TENEDORES[tenedorSeleccionado].color }}>
-                {TENEDORES[tenedorSeleccionado].nombre}
-              </h3>
+              <h3>{TENEDORES[tenedorSeleccionado].nombre}</h3>
               <p>{TENEDORES[tenedorSeleccionado].descripcion}</p>
             </div>
           )}

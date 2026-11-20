@@ -113,10 +113,13 @@
   padding: 1.25rem;
 }
 
+/* El color de cada instrumento va en el borde superior (style del TSX); el título, en el texto
+   del tema (cabo C0798) */
 .cardInstrumento h3 {
   font-size: 1rem;
   font-weight: 700;
   margin: 0 0 0.75rem;
+  color: var(--text-primary);
 }
 
 .chipGrid {
@@ -432,6 +435,7 @@
   font-size: 1rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
+  color: var(--text-primary);
 }
 
 .tenedorDetalle p {
@@ -1019,8 +1023,11 @@
   border-color: rgba(255, 255, 255, 0.1);
 }
 
+/* En oscuro, --primary-texto sobre el tinte azul se quedaba en 3,92:1 (cabo C0798): un azul más
+   claro, 5,9:1 sobre ese fondo */
 [data-theme='dark'] .faqTip {
   background: rgba(127, 179, 211, 0.12);
+  color: #8ec5e6 !important;
 }
 
 [data-theme='dark'] .warningBox {
@@ -1086,8 +1093,10 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+/* --primary-texto sobre el tinte de la chip daba 3,71:1 en oscuro (cabo C0798) */
 [data-theme='dark'] .chip {
   background: rgba(127, 179, 211, 0.15);
+  color: #8ec5e6;
 }
 
 [data-theme='dark'] .infoBox {

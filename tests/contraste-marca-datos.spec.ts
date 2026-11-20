@@ -277,6 +277,10 @@ const APPS: App[] = [
   // con style (el verde 27AE60 a 2,87:1 sobre blanco), y en oscuro los atributos activos en --primary-
   // texto sobre su tinte azul (4,50). Cada conjunto de datos, como sección
   { slug: 'arbol-decision-ia', todo: true, secciones: "button[class*='dsPill']" },
+  // 20/11/2026 (cabo C0798, color de texto tomado de una tabla): títulos de los instrumentos en su
+  // color de dato (teal 2,80 y acento 2,26 en claro) y, en oscuro, --primary-texto sobre el tinte
+  // de las chips y de los consejos (3,71 y 3,92:1)
+  { slug: 'visualizador-deuda-publica', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
