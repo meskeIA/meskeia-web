@@ -523,6 +523,10 @@ const APPS: App[] = [
   // de los nodos apagados al 40 % (1,51-1,71 en claro); en los cronotipos, las horas en --text-muted
   // sobre el tinte de la curva (3,94-4,32 en claro, 4,22 en oscuro)
   { slug: 'visualizador-cronobiologia', secciones: SECCIONES },
+  // 20/11/2026 (tanda 4): en el diagrama del Pacífico, las temperaturas en el color de su franja sobre el
+  // tinte del océano (2,05-2,74:1 en claro, 2,67-3,33 en oscuro), «upwelling» en 1E88E5 (3,65) y la
+  // intensidad de los alisios en 546E7A (4,00-4,45 en claro, 1,73-1,91 en oscuro)
+  { slug: 'visualizador-el-nino', secciones: SECCIONES, extremos: true },
 ];
 
 interface TextoSvg {

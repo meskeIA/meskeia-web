@@ -89,10 +89,14 @@ function PacificoDiagram({ modo }: { modo: 'normal' | 'elnino' | 'lanina' }) {
   const aguaCalienteAncho = modo === 'elnino' ? 45 : modo === 'lanina' ? 30 : 35;
   const nubeX = modo === 'elnino' ? 55 : modo === 'lanina' ? 15 : 20;
   const vientoIntensidad = modo === 'lanina' ? 'Fuertes →' : modo === 'elnino' ? 'Débiles ⇢' : 'Alisios →';
-  const tempEste = modo === 'elnino' ? '+3°C' : modo === 'lanina' ? '-2°C' : '22°C';
-  const tempOeste = modo === 'elnino' ? '+1°C' : modo === 'lanina' ? '+0.5°C' : '30°C';
+  // Con espacio duro antes de «°C» y coma decimal («+0,5 °C», decía «+0.5°C»)
+  const tempEste = modo === 'elnino' ? '+3 °C' : modo === 'lanina' ? '-2 °C' : '22 °C';
+  const tempOeste = modo === 'elnino' ? '+1 °C' : modo === 'lanina' ? '+0,5 °C' : '30 °C';
   const colorEste = modo === 'elnino' ? '#FF6B35' : modo === 'lanina' ? '#1E88E5' : '#42A5F5';
   const colorOeste = modo === 'elnino' ? '#FF4444' : modo === 'lanina' ? '#FF7043' : '#FF5722';
+  // El rótulo de la temperatura, en un tono de TEXTO frío o cálido por tema (C0297): el color de la
+  // franja como texto daba 2,05-2,74:1 en claro y 2,67-3,33 en oscuro sobre el tinte del océano
+  const tonoEste = modo === 'elnino' ? styles.svgCalido : styles.svgFrio;
 
   return (
     <div className={styles.svgWrapper} role="img" aria-label={`Diagrama del Pacífico en condiciones ${modo}`}>
@@ -115,14 +119,14 @@ function PacificoDiagram({ modo }: { modo: 'normal' | 'elnino' | 'lanina' }) {
         <text x="380" y="72" fontSize="11" fontWeight="bold" fill="var(--text-primary)">INDONESIA</text>
 
         {/* Temperaturas */}
-        <text x="60" y="125" fontSize="12" fontWeight="bold" fill={colorEste}>{tempEste}</text>
-        <text x="400" y="125" fontSize="12" fontWeight="bold" fill={colorOeste}>{tempOeste}</text>
+        <text x="60" y="125" fontSize="12" fontWeight="bold" className={tonoEste}>{tempEste}</text>
+        <text x="400" y="125" fontSize="12" fontWeight="bold" className={styles.svgCalido}>{tempOeste}</text>
 
         {/* Upwelling (solo en normal y La Niña) */}
         {modo !== 'elnino' && (
           <>
             <line x1="75" y1="160" x2="75" y2="120" stroke="#1E88E5" strokeWidth="2" strokeDasharray="4,2" markerEnd="url(#arrowUp)" />
-            <text x="55" y="175" fontSize="9" fill="#1E88E5">upwelling</text>
+            <text x="55" y="175" fontSize="9" className={styles.svgFrio}>upwelling</text>
           </>
         )}
 
@@ -167,7 +171,8 @@ function PacificoDiagram({ modo }: { modo: 'normal' | 'elnino' | 'lanina' }) {
         />
 
         {/* Texto vientos */}
-        <text x="200" y="100" fontSize="10" fill="#546E7A" textAnchor="middle">{vientoIntensidad}</text>
+        {/* --text-primary: el gris azulado 546E7A daba 4,0-4,45:1 en claro y 1,7-1,9 en oscuro (C0297) */}
+        <text x="200" y="100" fontSize="10" fill="var(--text-primary)" textAnchor="middle">{vientoIntensidad}</text>
 
         {/* Célula Walker — arco superior retorno */}
         <path

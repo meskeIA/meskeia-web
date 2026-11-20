@@ -155,6 +155,23 @@
   max-height: 220px;
 }
 
+/* Rótulos de temperatura del diagrama: tono de TEXTO frío o cálido por tema (C0297) */
+.svgFrio {
+  fill: #1559A8;
+}
+
+.svgCalido {
+  fill: #A32018;
+}
+
+[data-theme='dark'] .svgFrio {
+  fill: #8FC8FF;
+}
+
+[data-theme='dark'] .svgCalido {
+  fill: #FFAB91;
+}
+
 /* ─────────────────────────────────────────────
    Grid de mecanismos (Tab Normal)
 ───────────────────────────────────────────── */
