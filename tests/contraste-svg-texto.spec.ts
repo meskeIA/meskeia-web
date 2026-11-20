@@ -490,6 +490,11 @@ const APPS: App[] = [
   // dos temas) y, en la curva de velocidad radial, «hacia nosotros» en 4A9EFF y «alejándose» en FF6B6B
   // sobre la tarjeta (2,73 y 2,75 en claro). Cada tipo de estrella de la zona habitable, como subestado
   { slug: 'visualizador-exoplanetas', extremos: true, subestados: "button[aria-pressed]" },
+  // 20/11/2026 (tanda 4): en el tubo centrifugado, el blanco de «Glóbulos rojos» y «45 %» sobre el rojo
+  // translúcido (4,25 y 3,75:1 en claro; 2,96 y 2,69 con la capa elegida) y, en oscuro, el #333 de
+  // «Plasma» y «55 %» sobre el oro del plasma translúcido (4,31 y 3,19). Las capas del tubo y los pasos de
+  // la cascada, como subestados
+  { slug: 'visualizador-sangre-componentes', secciones: SECCIONES, subestados: "svg [aria-pressed]" },
 ];
 
 interface TextoSvg {

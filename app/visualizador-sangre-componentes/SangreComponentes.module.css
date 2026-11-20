@@ -36,8 +36,9 @@
 /* ─── Tubo de ensayo ─── */
 .tuboZona { display: flex; align-items: flex-start; justify-content: center; gap: var(--spacing-xl); margin-bottom: var(--spacing-xl); flex-wrap: wrap; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); }
 .tuboSvg { width: 180px; height: auto; flex-shrink: 0; }
-.tuboCapaClick { cursor: pointer; transition: opacity 0.2s; }
-.tuboCapaClick:hover { opacity: 0.65; }
+.tuboCapaClick { cursor: pointer; transition: filter 0.2s; }
+/* Oscurecer y no aclarar: con opacidad, el blanco de «Glóbulos rojos» bajaba de 4,5:1 */
+.tuboCapaClick:hover { filter: brightness(0.92); }
 .tuboCapaClick:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .hematocritoBox { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; padding: var(--spacing-md); max-width: 260px; color: var(--text-primary); font-size: 0.9rem; line-height: 1.5; }

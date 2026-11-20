@@ -340,10 +340,13 @@ function SeccionComposicion() {
           {/* Fondo redondeado del tubo */}
           <ellipse cx="100" cy="286" rx="38" ry="6" fill="none" stroke="var(--text-muted)" strokeWidth="2" />
 
+          {/* Las capas con rótulo van OPACAS (C0297): al 50-85 % dejaban pasar el fondo, y en
+              oscuro el plasma quedaba en ocre bajo el #333 (3,19:1) y el rojo, claro bajo el
+              blanco (2,96 con la capa elegida). La elegida se distingue por un tono más claro. */}
           {/* Capa 3: Glóbulos rojos (45 %) - abajo */}
           <rect
             x="62" y="170" width="76" height="118" rx="0"
-            fill="#c0392b" opacity={componenteActivo === 1 ? 0.6 : 0.85}
+            fill={componenteActivo === 1 ? '#C0392B' : '#A93226'}
             className={styles.tuboCapaClick}
             onClick={() => alternar(1)}
             onKeyDown={alPulsarTecla(() => alternar(1))}
@@ -353,7 +356,7 @@ function SeccionComposicion() {
             aria-label="Glóbulos rojos: 45 % del volumen"
           />
           <text x="100" y="230" textAnchor="middle" fill="#fff" fontSize="11" fontWeight="700" pointerEvents="none">Glóbulos rojos</text>
-          <text x="100" y="248" textAnchor="middle" fill="#fff" fontSize="10" opacity="0.9" pointerEvents="none">45 %</text>
+          <text x="100" y="248" textAnchor="middle" fill="#fff" fontSize="10" pointerEvents="none">45 %</text>
 
           {/* Capa 2: Buffy coat (<1 %) - medio */}
           <rect
@@ -371,7 +374,7 @@ function SeccionComposicion() {
           {/* Capa 1: Plasma (55 %) - arriba */}
           <rect
             x="62" y="32" width="76" height="132" rx="4"
-            fill="#f0c040" opacity={componenteActivo === 0 ? 0.5 : 0.7}
+            fill={componenteActivo === 0 ? '#F8E3A3' : '#F3D370'}
             className={styles.tuboCapaClick}
             onClick={() => alternar(0)}
             onKeyDown={alPulsarTecla(() => alternar(0))}
@@ -381,7 +384,7 @@ function SeccionComposicion() {
             aria-label="Plasma: 55 % del volumen"
           />
           <text x="100" y="90" textAnchor="middle" fill="#333" fontSize="11" fontWeight="700" pointerEvents="none">Plasma</text>
-          <text x="100" y="108" textAnchor="middle" fill="#333" fontSize="10" opacity="0.8" pointerEvents="none">55 %</text>
+          <text x="100" y="108" textAnchor="middle" fill="#333" fontSize="10" pointerEvents="none">55 %</text>
 
           {/* Etiquetas laterales */}
           {/* En dos líneas: en una sola empezaba en x = 168 y medía ~54, y el viewBox (200 de
