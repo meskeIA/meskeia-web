@@ -49,7 +49,7 @@ export const faqJsonLd = {
       name: '¿Cuántos días de pronóstico meteorológico puedo consultar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La herramienta ofrece el tiempo actual más un pronóstico de 5 días para cualquier ciudad del mundo. Puedes ver la temperatura máxima y mínima de cada día, la probabilidad de lluvia, la humedad relativa y la velocidad del viento. Los datos se actualizan periódicamente a partir de fuentes meteorológicas en tiempo real.',
+        text: 'La herramienta muestra el tiempo actual, lo que queda de hoy y los días siguientes completos del pronóstico a 5 días, normalmente cuatro. De cada día ves la temperatura máxima y mínima y la probabilidad de lluvia; al desplegarlo, la temperatura, la lluvia y el viento máximo por franjas de mañana, tarde y noche. La humedad relativa se da para el momento actual. Los datos se piden a una fuente meteorológica cada vez que consultas.',
       },
     },
     {
@@ -73,7 +73,7 @@ export const faqJsonLd = {
       name: '¿Puedo consultar el tiempo de cualquier ciudad del mundo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, basta con escribir el nombre de la ciudad en el buscador. La herramienta cubre miles de localidades en todos los continentes. Si hay varias ciudades con el mismo nombre en distintos países, se muestran sugerencias para que puedas elegir la correcta.',
+        text: 'Sí, basta con escribir el nombre de la ciudad en el buscador. La herramienta cubre miles de localidades en todos los continentes. Si hay varias ciudades con el mismo nombre en distintos países, se muestra la primera que devuelve el servicio meteorológico, con su país junto al nombre para que lo compruebes; si no es la tuya, el botón de ubicación consulta el tiempo de donde estás.',
       },
     },
     {
