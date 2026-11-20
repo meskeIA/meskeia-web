@@ -65,6 +65,12 @@
   display: flex; flex-direction: column; align-items: center;
 }
 .rinonSvg { width: 100%; max-width: 420px; height: auto; }
+/* Tonos de texto de los rótulos del riñón por tema (cabo C0297): el fill por CSS manda sobre el atributo */
+.svgRojo { fill: var(--rojo-texto, #B91C1C); }
+.svgNaranja { fill: var(--naranja-texto, #B93E0B); }
+.svgVioleta { fill: #6D28D9; }
+.svgMarca { fill: var(--primary-texto); }
+[data-theme='dark'] .svgVioleta { fill: #C4B5FD; }
 .svgHint { text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-top: var(--spacing-sm); }
 
 /* Grid zonas renales */

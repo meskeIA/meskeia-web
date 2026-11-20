@@ -374,13 +374,16 @@ export default function VisualizadorRinonFiltracion() {
               <polygon points="270,155 250,185 290,185" fill="#e67e22" opacity="0.5" />
               <polygon points="250,195 230,225 270,225" fill="#e67e22" opacity="0.5" />
               {/* Etiquetas */}
-              <text x="310" y="85" fontSize="11" fill="#c0392b" fontWeight="600">Corteza</text>
-              <line x1="300" y1="88" x2="270" y2="108" stroke="#c0392b" strokeWidth="1" strokeDasharray="3,2" />
-              <text x="315" y="145" fontSize="11" fill="#d35400" fontWeight="600">Médula</text>
-              <line x1="313" y1="148" x2="283" y2="155" stroke="#d35400" strokeWidth="1" strokeDasharray="3,2" />
-              <text x="315" y="185" fontSize="11" fill="#8e44ad" fontWeight="600">Pelvis</text>
-              <line x1="313" y1="188" x2="222" y2="175" stroke="#8e44ad" strokeWidth="1" strokeDasharray="3,2" />
-              <text x="50" y="290" fontSize="11" fill="#2E86AB" fontWeight="600">Uréter</text>
+              {/* Rótulos fuera de la silueta (que es clara en los dos temas) y en su tono de texto por
+                  tema: el color del trazo como texto daba 4,07-4,13:1 en claro y 2,64-3,50 en oscuro
+                  (cabo C0297, 20/11/2026) */}
+              <text x="346" y="85" fontSize="11" className={styles.svgRojo} fontWeight="600">Corteza</text>
+              <line x1="343" y1="88" x2="270" y2="108" stroke="#c0392b" strokeWidth="1" strokeDasharray="3,2" />
+              <text x="346" y="145" fontSize="11" className={styles.svgNaranja} fontWeight="600">Médula</text>
+              <line x1="343" y1="148" x2="283" y2="155" stroke="#d35400" strokeWidth="1" strokeDasharray="3,2" />
+              <text x="346" y="185" fontSize="11" className={styles.svgVioleta} fontWeight="600">Pelvis</text>
+              <line x1="343" y1="188" x2="222" y2="175" stroke="#8e44ad" strokeWidth="1" strokeDasharray="3,2" />
+              <text x="50" y="290" fontSize="11" className={styles.svgMarca} fontWeight="600">Uréter</text>
               <line x1="78" y1="285" x2="146" y2="270" stroke="#2E86AB" strokeWidth="1" strokeDasharray="3,2" />
             </svg>
             <p className={styles.svgHint} aria-hidden="true">Selecciona una zona en la lista de abajo</p>

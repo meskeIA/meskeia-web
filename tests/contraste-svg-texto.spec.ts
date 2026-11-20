@@ -468,6 +468,9 @@ const APPS: App[] = [
     secciones: SECCIONES,
     subestados: "button[class*='proyeccionPill']",
   },
+  // 20/11/2026 (tanda 3): los rótulos del riñón en el color de su trazo: «Médula» en d35400 (4,13:1 en
+  // claro, 3,44 en oscuro), «Uréter» en la marca (4,07 y 3,50) y «Corteza» en c0392b (2,64 en oscuro)
+  { slug: 'visualizador-rinon-filtracion', secciones: SECCIONES },
 ];
 
 interface TextoSvg {
