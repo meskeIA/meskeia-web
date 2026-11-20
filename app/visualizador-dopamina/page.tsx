@@ -221,7 +221,9 @@ function GraficaAnticipacion() {
 
         {/* Línea base */}
         <line x1="40" y1="120" x2="380" y2="120" stroke="currentColor" strokeWidth="1" strokeDasharray="4,4" opacity="0.3" />
-        <text x="2" y="124" fontSize="9" fill="currentColor" opacity="0.5">Base</text>
+        {/* Rótulos en el texto secundario sin opacidad y en el tono de texto de su curva: con
+            currentColor al 50-60 % y el color de la curva daban 2,10-3,25:1 (cabo C0297, 20/11/2026) */}
+        <text x="2" y="124" fontSize="9" fill="var(--text-secondary)">Base</text>
 
         {/* Escenario 1: Recompensa esperada */}
         <polyline
@@ -231,9 +233,9 @@ function GraficaAnticipacion() {
           strokeWidth="2.5"
           strokeLinejoin="round"
         />
-        <text x="55" y="115" fontSize="8" fill="#48A9A6">Anticipación</text>
-        <text x="155" y="45" fontSize="8" fill="#48A9A6">↑ pico</text>
-        <text x="185" y="75" fontSize="8" fill="#48A9A6">↓ recompensa</text>
+        <text x="55" y="115" fontSize="8" fill="var(--secondary-texto)">Anticipación</text>
+        <text x="155" y="45" fontSize="8" fill="var(--secondary-texto)">↑ pico</text>
+        <text x="185" y="75" fontSize="8" fill="var(--secondary-texto)">↓ recompensa</text>
 
         {/* Escenario 2: Sin recompensa */}
         <polyline
@@ -243,7 +245,7 @@ function GraficaAnticipacion() {
           strokeWidth="2.5"
           strokeLinejoin="round"
         />
-        <text x="315" y="145" fontSize="8" fill="#E07070">↓ frustración</text>
+        <text x="315" y="145" fontSize="8" fill="var(--rojo-texto, #B91C1C)">↓ frustración</text>
 
         {/* Leyenda */}
         <rect x="260" y="18" width="12" height="3" fill="#48A9A6" />
@@ -252,9 +254,9 @@ function GraficaAnticipacion() {
         <text x="275" y="34" fontSize="8" fill="currentColor">Sin recompensa</text>
 
         {/* Etiquetas eje X */}
-        <text x="130" y="175" fontSize="8" fill="currentColor" opacity="0.6" textAnchor="middle">Anticipar</text>
-        <text x="210" y="175" fontSize="8" fill="currentColor" opacity="0.6" textAnchor="middle">Recibir</text>
-        <text x="320" y="175" fontSize="8" fill="currentColor" opacity="0.6" textAnchor="middle">No llega</text>
+        <text x="130" y="175" fontSize="8" fill="var(--text-secondary)" textAnchor="middle">Anticipar</text>
+        <text x="210" y="175" fontSize="8" fill="var(--text-secondary)" textAnchor="middle">Recibir</text>
+        <text x="320" y="175" fontSize="8" fill="var(--text-secondary)" textAnchor="middle">No llega</text>
       </svg>
     </div>
   );

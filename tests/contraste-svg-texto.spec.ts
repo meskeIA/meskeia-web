@@ -482,6 +482,10 @@ const APPS: App[] = [
   // 20/11/2026 (tanda 3): «D» en la marca (4,07:1 en claro, 3,31 en oscuro), «O» en el teal (2,78) y
   // «E» y los hitos de la serie de precios en F4A261 (1,88-2,04 en claro)
   { slug: 'visualizador-mercado-inmobiliario', extremos: true },
+  // 20/11/2026 (tanda 3): en el gráfico de la predicción de recompensa, «Base» y «Anticipar», «Recibir» y
+  // «No llega» en currentColor al 50-60 % (2,10-2,51:1 en claro, 2,70-3,25 en oscuro), los rótulos de la
+  // curva en el teal (2,78) y «↓ frustración» en E07070 (3,10). Cada paso del circuito, como subestado
+  { slug: 'visualizador-dopamina', subestados: "[aria-label='Pasos del circuito de recompensa'] [role='tab']" },
 ];
 
 interface TextoSvg {
