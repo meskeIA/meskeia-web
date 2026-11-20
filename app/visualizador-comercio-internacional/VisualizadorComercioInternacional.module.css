@@ -394,6 +394,12 @@
   height: auto;
 }
 
+/* Rótulos del flujo comercial (cabo C0297, 20/11/2026): «Exportaciones» y su cifra en la marca pura
+   (4,07:1 en claro, 3,31 en oscuro) e «Importaciones» en rojo E74C3C (3,79 y 3,55); el color puro
+   se queda en las flechas y el texto toma su tono por tema (el fill por CSS manda sobre el atributo) */
+.svgMarca { fill: var(--primary-texto); }
+.svgRojo { fill: var(--rojo-texto, #B91C1C); }
+
 .balanzaGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

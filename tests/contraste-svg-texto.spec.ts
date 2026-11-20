@@ -429,6 +429,9 @@ const APPS: App[] = [
   // 20/11/2026 (tanda 3): «A (2012)», «25 % paro» y «26 % (2013)» en rojo E74C3C puro (3,79:1 en
   // claro, 3,55 en oscuro) y «B (2023)» y «12 % paro» en la marca pura (4,07 y 3,31)
   { slug: 'visualizador-desempleo-tipos' },
+  // 20/11/2026 (tanda 3): en el flujo comercial, «Exportaciones» y su cifra en la marca pura (4,07:1
+  // en claro, 3,31 en oscuro) e «Importaciones» y la suya en rojo E74C3C (3,79 y 3,55)
+  { slug: 'visualizador-comercio-internacional', secciones: SECCIONES },
 ];
 
 interface TextoSvg {

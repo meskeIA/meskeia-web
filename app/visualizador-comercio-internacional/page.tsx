@@ -639,7 +639,7 @@ export default function VisualizadorComercioInternacional() {
               {/* País central */}
               <rect x="220" y="60" width="160" height="80" rx="12" fill="var(--primary)" opacity="0.15" />
               <rect x="220" y="60" width="160" height="80" rx="12" fill="none" stroke="var(--primary)" strokeWidth="2" />
-              <text x="300" y="95" textAnchor="middle" fill="var(--primary)" fontWeight="700" fontSize="16">
+              <text x="300" y="95" textAnchor="middle" className={styles.svgMarca} fontWeight="700" fontSize="16">
                 {datosBalanza.bandera} {datosBalanza.pais}
               </text>
               <text x="300" y="118" textAnchor="middle" fill="var(--text-secondary)" fontSize="12">
@@ -657,21 +657,21 @@ export default function VisualizadorComercioInternacional() {
               </defs>
               <line x1="380" y1="85" x2="540" y2="85" stroke="#2E86AB" strokeWidth="4"
                 markerEnd="url(#arrowBlue)" />
-              <text x="460" y="75" textAnchor="middle" fill="#2E86AB" fontSize="12" fontWeight="600">
+              <text x="460" y="75" textAnchor="middle" className={styles.svgMarca} fontSize="12" fontWeight="600">
                 Exportaciones
               </text>
-              <text x="460" y="102" textAnchor="middle" fill="#2E86AB" fontSize="11">
-                {datosBalanza.exportaciones.toLocaleString('es-ES')}M€
+              <text x="460" y="102" textAnchor="middle" className={styles.svgMarca} fontSize="11">
+                {datosBalanza.exportaciones.toLocaleString('es-ES')}&nbsp;M€
               </text>
 
               {/* Flecha importaciones (entrante, roja) */}
               <line x1="540" y1="125" x2="380" y2="125" stroke="#E74C3C" strokeWidth="4"
                 markerEnd="url(#arrowRed)" />
-              <text x="460" y="148" textAnchor="middle" fill="#E74C3C" fontSize="12" fontWeight="600">
+              <text x="460" y="148" textAnchor="middle" className={styles.svgRojo} fontSize="12" fontWeight="600">
                 Importaciones
               </text>
-              <text x="460" y="165" textAnchor="middle" fill="#E74C3C" fontSize="11">
-                {datosBalanza.importaciones.toLocaleString('es-ES')}M€
+              <text x="460" y="165" textAnchor="middle" className={styles.svgRojo} fontSize="11">
+                {datosBalanza.importaciones.toLocaleString('es-ES')}&nbsp;M€
               </text>
 
               {/* Mundo */}
