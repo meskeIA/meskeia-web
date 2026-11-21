@@ -62,3 +62,7 @@
 .searchInput:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-color: var(--primary); }
 .sinResultados { margin-top: 24px; color: var(--text-secondary); font-size: 0.95rem; text-align: center; }
 .ocultoLabel { font-weight: 600; color: var(--text-secondary); }
+
+/* En oscuro, [data-theme='dark'] .filtroBtn (especificidad 0,2,0) pisaba el relleno de
+   .filtroBtnActivo (0,1,0) y el filtro elegido quedaba como los demás: su variante oscura (C0868) */
+[data-theme='dark'] .filtroBtnActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }

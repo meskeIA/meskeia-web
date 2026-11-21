@@ -430,3 +430,7 @@
     transition: none;
   }
 }
+
+/* En oscuro, [data-theme='dark'] .filtroBtn (especificidad 0,2,0) pisaba el relleno de
+   .filtroBtnActivo (0,1,0) y el filtro elegido quedaba como los demás: su variante oscura (C0868) */
+[data-theme='dark'] .filtroBtnActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }

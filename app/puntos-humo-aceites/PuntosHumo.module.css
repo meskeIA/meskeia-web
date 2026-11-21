@@ -61,3 +61,7 @@
 
 @media (max-width: 640px) { .hero { padding: 28px 20px; margin-top: 70px; } .title { font-size: 1.6rem; } .grid { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .filtroBtn { transition: none; } }
+
+/* En oscuro, [data-theme='dark'] .filtroBtn (especificidad 0,2,0) pisaba el relleno de
+   .filtroBtnActivo (0,1,0) y el filtro elegido quedaba como los demás: su variante oscura (C0868) */
+[data-theme='dark'] .filtroBtnActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }

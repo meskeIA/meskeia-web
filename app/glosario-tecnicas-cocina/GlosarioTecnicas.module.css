@@ -79,3 +79,7 @@
 .definicion { font-size: 0.9rem; color: var(--text-primary); line-height: 1.5; margin-bottom: 10px; }
 .ejemplo { font-size: 0.83rem; color: var(--text-secondary); line-height: 1.5; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--border); }
 .ejemplo strong { color: var(--text-secondary); font-weight: 600; }
+
+/* En oscuro, [data-theme='dark'] .filtroBtn (especificidad 0,2,0) pisaba el relleno de
+   .filtroBtnActivo (0,1,0) y el filtro elegido quedaba como los demás: su variante oscura (C0868) */
+[data-theme='dark'] .filtroBtnActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
