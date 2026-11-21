@@ -160,6 +160,13 @@ const COLORES = ['#2E86AB', '#48A9A6', '#7FB3D3', '#1a5278'];
  */
 const TINTAS = [styles.tinta0, styles.tinta1, styles.tinta2, styles.tinta3];
 
+/**
+ * Tinta de los rótulos A1…A5 del dibujo del doblado, una por pieza y con variante por tema: cada
+ * rótulo va sobre su pieza teñida, no sobre el lienzo, y con los rellenos de COLORES daba de 1,76 a
+ * 2,73:1 en 5 de los 10 casos (hallazgo 5377).
+ */
+const TINTAS_DOBLADO = [styles.doblado0, styles.doblado1, styles.doblado2, styles.doblado3, styles.doblado4];
+
 // Formatos destacados como acceso rápido del comparador
 const DESTACADOS = ['a4', 'carta', 'oficio-legal', 'a3', 'a5', 'cuartilla', 'folio', 'c4'];
 
@@ -1110,7 +1117,7 @@ export default function ComparadorTamanosPapelPage() {
                     fontSize={Math.max(26, Math.min(pieza.ancho, pieza.alto) / 3.2)}
                     textAnchor="middle"
                     fill={COLORES[i % COLORES.length]}
-                    className={styles.svgNombre}
+                    className={`${styles.svgNombre} ${TINTAS_DOBLADO[i]}`}
                   >
                     {pieza.etiqueta}
                   </text>

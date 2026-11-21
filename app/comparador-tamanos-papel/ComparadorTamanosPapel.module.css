@@ -299,6 +299,22 @@
 [data-theme='dark'] .tinta2 { fill: #7FB3D3; }
 [data-theme='dark'] .tinta3 { fill: #8FA9D9; }
 
+/* Rótulos A1…A5 del dibujo del doblado (hallazgo 5377). Van sobre SU pieza, teñida con
+   fill-opacity 0,14 + 0,05·i, no sobre el lienzo desnudo: las tintas de las cotas no llegan ahí
+   (A5 3,46:1 en claro). Una por pieza, del mismo tono, calculada contra la pieza compuesta sobre
+   #FAFAFA / #1A1A1A para dar al menos 4,6:1 aunque el rótulo sea pequeño (A4 y A5 en el móvil):
+   claro 4,63 · 4,65 · 4,67 · 4,92 · 4,63 · oscuro 4,61 · 4,64 · 4,81 · 4,66 · 4,67 */
+.doblado0 { fill: #266E8C; }
+.doblado1 { fill: #30706E; }
+.doblado2 { fill: #4B6A7C; }
+.doblado3 { fill: #1A5278; }
+.doblado4 { fill: #205C76; }
+[data-theme='dark'] .doblado0 { fill: #4D98B8; }
+[data-theme='dark'] .doblado1 { fill: #4AAAA7; }
+[data-theme='dark'] .doblado2 { fill: #7FB3D3; }
+[data-theme='dark'] .doblado3 { fill: #7395AD; }
+[data-theme='dark'] .doblado4 { fill: #75AFC8; }
+
 .svgLamina {
   fill: none;
   stroke: var(--guia);

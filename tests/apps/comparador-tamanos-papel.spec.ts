@@ -64,7 +64,8 @@ import { activarTemaOscuro, prepararParaMedir } from '../_contraste';
  *   I. «%» con espacio normal (no U+00A0) y «100%» pegado en el JSON-LD.
  *   J. JSON-LD: la serie C no es ISO 216 (es ISO 269) y el «catálogo completo» se para en C8.
  *
- * HALLAZGO del 21/11/2026 (cabo C0862), ABIERTO (sus tres test llevan test.fail()):
+ * HALLAZGO 5377 del 21/11/2026 (cabo C0862), REPARADO el 21/11/2026 con una tinta por pieza y tema
+ * (.doblado0…4), calculada contra la pieza compuesta para dar ≥ 4,6:1:
  *   K. Los rótulos A1…A5 del dibujo «Por qué al doblar un A4 sale un A5» se pintan con los rellenos
  *      fijos de COLORES (sin variante de tema, lo que 5344 ya corrigió en las cotas del comparador)
  *      sobre su propia pieza teñida con fill-opacity 0,14 + 0,05·i. Las piezas no se superponen (cada
@@ -708,7 +709,7 @@ test.describe('comparador-tamanos-papel — Inspector 20/11/2026', () => {
     expect(!/completo/i.test(texto) || filas.has('C10')).toBe(true);
   });
 
-  test.fail('HALLAZGO (21/11/2026, cabo C0862, ABIERTO) · K · claro: los rótulos A1…A5 del doblado llegan a su umbral', async ({ page }) => {
+  test('HALLAZGO 5377 (21/11/2026, cabo C0862, REPARADO) · K · claro: los rótulos A1…A5 del doblado llegan a su umbral', async ({ page }) => {
     // 1280 × 720, lienzo #FAFAFA. Calculado a mano (cabecera): A2 #48A9A6 sobre su pieza al 19 %,
     // 2,26:1 (51,0 px, umbral 3) · A3 #7FB3D3 al 24 %, 1,83:1 (36,1 px, umbral 3) · A5 #2E86AB al
     // 34 %, 2,60:1 (18,0 px en negrita, por debajo de 18,66: umbral 4,5; en una ventana de 745 px de
@@ -720,7 +721,7 @@ test.describe('comparador-tamanos-papel — Inspector 20/11/2026', () => {
     expect(rotulosPorDebajo(medidas, 'claro')).toEqual([]);
   });
 
-  test.fail('HALLAZGO (21/11/2026, cabo C0862, ABIERTO) · K · oscuro: los rótulos A1…A5 del doblado llegan a su umbral', async ({ page }) => {
+  test('HALLAZGO 5377 (21/11/2026, cabo C0862, REPARADO) · K · oscuro: los rótulos A1…A5 del doblado llegan a su umbral', async ({ page }) => {
     // 1280 × 720, lienzo #1A1A1A, los mismos rellenos fijos: A4 #1a5278 (el azul del hero) sobre su
     // pieza al 29 %, 1,76:1 (25,5 px, umbral 3) · A5 #2E86AB al 34 %, 2,73:1 (18,0 px, umbral 4,5).
     // A1 3,63 · A2 4,59 · A3 4,81 sí llegan a 3.
@@ -791,7 +792,7 @@ test.describe('comparador-tamanos-papel — móvil (Pixel 7)', () => {
     expect(razones.map((r) => r.ancho).sort((a, b) => a - b)).toEqual([210, 215.9, 215.9, 297]);
   });
 
-  test.fail('HALLAZGO (21/11/2026, cabo C0862, ABIERTO) · K · Pixel 7: los rótulos del doblado llegan a su umbral en los dos temas', async ({ page }) => {
+  test('HALLAZGO 5377 (21/11/2026, cabo C0862, REPARADO) · K · Pixel 7: los rótulos del doblado llegan a su umbral en los dos temas', async ({ page }) => {
     // Lienzo de 312 px (escala 312/1201): A1 48,3 · A2 34,1 · A3 24,1 · A4 17,1 · A5 12,1 px, así que
     // A4 y A5 ya no son texto grande y piden 4,5:1. Calculado a mano (cabecera): en claro A2 2,26 ·
     // A3 1,83 · A5 2,60 (A4 4,92 sí llega a 4,5); en oscuro A4 1,76 · A5 2,73.
