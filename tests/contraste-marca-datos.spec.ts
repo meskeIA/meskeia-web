@@ -295,6 +295,11 @@ const APPS: App[] = [
   // 21/11/2026 (C0645): el título de la fase y la pestaña del tipo de dolor en el color del dato con
   // style (Transducción y Dolor agudo en #E67E22 sobre su tinte, 2,52:1 en claro y 4,23 en oscuro) y los
   // literales de las fibras C, la puerta y el sistema límbico. Las fases y los tipos como secciones
+  // 21/11/2026 (C0645): en oscuro, el blanco de la etiqueta del hueco vacío sobre --text-muted (2,78:1),
+  // y con dos autores elegidos el movimiento y las obras en el color del autor con style (#1A3A4A,
+  // #2C3E50, #6C3483 sobre la tarjeta oscura) y el blanco sobre los colores medios (#16A085, 3,3).
+  // Cada botón «+ A» y «+ B» de los diez autores, como sección: recorre todos los colores
+  { slug: 'comparador-voces-narrativas', todo: true, secciones: "[class*='autorBotones'] button" },
   { slug: 'visualizador-como-funciona-el-dolor', todo: true, secciones: "nav[aria-label='Fases de la nocicepción'] button, [role='tablist'][aria-label='Tipos de dolor'] [role='tab']" },
 ];
 

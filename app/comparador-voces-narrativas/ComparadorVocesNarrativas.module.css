@@ -788,6 +788,22 @@
   border-color: rgba(255, 255, 255, 0.15);
 }
 
+/* Etiqueta del hueco vacío: en oscuro --text-muted es claro (#9B9B9B) y el blanco encima daba
+   2,78:1. Con autor elegido, relleno y tinta los pone rellenoConTinta en línea (C0645) */
+[data-theme='dark'] .slotEtiqueta {
+  color: #1A1A1A;
+}
+
+/* El texto en el color del autor: el tono de ese color que llega a 4,5:1 sobre la tarjeta de cada
+   tema, calculado con tonoSobre en la página (#1A3A4A, #2C3E50 o #6C3483 se perdían en oscuro) */
+.tonoAutor {
+  color: var(--tono-claro);
+}
+
+[data-theme='dark'] .tonoAutor {
+  color: var(--tono-oscuro);
+}
+
 [data-theme='dark'] .autorCard {
   border-color: rgba(255, 255, 255, 0.08);
 }

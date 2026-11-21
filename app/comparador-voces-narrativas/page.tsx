@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type CSSProperties } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -11,6 +11,7 @@ import {
   EducationalSection,
 } from '@/components';
 import styles from './ComparadorVocesNarrativas.module.css';
+import { rellenoConTinta, tonoSobre } from '@/lib/tintaLegible';
 import { RESPUESTA_FAQ_INDIRECTO_LIBRE } from './metadata';
 
 interface Dimensiones {
@@ -335,6 +336,24 @@ function calcularAnalisis(a: AutorData, b: AutorData): Analisis {
   return { comun, distintos };
 }
 
+// Tarjeta de globals.css en cada tema: el texto en el color del autor se calcula contra ella
+const FONDO_TARJETA_CLARO = '#FFFFFF';
+const FONDO_TARJETA_OSCURO = '#2D2D2D';
+
+/** Relleno con su tinta para las etiquetas y botones en el color del autor (#16A085 con blanco daba 3,3:1) */
+function rellenoAutor(color: string): CSSProperties {
+  const { relleno, tinta } = rellenoConTinta(color);
+  return { background: relleno, borderColor: relleno, color: tinta };
+}
+
+/** Variables de la clase tonoAutor: el tono del color del autor que se lee sobre la tarjeta de cada tema */
+function tonosAutor(color: string): CSSProperties {
+  return {
+    '--tono-claro': tonoSobre(color, FONDO_TARJETA_CLARO),
+    '--tono-oscuro': tonoSobre(color, FONDO_TARJETA_OSCURO),
+  } as CSSProperties;
+}
+
 export default function ComparadorVocesNarrativas() {
   const [autorA, setAutorA] = useState<string | null>(null);
   const [autorB, setAutorB] = useState<string | null>(null);
@@ -379,7 +398,7 @@ export default function ComparadorVocesNarrativas() {
         {/* Slots activos */}
         <div className={styles.slots}>
           <div className={`${styles.slot} ${dataA ? styles.slotActivo : ''}`} style={dataA ? { borderColor: dataA.color } : {}}>
-            <span className={styles.slotEtiqueta} style={dataA ? { background: dataA.color } : {}}>VOZ A</span>
+            <span className={styles.slotEtiqueta} style={dataA ? rellenoAutor(dataA.color) : {}}>VOZ A</span>
             {dataA ? (
               <>
                 <span className={styles.slotNombre}>{dataA.nombre}</span>
@@ -391,7 +410,7 @@ export default function ComparadorVocesNarrativas() {
           </div>
           <div className={styles.vsCircle}>VS</div>
           <div className={`${styles.slot} ${dataB ? styles.slotActivo : ''}`} style={dataB ? { borderColor: dataB.color } : {}}>
-            <span className={styles.slotEtiqueta} style={dataB ? { background: dataB.color } : {}}>VOZ B</span>
+            <span className={styles.slotEtiqueta} style={dataB ? rellenoAutor(dataB.color) : {}}>VOZ B</span>
             {dataB ? (
               <>
                 <span className={styles.slotNombre}>{dataB.nombre}</span>
@@ -428,7 +447,7 @@ export default function ComparadorVocesNarrativas() {
                     <button
                       type="button"
                       className={`${styles.btnSlot} ${esA ? styles.btnSlotActivoA : ''}`}
-                      style={esA ? { background: autor.color, borderColor: autor.color } : {}}
+                      style={esA ? rellenoAutor(autor.color) : {}}
                       onClick={() => handleSelectA(autor.id)}
                       aria-pressed={esA}
                     >
@@ -437,7 +456,7 @@ export default function ComparadorVocesNarrativas() {
                     <button
                       type="button"
                       className={`${styles.btnSlot} ${esB ? styles.btnSlotActivoB : ''}`}
-                      style={esB ? { background: autor.color, borderColor: autor.color } : {}}
+                      style={esB ? rellenoAutor(autor.color) : {}}
                       onClick={() => handleSelectB(autor.id)}
                       aria-pressed={esB}
                     >
@@ -456,17 +475,17 @@ export default function ComparadorVocesNarrativas() {
             {/* Cabeceras */}
             <div className={styles.compDual}>
               <div className={styles.compCabecera} style={{ borderTopColor: dataA.color }}>
-                <div className={styles.compTag} style={{ background: dataA.color }}>VOZ A</div>
+                <div className={styles.compTag} style={rellenoAutor(dataA.color)}>VOZ A</div>
                 <h2 className={styles.compNombre}>{dataA.nombre}</h2>
                 <p className={styles.compMetaLine}>{dataA.pais} · {dataA.vida}</p>
-                <span className={styles.compMovimiento} style={{ color: dataA.color }}>{dataA.movimiento}</span>
+                <span className={`${styles.compMovimiento} ${styles.tonoAutor}`} style={tonosAutor(dataA.color)}>{dataA.movimiento}</span>
                 <p className={styles.compVoz}>{dataA.vozResumen}</p>
               </div>
               <div className={styles.compCabecera} style={{ borderTopColor: dataB.color }}>
-                <div className={styles.compTag} style={{ background: dataB.color }}>VOZ B</div>
+                <div className={styles.compTag} style={rellenoAutor(dataB.color)}>VOZ B</div>
                 <h2 className={styles.compNombre}>{dataB.nombre}</h2>
                 <p className={styles.compMetaLine}>{dataB.pais} · {dataB.vida}</p>
-                <span className={styles.compMovimiento} style={{ color: dataB.color }}>{dataB.movimiento}</span>
+                <span className={`${styles.compMovimiento} ${styles.tonoAutor}`} style={tonosAutor(dataB.color)}>{dataB.movimiento}</span>
                 <p className={styles.compVoz}>{dataB.vozResumen}</p>
               </div>
             </div>
@@ -565,14 +584,14 @@ export default function ComparadorVocesNarrativas() {
               <div className={styles.compDual}>
                 <div className={styles.obrasList}>
                   {dataA.obras.map(o => (
-                    <span key={o} className={styles.obraTag} style={{ borderColor: dataA.color, color: dataA.color }}>
+                    <span key={o} className={`${styles.obraTag} ${styles.tonoAutor}`} style={{ borderColor: dataA.color, ...tonosAutor(dataA.color) }}>
                       {o}
                     </span>
                   ))}
                 </div>
                 <div className={styles.obrasList}>
                   {dataB.obras.map(o => (
-                    <span key={o} className={styles.obraTag} style={{ borderColor: dataB.color, color: dataB.color }}>
+                    <span key={o} className={`${styles.obraTag} ${styles.tonoAutor}`} style={{ borderColor: dataB.color, ...tonosAutor(dataB.color) }}>
                       {o}
                     </span>
                   ))}
