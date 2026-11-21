@@ -287,6 +287,18 @@
   font-family: inherit;
 }
 
+/* Tinta de nombres y cotas del comparador, una por color del dibujo (TINTAS en page.tsx; hallazgo
+   5344). Contra el lienzo #FAFAFA: 5,2 · 4,9 · 5,0 · 7,6:1. En oscuro, contra #1A1A1A: 6,2 · 6,2 ·
+   7,9 · 7,1:1. Antes, los rellenos fijos de la marca: de 2,09 a 4,24:1. */
+.tinta0 { fill: #26718F; }
+.tinta1 { fill: #327874; }
+.tinta2 { fill: #3D6F8F; }
+.tinta3 { fill: #1a5278; }
+[data-theme='dark'] .tinta0 { fill: #5BA3C9; }
+[data-theme='dark'] .tinta1 { fill: #48A9A6; }
+[data-theme='dark'] .tinta2 { fill: #7FB3D3; }
+[data-theme='dark'] .tinta3 { fill: #8FA9D9; }
+
 .svgLamina {
   fill: none;
   stroke: var(--guia);
@@ -463,6 +475,18 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Aviso del DPI fuera de rango (hallazgo 5349): siempre montado; vacío no ocupa sitio */
+.dpiAviso {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--rojo-texto, #B3261E);
+}
+.dpiAviso:empty,
+.dpiAviso:has(> span:empty) {
+  margin: 0;
 }
 
 .btnSecundario {

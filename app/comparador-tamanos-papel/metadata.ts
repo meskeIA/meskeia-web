@@ -55,17 +55,17 @@ export const jsonLd = generateWebAppSchema({
   name: 'Comparador de Tamaños de Papel',
   category: 'UtilityApplication',
   description:
-    'Herramienta visual para comparar formatos de papel superpuestos a escala real: series A, B y C de la norma ISO 216, formatos norteamericanos (Carta/Letter, Oficio/Legal, Tabloide/Ledger), formatos tradicionales españoles (folio, cuartilla, holandesa), tamaños de fotografía y tarjeta de visita. Incluye conversor de mm, cm, pulgadas y píxeles según los DPI, y un comprobador de escala para imprimir un documento en un formato distinto al original.',
+    'Herramienta visual para comparar formatos de papel superpuestos a escala real: series A y B de la norma ISO 216, sobres de la serie C (ISO 269), formatos norteamericanos (Carta/Letter, Oficio/Legal, Tabloide/Ledger), formatos tradicionales españoles (folio, cuartilla, holandesa), tamaños de fotografía y tarjeta de visita. Incluye conversor de mm, cm, pulgadas y píxeles según los DPI, y un comprobador de escala para imprimir un documento en un formato distinto al original.',
   url: 'https://meskeia.com/comparador-tamanos-papel/',
   features: [
     'Comparador visual con los formatos superpuestos y dibujados a escala real',
-    'Catálogo completo de series A, B y C (ISO 216) con medidas exactas',
+    'Catálogo de las series A y B (ISO 216) de A0 a A10 y de B0 a B10, y de los sobres de la serie C (ISO 269) de C0 a C8 y DL',
     'Formatos norteamericanos: Carta (Letter), Oficio (Legal), Tabloide (Ledger)',
     'Formatos tradicionales en desuso: folio, cuartilla, holandesa y octavilla',
     'Conversor entre milímetros, centímetros, pulgadas y píxeles con DPI configurable',
-    'Comprobador de impresión: porcentaje de escala y margen sobrante entre dos formatos',
+    'Comprobador de impresión: porcentaje de escala (también girando el documento) y margen sobrante entre dos formatos',
     'Demostración visual de la proporción √2 y del doblado de la serie A',
-    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Funciona 100 % en el navegador, sin registro ni instalación',
   ],
 });
 
@@ -93,7 +93,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la diferencia entre el tamaño Carta y el A4?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Carta (Letter) mide 216 × 279 mm y el A4 mide 210 × 297 mm. El Carta es 6 mm más ancho pero 18 mm más corto, así que ninguno cabe dentro del otro: no son intercambiables. Por eso un documento maquetado en Carta impreso en A4 pierde 6 mm de ancho por los lados, y un A4 impreso en Carta se corta 18 mm por abajo salvo que se reduzca la escala al 97 %.',
+        text: 'El Carta (Letter) mide 216 × 279 mm y el A4 mide 210 × 297 mm. El Carta es 6 mm más ancho pero 18 mm más corto, así que ninguno cabe dentro del otro: no son intercambiables. Por eso un documento maquetado en Carta impreso en A4 pierde 6 mm de ancho por los lados, y un A4 impreso en Carta se corta casi 18 mm por abajo salvo que se reduzca la escala al 94 % (279,4 ÷ 297 = 94,07 %).',
       },
     },
     {

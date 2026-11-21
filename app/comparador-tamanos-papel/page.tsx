@@ -83,7 +83,7 @@ const CATEGORIAS: Categoria[] = [
 
 const FORMATOS: Formato[] = [
   // ── Serie A (ISO 216) ──
-  { id: 'a0', nombre: 'A0', ancho: 841, alto: 1189, categoria: 'serie-a', nota: 'Superficie de exactamente 1 m². Es el origen de toda la serie.' },
+  { id: 'a0', nombre: 'A0', ancho: 841, alto: 1189, categoria: 'serie-a', nota: 'Superficie de 1 m² por definición (9999 cm² con las medidas redondeadas al milímetro). Es el origen de toda la serie.' },
   { id: 'a1', nombre: 'A1', ancho: 594, alto: 841, categoria: 'serie-a', nota: 'Carteles grandes y planos de arquitectura.' },
   { id: 'a2', nombre: 'A2', ancho: 420, alto: 594, categoria: 'serie-a', nota: 'Carteles medianos y láminas de dibujo.' },
   { id: 'a3', nombre: 'A3', ancho: 297, alto: 420, categoria: 'serie-a', nota: 'Dos A4 juntos por el lado largo. Planos, tablas y menús.' },
@@ -126,7 +126,7 @@ const FORMATOS: Formato[] = [
   { id: 'oficio-mx', nombre: 'Oficio (México)', ancho: 215.9, alto: 340, categoria: 'norteamerica', nota: 'En México y varios países de la región el «Oficio» mide 340 mm de alto, no 356. Es una fuente habitual de errores de impresión.' },
   { id: 'tabloide', nombre: 'Tabloide (Ledger)', ancho: 279.4, alto: 431.8, categoria: 'norteamerica', nota: '11 × 17 pulgadas: dos Carta juntos. Equivale funcionalmente al A3.' },
   { id: 'media-carta', nombre: 'Media carta (Half Letter)', ancho: 139.7, alto: 215.9, categoria: 'norteamerica', nota: '5,5 × 8,5 pulgadas. Equivalente funcional del A5.' },
-  { id: 'ejecutivo', nombre: 'Ejecutivo (Executive)', ancho: 184.1, alto: 266.7, categoria: 'norteamerica', nota: '7,25 × 10,5 pulgadas. Papelería corporativa.' },
+  { id: 'ejecutivo', nombre: 'Ejecutivo (Executive)', ancho: 184.15, alto: 266.7, categoria: 'norteamerica', nota: '7,25 × 10,5 pulgadas. Papelería corporativa.' },
   { id: 'ansi-c', nombre: 'ANSI C', ancho: 431.8, alto: 558.8, categoria: 'norteamerica', nota: '17 × 22 pulgadas. Planos técnicos.' },
 
   // ── Tradicionales españoles ──
@@ -153,6 +153,13 @@ const MAPA_FORMATOS: Record<string, Formato> = Object.fromEntries(
 // Colores de la paleta meskeIA para el comparador visual
 const COLORES = ['#2E86AB', '#48A9A6', '#7FB3D3', '#1a5278'];
 
+/**
+ * Tinta de los TEXTOS del comparador (nombres y cotas), una por color y con variante por tema: los
+ * rellenos fijos de COLORES daban de 2,09 a 4,24:1 contra el lienzo (hallazgo 5344). La clase gana
+ * al atributo `fill` (un atributo de presentación pierde ante cualquier regla CSS).
+ */
+const TINTAS = [styles.tinta0, styles.tinta1, styles.tinta2, styles.tinta3];
+
 // Formatos destacados como acceso rápido del comparador
 const DESTACADOS = ['a4', 'carta', 'oficio-legal', 'a3', 'a5', 'cuartilla', 'folio', 'c4'];
 
@@ -173,9 +180,71 @@ const mmAPixeles = (mm: number, dpi: number): number => (mm / MM_POR_PULGADA) * 
 /** Devuelve la superficie en cm² de un formato */
 const superficieCm2 = (f: Formato): number => (f.ancho * f.alto) / 100;
 
+/**
+ * Milímetros con los decimales que tienen de verdad (a lo sumo dos): «210», «215,9», «184,15». Los
+ * formatos en pulgadas no son milímetros enteros; redondeados al mm, la tabla «Medidas exactas»
+ * daba la Carta como 216 × 279 y el comparador +6 / −18 donde son 5,9 y 17,6 (hallazgo 5347).
+ */
+const formatMm = (mm: number): string => {
+  const r = Math.round(mm * 100) / 100;
+  const decimales = Number.isInteger(r) ? 0 : Number.isInteger(Math.round(r * 100) / 10) ? 1 : 2;
+  return formatNumber(r, decimales);
+};
+
 /** Texto «210 × 297 mm» */
-const textoMm = (f: Formato): string =>
-  `${formatNumber(f.ancho, 0)} × ${formatNumber(f.alto, 0)} mm`;
+const textoMm = (f: Formato): string => `${formatMm(f.ancho)} × ${formatMm(f.alto)} mm`;
+
+/**
+ * Imprimir `origen` en papel `destino`. Tres reglas, del 21/11/2026:
+ *  · Si cabe, se imprime al 100 %: el sobrante y el aprovechamiento son los de ese 100 %. Antes se
+ *    calculaban con el factor de AMPLIAR (A5 en A4 a 141,4 %), una escala que la app no recomienda
+ *    (hallazgo 5343).
+ *  · La escala para reducir se redondea al décimo HACIA ABAJO: al 97,3 % un Carta mide 210,07 mm y
+ *    no entra en un A4; al 97,2 %, sí (hallazgo 5346).
+ *  · Se prueba también el documento girado, como hace la impresora: una tarjeta de visita apaisada
+ *    de 85 × 55 cabe al 100 % en un A7 de 74 × 105 (hallazgo 5348).
+ */
+interface Impresion {
+  /** Escala que se muestra y se recomienda, en %: 100 si cabe; si no, la de reducir, a la baja */
+  escala: number;
+  cabeEntero: boolean;
+  girado: boolean;
+  sobranteAncho: number;
+  sobranteAlto: number;
+  recorteAncho: number;
+  recorteAlto: number;
+  aprovechamiento: number;
+  mismaProporcion: boolean;
+}
+
+function calcularImpresion(origen: Formato, destino: Formato): Impresion {
+  const factorDe = (w: number, h: number) => Math.min(destino.ancho / w, destino.alto / h);
+  const normal = factorDe(origen.ancho, origen.alto);
+  const girada = factorDe(origen.alto, origen.ancho);
+  const girado = girada > normal + 1e-9;
+  const [w, h] = girado ? [origen.alto, origen.ancho] : [origen.ancho, origen.alto];
+  const factor = Math.max(normal, girada);
+  const cabeEntero = factor >= 1 - 1e-9;
+  const escala = cabeEntero ? 100 : Math.floor(factor * 1000 + 1e-6) / 10;
+  const aplicado = escala / 100;
+  const anchoImpreso = w * aplicado;
+  const altoImpreso = h * aplicado;
+  return {
+    escala,
+    cabeEntero,
+    girado,
+    sobranteAncho: Math.max(0, destino.ancho - anchoImpreso),
+    sobranteAlto: Math.max(0, destino.alto - altoImpreso),
+    recorteAncho: Math.max(0, w - destino.ancho),
+    recorteAlto: Math.max(0, h - destino.alto),
+    aprovechamiento: ((anchoImpreso * altoImpreso) / (destino.ancho * destino.alto)) * 100,
+    mismaProporcion: Math.abs(h / w - destino.alto / destino.ancho) < 0.005,
+  };
+}
+
+/** «97,2 %» con espacio duro, para los textos que citan la escala del comprobador */
+const textoEscala = (o: string, d: string): string =>
+  `${formatNumber(calcularImpresion(MAPA_FORMATOS[o], MAPA_FORMATOS[d]).escala, 1)} %`;
 
 // Piezas del doblado sucesivo de un A0 (demostración de la proporción √2)
 interface PiezaDoblado {
@@ -221,6 +290,7 @@ export default function ComparadorTamanosPapelPage() {
   // Resolución compartida por el catálogo y el conversor
   const [dpi, setDpi] = useState<number>(300);
   const [dpiLibre, setDpiLibre] = useState<string>('');
+  const [dpiInvalido, setDpiInvalido] = useState<boolean>(false);
 
   // Conversor de unidades
   const [valor, setValor] = useState<string>('210');
@@ -303,11 +373,11 @@ export default function ComparadorTamanosPapelPage() {
         const anchoTexto =
           dAncho === 0
             ? 'igual de ancho'
-            : `${formatNumber(Math.abs(dAncho), 0)} mm más ${dAncho > 0 ? 'ancho' : 'estrecho'}`;
+            : `${formatMm(Math.abs(dAncho))} mm más ${dAncho > 0 ? 'ancho' : 'estrecho'}`;
         const altoTexto =
           dAlto === 0
             ? 'igual de alto'
-            : `${formatNumber(Math.abs(dAlto), 0)} mm más ${dAlto > 0 ? 'alto' : 'corto'}`;
+            : `${formatMm(Math.abs(dAlto))} mm más ${dAlto > 0 ? 'alto' : 'corto'}`;
         return `${f.nombre} es ${anchoTexto} y ${altoTexto} que ${referencia.nombre}`;
       });
       texto += ` ${diferencias.join('. ')}.`;
@@ -348,45 +418,25 @@ export default function ComparadorTamanosPapelPage() {
     const origen = MAPA_FORMATOS[origenId];
     const destino = MAPA_FORMATOS[destinoId];
     if (!origen || !destino) return null;
-
-    const factor = Math.min(destino.ancho / origen.ancho, destino.alto / origen.alto);
-    const escala = factor * 100;
-    const cabeEntero = factor >= 1;
-
-    // Tras escalar al factor calculado, cuánto papel queda sin usar
-    const anchoEscalado = origen.ancho * factor;
-    const altoEscalado = origen.alto * factor;
-    const sobranteAncho = destino.ancho - anchoEscalado;
-    const sobranteAlto = destino.alto - altoEscalado;
-
-    // Si se imprime al 100 % sin reducir, qué se sale del papel
-    const recorteAncho = Math.max(0, origen.ancho - destino.ancho);
-    const recorteAlto = Math.max(0, origen.alto - destino.alto);
-
-    const aprovechamiento =
-      ((anchoEscalado * altoEscalado) / (destino.ancho * destino.alto)) * 100;
-
-    return {
-      origen,
-      destino,
-      escala,
-      cabeEntero,
-      sobranteAncho,
-      sobranteAlto,
-      recorteAncho,
-      recorteAlto,
-      aprovechamiento,
-      mismaProporcion: Math.abs(origen.alto / origen.ancho - destino.alto / destino.ancho) < 0.005,
-    };
+    return { origen, destino, ...calcularImpresion(origen, destino) };
   }, [origenId, destinoId]);
 
   const formatosCategoria = FORMATOS.filter((f) => f.categoria === categoriaActiva);
   const categoriaInfo = CATEGORIAS.find((c) => c.id === categoriaActiva);
 
+  // Un DPI fuera de 10-4800 (o un texto) se rechaza AVISANDO: antes se descartaba callado y el
+  // usuario creía haber aplicado su resolución (hallazgo 5349).
   const aplicarDpiLibre = () => {
+    if (dpiLibre.trim() === '') {
+      setDpiInvalido(false);
+      return;
+    }
     const numero = parseSpanishNumber(dpiLibre);
     if (Number.isFinite(numero) && numero >= 10 && numero <= 4800) {
       setDpi(Math.round(numero));
+      setDpiInvalido(false);
+    } else {
+      setDpiInvalido(true);
     }
   };
 
@@ -544,9 +594,9 @@ export default function ComparadorTamanosPapelPage() {
                     fontSize={geometria.fuente}
                     textAnchor="middle"
                     fill={COLORES[i % COLORES.length]}
-                    className={styles.svgCota}
+                    className={`${styles.svgCota} ${TINTAS[i % TINTAS.length]}`}
                   >
-                    {formatNumber(formato.ancho, 0)} mm
+                    {formatMm(formato.ancho)} mm
                   </text>
                 </g>
               );
@@ -580,9 +630,9 @@ export default function ComparadorTamanosPapelPage() {
                     fontSize={geometria.fuente}
                     textAnchor="start"
                     fill={COLORES[i % COLORES.length]}
-                    className={styles.svgCota}
+                    className={`${styles.svgCota} ${TINTAS[i % TINTAS.length]}`}
                   >
-                    {formatNumber(formato.alto, 0)} mm
+                    {formatMm(formato.alto)} mm
                   </text>
                 </g>
               );
@@ -596,7 +646,7 @@ export default function ComparadorTamanosPapelPage() {
                 y={geometria.fuente * (1.2 + 1.3 * i)}
                 fontSize={geometria.fuente}
                 fill={COLORES[i % COLORES.length]}
-                className={styles.svgNombre}
+                className={`${styles.svgNombre} ${TINTAS[i % TINTAS.length]}`}
               >
                 {formato.nombre}
               </text>
@@ -625,6 +675,8 @@ export default function ComparadorTamanosPapelPage() {
                   const dAncho = f.ancho - referencia.ancho;
                   const dAlto = f.alto - referencia.alto;
                   const encaja = f.ancho <= referencia.ancho && f.alto <= referencia.alto;
+                  // Girado, como lo mete cualquiera en un sobre o una bandeja (hallazgo 5348)
+                  const encajaGirado = !encaja && f.alto <= referencia.ancho && f.ancho <= referencia.alto;
                   return (
                     <tr key={f.id}>
                       <th scope="row">{f.nombre}</th>
@@ -632,18 +684,20 @@ export default function ComparadorTamanosPapelPage() {
                       <td className={dAncho > 0 ? styles.deltaPos : styles.deltaNeg}>
                         {dAncho === 0
                           ? '—'
-                          : `${dAncho > 0 ? '+' : '−'}${formatNumber(Math.abs(dAncho), 0)} mm`}
+                          : `${dAncho > 0 ? '+' : '−'}${formatMm(Math.abs(dAncho))} mm`}
                       </td>
                       <td className={dAlto > 0 ? styles.deltaPos : styles.deltaNeg}>
                         {dAlto === 0
                           ? '—'
-                          : `${dAlto > 0 ? '+' : '−'}${formatNumber(Math.abs(dAlto), 0)} mm`}
+                          : `${dAlto > 0 ? '+' : '−'}${formatMm(Math.abs(dAlto))} mm`}
                       </td>
                       <td>
                         {encaja ? (
-                          <span className={styles.si}>Sí, cabe entero</span>
+                          <span key="si" className={styles.si}>Sí, cabe entero</span>
+                        ) : encajaGirado ? (
+                          <span key="girado" className={styles.si}>Sí, girado</span>
                         ) : (
-                          <span className={styles.no}>No, se sale</span>
+                          <span key="no" className={styles.no}>No, se sale</span>
                         )}
                       </td>
                     </tr>
@@ -730,20 +784,20 @@ export default function ComparadorTamanosPapelPage() {
               <div className={`${styles.resultado} ${styles.resultadoPrincipal}`}>
                 <span className={styles.resultadoEtiqueta}>Escala necesaria</span>
                 <strong className={styles.resultadoValor}>
-                  {formatNumber(Math.min(comprobacion.escala, 100), 1)} %
+                  {`${formatNumber(comprobacion.escala, 1)} %`}
                 </strong>
                 <span className={styles.resultadoNota}>
                   {comprobacion.cabeEntero
-                    ? 'Cabe al 100 %: imprime a tamaño real sin reducir.'
-                    : `Reduce al ${formatNumber(comprobacion.escala, 1)} % para que entre completo.`}
+                    ? `Cabe al 100 %${comprobacion.girado ? ' girando el documento' : ''}: imprime a tamaño real sin reducir.`
+                    : `Reduce al ${formatNumber(comprobacion.escala, 1)} %${comprobacion.girado ? ' y gira el documento' : ''} para que entre completo.`}
                 </span>
               </div>
 
               <div className={styles.resultado}>
                 <span className={styles.resultadoEtiqueta}>Papel sobrante tras escalar</span>
                 <strong className={styles.resultadoValor}>
-                  {formatNumber(Math.max(comprobacion.sobranteAncho, 0), 0)} ×{' '}
-                  {formatNumber(Math.max(comprobacion.sobranteAlto, 0), 0)} mm
+                  {formatNumber(comprobacion.sobranteAncho, 0)} ×{' '}
+                  {formatNumber(comprobacion.sobranteAlto, 0)} mm
                 </strong>
                 <span className={styles.resultadoNota}>
                   Franja libre a lo ancho y a lo alto, que se reparte como margen adicional.
@@ -753,23 +807,24 @@ export default function ComparadorTamanosPapelPage() {
               <div className={styles.resultado}>
                 <span className={styles.resultadoEtiqueta}>Aprovechamiento de la hoja</span>
                 <strong className={styles.resultadoValor}>
-                  {formatNumber(comprobacion.aprovechamiento, 1)} %
+                  {`${formatNumber(comprobacion.aprovechamiento, 1)} %`}
                 </strong>
                 <span className={styles.resultadoNota}>
-                  {comprobacion.mismaProporcion
-                    ? 'Ambos formatos comparten proporción: el ajuste es perfecto.'
-                    : 'Las proporciones no coinciden, así que siempre queda papel sin usar.'}
+                  {!comprobacion.mismaProporcion
+                    ? 'Las proporciones no coinciden, así que siempre queda papel sin usar.'
+                    : comprobacion.aprovechamiento >= 99.5
+                      ? 'Ambos formatos comparten proporción: el ajuste es perfecto.'
+                      : 'Comparten proporción, pero a tamaño real el documento es menor que la hoja: ampliándolo la llenaría.'}
                 </span>
               </div>
 
               <div className={styles.resultado}>
-                <span className={styles.resultadoEtiqueta}>Si imprimes al 100 % sin reducir</span>
+                <span className={styles.resultadoEtiqueta}>Si imprimes al 100&nbsp;% sin reducir</span>
                 <strong className={styles.resultadoValor}>
                   {comprobacion.recorteAncho === 0 && comprobacion.recorteAlto === 0
                     ? 'No se corta nada'
-                    : `Se pierden ${formatNumber(comprobacion.recorteAncho, 0)} mm de ancho y ${formatNumber(
-                        comprobacion.recorteAlto,
-                        0
+                    : `Se pierden ${formatMm(comprobacion.recorteAncho)} mm de ancho y ${formatMm(
+                        comprobacion.recorteAlto
                       )} mm de alto`}
                 </strong>
                 <span className={styles.resultadoNota}>
@@ -837,7 +892,12 @@ export default function ComparadorTamanosPapelPage() {
                 inputMode="numeric"
                 value={dpiLibre}
                 placeholder="p. ej. 240"
-                onChange={(e) => setDpiLibre(e.target.value)}
+                aria-invalid={dpiInvalido}
+                aria-describedby="dpi-libre-aviso"
+                onChange={(e) => {
+                  setDpiLibre(e.target.value);
+                  setDpiInvalido(false);
+                }}
                 onBlur={aplicarDpiLibre}
               />
               <button type="button" className={styles.btnSecundario} onClick={aplicarDpiLibre}>
@@ -845,6 +905,9 @@ export default function ComparadorTamanosPapelPage() {
               </button>
             </span>
           </div>
+          <p id="dpi-libre-aviso" className={styles.dpiAviso} role="alert">
+            <span>{dpiInvalido ? 'La resolución tiene que estar entre 10 y 4800 DPI: se mantiene la anterior.' : ''}</span>
+          </p>
         </div>
 
         <div className={styles.tablaWrapper}>
@@ -871,7 +934,7 @@ export default function ComparadorTamanosPapelPage() {
                     {f.nota && <span className={styles.notaCelda}>{f.nota}</span>}
                   </th>
                   <td>
-                    {formatNumber(f.ancho, 0)} × {formatNumber(f.alto, 0)}
+                    {formatMm(f.ancho)} × {formatMm(f.alto)}
                   </td>
                   <td>
                     {formatNumber(mmACm(f.ancho), 1)} × {formatNumber(mmACm(f.alto), 1)}
@@ -1071,12 +1134,13 @@ export default function ComparadorTamanosPapelPage() {
             </li>
             <li>
               Al doblar por la mitad el lado largo, la hoja pasa a medir 841 × 594,5: la nueva
-              proporción es 841 ÷ 594,5 = 1,4142. <strong>La misma de antes.</strong>
+              proporción es 841 ÷ 594,5 = 1,4146, que es √2 ≈ 1,4142 salvo el redondeo al
+              milímetro. <strong>La misma de antes.</strong>
             </li>
             <li>
               Consecuencia práctica: el A4 es 1/16 de un A0, así que su superficie es 1/16 m² =
-              625 cm² (623,7 exactos por el redondeo a milímetros). Por eso un papel de 80 g/m²
-              da hojas A4 de exactamente 5 gramos, y una resma de 500 pesa 2,5 kg.
+              625 cm² (623,7 con el redondeo a milímetros). Por eso un papel de 80 g/m² da
+              hojas A4 de casi 5 gramos (4,99 g), y una resma de 500 pesa unos 2,5 kg.
             </li>
           </ol>
         </div>
@@ -1196,7 +1260,7 @@ export default function ComparadorTamanosPapelPage() {
                 <p>
                   El documento viene en Carta (216 × 279 mm) y la bandeja tiene A4 (210 × 297).
                   Sobran 6 mm de ancho, así que hay que reducir al{' '}
-                  <strong>97,2 %</strong>. A cambio quedan 18 mm libres abajo. Si imprimes a
+                  <strong>{textoEscala('carta', 'a4')}</strong>. A cambio quedan unos 25 mm libres abajo. Si imprimes a
                   «tamaño real», pierdes 6 mm del margen derecho.
                 </p>
               </article>
@@ -1290,7 +1354,8 @@ export default function ComparadorTamanosPapelPage() {
                 </summary>
                 <p className={styles.eduFaqRespuesta}>
                   Se calcula directamente gracias a que el A0 mide 1 m². Un papel de 80 g/m² da
-                  hojas A4 de 5 g exactos (80 ÷ 16), A3 de 10 g y A5 de 2,5 g. Es un dato práctico
+                  hojas A4 de unos 5 g (80 ÷ 16; 4,99 g con las medidas redondeadas al
+                  milímetro), A3 de unos 10 g y A5 de unos 2,5 g. Es un dato práctico
                   para calcular franqueo: una carta con tres A4 y un sobre DL ronda los 20 g, por
                   debajo del primer escalón tarifario habitual.
                 </p>
@@ -1339,11 +1404,12 @@ export default function ComparadorTamanosPapelPage() {
               </li>
               <li>
                 <strong>Calcula la escala necesaria</strong> con el comprobador de esta página. De
-                Carta a A4 es 97,2 %; de A4 a Carta, 94,3 %; de Oficio a A4, 83,5 %.
+                Carta a A4 es {textoEscala('carta', 'a4')}; de A4 a Carta,{' '}
+                {textoEscala('a4', 'carta')}; de Oficio a A4, {textoEscala('oficio-legal', 'a4')}.
               </li>
               <li>
                 <strong>Elige la opción correcta en el diálogo de impresión.</strong> «Ajustar» o
-                «Encajar» reduce automáticamente; «Tamaño real» imprime al 100 % y recorta;
+                «Encajar» reduce automáticamente; «Tamaño real» imprime al 100&nbsp;% y recorta;
                 «Escala personalizada» te deja escribir el porcentaje exacto.
               </li>
               <li>
@@ -1385,7 +1451,7 @@ export default function ComparadorTamanosPapelPage() {
                 <span className={styles.eduTipIcono} aria-hidden="true">
                   ✉️
                 </span>
-                <h4>El sobre lleva la misma letra y número que el papel más uno</h4>
+                <h4>El sobre es de la serie C: mismo número sin doblar, uno más por cada doblez</h4>
                 <p>A4 sin doblar → C4. A4 doblado por la mitad → C5. En cuatro → C6.</p>
               </div>
               <div className={styles.eduTipCard}>
@@ -1427,7 +1493,7 @@ export default function ComparadorTamanosPapelPage() {
                 </li>
                 <li>
                   <strong><span aria-hidden="true">❌</span> Imprimir un Carta en A4 a «tamaño real»:</strong> se pierden 6 mm del
-                  borde derecho, justo donde suelen caer los números de las tablas. Reduce al 97,2 %
+                  borde derecho, justo donde suelen caer los números de las tablas. Reduce al {textoEscala('carta', 'a4')}
                   y activa el centrado.
                 </li>
                 <li>

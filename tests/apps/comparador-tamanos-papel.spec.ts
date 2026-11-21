@@ -50,8 +50,7 @@ import { activarTemaOscuro, prepararParaMedir } from '../_contraste';
  *     «1,234.5» → con los dos separadores manda el último: 1234,50 mm. DPI «1.200» = mil doscientos;
  *     DPI «5» (fuera de 10-4800) no se aplica.
  *
- * HALLAZGOS del 20/11/2026 (ABIERTOS). Los test con test.fail() afirman lo CORRECTO: el día que se
- * reparen fallarán por pasar y habrá que quitarles el test.fail() (y cambiar ABIERTO por REPARADO).
+ * HALLAZGOS del 20/11/2026 (5343-5352), REPARADOS el 21/11/2026: sus test ya no llevan test.fail().
  *   A. «Cabe al 100 %», pero sobrante y aprovechamiento se calculan ampliando (A5 → A4 a 141,4 %).
  *   B. Texto del SVG del comparador por debajo de 4,5:1 en los dos temas.
  *   C. Escala A4 → Carta: el FAQPage dice 97 % y la guía 94,3 %; el comprobador da 94,1 %.
@@ -360,12 +359,15 @@ test.describe('comparador-tamanos-papel — Inspector 20/11/2026', () => {
     r = await comprobar(page, 'a4', 'carta');
     expect(r.sobrante).toMatch(/^1[89] × 0 mm$/);
     expect(r.recorte).toMatch(/^Se pierden 0 mm de ancho y (18|17,6) mm de alto$/);
-    // Legal → A4: 297/355,6 = 83,52 % (redondeo y truncado coinciden); sobran 29,68 × 0; 85,87 %.
+    // Legal → A4: 297/355,6 = 83,52 % (redondeo y truncado coinciden); sobran 29,68 × 0. El
+    // aprovechamiento, a la escala que se MUESTRA y se recomienda (83,5 %, hallazgos 5343 y 5346):
+    // 215,9 × 0,835 = 180,28 por 355,6 × 0,835 = 296,93 → 53.530/62.370 = 85,83 % («85,8 %»). Antes
+    // se calculaba con el factor exacto sin redondear (85,87 %), que no es el que se imprime.
     r = await comprobar(page, 'oficio-legal', 'a4');
     expect(r.escala).toBe('83,5 %');
     expect(r.notaEscala).toBe('Reduce al 83,5 % para que entre completo.');
     expect(r.sobrante).toBe('30 × 0 mm');
-    expect(r.aprovechamiento).toBe('85,9 %');
+    expect(r.aprovechamiento).toBe('85,8 %');
     expect(r.recorte).toMatch(/^Se pierden (6|5,9) mm de ancho y (59|58,6) mm de alto$/);
     // A3 → A4: misma proporción √2; 210/297 = 70,71 %.
     r = await comprobar(page, 'a3', 'a4');
@@ -447,21 +449,19 @@ test.describe('comparador-tamanos-papel — Inspector 20/11/2026', () => {
   });
 
   // ── Hallazgos abiertos ─────────────────────────────────────────────────────
-  test('HALLAZGO (20/11/2026, ABIERTO) · A · «cabe al 100 %», pero sobrante y aprovechamiento son los de ampliar', async ({ page }) => {
+  test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · A · «cabe al 100 %», pero sobrante y aprovechamiento son los de ampliar', async ({ page }) => {
     // A5 (148 × 210) en A4 (210 × 297): la app recomienda 100 % («imprime a tamaño real») y calcula
     // las otras dos tarjetas con el factor de AMPLIAR, min(210/148; 297/210) = 141,4 %: «1 × 0 mm» y
     // «99,7 %». Impreso al 100 % sobran 210 − 148 = 62 y 297 − 210 = 87 mm, y se usa
     // 31 080/62 370 = 49,8 % de la hoja.
-    test.fail();
     const r = await comprobar(page, 'a5', 'a4');
     expect(r.sobrante).toBe('62 × 87 mm');
     expect(r.aprovechamiento).toBe('49,8 %');
   });
 
-  test('HALLAZGO (20/11/2026, ABIERTO) · B · claro: las cotas del dibujo llegan a 4,5:1', async ({ page }) => {
+  test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · B · claro: las cotas del dibujo llegan a 4,5:1', async ({ page }) => {
     // Rellenos fijos (COLORES) sobre el lienzo #FAFAFA: #2E86AB 3,93 · #48A9A6 2,68 · #7FB3D3 2,17.
     // Las cotas pintan a ~14 px en escritorio (11 px de caja en móvil): texto normal, umbral 4,5.
-    test.fail();
     await esperarPaginaAsentada(page);
     await prepararParaMedir(page);
     await elegirCuatroFormatos(page);
@@ -470,10 +470,9 @@ test.describe('comparador-tamanos-papel — Inspector 20/11/2026', () => {
     for (const m of medidas) expect(m.ratio, `${m.texto} en ${m.fill}`).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO (20/11/2026, ABIERTO) · B · oscuro: las cotas del dibujo llegan a 4,5:1', async ({ page }) => {
+  test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · B · oscuro: las cotas del dibujo llegan a 4,5:1', async ({ page }) => {
     // En oscuro el lienzo es #1A1A1A: #2E86AB da 4,24:1 y el cuarto color, #1a5278 (el azul del
     // hero), 2,09:1. Sin transiciones: medido a mitad del cambio de tema salía 1,30:1.
-    test.fail();
     await esperarPaginaAsentada(page);
     await prepararParaMedir(page);
     await activarTemaOscuro(page);
@@ -483,11 +482,10 @@ test.describe('comparador-tamanos-papel — Inspector 20/11/2026', () => {
     for (const m of medidas) expect(m.ratio, `${m.texto} en ${m.fill}`).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO (20/11/2026, ABIERTO) · C · el FAQPage da 97 % para imprimir un A4 en Carta', async ({ page }) => {
+  test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · C · el FAQPage da 97 % para imprimir un A4 en Carta', async ({ page }) => {
     // «un A4 impreso en Carta se corta 18 mm por abajo salvo que se reduzca la escala al 97 %»: a 97 %
     // el A4 mide 297 × 0,97 = 288,1 mm y la Carta 279,4: siguen cortándose 8,7 mm. Lo que hace falta
     // es 279,4/297 = 94,07 %, lo que da el propio comprobador («94,1 %»).
-    test.fail();
     const faq = await ldDeTipo(page, 'FAQPage');
     const preguntas = faq.mainEntity as { name: string; acceptedAnswer: { text: string } }[];
     const texto = preguntas.find((p) => p.name.includes('Carta y el A4'))!.acceptedAnswer.text;
@@ -495,12 +493,11 @@ test.describe('comparador-tamanos-papel — Inspector 20/11/2026', () => {
     expect(texto).toMatch(/94(,\d)?\s?%/);
   });
 
-  test('HALLAZGO (20/11/2026, ABIERTO) · C · la guía y el escenario dan otras escalas que el comprobador', async ({ page }) => {
+  test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · C · la guía y el escenario dan otras escalas que el comprobador', async ({ page }) => {
     // Guía: «De Carta a A4 es 97,2 %; de A4 a Carta, 94,3 %». A4 → Carta es 279,4/297 = 94,07 %; a
     // 94,3 % el A4 mide 280,1 mm y se corta 0,7. Y el escenario «Un PDF mexicano…»: «hay que reducir
     // al 97,2 %. A cambio quedan 18 mm libres abajo»: tras reducir quedan 297 − 279,4 × 0,9727 = 25,2
     // mm (el comprobador: «0 × 25 mm»); 17,6 mm es lo que sobra SIN reducir.
-    test.fail();
     const cartaA4 = (await comprobar(page, 'carta', 'a4')).escala;
     const a4Carta = (await comprobar(page, 'a4', 'carta')).escala;
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
@@ -509,12 +506,11 @@ test.describe('comparador-tamanos-papel — Inspector 20/11/2026', () => {
     await expect(contenedor(page)).not.toContainText('A cambio quedan 18 mm libres abajo');
   });
 
-  test('HALLAZGO (20/11/2026, ABIERTO) · D · la escala mostrada hace que el documento entre', async ({ page }) => {
+  test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · D · la escala mostrada hace que el documento entre', async ({ page }) => {
     // La escala se redondea al décimo más cercano: Carta → A4 97,267 % → «97,3 %», y 215,9 × 0,973 =
     // 210,07 mm > 210; A4 → Carta 94,074 % → «94,1 %», 297 × 0,941 = 279,48 > 279,4; A0 → A10
     // 3,0916 % → «3,1 %», 841 × 0,031 = 26,07 > 26. «Para que entre completo» pide redondear hacia
     // abajo (97,2 %, 94,0 %, 3,0 %), que es lo que ya escribe el texto de la página para el Carta.
-    test.fail();
     const casos: [string, string, [number, number], [number, number]][] = [
       ['carta', 'a4', [215.9, 279.4], [210, 297]],
       ['a4', 'carta', [210, 297], [215.9, 279.4]],
@@ -527,30 +523,27 @@ test.describe('comparador-tamanos-papel — Inspector 20/11/2026', () => {
     }
   });
 
-  test('HALLAZGO (20/11/2026, ABIERTO) · E · Ejecutivo 7,25 in = 184,15 mm: 2175 px a 300 DPI; «exactas» sin redondear al mm', async ({ page }) => {
+  test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · E · Ejecutivo 7,25 in = 184,15 mm: 2175 px a 300 DPI; «exactas» sin redondear al mm', async ({ page }) => {
     // FORMATOS guarda ancho 184.1: 184,1/25,4 × 300 = 2174,4 → «2174»; 7,25 × 300 = 2175 exactos (a
     // 600 DPI, 4349 por 4350). Y la tabla «Medidas exactas» da la Carta como «216 × 279» cuando por
     // definición mide 215,9 × 279,4 (Δ con A4: 5,9 y 17,6 mm, no 6 y 18).
-    test.fail();
     const filas = porNombre(await filasDe(page, /Norteamericanos/));
     expect(filas.get('Ejecutivo (Executive)')?.[4]).toBe('2175 × 3150');
     const leyenda = normal(await catalogo(page).locator('caption').textContent());
     expect(filas.get('Carta (Letter)')?.[1] === '215,9 × 279,4' || !/exactas/i.test(leyenda)).toBe(true);
   });
 
-  test('HALLAZGO (20/11/2026, ABIERTO) · F · una tarjeta de visita (85 × 55) cabe girada en un A7', async ({ page }) => {
+  test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · F · una tarjeta de visita (85 × 55) cabe girada en un A7', async ({ page }) => {
     // Las dos tarjetas son los únicos formatos guardados apaisados y ni el comprobador ni «¿Encaja
     // dentro?» giran: en A7 (74 × 105) la app dice «Reduce al 87,1 %» y «Se pierden 11 mm de ancho»;
     // girada, 55 × 85 entra en 74 × 105 al 100 %.
-    test.fail();
     const r = await comprobar(page, 'tarjeta-es', 'a7');
     expect(r.escala).toBe('100,0 %');
     expect(r.recorte).toBe('No se corta nada');
   });
 
-  test('HALLAZGO (20/11/2026, ABIERTO) · G · un DPI fuera de 10-4800 avisa en vez de descartarse callado', async ({ page }) => {
+  test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · G · un DPI fuera de 10-4800 avisa en vez de descartarse callado', async ({ page }) => {
     // «5» + Aplicar: la leyenda sigue en 300 DPI, el campo sigue diciendo 5 y no hay ningún aviso.
-    test.fail();
     await aplicarDpi(page, '5');
     await expect(catalogo(page).locator('caption')).toContainText('calculada a 300 DPI');
     const invalido = await page.locator('#dpi-libre').getAttribute('aria-invalid');
@@ -558,13 +551,12 @@ test.describe('comparador-tamanos-papel — Inspector 20/11/2026', () => {
     expect(invalido === 'true' || mensaje > 0).toBe(true);
   });
 
-  test('HALLAZGO (20/11/2026, ABIERTO) · H · cifras «exactas» que no lo son y la regla del sobre', async ({ page }) => {
+  test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · H · cifras «exactas» que no lo son y la regla del sobre', async ({ page }) => {
     // «841 ÷ 594,5 = 1,4142»: 841/594,5 = 1,41463 (√2 = 1,41421 solo sin redondear a mm).
     // «hojas A4 de exactamente 5 gramos» / «de 5 g exactos»: 80 g/m² × 0,06237 m² = 4,99 g, y la
     // propia página dice antes «623,7 exactos por el redondeo a milímetros».
     // «El sobre lleva la misma letra y número que el papel más uno»: un A4 sin doblar va en C4 (otra
     // letra, mismo número), como dice la línea de debajo.
-    test.fail();
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const cuerpo = contenedor(page);
     await expect(cuerpo).toHaveCount(1);
@@ -573,21 +565,19 @@ test.describe('comparador-tamanos-papel — Inspector 20/11/2026', () => {
     await expect(cuerpo).not.toContainText('la misma letra y número que el papel más uno');
   });
 
-  test('HALLAZGO (20/11/2026, ABIERTO) · I · el «%» va con espacio duro, también en el JSON-LD', async ({ page }) => {
+  test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · I · el «%» va con espacio duro, también en el JSON-LD', async ({ page }) => {
     // CLAUDE.md global §2: «15 %» con U+00A0. «97,3 %» de la escala lleva un espacio normal (U+0020)
     // y featureList dice «Funciona 100% en el navegador».
-    test.fail();
     const escala = (await (await tarjeta(page, 'Escala necesaria')).locator('strong').textContent()) ?? '';
     expect(escala).toMatch(/\d %$/);
     const app = await ldDeTipo(page, 'WebApplication');
     for (const f of ((app.featureList ?? app.features ?? []) as string[])) expect(f).not.toMatch(/\d%/);
   });
 
-  test('HALLAZGO (20/11/2026, ABIERTO) · J · el JSON-LD atribuye la serie C a la ISO 216 y promete un catálogo completo', async ({ page }) => {
+  test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · J · el JSON-LD atribuye la serie C a la ISO 216 y promete un catálogo completo', async ({ page }) => {
     // La serie C (sobres) es de la ISO 269; la propia página la etiqueta «Serie C (sobres)» y deja
     // «(ISO 216)» para A y B. Y «Catálogo completo de series A, B y C»: A y B llegan a 10, la C se
     // para en C8 (por la misma regla, C9 = 40 × 57 y C10 = 28 × 40).
-    test.fail();
     const app = await ldDeTipo(page, 'WebApplication');
     const texto = JSON.stringify([app.description, app.featureList ?? app.features]);
     expect(texto).not.toMatch(/A, B y C \(ISO 216\)|A, B y C de la norma ISO 216/);
