@@ -24,8 +24,11 @@ interface Fase {
   titulo: string;
   icono: string;
   subtitulo: string;
+  /** Color del dato: borde y tinte, no texto (el naranja #E67E22 da 2,52:1 sobre su tinte) */
   color: string;
   colorBg: string;
+  /** Tono de TEXTO del mismo color, por tema (C0645) */
+  texto: string;
 }
 
 interface TipoDolorInfo {
@@ -34,6 +37,7 @@ interface TipoDolorInfo {
   icono: string;
   color: string;
   colorBg: string;
+  texto: string;
   duracion: string;
   causa: string;
   mecanismo: string;
@@ -53,6 +57,7 @@ const FASES: Fase[] = [
     subtitulo: 'En el tejido lesionado',
     color: '#E67E22',
     colorBg: 'rgba(230,126,34,0.12)',
+    texto: 'var(--naranja-texto, #B93E0B)',
   },
   {
     id: 'transmision',
@@ -61,6 +66,7 @@ const FASES: Fase[] = [
     subtitulo: 'Por el nervio',
     color: '#2E86AB',
     colorBg: 'rgba(46,134,171,0.12)',
+    texto: 'var(--dolor-azul-texto)',
   },
   {
     id: 'modulacion',
@@ -69,6 +75,7 @@ const FASES: Fase[] = [
     subtitulo: 'En la médula espinal',
     color: '#48A9A6',
     colorBg: 'rgba(72,169,166,0.12)',
+    texto: 'var(--secondary-texto)',
   },
   {
     id: 'percepcion',
@@ -77,6 +84,7 @@ const FASES: Fase[] = [
     subtitulo: 'En el cerebro',
     color: '#9B59B6',
     colorBg: 'rgba(155,89,182,0.12)',
+    texto: 'var(--dolor-violeta-texto)',
   },
 ];
 
@@ -87,6 +95,7 @@ const TIPOS_DOLOR: TipoDolorInfo[] = [
     icono: '⚡',
     color: '#E67E22',
     colorBg: 'rgba(230,126,34,0.12)',
+    texto: 'var(--naranja-texto, #B93E0B)',
     duracion: 'Horas a días, máx. 3 meses',
     causa: 'Lesión identificable (corte, fractura, cirugía)',
     mecanismo: 'Señal de alarma: protege el tejido dañado evitando que se use',
@@ -98,6 +107,7 @@ const TIPOS_DOLOR: TipoDolorInfo[] = [
     icono: '🔴',
     color: '#E74C3C',
     colorBg: 'rgba(231,76,60,0.12)',
+    texto: 'var(--rojo-texto, #B91C1C)',
     duracion: 'Más de 3 meses',
     causa: 'Puede no haber lesión activa: el sistema nervioso ha cambiado',
     mecanismo: 'Sensibilización central: la "alarma" queda encendida sin incendio',
@@ -110,6 +120,7 @@ const TIPOS_DOLOR: TipoDolorInfo[] = [
     icono: '🔮',
     color: '#8E44AD',
     colorBg: 'rgba(142,68,173,0.12)',
+    texto: 'var(--dolor-violeta-texto)',
     duracion: 'Crónico',
     causa: 'Daño o disfunción del propio nervio (diabetes, herpes zóster, lesión medular)',
     mecanismo: 'El nervio dañado genera señales espontáneas o responde a estímulos no dolorosos',
@@ -182,7 +193,7 @@ export default function ComoFuncionaElDolorPage() {
                 key={fase.id}
                 type="button"
                 className={`${styles.faseBtn} ${faseActiva === fase.id ? styles.faseBtnActivo : ''}`}
-                style={faseActiva === fase.id ? { borderColor: fase.color, background: fase.colorBg } : undefined}
+                style={faseActiva === fase.id ? { borderColor: fase.color, background: fase.colorBg, color: fase.texto } : undefined}
                 onClick={() => setFaseActiva(fase.id)}
                 aria-pressed={faseActiva === fase.id}
               >
@@ -198,7 +209,7 @@ export default function ComoFuncionaElDolorPage() {
             <div className={styles.faseHeader} style={{ background: faseInfo.colorBg }}>
               <span className={styles.faseHeaderIcono} aria-hidden="true">{faseInfo.icono}</span>
               <div>
-                <h3 className={styles.faseHeaderTitulo} style={{ color: faseInfo.color }}>{faseInfo.titulo}</h3>
+                <h3 className={styles.faseHeaderTitulo} style={{ color: faseInfo.texto }}>{faseInfo.titulo}</h3>
                 <p className={styles.faseHeaderSub}>{faseInfo.subtitulo}</p>
               </div>
             </div>
@@ -231,7 +242,7 @@ export default function ComoFuncionaElDolorPage() {
                     </ul>
                   </div>
                   <div className={styles.fibraCard} style={{ borderColor: '#E74C3C' }}>
-                    <span className={styles.fibraLetra} style={{ color: '#E74C3C' }}>C</span>
+                    <span className={styles.fibraLetra} style={{ color: 'var(--rojo-texto, #B91C1C)' }}>C</span>
                     <span className={styles.fibraNombre}>Fibras C</span>
                     <ul className={styles.fibraLista}>
                       <li>No mielínicas (sin vaina)</li>
@@ -264,7 +275,7 @@ export default function ComoFuncionaElDolorPage() {
                 </div>
                 <div className={styles.modulacionGrid}>
                   <div className={styles.modulacionCard} style={{ borderColor: '#27AE60' }}>
-                    <h4 className={styles.modulacionTitulo} style={{ color: '#27AE60' }}><span aria-hidden="true">🔒</span> Cierra la puerta (menos dolor)</h4>
+                    <h4 className={styles.modulacionTitulo} style={{ color: 'var(--verde-texto, #136E35)' }}><span aria-hidden="true">🔒</span> Cierra la puerta (menos dolor)</h4>
                     <ul className={styles.listaPuntos}>
                       <li>Opioides endógenos (endorfinas, encefalinas)</li>
                       <li>Serotonina y noradrenalina</li>
@@ -273,7 +284,7 @@ export default function ComoFuncionaElDolorPage() {
                     </ul>
                   </div>
                   <div className={styles.modulacionCard} style={{ borderColor: '#E74C3C' }}>
-                    <h4 className={styles.modulacionTitulo} style={{ color: '#E74C3C' }}><span aria-hidden="true">🔓</span> Abre la puerta (más dolor)</h4>
+                    <h4 className={styles.modulacionTitulo} style={{ color: 'var(--rojo-texto, #B91C1C)' }}><span aria-hidden="true">🔓</span> Abre la puerta (más dolor)</h4>
                     <ul className={styles.listaPuntos}>
                       <li>Estrés y ansiedad sostenidos</li>
                       <li>Falta de sueño crónica</li>
@@ -298,7 +309,7 @@ export default function ComoFuncionaElDolorPage() {
                   </div>
                   <div className={styles.cerebroArea} style={{ borderColor: '#9B59B6' }}>
                     <span className={styles.cerebroIcono} aria-hidden="true">💜</span>
-                    <h4 style={{ color: '#9B59B6' }}>Sistema límbico</h4>
+                    <h4 style={{ color: 'var(--dolor-violeta-texto)' }}>Sistema límbico</h4>
                     <p>Componente emocional y afectivo: el sufrimiento, el miedo, la aversión. Explica por qué el mismo dolor puede sentirse muy diferente según el contexto.</p>
                   </div>
                   <div className={styles.cerebroArea} style={{ borderColor: '#48A9A6' }}>
@@ -330,7 +341,7 @@ export default function ComoFuncionaElDolorPage() {
                 role="tab"
                 aria-selected={tipoActivo === tipo.id}
                 className={`${styles.tipoBtn} ${tipoActivo === tipo.id ? styles.tipoBtnActivo : ''}`}
-                style={tipoActivo === tipo.id ? { borderColor: tipo.color, background: tipo.colorBg, color: tipo.color } : undefined}
+                style={tipoActivo === tipo.id ? { borderColor: tipo.color, background: tipo.colorBg, color: tipo.texto } : undefined}
                 onClick={() => setTipoActivo(tipo.id)}
               >
                 <span aria-hidden="true">{tipo.icono}</span> {tipo.titulo}

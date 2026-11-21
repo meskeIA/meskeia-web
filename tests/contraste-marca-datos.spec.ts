@@ -292,6 +292,10 @@ const APPS: App[] = [
   // pastel sin cambiar de tema bajo el texto claro (1,06-1,17) y el blanco sobre la fase en rojo (3,82).
   // Las etapas, fases y órganos ELEGIDOS los mide tests/apps/visualizador-hipertension.spec.ts
   { slug: 'visualizador-hipertension', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 21/11/2026 (C0645): el título de la fase y la pestaña del tipo de dolor en el color del dato con
+  // style (Transducción y Dolor agudo en #E67E22 sobre su tinte, 2,52:1 en claro y 4,23 en oscuro) y los
+  // literales de las fibras C, la puerta y el sistema límbico. Las fases y los tipos como secciones
+  { slug: 'visualizador-como-funciona-el-dolor', todo: true, secciones: "nav[aria-label='Fases de la nocicepción'] button, [role='tablist'][aria-label='Tipos de dolor'] [role='tab']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
