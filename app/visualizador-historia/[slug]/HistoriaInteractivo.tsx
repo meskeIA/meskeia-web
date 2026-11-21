@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, type ReactNode } from 'react';
+import { useState, useMemo, type CSSProperties, type ReactNode } from 'react';
 import styles from './Historia.module.css';
 import type { HistoriaData, HitoHistoria } from '@/data/historias/types';
 import {
@@ -13,11 +13,43 @@ import {
   type RelatedApp,
 } from '@/components';
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
-import { rellenoConTinta } from '@/lib/tintaLegible';
+import { mezclar, rellenoConTinta, tonosPorTema } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────
+
+// Texto en el color de cada categoría (cabo C0645). El nombre de cada período y su categoría se
+// pintaban en su color puro con style, también sobre un tinte de ese color (en oscuro «El Terror»
+// #4B0082 a 1,06-1,20:1 y #8B4513 a 1,73-2,05; en claro el oro #DAA520 a 1,90-2,24), el botón, la
+// insignia y la cabecera de lo elegido eran blanco sobre su color (3,99) y «Todos» blanco sobre
+// --primary (4,11 en claro, 2,79 en oscuro). Cada texto toma el tono de su color que llega a 4,6:1
+// sobre el fondo REAL donde se pinta en cada tema (el navegador redondea el tinte: con 4,5 justo
+// salía 4,49) y el blanco sobre color pasa a relleno y tinta de rellenoConTinta. Fondos: la
+// tarjeta (--bg-card) y el panel y las eras (--bg-primary en claro, #1a2633 en oscuro). Receta de
+// visualizador-filosofia.
+const TARJETA = { claro: '#FFFFFF', oscuro: '#2D2D2D' };
+const PANEL = { claro: '#FAFAFA', oscuro: '#1A2633' };
+const ALFA_FILA = 0x18 / 255;
+const ALFA_BADGE = 0x22 / 255;
+const ALFA_ERA = 0x1a / 255;
+
+/** Tono del color sobre su tinte al `alfa` encima de `base`, en cada tema */
+function tonoSobreTinte(color: string, base: { claro: string; oscuro: string }, alfa: number): CSSProperties {
+  return tonosPorTema(color, mezclar(color, base.claro, alfa), mezclar(color, base.oscuro, alfa), 4.6) as CSSProperties;
+}
+
+/** Fondo real de la fila `i` de la comparativa en cada tema: teñida con su color en las pares */
+function filaDe(color: string, i: number): { claro: string; oscuro: string } {
+  const alfa = i % 2 === 0 ? ALFA_FILA : 0;
+  return { claro: mezclar(color, TARJETA.claro, alfa), oscuro: mezclar(color, TARJETA.oscuro, alfa) };
+}
+
+/** Relleno de su color y tinta legible encima, para el botón, la insignia y la cabecera de lo elegido */
+function rellenoDe(color: string): CSSProperties {
+  const { relleno, tinta } = rellenoConTinta(color);
+  return { background: relleno, borderColor: relleno, color: tinta };
+}
 
 function formatAnio(anio: number): string {
   if (anio <= -9000) return '';
@@ -64,13 +96,13 @@ function PanelDetalle({
 
   return (
     <div className={styles.detallePanel} style={{ borderLeftColor: color }}>
-      <h3 className={styles.detalleTitulo} style={{ color }}>
+      <h3 className={`${styles.detalleTitulo} ${styles.tonoDato}`} style={tonoSobreTinte(color, PANEL, 0)}>
         {hito.nombre}
       </h3>
       <p className={styles.detallePeriodo}>
         {formatAnio(hito.anioInicio)} – {formatAnio(hito.anioFin)}
       </p>
-      <span className={styles.detalleCategoria} style={{ background: color }}>
+      <span className={styles.detalleCategoria} style={rellenoDe(color)}>
         {catLabel}
       </span>
 
@@ -351,14 +383,7 @@ export default function HistoriaInteractivo({
                     key={h.id}
                     className={`${styles.periodoBtn} ${i === detalleIdx ? styles.periodoBtnActivo : ''}`}
                     onClick={() => setDetalleIdx(i)}
-                    style={
-                      i === detalleIdx
-                        ? {
-                            background: data.colores[h.categoria] ?? h.color,
-                            borderColor: data.colores[h.categoria] ?? h.color,
-                          }
-                        : {}
-                    }
+                    style={i === detalleIdx ? rellenoDe(data.colores[h.categoria] ?? h.color) : {}}
                     aria-label={h.nombre}
                   >
                     {formatAnio(h.anioInicio)}
@@ -373,7 +398,7 @@ export default function HistoriaInteractivo({
                 >
                   <div
                     className={styles.detalleTarjetaHeader}
-                    style={{ background: data.colores[hitoDetalle.categoria] ?? hitoDetalle.color }}
+                    style={rellenoDe(data.colores[hitoDetalle.categoria] ?? hitoDetalle.color)}
                   >
                     <h3>{hitoDetalle.nombre}</h3>
                     <p>
@@ -456,7 +481,7 @@ export default function HistoriaInteractivo({
                   onClick={() => setCatFiltro('todas')}
                   style={
                     catFiltro === 'todas'
-                      ? { background: 'var(--primary)', borderColor: 'var(--primary)', color: '#fff' }
+                      ? { background: 'var(--primary-boton)', borderColor: 'var(--primary-boton)', color: '#fff' }
                       : {}
                   }
                 >
@@ -470,11 +495,9 @@ export default function HistoriaInteractivo({
                     onClick={() => setCatFiltro(id)}
                     style={
                       catFiltro === id
-                        ? {
-                            background: data.colores[id] ?? 'var(--primary)',
-                            borderColor: data.colores[id] ?? 'var(--primary)',
-                            color: '#fff',
-                          }
+                        ? data.colores[id]
+                          ? rellenoDe(data.colores[id])
+                          : { background: 'var(--primary-boton)', borderColor: 'var(--primary-boton)', color: '#fff' }
                         : {}
                     }
                   >
@@ -510,7 +533,10 @@ export default function HistoriaInteractivo({
                         style={i % 2 === 0 ? { background: `${data.colores[h.categoria] ?? h.color}18` } : {}}
                       >
                         <td>
-                          <strong style={{ color: data.colores[h.categoria] ?? h.color }}>
+                          <strong
+                            className={styles.tonoDato}
+                            style={tonoSobreTinte(data.colores[h.categoria] ?? h.color, filaDe(data.colores[h.categoria] ?? h.color, i), 0)}
+                          >
                             {h.nombre}
                           </strong>
                         </td>
@@ -519,10 +545,10 @@ export default function HistoriaInteractivo({
                         </td>
                         <td>
                           <span
-                            className={styles.badgeCategoria}
+                            className={`${styles.badgeCategoria} ${styles.tonoDato}`}
                             style={{
                               background: `${data.colores[h.categoria] ?? h.color}22`,
-                              color: data.colores[h.categoria] ?? h.color,
+                              ...tonoSobreTinte(data.colores[h.categoria] ?? h.color, filaDe(data.colores[h.categoria] ?? h.color, i), ALFA_BADGE),
                             }}
                           >
                             {data.categorias[h.categoria] ?? h.categoria}
@@ -580,11 +606,11 @@ export default function HistoriaInteractivo({
                           {hitosEra.map(h => (
                             <span
                               key={h.id}
-                              className={styles.eraEstiloBadge}
+                              className={`${styles.eraEstiloBadge} ${styles.tonoDato}`}
                               style={{
                                 background: `${data.colores[h.categoria] ?? h.color}1A`,
-                                color: data.colores[h.categoria] ?? h.color,
                                 borderColor: `${data.colores[h.categoria] ?? h.color}55`,
+                                ...tonoSobreTinte(data.colores[h.categoria] ?? h.color, PANEL, ALFA_ERA),
                               }}
                             >
                               {h.nombre}

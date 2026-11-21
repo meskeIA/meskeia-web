@@ -346,7 +346,12 @@ const APPS: App[] = [
   { slug: 'visualizador-literatura-movimientos', todo: true, secciones: "[role='tablist'] [role='tab']" },
   { slug: 'visualizador-musica-movimientos', todo: true, secciones: "[role='tablist'] [role='tab']" },
   { slug: 'visualizador-revoluciones-industriales', todo: true, secciones: "[role='tablist'] [role='tab']" },
-  { slug: 'visualizador-derechos-humanos', todo: true, secciones: "[role='tablist'] [role='tab']" },];
+  { slug: 'visualizador-derechos-humanos', todo: true, secciones: "[role='tablist'] [role='tab']" },
+  // 21/11/2026 (C0645): la plantilla de todas las cronologías de Cronicum (HistoriaInteractivo), la
+  // misma forma; «Todos» además en blanco sobre --primary (4,11 en claro, 2,79 en oscuro). Dos
+  // cronologías con paletas distintas
+  { slug: 'visualizador-historia/revolucion-francesa', todo: true, secciones: "[role='tablist'] [role='tab']" },
+  { slug: 'visualizador-historia/china-dinastias', todo: true, secciones: "[role='tablist'] [role='tab']" },];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
   return page.evaluate(({ marca, todo }) => {
