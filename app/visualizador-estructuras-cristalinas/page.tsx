@@ -783,6 +783,22 @@ function calcularAristaCSS(ar: Arista3D) {
   };
 }
 
+/**
+ * Contragiro de un átomo para que mire siempre a la cámara: un átomo es una esfera y debe medir
+ * lo mismo desde cualquier lado. La estructura gira con rotateX(rx) rotateY(ry); si cada átomo
+ * añade, tras su traslación, rotateY(−ry) rotateX(−rx), la orientación total es la identidad y
+ * el disco queda de cara (su posición sí gira con la celda). Hasta el 21/11/2026 eran discos que
+ * giraban con la celda: a 90° medían el 8 % de su tamaño y la celda se quedaba sin átomos
+ * (hallazgo 5309). Va como matrix3d (columnas) de Ry(φ)·Rx(ψ), con φ = −ry y ψ = −rx.
+ */
+function contragiroAtomo(rot: Rotation): string {
+  const f = (-rot.y * Math.PI) / 180;
+  const p = (-rot.x * Math.PI) / 180;
+  const cf = Math.cos(f), sf = Math.sin(f), cp = Math.cos(p), sp = Math.sin(p);
+  const m = [cf, 0, -sf, 0, sf * sp, cp, cf * sp, 0, sf * cp, -sp, cf * cp, 0, 0, 0, 0, 1];
+  return `matrix3d(${m.map((v) => Number(v.toFixed(6))).join(', ')})`;
+}
+
 function Escena3D({ atomos, aristas, caras, tamano = 320, rotacionInicial }: Escena3DProps) {
   const [rotation, setRotation] = useState<Rotation>(rotacionInicial ?? { x: -20, y: 30 });
   const [isDragging, setIsDragging] = useState(false);
@@ -816,6 +832,8 @@ function Escena3D({ atomos, aristas, caras, tamano = 320, rotacionInicial }: Esc
       y: eje === 'y' ? prev.y + dir * 30 : prev.y,
     }));
   }, []);
+
+  const contragiro = contragiroAtomo(rotation);
 
   return (
     <div className={styles.escenaWrapper}>
@@ -859,7 +877,7 @@ function Escena3D({ atomos, aristas, caras, tamano = 320, rotacionInicial }: Esc
               key={`t-${i}`}
               className={styles.atomo}
               style={{
-                transform: `translate3d(${at.x}px, ${at.y}px, ${at.z}px)`,
+                transform: `translate3d(${at.x}px, ${at.y}px, ${at.z}px) ${contragiro}`,
                 background: at.color,
                 width: at.size,
                 height: at.size,

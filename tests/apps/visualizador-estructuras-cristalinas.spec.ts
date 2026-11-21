@@ -684,7 +684,7 @@ test.describe('Firma 20/11/2026 · escritorio 1280 px', () => {
     }
   });
 
-  test.fail('ABIERTO (firma 20/11/2026) · girada 90°, la celda se queda sin átomos: son discos planos, no esferas', async ({ page }) => {
+  test('REPARADO 5309 (firma 20/11/2026) · girada 90°, la celda se queda sin átomos: son discos planos, no esferas', async ({ page }) => {
     // Dos pulsaciones de «Rotar derecha» (30° → 90°, las dos llegan). Una esfera mediría ~18 px de
     // ancho; un disco de canto mide 18·|cos 90°| = 0. Obtenido: 1,1-1,5 px los 8 átomos del cúbico
     // (8 % de su tamaño); a 60°, 120°, 240° y 300° miden el 52 %. Umbral 60 %: holgura sobre la
