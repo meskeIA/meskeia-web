@@ -718,7 +718,7 @@ test.describe('Firma 20/11/2026 · escritorio 1280 px', () => {
     expect(mitad, `mitad de la escena (px desde arriba) frente a ${alto} px de pantalla`).toBeLessThan(alto);
   });
 
-  test.fail('ABIERTO (firma 20/11/2026) · HCP: la capa intermedia queda más lejos que los vecinos del plano', async ({ page }) => {
+  test('REPARADO 5314 (firma 20/11/2026) · HCP: la capa intermedia queda más lejos que los vecinos del plano', async ({ page }) => {
     // La tarjeta dice «Nº coordinación 12» y «74 %»: en la HCP compacta los 6 vecinos del plano y
     // los 3 + 3 de las capas contiguas están a la MISMA distancia a, y c/a = 2·√(2/3) = 1,633.
     // Dibujada: a = 40,5 px, c = 90 px (c/a = 2,22) y la capa intermedia a 50,69 px de la base.
@@ -733,6 +733,7 @@ test.describe('Firma 20/11/2026 · escritorio 1280 px', () => {
     const enPlano = Math.min(...base.flatMap((p, i) => base.filter((_, j) => j !== i).map((q) => dist(p, q))));
     const entreCapas = Math.min(...medio.flatMap((p) => base.map((q) => dist(p, q))));
     expect(Math.abs(entreCapas - enPlano), `vecino de la capa contigua ${entreCapas.toFixed(2)} px · del plano ${enPlano.toFixed(2)} px`).toBeLessThan(1);
+    expect((ys[2] - ys[0]) / enPlano, 'c/a = 2·√(2/3) = 1,633').toBeCloseTo(1.633, 1);
   });
 
   test('REPARADO 5313 (firma 20/11/2026) · aristas a 1,45:1 en claro: el contorno de la celda apenas se ve', async ({ page }) => {

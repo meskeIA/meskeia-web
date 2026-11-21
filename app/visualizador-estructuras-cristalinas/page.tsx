@@ -385,10 +385,21 @@ function fccAtomos(): Atomo3D[] {
   return [...esquinas, ...caras];
 }
 
+/**
+ * HCP compacta: arista del hexágono a = HCP_R (= radio, en un hexágono regular) y altura de la
+ * celda c = 2·√(2/3)·a = 1,633·a, de modo que cada átomo de la capa intermedia, sobre el centro de
+ * un triángulo de la base (a a/√3 del eje), toca los tres de debajo a la distancia a:
+ * (a/√3)² + (c/2)² = a². Así los 6 vecinos del plano y los 3 + 3 de las capas contiguas están a
+ * la misma distancia, que es el «Nº coordinación 12» de la tarjeta. Hasta el 21/11/2026, c = 90 px
+ * con a = 40,5 (c/a = 2,22) y la capa intermedia quedaba a 50,7 px (hallazgo 5314).
+ */
+const HCP_R = S * 0.45;
+const HCP_MEDIA_ALTURA = HCP_R * Math.sqrt(2 / 3);
+
 function hcpAtomos(): Atomo3D[] {
   const atoms: Atomo3D[] = [];
-  const r = S * 0.45;
-  const hLayer = S * 0.5;
+  const r = HCP_R;
+  const hLayer = HCP_MEDIA_ALTURA;
   // Capa inferior: hexágono + centro
   for (let i = 0; i < 6; i++) {
     const ang = (i * 60) * Math.PI / 180;
@@ -398,7 +409,7 @@ function hcpAtomos(): Atomo3D[] {
   // Capa intermedia: 3 átomos en huecos
   for (let i = 0; i < 3; i++) {
     const ang = (i * 120 + 30) * Math.PI / 180;
-    atoms.push({ x: Math.cos(ang) * r * 0.58, y: 0, z: Math.sin(ang) * r * 0.58, color: '#48A9A6', size: 22 });
+    atoms.push({ x: Math.cos(ang) * r / Math.sqrt(3), y: 0, z: Math.sin(ang) * r / Math.sqrt(3), color: '#48A9A6', size: 22 });
   }
   // Capa superior: hexágono + centro
   for (let i = 0; i < 6; i++) {
@@ -411,8 +422,8 @@ function hcpAtomos(): Atomo3D[] {
 
 function hcpAristas(): Arista3D[] {
   const edges: Arista3D[] = [];
-  const r = S * 0.45;
-  const hLayer = S * 0.5;
+  const r = HCP_R;
+  const hLayer = HCP_MEDIA_ALTURA;
   // Hexágonos inferior y superior + verticales
   for (let layer = -1; layer <= 1; layer += 2) {
     const y = layer * hLayer;
@@ -474,7 +485,7 @@ const ESTRUCTURAS_METALICAS: EstructuraMetalica[] = [
     color: '#48A9A6',
     atomos: hcpAtomos(),
     aristas: hcpAristas(),
-    caras: hexCaras(S * 0.45, S, '#48A9A6', 0),
+    caras: hexCaras(HCP_R, 2 * HCP_MEDIA_ALTURA, '#48A9A6', 0),
   },
 ];
 
