@@ -10,6 +10,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import { traerALaVista } from '@/lib';
 import styles from './SimuladorModeloOsi.module.css';
 
 // ============================================================
@@ -24,6 +25,12 @@ interface Capa {
   funcion: string;
   dispositivos: string;
   color: string;
+  /**
+   * Fondo del círculo con el número, con texto blanco encima: el `color` de la capa daba de 2,70 a
+   * 4,11:1 en cinco capas (hallazgo 5372). Mismo tono, oscurecido hasta 4,6:1 o más; igual en los
+   * dos temas porque el blanco no cambia.
+   */
+  colorNumero: string;
   tcpip: string;
 }
 
@@ -37,6 +44,7 @@ const CAPAS: Capa[] = [
     funcion: 'Interfaz entre la red y las aplicaciones del usuario.',
     dispositivos: 'Navegador, cliente de correo, servidores',
     color: '#2E86AB',
+    colorNumero: '#2B7D9F',
     tcpip: 'Aplicación',
   },
   {
@@ -47,6 +55,7 @@ const CAPAS: Capa[] = [
     funcion: 'Cifrado, compresión y formato de los datos.',
     dispositivos: 'Software de cifrado y códecs',
     color: '#3E91A8',
+    colorNumero: '#367E92',
     tcpip: 'Aplicación',
   },
   {
@@ -57,6 +66,7 @@ const CAPAS: Capa[] = [
     funcion: 'Abre, mantiene y cierra las sesiones de comunicación.',
     dispositivos: 'APIs de sesión del sistema',
     color: '#48A9A6',
+    colorNumero: '#367F7D',
     tcpip: 'Aplicación',
   },
   {
@@ -67,6 +77,7 @@ const CAPAS: Capa[] = [
     funcion: 'Entrega extremo a extremo, puertos, fiabilidad y control de flujo.',
     dispositivos: 'Cortafuegos (filtrado por puerto)',
     color: '#5BAE7A',
+    colorNumero: '#43815A',
     tcpip: 'Transporte',
   },
   {
@@ -77,6 +88,7 @@ const CAPAS: Capa[] = [
     funcion: 'Direccionamiento lógico (IP) y enrutamiento entre redes.',
     dispositivos: 'Router',
     color: '#C0653A',
+    colorNumero: '#B35E36',
     tcpip: 'Internet',
   },
   {
@@ -87,6 +99,7 @@ const CAPAS: Capa[] = [
     funcion: 'Direccionamiento físico (MAC) y entrega dentro de la misma red.',
     dispositivos: 'Switch, tarjeta de red',
     color: '#A6533F',
+    colorNumero: '#A6533F',
     tcpip: 'Acceso a la red',
   },
   {
@@ -97,6 +110,7 @@ const CAPAS: Capa[] = [
     funcion: 'Transmite los bits como señales por el medio físico.',
     dispositivos: 'Hub, cables, repetidor',
     color: '#7B5EA7',
+    colorNumero: '#7B5EA7',
     tcpip: 'Acceso a la red',
   },
 ];
@@ -133,17 +147,24 @@ const ESCENARIOS: Escenario[] = [
     puerto: '587',
     seguridad: true,
   },
+  // Hallazgo 5368: decía «RTP/DNS · UDP puerto 443». DNS va al 53 (RFC 1035 §4.2.1) y RTP no tiene
+  // puerto fijo (RFC 3550 §11); el 443 sobre UDP es el de HTTP/3, que viaja sobre QUIC y es como
+  // se sirve hoy buena parte del vídeo en streaming. QUIC cifra siempre (TLS 1.3 integrado).
+  // El dato ya no se llama «paquete», que en la app es la PDU de la capa 3.
   {
     id: 'streaming',
     nombre: 'Streaming de vídeo',
     icono: '📺',
-    appProto: 'RTP/DNS',
-    payload: 'Paquete de vídeo',
+    appProto: 'HTTP/3 (QUIC)',
+    payload: 'Fragmento de vídeo',
     transporte: 'UDP',
     puerto: '443',
-    seguridad: false,
+    seguridad: true,
   },
 ];
+
+/** Lo que se ve del dato de aplicación una vez cifrado por TLS en la capa 6 (hallazgo 5369). */
+const DATOS_CIFRADOS = 'Datos cifrados (TLS)';
 
 // ============================================================
 //  CONSTRUCCIÓN DE LOS FOTOGRAMAS DE LA ANIMACIÓN
@@ -165,7 +186,12 @@ interface Fotograma {
 }
 
 function bloquesYpdu(capaNum: number, esc: Escenario): { bloques: Bloque[]; pdu: string } {
-  const datos: Bloque = { txt: esc.payload, tipo: 'datos' };
+  // Con TLS (HTTPS, SMTP con STARTTLS, QUIC) el dato solo va en claro en la capa 7: desde la 6
+  // hacia abajo viaja cifrado, y quien capture la trama no lee la petición (hallazgo 5369)
+  const datos: Bloque = {
+    txt: esc.seguridad && capaNum <= 6 ? DATOS_CIFRADOS : esc.payload,
+    tipo: 'datos',
+  };
   if (capaNum >= 5) {
     return { bloques: [datos], pdu: 'Datos' };
   }
@@ -205,8 +231,11 @@ function construirFotogramas(esc: Escenario): Fotograma[] {
     const c = capaPorNum(n);
     const { bloques, pdu } = bloquesYpdu(n, esc);
     let desc = '';
-    if (n >= 5) desc = `${c.funcion} La PDU sigue siendo "Datos".`;
+    if (n === 6 && esc.seguridad) desc = `${c.funcion} Aquí TLS cifra los datos: desde esta capa hacia abajo la petición viaja cifrada. La PDU sigue siendo "Datos".`;
+    else if (n >= 5) desc = `${c.funcion} La PDU sigue siendo "Datos".`;
     else if (n === 1) desc = 'La trama se convierte en señales (bits) listas para el medio físico.';
+    // Hallazgo 5371: la capa 2 añade cabecera Y cola, como dibuja el bloque [MAC]…[FCS]
+    else if (n === 2) desc = `Añade la cabecera de capa 2 (MAC) y la cola FCS, que permite detectar errores. ${c.funcion}`;
     else desc = `Añade la cabecera de capa ${n}. ${c.funcion}`;
     frames.push({
       lado: 'emisor',
@@ -234,7 +263,9 @@ function construirFotogramas(esc: Escenario): Fotograma[] {
     const { bloques, pdu } = bloquesYpdu(n, esc);
     let desc = '';
     if (n === 1) desc = 'Recibe las señales y reconstruye los bits en una trama.';
+    else if (n === 6 && esc.seguridad) desc = `${c.funcion} Aquí TLS descifra los datos y entrega la petición en claro a la capa 7.`;
     else if (n >= 5) desc = `${c.funcion} Entrega los datos a la capa superior.`;
+    else if (n === 2) desc = 'Comprueba la cola FCS para detectar errores, lee y quita la cabecera MAC y la cola, y entrega el paquete hacia arriba.';
     else desc = `Lee y quita la cabecera de capa ${n}, y entrega el contenido hacia arriba.`;
     frames.push({
       lado: 'receptor',
@@ -300,6 +331,16 @@ export default function SimuladorModeloOsi() {
 
   const detalle = capaDetalle !== null ? CAPAS.find((c) => c.num === capaDetalle) : null;
 
+  // Hallazgo 5376: «Pulsa cualquier capa para ver sus protocolos» abría el detalle ~700 px por
+  // debajo del botón y no se veía nada. Va justo bajo las pilas y, si no se ve, se trae a la vista
+  // (sin mover el foco: con el teclado, Espacio sobre la misma capa lo vuelve a cerrar).
+  const detalleRef = useRef<HTMLElement>(null);
+  const tituloDetalleRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (capaDetalle === null) return;
+    traerALaVista(detalleRef.current, tituloDetalleRef.current);
+  }, [capaDetalle]);
+
   const renderStack = (lado: 'emisor' | 'receptor') => (
     <div className={styles.stack}>
       <div className={styles.stackTitulo}>{lado === 'emisor' ? 'Emisor' : 'Receptor'}</div>
@@ -316,7 +357,7 @@ export default function SimuladorModeloOsi() {
             onClick={() => setCapaDetalle((prev) => (prev === c.num ? null : c.num))}
             aria-pressed={capaDetalle === c.num}
           >
-            <span className={styles.capaNum} style={{ background: c.color }}>{c.num}</span>
+            <span className={styles.capaNum} style={{ background: c.colorNumero }}>{c.num}</span>
             <span className={styles.capaInfo}>
               <span className={styles.capaNombre}>{c.nombre}</span>
               <span className={styles.capaTcpip}>TCP/IP: {c.tcpip}</span>
@@ -383,6 +424,37 @@ export default function SimuladorModeloOsi() {
           </div>
         </section>
 
+        {/* Detalle de capa: justo bajo las pilas (hallazgo 5376) */}
+        {detalle && (
+          <section ref={detalleRef} className={styles.panel}>
+            <h2 ref={tituloDetalleRef} className={styles.panelTitle}>
+              Capa {detalle.num}: {detalle.nombre}
+            </h2>
+            <div className={styles.detalleGrid}>
+              <div className={styles.detalleItem}>
+                <span className={styles.detalleLabel}>Función</span>
+                <span className={styles.detalleValor}>{detalle.funcion}</span>
+              </div>
+              <div className={styles.detalleItem}>
+                <span className={styles.detalleLabel}>PDU</span>
+                <span className={styles.detalleValor}>{detalle.pdu}</span>
+              </div>
+              <div className={styles.detalleItem}>
+                <span className={styles.detalleLabel}>Protocolos</span>
+                <span className={styles.detalleValor}>{detalle.protocolos}</span>
+              </div>
+              <div className={styles.detalleItem}>
+                <span className={styles.detalleLabel}>Dispositivos</span>
+                <span className={styles.detalleValor}>{detalle.dispositivos}</span>
+              </div>
+              <div className={styles.detalleItem}>
+                <span className={styles.detalleLabel}>Modelo TCP/IP</span>
+                <span className={styles.detalleValor}>{detalle.tcpip}</span>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* PDU actual */}
         <section className={styles.panel}>
           <h2 className={styles.panelTitle}>
@@ -424,9 +496,10 @@ export default function SimuladorModeloOsi() {
               type="button"
               className={`${styles.ctrlBtn} ${auto ? styles.ctrlBtnDanger : styles.ctrlBtnSecondary}`}
               onClick={() => setAuto((a) => !a)}
-              aria-pressed={auto}
               disabled={frameIdx >= totalFrames - 1}
             >
+              {/* Sin aria-pressed (hallazgo 5375): el nombre ya dice la acción («Auto» / «Pausar»);
+                  con los dos, en marcha se leía «Pausar, presionado» */}
               {auto ? <span key="si">Pausar</span> : <span key="no">Auto <span aria-hidden="true">▶▶</span></span>}
             </button>
             <button type="button" className={`${styles.ctrlBtn} ${styles.ctrlBtnDanger}`} onClick={handleReiniciar}>
@@ -457,36 +530,6 @@ export default function SimuladorModeloOsi() {
           </div>
         </section>
 
-        {/* Detalle de capa */}
-        {detalle && (
-          <section className={styles.panel}>
-            <h2 className={styles.panelTitle}>
-              Capa {detalle.num}: {detalle.nombre}
-            </h2>
-            <div className={styles.detalleGrid}>
-              <div className={styles.detalleItem}>
-                <span className={styles.detalleLabel}>Función</span>
-                <span className={styles.detalleValor}>{detalle.funcion}</span>
-              </div>
-              <div className={styles.detalleItem}>
-                <span className={styles.detalleLabel}>PDU</span>
-                <span className={styles.detalleValor}>{detalle.pdu}</span>
-              </div>
-              <div className={styles.detalleItem}>
-                <span className={styles.detalleLabel}>Protocolos</span>
-                <span className={styles.detalleValor}>{detalle.protocolos}</span>
-              </div>
-              <div className={styles.detalleItem}>
-                <span className={styles.detalleLabel}>Dispositivos</span>
-                <span className={styles.detalleValor}>{detalle.dispositivos}</span>
-              </div>
-              <div className={styles.detalleItem}>
-                <span className={styles.detalleLabel}>Modelo TCP/IP</span>
-                <span className={styles.detalleValor}>{detalle.tcpip}</span>
-              </div>
-            </div>
-          </section>
-        )}
       </main>
 
       <EducationalSection
@@ -508,7 +551,7 @@ export default function SimuladorModeloOsi() {
               <tr><td>7 · Aplicación</td><td>Datos</td><td>HTTP, DNS, SMTP</td><td rowSpan={3}>Aplicación</td></tr>
               <tr><td>6 · Presentación</td><td>Datos</td><td>TLS, JPEG</td></tr>
               <tr><td>5 · Sesión</td><td>Datos</td><td>Sockets, RPC</td></tr>
-              <tr><td>4 · Transporte</td><td>Segmento</td><td>TCP, UDP</td><td>Transporte</td></tr>
+              <tr><td>4 · Transporte</td><td>Segmento (TCP) / Datagrama (UDP)</td><td>TCP, UDP</td><td>Transporte</td></tr>
               <tr><td>3 · Red</td><td>Paquete</td><td>IP, ICMP</td><td>Internet</td></tr>
               <tr><td>2 · Enlace</td><td>Trama</td><td>Ethernet, Wi-Fi</td><td rowSpan={2}>Acceso a la red</td></tr>
               <tr><td>1 · Física</td><td>Bits</td><td>Cables, señales</td></tr>
@@ -626,7 +669,7 @@ export default function SimuladorModeloOsi() {
             <div className={styles.stepNumber}>2</div>
             <div className={styles.stepContent}>
               <strong>Transporte añade puertos (capa 4)</strong>
-              <p>Se añade la cabecera TCP o UDP con el puerto origen y destino: la PDU pasa a ser un segmento.</p>
+              <p>Se añade la cabecera TCP o UDP con el puerto origen y destino: la PDU pasa a ser un segmento (con TCP) o un datagrama (con UDP).</p>
             </div>
           </div>
           <div className={styles.step}>
@@ -657,7 +700,7 @@ export default function SimuladorModeloOsi() {
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🔢</span>
             <strong>Asocia capa y PDU</strong>
-            <p>4 = segmento, 3 = paquete, 2 = trama, 1 = bits. Las capas 5-7 manejan "datos".</p>
+            <p>4 = segmento (TCP) o datagrama (UDP), 3 = paquete, 2 = trama, 1 = bits. Las capas 5-7 manejan "datos".</p>
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">📍</span>

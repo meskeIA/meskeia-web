@@ -35,7 +35,10 @@ import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliar
  *   3 (aparte)  En UDP la PDU de capa 4 es «Datagrama», no «Segmento»; y un protocolo con su
  *               puerto equivocado (DNS en el 443) debe marcarse mal: HALLAZGO A.
  *
- * HALLAZGOS de esta inspección (ABIERTOS):
+ * HALLAZGOS de esta inspección (REPARADOS en /reparar del 21/11/2026, nº 5368-5376: el streaming
+ * pasa a HTTP/3 (QUIC) · UDP 443; con TLS el dato va cifrado de la capa 6 hacia abajo; la guía
+ * dice datagrama con UDP; la capa 2 nombra la cola FCS; tintas a 4,5:1; Auto sin aria-pressed; el
+ * detalle de capa va bajo las pilas y se trae a la vista):
  *   A. Streaming «RTP/DNS · UDP puerto 443» y cabecera «UDP:443»: DNS va al 53 y RTP no tiene
  *      puerto fijo; el 443 es el de HTTPS.
  *   B. En HTTPS (y en el correo, también con `seguridad: true`) la petición «GET /index.html»
@@ -251,7 +254,8 @@ test.describe('Caso 2 (límite): extremos de la animación y del deslizador', ()
     await botonAuto(page).click();
     await expect(progreso(page)).toHaveText('Paso 15 de 15', { timeout: 15_000 });
     await expect(botonAuto(page)).toHaveAccessibleName('Auto');
-    await expect(botonAuto(page)).toHaveAttribute('aria-pressed', 'false');
+    // Hallazgo 5375: el estado lo da el nombre («Auto» / «Pausar»), sin aria-pressed
+    await expect(botonAuto(page)).not.toHaveAttribute('aria-pressed');
     await expect(botonAuto(page)).toBeDisabled();
   });
 
@@ -262,7 +266,8 @@ test.describe('Caso 2 (límite): extremos de la animación y del deslizador', ()
     await expect(progreso(page)).toHaveText('Paso 1 de 15');
     await page.waitForTimeout(2_500); // más de dos saltos a 1100 ms
     await expect(progreso(page)).toHaveText('Paso 1 de 15');
-    await expect(botonAuto(page)).toHaveAttribute('aria-pressed', 'false');
+    // Parado: vuelve a ofrecer «Auto» (sin aria-pressed desde el hallazgo 5375)
+    await expect(botonAuto(page)).toHaveAccessibleName('Auto');
   });
 
   test('Deslizador de velocidad: acota a 400-2000 ms (99999 → 2000) y responde a Inicio con el teclado', async ({ page }) => {
@@ -277,65 +282,75 @@ test.describe('Caso 2 (límite): extremos de la animación y del deslizador', ()
   });
 });
 
-test.describe('Hallazgos de contenido (ABIERTOS)', () => {
+test.describe('Hallazgos de contenido (REPARADOS 21/11/2026)', () => {
   test.beforeEach(async ({ page }) => {
     await abrir(page);
   });
 
-  test.fail('A · Streaming: el protocolo que nombra debe ir con su puerto (DNS 53, RFC 1035; RTP sin puerto fijo, RFC 3550)', async ({ page }) => {
+  test('A (5368) · Streaming: el protocolo que nombra debe ir con su puerto (DNS 53, RFC 1035; RTP sin puerto fijo, RFC 3550)', async ({ page }) => {
     const texto = (await escenario(page, /Streaming de vídeo/).textContent()) ?? '';
     const m = texto.match(/([^·]+?) · (TCP|UDP) puerto (\d+)$/);
     expect(m, 'etiqueta «<protocolo> · <transporte> puerto <n>»').not.toBeNull();
     const [, proto, , puerto] = m as RegExpMatchArray;
-    // Hoy: «RTP/DNS · UDP puerto 443»
+    // Antes: «RTP/DNS · UDP puerto 443». Ahora HTTP/3 sobre QUIC, que sí va por UDP 443
     if (/DNS/.test(proto)) expect(puerto, 'DNS usa el puerto 53 (RFC 1035 §4.2.1)').toBe('53');
     if (/RTP/.test(proto)) expect(puerto, 'RTP no usa el 443: puerto par elegido por sesión (RFC 3550 §11)').not.toBe('443');
+    expect(texto).toContain('HTTP/3 (QUIC) · UDP puerto 443');
   });
 
-  test.fail('B · HTTPS: dentro de la trama la petición no puede viajar en claro (TLS cifra en la capa 6, según la propia página)', async ({ page }) => {
+  test('B (5369) · HTTPS: dentro de la trama la petición no puede viajar en claro (TLS cifra en la capa 6, según la propia página)', async ({ page }) => {
+    // En la capa 7 la petición sí está en claro
+    expect(await bloques(page).allTextContents()).toEqual(['GET /index.html']);
     await irAlPaso(page, 6); // Emisor · Capa 2: trama
     const b = await bloques(page).allTextContents();
-    // Hoy: [MAC][IP][TCP][GET /index.html][FCS]
+    // Antes: [MAC][IP][TCP][GET /index.html][FCS]
     expect(b.join(' '), 'la trama de HTTPS muestra TLS o datos cifrados').toMatch(/TLS|cifrad/i);
+    expect(b.join(' ')).not.toContain('GET /index.html');
   });
 
-  test.fail('C · Guía paso a paso: con UDP la PDU de capa 4 es un datagrama, no un segmento', async ({ page }) => {
+  test('C (5370) · Guía paso a paso: con UDP la PDU de capa 4 es un datagrama, no un segmento', async ({ page }) => {
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const paso = page.getByText('Transporte añade puertos (capa 4)', { exact: true }).locator('xpath=following-sibling::p[1]');
-    // Hoy: «Se añade la cabecera TCP o UDP con el puerto origen y destino: la PDU pasa a ser un segmento.»
+    // Antes: «Se añade la cabecera TCP o UDP con el puerto origen y destino: la PDU pasa a ser un segmento.»
     await expect(paso).toContainText(/datagrama/i, { timeout: 2_000 });
   });
 
-  test.fail('D · Capa 2 del emisor: su texto debe decir que añade también la cola FCS que dibuja el bloque', async ({ page }) => {
+  test('D (5371) · Capa 2 del emisor: su texto debe decir que añade también la cola FCS que dibuja el bloque', async ({ page }) => {
     await irAlPaso(page, 6);
     expect((await bloques(page).allTextContents()).at(-1)).toBe('FCS');
-    // Hoy: «Añade la cabecera de capa 2. Direccionamiento físico (MAC)…»
+    // Antes: «Añade la cabecera de capa 2. Direccionamiento físico (MAC)…»
     await expect(estado(page)).toContainText(/FCS|cola/i, { timeout: 2_000 });
+    // Y el receptor, en el paso 10, la comprueba y la quita
+    for (let i = 6; i < 10; i++) await siguiente(page).click();
+    await expect(progreso(page)).toHaveText('Paso 10 de 15');
+    await expect(estado(page)).toContainText('Receptor · Capa 2: Enlace de datos.');
+    await expect(estado(page)).toContainText('cola FCS');
   });
 
-  test.fail('H · El botón Auto no puede cambiar de nombre y conservar aria-pressed (lee «Pausar, presionado» en marcha)', async ({ page }) => {
+  test('H (5375) · El botón Auto no puede cambiar de nombre y conservar aria-pressed (lee «Pausar, presionado» en marcha)', async ({ page }) => {
     const antes = { nombre: (await botonAuto(page).textContent())?.trim(), pulsado: await botonAuto(page).getAttribute('aria-pressed') };
-    expect(antes).toEqual({ nombre: 'Auto ▶▶', pulsado: 'false' });
+    expect(antes).toEqual({ nombre: 'Auto ▶▶', pulsado: null });
     await botonAuto(page).click();
     const despues = { nombre: (await botonAuto(page).textContent())?.trim(), pulsado: await botonAuto(page).getAttribute('aria-pressed') };
-    // Hoy: { nombre: 'Pausar', pulsado: 'true' }
+    // Antes: { nombre: 'Pausar', pulsado: 'true' }
     expect(despues.nombre !== antes.nombre && despues.pulsado !== null, `nombre «${despues.nombre}» con aria-pressed=${despues.pulsado}`).toBe(false);
+    expect(despues.nombre).toBe('Pausar');
   });
 
-  test.fail('I · Escritorio: al pulsar una capa, su detalle aparece en la pantalla', async ({ page }) => {
+  test('I (5376) · Escritorio: al pulsar una capa, su detalle aparece en la pantalla', async ({ page }) => {
     await capa(page, 3, 'Red').first().click();
-    // Hoy: el panel aparece debajo de los controles, ~700 px por debajo del botón pulsado
+    // Antes: el panel aparecía debajo de los controles, ~700 px por debajo del botón pulsado
     await expect(page.getByRole('heading', { level: 2, name: 'Capa 3: Red' })).toBeInViewport({ timeout: 2_000 });
   });
 });
 
-test.describe('Hallazgos de contraste (ABIERTOS)', () => {
+test.describe('Hallazgos de contraste (REPARADOS 21/11/2026)', () => {
   test.beforeEach(async ({ page }) => {
     await abrir(page);
     await prepararParaMedir(page);
   });
 
-  test.fail('E · Números de capa: blanco sobre el color de la capa, 4,5:1 (texto de 13,6 px)', async ({ page }) => {
+  test('E (5372) · Números de capa: blanco sobre el color de la capa, 4,5:1 (texto de 13,6 px)', async ({ page }) => {
     await activarTema(page, 'light');
     await page.getByRole('button', { name: /TCP\/IP:/ }).evaluateAll((bs) =>
       bs.forEach((b) => b.firstElementChild?.setAttribute('data-medir', 'num-capa')),
@@ -346,7 +361,7 @@ test.describe('Hallazgos de contraste (ABIERTOS)', () => {
     expect(m.ratio, `peor: «${m.texto}» sobre ${m.fondo}`).toBeGreaterThanOrEqual(4.5);
   });
 
-  test.fail('F · Botones Auto y Reiniciar: texto blanco a 4,5:1 en claro', async ({ page }) => {
+  test('F (5373) · Botones Auto y Reiniciar: texto blanco a 4,5:1 en claro', async ({ page }) => {
     await activarTema(page, 'light');
     await botonAuto(page).evaluate((b) => b.setAttribute('data-medir', 'ctrl'));
     await reiniciar(page).evaluate((b) => b.setAttribute('data-medir', 'ctrl'));
@@ -356,7 +371,7 @@ test.describe('Hallazgos de contraste (ABIERTOS)', () => {
     expect(m.ratio, `peor: «${m.texto}» sobre ${m.fondo}`).toBeGreaterThanOrEqual(4.5);
   });
 
-  test.fail('F · Botón Auto: texto blanco a 4,5:1 en oscuro', async ({ page }) => {
+  test('F (5373) · Botón Auto: texto blanco a 4,5:1 en oscuro', async ({ page }) => {
     await activarTema(page, 'dark');
     await botonAuto(page).evaluate((b) => b.setAttribute('data-medir', 'ctrl'));
     const m = await medirContraste(page, { selector: '[data-medir="ctrl"], [data-medir="ctrl"] span', texto: ['#ffffff'] });
@@ -365,14 +380,34 @@ test.describe('Hallazgos de contraste (ABIERTOS)', () => {
     expect(m.ratio, `peor: «${m.texto}» sobre ${m.fondo}`).toBeGreaterThanOrEqual(4.5);
   });
 
-  test.fail('G · Bloque FCS de la trama: 4,5:1 en oscuro', async ({ page }) => {
+  test('G (5374) · Bloque FCS de la trama: 4,5:1 en oscuro', async ({ page }) => {
     await activarTema(page, 'dark');
     await irAlPaso(page, 6);
     await bloques(page).filter({ hasText: /^FCS$/ }).evaluate((b) => b.setAttribute('data-medir', 'fcs'));
-    const m = await medirContraste(page, { selector: '[data-medir="fcs"]', texto: ['#7b5ea7'] });
+    // Se mide el color que pinte, sea cual sea: antes #7b5ea7 (2,89 sobre rgb(40,36,47))
+    const color = await page.locator('[data-medir="fcs"]').evaluate((b) => getComputedStyle(b).color);
+    const m = await medirContraste(page, { selector: '[data-medir="fcs"]', texto: [color] });
     expect(m.vistos).toBe(1);
-    // Hoy: 2,89 sobre rgb(40,36,47)
     expect(m.ratio, `«FCS» sobre ${m.fondo}`).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('G (5374) · En claro: «FCS», el bloque de datos y el «TCP/IP» de la fila activa a 4,5:1', async ({ page }) => {
+    // Antes: FCS 4,14 · «GET /index.html» (--primary-texto sobre su tinte) 4,40 · «TCP/IP: …» de la
+    // capa activa (--text-muted sobre el tinte de .capaActiva) 4,05
+    await activarTema(page, 'light');
+    await irAlPaso(page, 6);
+    await bloques(page).filter({ hasText: /^FCS$/ }).evaluate((b) => b.setAttribute('data-medir', 'g-claro'));
+    await bloques(page).filter({ hasText: /TLS/ }).evaluate((b) => b.setAttribute('data-medir', 'g-claro'));
+    // En el paso 6 la fila activa es la capa 2 del emisor
+    await capa(page, 2, 'Enlace de datos')
+      .first()
+      .locator('span', { hasText: /^TCP\/IP:/ })
+      .evaluate((s) => s.setAttribute('data-medir', 'g-claro'));
+    const colores = await page.locator('[data-medir="g-claro"]').evaluateAll((els) => els.map((e) => getComputedStyle(e).color));
+    expect(colores).toHaveLength(3);
+    const m = await medirContraste(page, { selector: '[data-medir="g-claro"]', texto: colores });
+    expect(m.vistos).toBe(3);
+    expect(m.ratio, `peor: «${m.texto}» sobre ${m.fondo}`).toBeGreaterThanOrEqual(4.5);
   });
 });
 
@@ -402,12 +437,12 @@ test.describe('Móvil (Pixel 7)', () => {
     await expect(progreso(page)).toHaveText('Paso 1 de 15');
   });
 
-  test.fail('I · Al tocar una capa, su detalle aparece en la pantalla', async ({ page }) => {
+  test('I (5376, REPARADO) · Al tocar una capa, su detalle aparece en la pantalla', async ({ page }) => {
     const boton = capa(page, 3, 'Red').first();
     await boton.scrollIntoViewIfNeeded();
     await boton.tap();
     await expect(boton).toHaveAttribute('aria-pressed', 'true');
-    // Hoy: el panel empieza ~960 px por debajo del borde inferior (839 px de alto)
+    // Antes: el panel empezaba ~960 px por debajo del borde inferior (839 px de alto)
     await expect(page.getByRole('heading', { level: 2, name: 'Capa 3: Red' })).toBeInViewport({ timeout: 2_000 });
   });
 });
