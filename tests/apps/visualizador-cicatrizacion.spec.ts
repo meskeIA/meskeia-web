@@ -373,7 +373,7 @@ test.describe('CASO 3 · móvil Pixel 7', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 // HALLAZGOS (21/11/2026): los test con test.fail() describen lo que DEBERÍA pasar. El día que se
 // reparen fallarán por pasar: quitar el test.fail() y cambiar ABIERTO por REPARADO. Reparados en
-// /reparar del 21/11/2026 todos menos 5382 (duraciones del FAQPage: espera fuente y decisión).
+// /reparar del 21/11/2026 todos menos 5382, reparado ese mismo día tras la decisión del usuario.
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Hallazgos de contenido', () => {
@@ -405,19 +405,27 @@ test.describe('Hallazgos de contenido', () => {
     await expect(resultado).toContainText('70-80');
   });
 
-  test('HALLAZGO 5382 (21/11/2026, ABIERTO: espera decisión con fuente) · el FAQPage da a hemostasia e inflamación otra duración que la página', async ({ page }) => {
-    // FAQPage: «hemostasia (0-24 horas)», «inflamación (1-4 días)». Tabla de la guía: «Segundos–15
-    // min» y «1–5 días»; línea temporal: «Segundos a minutos». Se compara el FINAL de cada
-    // intervalo en minutos: hemostasia 1.440 frente a 15; inflamación 5.760 frente a 7.200.
-    // Proliferación (21 días) y remodelado (2 años) ya coinciden y no cambian.
-    test.fail();
+  test('HALLAZGO 5382 (21/11/2026, REPARADO) · el FAQPage no da a hemostasia e inflamación otra duración que la página', async ({ page }) => {
+    // ANTES, FAQPage: «hemostasia (0-24 horas)», «inflamación (1-4 días)», frente a la tabla de la
+    // guía «Segundos–15 min» y «1–5 días» y la línea temporal «Segundos a minutos». Sin fuente
+    // legible para elegir la cifra (StatPearls NBK535406 responde con un reCAPTCHA a la descarga),
+    // el usuario decidió en /reparar pendientes del 21/11/2026 matizar sin cifra (criterio C0203):
+    // el FAQPage describe esas dos fases sin intervalo («en los primeros minutos», «durante los
+    // primeros días») y no contradice a la página. Proliferación (21 días) y remodelado (2 años)
+    // coinciden con la tabla y conservan su intervalo.
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     const faq = (await jsonLd(page)).find((n) => n['@type'] === 'FAQPage');
     const respuesta = faq?.mainEntity?.[0].acceptedAnswer.text ?? '';
+    expect(respuesta).not.toMatch(/0-24 horas|1-4 días/);
+    for (const fase of ['Hemostasia', 'Inflamación']) {
+      expect(respuesta, `${fase} sin intervalo en el FAQPage`).not.toMatch(new RegExp(`${fase}\\s*\\(`, 'i'));
+    }
+    expect(respuesta).toContain('hemostasia, en los primeros minutos');
+    expect(respuesta).toContain('inflamación, durante los primeros días');
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const distintas: string[] = [];
-    for (const fase of ['Hemostasia', 'Inflamación', 'Proliferación', 'Remodelado']) {
+    for (const fase of ['Proliferación', 'Remodelado']) {
       const enFaq = respuesta.match(new RegExp(`${fase}\\s*\\(([^)]+)\\)`, 'i'))?.[1] ?? '';
       const celda = (await page.locator('table tbody tr').filter({ hasText: fase }).locator('td').nth(1).textContent()) ?? '';
       const enTabla = celda.replace(/\(.*\)/, '').trim();

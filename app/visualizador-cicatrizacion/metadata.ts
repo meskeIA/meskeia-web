@@ -50,7 +50,7 @@ export const faqJsonLd = {
       name: '¿Cuáles son las 4 fases de la cicatrización de heridas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La cicatrización se divide en cuatro fases secuenciales: hemostasia (0-24 horas), donde se forma el coágulo para detener el sangrado; inflamación (1-4 días), con llegada de neutrófilos y macrófagos que limpian la herida; proliferación (4-21 días), donde fibroblastos depositan colágeno y se forma tejido de granulación; y remodelado (3 semanas a 2 años), en el que el colágeno se reorganiza y la cicatriz madura y se contrae.',
+        text: 'La cicatrización se divide en cuatro fases secuenciales: hemostasia, en los primeros minutos tras la lesión, donde se forma el coágulo para detener el sangrado; inflamación, durante los primeros días, con llegada de neutrófilos y macrófagos que limpian la herida; proliferación (4-21 días), donde fibroblastos depositan colágeno y se forma tejido de granulación; y remodelado (3 semanas a 2 años), en el que el colágeno se reorganiza y la cicatriz madura y se contrae.',
       },
     },
     {
