@@ -306,6 +306,12 @@ const APPS: App[] = [
   // 21/11/2026 (C0645): el nombre de cada macronutriente en su color con style (Grasas en #F39C12 a 2,01:1,
   // Proteínas 3,82 y Carbohidratos 4,11 en claro; 3,50-3,76 en oscuro) y el porcentaje blanco sobre cada
   // segmento de la barra de proporciones (2,19-4,11). Las secciones del explicador
+  // 21/11/2026 (C0645): la rentabilidad de cada clase en su color sobre su insignia teñida (#C9A84C y
+  // #F7931A a 2,06:1, el teal 2,48 en claro; la marca 2,68 en oscuro) y, en la pestaña de correlación,
+  // la leyenda en texto claro sobre sus pasteles fijos en oscuro y blanco sobre el gris de la
+  // diagonal. Las cuatro pestañas; el nombre de cada clase en su detalle, en
+  // tests/apps/visualizador-tipos-activos.spec.ts
+  { slug: 'visualizador-tipos-activos', todo: true, secciones: "[role='tablist'][aria-label='Secciones del visualizador'] [role='tab']" },
   { slug: 'visualizador-digestion-nutrientes', todo: true, secciones: "nav[aria-label='Secciones del explicador'] button" },
   { slug: 'comparador-voces-narrativas', todo: true, secciones: "[class*='autorBotones'] button" },
   { slug: 'visualizador-como-funciona-el-dolor', todo: true, secciones: "nav[aria-label='Fases de la nocicepción'] button, [role='tablist'][aria-label='Tipos de dolor'] [role='tab']" },

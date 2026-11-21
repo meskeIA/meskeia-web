@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -11,6 +11,8 @@ import {
 } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import styles from './VisualizadorTiposActivos.module.css';
+import { rgbDeHex, tonoSobre } from '@/lib/tintaLegible';
+import { formatNumber } from '@/lib';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -362,6 +364,36 @@ function colorCorrelacion(valor: number): string {
   return '#86efac'; // negativa: verde
 }
 
+// ─────────────────────────────────────────────
+// Tono de texto del color de cada clase (C0645)
+// ─────────────────────────────────────────────
+
+// Fondos del módulo en cada tema: la tarjeta de clase (#333333 en oscuro) y la de detalle
+const TARJETA_CLASE = { claro: '#FFFFFF', oscuro: '#333333' };
+const TARJETA = { claro: '#FFFFFF', oscuro: '#2A2A2A' };
+// La insignia de rentabilidad pinta el color de la clase al 13 % (sufijo '22') bajo su texto
+const ALFA_INSIGNIA = 0x22 / 255;
+
+/** `color` al `alfa` sobre `fondo`, opaco, en hexadecimal */
+function mezclar(color: string, fondo: string, alfa: number): string {
+  const c = rgbDeHex(color);
+  const f = rgbDeHex(fondo);
+  if (!c || !f) return fondo;
+  return '#' + c.map((v, i) => Math.round(v * alfa + f[i] * (1 - alfa)).toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Variables de la clase tonoClase: el tono del color de la clase que llega a `minimo` sobre su
+ * fondo en cada tema. El nombre y la rentabilidad iban en el color puro: #C9A84C a 2,06:1 sobre su
+ * insignia y 2,29 como título, #2E86AB a 2,68 sobre su insignia en oscuro (C0645)
+ */
+function tonosClase(color: string, fondo: { claro: string; oscuro: string }, alfa = 0, minimo = 4.5): CSSProperties {
+  return {
+    '--tono-claro': tonoSobre(color, mezclar(color, fondo.claro, alfa), minimo),
+    '--tono-oscuro': tonoSobre(color, mezclar(color, fondo.oscuro, alfa), minimo),
+  } as CSSProperties;
+}
+
 function getActivo(id: string): ClaseActivo | undefined {
   return CLASES_ACTIVOS.find((a) => a.id === id);
 }
@@ -462,7 +494,10 @@ export default function VisualizadorTiposActivosPage() {
                       </div>
                     </div>
                     <div className={styles.tarjetaBadges}>
-                      <span className={styles.badge} style={{ background: clase.color + '22', color: clase.color }}>
+                      <span
+                        className={`${styles.badge} ${styles.tonoClase}`}
+                        style={{ background: clase.color + '22', ...tonosClase(clase.color, TARJETA_CLASE, ALFA_INSIGNIA) }}
+                      >
                         {clase.rentabilidadNominal.split('(')[0].trim()}
                       </span>
                       <span className={styles.badge}>
@@ -540,7 +575,7 @@ export default function VisualizadorTiposActivosPage() {
                       {activo.emoji}
                     </span>
                     <div>
-                      <h2 className={styles.detalleNombre} style={{ color: activo.color }}>
+                      <h2 className={`${styles.detalleNombre} ${styles.tonoClase}`} style={tonosClase(activo.color, TARJETA, 0, 3)}>
                         {activo.nombre}
                       </h2>
                       <p className={styles.detalleSubtitulo}>{activo.subtitulo}</p>
@@ -685,10 +720,10 @@ export default function VisualizadorTiposActivosPage() {
                               style={{
                                 background: colorCorrelacion(valor),
                               }}
-                              title={`${fila.nombre} ↔ ${col.nombre}: ${valor.toFixed(2)}`}
+                              title={`${fila.nombre} ↔ ${col.nombre}: ${formatNumber(valor, 2)}`}
                             >
                               <span className={styles.matrizValor}>
-                                {valor.toFixed(2)}
+                                {formatNumber(valor, 2)}
                               </span>
                             </td>
                           );
@@ -711,7 +746,7 @@ export default function VisualizadorTiposActivosPage() {
                 <span className={styles.leyendaItem} style={{ background: '#86efac' }}>
                   Correlación negativa: buena diversificación
                 </span>
-                <span className={styles.leyendaItem} style={{ background: '#9ca3af', color: 'white' }}>
+                <span className={styles.leyendaItem} style={{ background: '#9ca3af' }}>
                   Diagonal (el activo con sí mismo)
                 </span>
               </div>

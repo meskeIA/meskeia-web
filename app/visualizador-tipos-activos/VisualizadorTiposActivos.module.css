@@ -621,9 +621,8 @@
   color: #1a1a1a;
 }
 
-[data-theme='dark'] .matrizValor {
-  color: #f0f0f0;
-}
+/* Sin variante oscura: las celdas llevan los mismos pasteles fijos en los dos temas y el texto
+   claro del tema oscuro quedaba de 1,00 a 2,23:1 sobre ellos (C0645) */
 
 .matrizLeyenda {
   display: flex;
@@ -639,8 +638,17 @@
   color: #1a1a1a;
 }
 
-[data-theme='dark'] .leyendaItem {
-  color: #f0f0f0;
+/* Sin variante oscura: los rellenos de la leyenda son pasteles fijos, iguales en los dos temas, y
+   el texto claro que les ponía el tema oscuro quedaba por debajo de 1,5:1 (C0645) */
+
+/* El texto en el color de una clase de activo: su tono que llega al umbral sobre su fondo en cada
+   tema, calculado en la página con tonoSobre (tonosClase) */
+.tonoClase {
+  color: var(--tono-claro);
+}
+
+[data-theme='dark'] .tonoClase {
+  color: var(--tono-oscuro);
 }
 
 .matrizNota {
