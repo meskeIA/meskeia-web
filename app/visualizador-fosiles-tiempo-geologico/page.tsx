@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import styles from './FosilesGeologico.module.css';
+import { tonosPorTema } from '@/lib/tintaLegible';
 import {
   MeskeiaLogo,
   Footer,
@@ -486,7 +487,12 @@ export default function VisualizadorFosilesGeologicoPage() {
                 role="region"
                 aria-label={`Información de ${eraSeleccionada.nombre}`}
               >
-                <h3 className={styles.eraPanelTitulo} style={{ color: eraSeleccionada.color }}>
+                {/* Tono del color de la era que llega a 4,5 sobre el panel en cada tema:
+                    «Cenozoico» en #E8842A daba 2,70:1 en claro (C0645) */}
+                <h3
+                  className={styles.eraPanelTitulo}
+                  style={tonosPorTema(eraSeleccionada.color, '#FAFAFA', '#2D2D2D') as React.CSSProperties}
+                >
                   {eraSeleccionada.nombre}
                 </h3>
                 <div className={styles.eraDatos}>
@@ -649,7 +655,10 @@ export default function VisualizadorFosilesGeologicoPage() {
                 role="region"
                 aria-label={`Detalles de la extinción ${extincionSeleccionada.nombre}`}
               >
-                <h3 className={styles.extincionPanelTitulo} style={{ color: extincionSeleccionada.color }}>
+                <h3
+                  className={styles.extincionPanelTitulo}
+                  style={tonosPorTema(extincionSeleccionada.color, '#FAFAFA', '#2D2D2D') as React.CSSProperties}
+                >
                   {extincionSeleccionada.nombre} — {extincionSeleccionada.porcentaje}% de especies
                 </h3>
                 <div className={styles.extincionDatos}>

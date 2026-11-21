@@ -128,10 +128,16 @@
   padding: var(--spacing-md) var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
 }
+/* Títulos en el color de su era o extinción: el tono que llega a 4,5 en cada tema (tonosPorTema, C0645) */
 .eraPanelTitulo {
   font-size: 1.2rem;
   font-weight: 700;
   margin-bottom: var(--spacing-sm);
+  color: var(--tono-claro, var(--text-primary));
+}
+[data-theme='dark'] .eraPanelTitulo,
+[data-theme='dark'] .extincionPanelTitulo {
+  color: var(--tono-oscuro, var(--text-primary));
 }
 .eraDatos {
   display: grid;
@@ -380,6 +386,7 @@
   font-size: 1.1rem;
   font-weight: 700;
   margin-bottom: var(--spacing-md);
+  color: var(--tono-claro, var(--text-primary));
 }
 .extincionDatos {
   display: flex;

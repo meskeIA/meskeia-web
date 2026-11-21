@@ -161,10 +161,16 @@
   animation: fadeInUp 0.2s ease;
 }
 
+/* Títulos en el color de su dato: el tono que llega a 4,5 sobre la tarjeta (tonosPorTema, C0645) */
 .sectorInfoTitulo {
   font-size: 1rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
+  color: var(--tono-claro, var(--text-primary));
+}
+
+[data-theme='dark'] .sectorInfoTitulo {
+  color: var(--tono-oscuro, var(--text-primary));
 }
 
 .sectorInfoDescripcion {
@@ -358,11 +364,13 @@
   inset: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* El relleno no pasa del 5-35 %: el rótulo, centrado, caía sobre la pista gris y en blanco daba
+     1,17:1. Ahora va al final de la pista, en el texto del tema (C0645) */
+  justify-content: flex-end;
+  padding-right: 0.75rem;
   font-size: 0.78rem;
   font-weight: 700;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  color: var(--text-primary);
 }
 
 .absorcionNota {
@@ -629,6 +637,11 @@
   font-size: 1.2rem;
   font-weight: 800;
   margin: 0 0 0.5rem;
+  color: var(--tono-claro, var(--text-primary));
+}
+
+[data-theme='dark'] .estadoTitulo {
+  color: var(--tono-oscuro, var(--text-primary));
 }
 
 .estadoDescripcion {
@@ -772,6 +785,12 @@
 
 [data-theme='dark'] .sectorInfoBox {
   background: var(--bg-card);
+}
+
+/* En oscuro, --text-muted sobre el tinte de los recuadros de hepcidina y ferroportina daba 4,42:1 (C0645) */
+[data-theme='dark'] .hepcidinLabel,
+[data-theme='dark'] .ferroportinaLabel {
+  color: var(--text-secondary);
 }
 
 [data-theme='dark'] .vitaminCSlider {

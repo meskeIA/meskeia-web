@@ -8,6 +8,7 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import EducationalSection from '@/components/EducationalSection';
 import ShareCard from '@/components/ShareCard';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 import styles from './GeneradorPoemas.module.css';
 
 // ─── TIPOS ───────────────────────────────────────────────────────────────────
@@ -409,9 +410,14 @@ export default function GeneradorPoemas() {
                   <div className={styles.formaInfo}>
                     <div className={styles.formaCabecera}>
                       <span className={styles.formaNombre}>{forma.nombre}</span>
+                      {/* Relleno opaco con la tinta que le llega: el blanco sobre #27ae60 daba
+                          2,87:1 y sobre #e07b39 2,97 (C0645) */}
                       <span
                         className={styles.dificultadBadge}
-                        style={{ backgroundColor: DIFICULTAD_CONFIG[forma.dificultad].color }}
+                        style={(() => {
+                          const r = rellenoConTinta(DIFICULTAD_CONFIG[forma.dificultad].color);
+                          return { backgroundColor: r.relleno, color: r.tinta };
+                        })()}
                       >
                         {DIFICULTAD_CONFIG[forma.dificultad].label}
                       </span>

@@ -20,6 +20,7 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { PLUGIN_REDIMENSION_APLAZADA } from '@/lib/chartjsRedimension';
+import { tonosPorTema } from '@/lib/tintaLegible';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 // Aplica el redimensionado que Chart.js aplaza y pierde al acabar la animación (cabo C0456)
@@ -252,7 +253,10 @@ function DonutDistribucion() {
 
       {sectorInfo && (
         <div className={styles.sectorInfoBox} role="region" aria-label={`Información sobre ${sectorInfo.nombre}`}>
-          <h3 className={styles.sectorInfoTitulo} style={{ color: sectorInfo.color }}>
+          <h3
+            className={styles.sectorInfoTitulo}
+            style={tonosPorTema(sectorInfo.color, '#FFFFFF', '#2D2D2D') as React.CSSProperties}
+          >
             {sectorInfo.nombre} — {sectorInfo.porcentaje}%
           </h3>
           <p className={styles.sectorInfoDescripcion}>{sectorInfo.descripcion}</p>
@@ -501,7 +505,12 @@ function EspetroCli() {
         role="region"
         aria-label={`Detalle: ${estado.etiqueta}`}
       >
-        <h3 className={styles.estadoTitulo} style={{ color: estado.color }}>
+        {/* Tono del color del estado que llega a 4,5 sobre la tarjeta en cada tema: «Normal» en
+            #27AE60 daba 2,87:1 en claro (C0645) */}
+        <h3
+          className={styles.estadoTitulo}
+          style={tonosPorTema(estado.color, '#FFFFFF', '#2D2D2D') as React.CSSProperties}
+        >
           {estado.etiqueta}
         </h3>
         <p className={styles.estadoDescripcion}>{estado.descripcion}</p>

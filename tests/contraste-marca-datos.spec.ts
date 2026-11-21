@@ -359,7 +359,26 @@ const APPS: App[] = [
   { slug: 'visualizador-biomas-terrestres', todo: true, secciones: "nav[aria-label='Secciones del visualizador'] [role='tab']" },
   // 21/11/2026 (C0645): en oscuro, los consejos de los escenarios y de la FAQ en --text-muted sobre su
   // tinte teal (4,43:1)
-  { slug: 'planificador-turnos', todo: true },];
+  { slug: 'planificador-turnos', todo: true },
+  // 21/11/2026 (C0645): el título de la era y de la extinción elegidas en su color con style
+  // («Cenozoico» en #E8842A a 2,70:1 en claro). Las pestañas
+  { slug: 'visualizador-fosiles-tiempo-geologico', todo: true, secciones: "nav[aria-label='Secciones del explicador'] [role='tab']" },
+  // 21/11/2026 (C0645): en oscuro, el nombre de cada género y sus subgéneros en su color con style, que
+  // son oscuros (1,09-2,13:1 sobre la tarjeta, «Distopía» #1C2833), y los nombres de los pares
+  // comparados en --primary-texto sobre su tinte (4,18)
+  { slug: 'visualizador-generos-novela', todo: true },
+  // 21/11/2026 (C0645): el «N % absorbido» en blanco sobre la pista gris de la barra (1,17:1), el título
+  // del estado en su color con style («Normal» #27AE60 a 2,87 en claro) y, en oscuro, los rótulos de
+  // hepcidina y ferroportina en --text-muted sobre su tinte (4,42)
+  { slug: 'visualizador-hierro', todo: true },
+  // 21/11/2026 (C0645): el número y la barra del ciclo en blanco sobre el color de cada fase con style
+  // (ámbar 2,15:1, amarillo 1,92, verde 2,54, rojo 3,76, en los dos temas), el título de la fase en su
+  // color (ámbar 2,15 en claro) y las pérdidas por año en rojo y ámbar puros. Las secciones
+  { slug: 'visualizador-osteoporosis', todo: true, secciones: "nav[aria-label='Secciones del visualizador de osteoporosis'] button" },
+  // 21/11/2026 (C0645): la insignia de dificultad en blanco sobre su color con style (Fácil #27ae60 a
+  // 2,87:1, Media #e07b39 a 2,97), en los dos temas
+  { slug: 'generador-poemas', todo: true },
+];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
   return page.evaluate(({ marca, todo }) => {

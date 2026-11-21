@@ -68,7 +68,12 @@
 .generoCard:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
 
 .generoEmoji { font-size: 2rem; line-height: 1; }
-.generoNombre { font-size: 1.1rem; font-weight: 700; margin: 0; line-height: 1.2; }
+/* Nombre y subgéneros en el tono del color del género que llega a 4,5 en cada tema (tonoGenero, C0645) */
+.generoNombre { font-size: 1.1rem; font-weight: 700; margin: 0; line-height: 1.2; color: var(--tono-claro, var(--text-primary)); }
+.subgeneroTag, .subgeneroTagModal { color: var(--tono-claro, var(--text-primary)); }
+[data-theme='dark'] .generoNombre,
+[data-theme='dark'] .subgeneroTag,
+[data-theme='dark'] .subgeneroTagModal { color: var(--tono-oscuro, var(--text-primary)); }
 .generoTagline { font-size: 0.82rem; color: var(--text-secondary); margin: 0; line-height: 1.45; }
 .generoAtmosfera { font-size: 0.78rem; color: var(--text-secondary); margin: 0; }
 
@@ -185,6 +190,8 @@
 }
 .parHeader { display: flex; align-items: center; gap: 0.5rem; }
 .parNombre { flex: 1; text-align: center; font-size: 0.88rem; font-weight: 700; color: var(--primary-texto); background: rgba(46,134,171,0.08); border-radius: 6px; padding: 0.3rem 0.5rem; }
+/* En oscuro, --primary-texto (#3FA5D1) sobre el tinte de marca daba 4,18:1 (C0645) */
+[data-theme='dark'] .parNombre { color: var(--text-primary); }
 .parVs { font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); flex-shrink: 0; }
 .parDiferencia { font-size: 0.83rem; color: var(--text-primary); line-height: 1.55; margin: 0; }
 .parClaves { display: flex; flex-direction: column; gap: 0.3rem; }

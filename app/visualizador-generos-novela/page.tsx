@@ -8,6 +8,15 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
+import { tonosPorTema } from '@/lib/tintaLegible';
+
+/**
+ * El color de cada género como TEXTO, con el tono que llega a 4,5 sobre la tarjeta en cada tema:
+ * los colores son oscuros y en oscuro daban 1,09-2,13:1 sobre #2D2D2D («Distopía» #1C2833) (C0645)
+ */
+function tonoGenero(color: string, borde = false): React.CSSProperties {
+  return { ...tonosPorTema(color, '#FAFAFA', '#2D2D2D'), ...(borde ? { borderColor: color } : {}) } as React.CSSProperties;
+}
 
 type FiltroBusco = 'todos' | 'suspense' | 'mundos' | 'personajes' | 'ideas' | 'emocion' | 'historia';
 
@@ -480,12 +489,12 @@ export default function VisualizadorGenerosNovelaPage() {
                 style={{ borderTopColor: genero.color }}
               >
                 <div className={styles.generoEmoji} aria-hidden="true">{genero.emoji}</div>
-                <h2 className={styles.generoNombre} style={{ color: genero.color }}>{genero.nombre}</h2>
+                <h2 className={styles.generoNombre} style={tonoGenero(genero.color)}>{genero.nombre}</h2>
                 <p className={styles.generoTagline}>{genero.tagline}</p>
                 <p className={styles.generoAtmosfera}><em>"{genero.atmosfera}"</em></p>
                 <div className={styles.generoSubgeneros}>
                   {genero.subgeneros.slice(0, 3).map(s => (
-                    <span key={s} className={styles.subgeneroTag} style={{ borderColor: genero.color, color: genero.color }}>{s}</span>
+                    <span key={s} className={styles.subgeneroTag} style={tonoGenero(genero.color, true)}>{s}</span>
                   ))}
                 </div>
                 <span className={styles.generoVerMas}>Ver autores y lecturas →</span>
@@ -556,7 +565,7 @@ export default function VisualizadorGenerosNovelaPage() {
                   <h3 className={styles.modalSeccionTitle}>Subgéneros</h3>
                   <div className={styles.subgenerosWrap}>
                     {generoActivo.subgeneros.map(s => (
-                      <span key={s} className={styles.subgeneroTagModal} style={{ borderColor: generoActivo.color, color: generoActivo.color }}>{s}</span>
+                      <span key={s} className={styles.subgeneroTagModal} style={tonoGenero(generoActivo.color, true)}>{s}</span>
                     ))}
                   </div>
                 </section>

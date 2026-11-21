@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import styles from './Osteoporosis.module.css';
+import { rellenoConTinta, tonosPorTema } from '@/lib/tintaLegible';
 import {
   MeskeiaLogo,
   Footer,
@@ -241,6 +242,10 @@ function SeccionCiclo() {
   const [faseActiva, setFaseActiva] = useState<number>(1);
 
   const fase = FASES_CICLO.find(f => f.id === faseActiva)!;
+  // El color de cada fase como relleno bajo texto (blanco sobre #F59E0B daba 2,15:1, #EAB308 1,92,
+  // #10B981 2,54, #EF4444 3,76) y como texto sobre la tarjeta (2,15 el ámbar), con la tinta y el
+  // tono que llegan a 4,5 en cada tema (C0645)
+  const numero = rellenoConTinta(fase.color);
 
   return (
     <div className={styles.seccionContent}>
@@ -275,12 +280,15 @@ function SeccionCiclo() {
         <div className={styles.faseDetalleHeader}>
           <span
             className={styles.faseDetalleNumero}
-            style={{ background: fase.color }}
+            style={{ background: numero.relleno, color: numero.tinta }}
           >
             {fase.id}
           </span>
           <div>
-            <h3 className={styles.faseDetalleTitulo} style={{ color: fase.color }}>
+            <h3
+              className={styles.faseDetalleTitulo}
+              style={tonosPorTema(fase.color, '#FFFFFF', '#2D2D2D') as React.CSSProperties}
+            >
               {fase.icono} {fase.nombre}
             </h3>
             <span className={styles.faseDetalleDias}>{fase.dias}</span>
@@ -303,20 +311,25 @@ function SeccionCiclo() {
       <div className={styles.cicloBarraCard}>
         <h3 className={styles.cicloBarraTitulo}>Duración del ciclo completo: 3 a 6 meses</h3>
         <div className={styles.cicloBarraContainer} role="img" aria-label="Barra de proporciones del ciclo de remodelado óseo">
-          {FASES_CICLO.map(f => (
-            <div
-              key={f.id}
-              className={`${styles.cicloBarraSegmento} ${faseActiva === f.id ? styles.cicloBarraActivo : ''}`}
-              style={{
-                flex: f.id === 4 ? 5 : f.id === 2 ? 2.5 : 1,
-                background: f.color,
-                opacity: faseActiva === f.id ? 1 : 0.45,
-              }}
-              title={`${f.nombre}: ${f.dias}`}
-            >
-              <span className={styles.cicloBarraLabel}>{f.nombre}</span>
-            </div>
-          ))}
+          {FASES_CICLO.map(f => {
+            // Cada tramo opaco con la tinta que le llega; los no elegidos ya no se atenúan al 45 %
+            // (el rótulo se atenuaba con ellos): el elegido se marca con un contorno
+            const tramo = rellenoConTinta(f.color);
+            return (
+              <div
+                key={f.id}
+                className={`${styles.cicloBarraSegmento} ${faseActiva === f.id ? styles.cicloBarraActivo : ''}`}
+                style={{
+                  flex: f.id === 4 ? 5 : f.id === 2 ? 2.5 : 1,
+                  background: tramo.relleno,
+                  color: tramo.tinta,
+                }}
+                title={`${f.nombre}: ${f.dias}`}
+              >
+                <span className={styles.cicloBarraLabel}>{f.nombre}</span>
+              </div>
+            );
+          })}
         </div>
         <p className={styles.cicloBarraNota}>La fase de formación es la más larga: depositar y mineralizar el nuevo hueso lleva meses</p>
       </div>
@@ -695,7 +708,7 @@ function SeccionCurva() {
             </div>
             <div className={styles.sexoComparativaFila}>
               <span className={styles.sexoComparativaLabel}>Pérdida post-menopausia</span>
-              <span className={styles.sexoComparativaValor} style={{ color: '#EF4444' }}>-1 a -3%/año</span>
+              <span className={styles.sexoComparativaValor} style={{ color: 'var(--rojo-texto, #EF4444)' }}>-1 a -3%/año</span>
             </div>
             <div className={styles.sexoComparativaFila}>
               <span className={styles.sexoComparativaLabel}>Riesgo fractura de cadera</span>
@@ -714,7 +727,7 @@ function SeccionCurva() {
             </div>
             <div className={styles.sexoComparativaFila}>
               <span className={styles.sexoComparativaLabel}>Pérdida gradual</span>
-              <span className={styles.sexoComparativaValor} style={{ color: '#F59E0B' }}>-0,5 a -1%/año</span>
+              <span className={styles.sexoComparativaValor} style={{ color: 'var(--ambar-texto, #F59E0B)' }}>-0,5 a -1%/año</span>
             </div>
             <div className={styles.sexoComparativaFila}>
               <span className={styles.sexoComparativaLabel}>Riesgo fractura de cadera</span>
