@@ -424,7 +424,7 @@
 }
 
 /* «Todas» no lleva color de categoría: sin fondo propio quedaba blanco sobre la página (1,04:1) */
-.filtroCatBtnActivo,
+.filtroCatBtnActivo, .filtroCatBtnActivo:hover,
 [data-theme='dark'] .filtroCatBtnActivo {
   background: var(--primary-boton);
   border-color: var(--primary-boton);

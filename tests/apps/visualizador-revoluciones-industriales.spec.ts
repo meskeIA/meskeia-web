@@ -649,35 +649,42 @@ test.describe('Hallazgos de coherencia y contenido (Inspector 20/11/2026)', () =
 });
 
 // ════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS de contraste (WCAG 1.4.3) — afirman lo correcto; hoy fallan
+// HALLAZGOS de contraste (WCAG 1.4.3) — REPARADOS el 21/11/2026 (cabo C0645, receta de
+// visualizador-filosofia: tono por tema con mezclar y tonosPorTema, relleno y tinta de
+// rellenoConTinta en botón, filtro y cabecera)
 // ════════════════════════════════════════════════════════════════════════════
 test.describe('Hallazgos de contraste (Inspector 20/11/2026)', () => {
   test.beforeEach(async ({ page }) => {
     await abrir(page);
   });
 
-  // HALLAZGO [medio]: en claro, «Todas» —el filtro activo al abrir la Comparativa— es blanco sobre
-  // #FAFAFA (1,04:1): `.filtroCatBtnActivo` pone el texto blanco y solo las eras ponen fondo. Y el
-  // botón activo con el ratón encima toma `--primary-texto` sobre el color de la era (`:hover`,
-  // 0,2,0, gana a `.filtroCatBtnActivo`, 0,1,0): 1,05-1,72:1.
-  test.fail('tema claro: el filtro activo se lee, también «Todas» y con el ratón encima', async ({ page }) => {
+  // HALLAZGO 5316 [medio] (REPARADO): en claro, «Todas» —el filtro activo al abrir la Comparativa—
+  // era blanco sobre #FAFAFA (1,04:1): `.filtroCatBtnActivo` pone el texto blanco y solo las eras
+  // ponían fondo. Y el botón activo con el ratón encima tomaba `--primary-texto` sobre el color de
+  // la era (`:hover`, 0,2,0, gana a `.filtroCatBtnActivo`, 0,1,0): 1,05-1,72:1. Ahora «Todas» va
+  // sobre --primary-boton, también con el ratón encima, y cada era con su relleno y tinta.
+  test('tema claro: el filtro activo se lee, también «Todas» y con el ratón encima', async ({ page }) => {
     await activarTema(page, 'light');
     await sinTransiciones(page);
     await pestana(page, 'Comparativa');
     await page.mouse.move(0, 0);
-    const fallos = suspensos(await contrastes(page.getByRole('button', { name: 'Todas', exact: true })), 'Todas (por defecto)');
+    const todas = page.getByRole('button', { name: 'Todas', exact: true });
+    const fallos = suspensos(await contrastes(todas), 'Todas (por defecto)');
     for (const era of ERAS_FILTRO) {
       const b = page.getByRole('button', { name: era, exact: true });
       await b.click();
       fallos.push(...suspensos(await contrastes(b), `${era} con el ratón encima`));
     }
+    await todas.click();
+    await expect(todas).toHaveAttribute('aria-pressed', 'true');
+    fallos.push(...suspensos(await contrastes(todas), 'Todas con el ratón encima'));
     expect(fallos).toEqual([]);
   });
 
-  // HALLAZGO [medio]: en oscuro, `[data-theme='dark'] .filtroCatBtn` y `.movimientoBtn` (0,2,0)
-  // ganan al `color: #fff` del activo (0,1,0): gris #B0B0B0 sobre el color de la era o la fase,
-  // 1,22-4,45:1 en 11 de 13 fases y en las 6 eras.
-  test.fail('tema oscuro: el botón activo de fase y de era se lee (≥ 4,5:1)', async ({ page }) => {
+  // HALLAZGO 5316 [medio] (REPARADO): en oscuro, `[data-theme='dark'] .filtroCatBtn` y
+  // `.movimientoBtn` (0,2,0) ganaban al `color: #fff` del activo (0,1,0): gris #B0B0B0 sobre el
+  // color de la era o la fase, 1,22-4,45:1 en 11 de 13 fases y en las 6 eras.
+  test('tema oscuro: el botón activo de fase y de era se lee (≥ 4,5:1)', async ({ page }) => {
     test.setTimeout(60_000);
     await activarTema(page, 'dark');
     await sinTransiciones(page);
@@ -700,12 +707,12 @@ test.describe('Hallazgos de contraste (Inspector 20/11/2026)', () => {
     expect(fallos).toEqual([]);
   });
 
-  // HALLAZGO [medio]: el color de cada fase se usa como TEXTO sin variante oscura —nombre de la
-  // fase en la Comparativa, insignia de era, insignias del Contexto, título de la ficha de la línea
-  // del tiempo—: en oscuro 1,20-3,34:1 (todos menos Fordismo); en claro, Fordismo (#F57F17)
-  // 2,31-2,54, Energías Renovables 3,51-3,68 e Industria 4.0 3,57-4,23.
+  // HALLAZGO 5317 [medio] (REPARADO): el color de cada fase se usaba como TEXTO sin variante
+  // oscura —nombre de la fase en la Comparativa, insignia de era, insignias del Contexto, título de
+  // la ficha de la línea del tiempo—: en oscuro 1,20-3,34:1 (todos menos Fordismo); en claro,
+  // Fordismo (#F57F17) 2,31-2,54, Energías Renovables 3,51-3,68 e Industria 4.0 3,57-4,23.
   for (const tema of ['light', 'dark'] as const) {
-    test.fail(`tema ${tema === 'light' ? 'claro' : 'oscuro'}: el texto pintado con el color de la fase se lee`, async ({ page }) => {
+    test(`tema ${tema === 'light' ? 'claro' : 'oscuro'}: el texto pintado con el color de la fase se lee`, async ({ page }) => {
       test.setTimeout(60_000);
       await activarTema(page, tema);
       await sinTransiciones(page);
@@ -724,10 +731,10 @@ test.describe('Hallazgos de contraste (Inspector 20/11/2026)', () => {
     });
   }
 
-  // HALLAZGO [medio]: la cabecera de Fase en Detalle pone blanco sobre el color de la fase:
-  // Fordismo 2,65 (título), 2,41 (fechas) y 2,09 (era); Energías Renovables 3,65 en las fechas;
-  // la etiqueta de era (blanca sobre un 25 % de blanco) no llega a 4,5 en 8 de 13.
-  test.fail('la cabecera de cada ficha en detalle se lee (título ≥ 3:1, fechas y era ≥ 4,5:1)', async ({ page }) => {
+  // HALLAZGO 5318 [medio] (REPARADO): la cabecera de Fase en Detalle ponía blanco sobre el color de
+  // la fase: Fordismo 2,65 (título), 2,41 (fechas) y 2,09 (era); Energías Renovables 3,65 en las
+  // fechas; la etiqueta de era (blanca sobre un 25 % de blanco) no llegaba a 4,5 en 8 de 13.
+  test('la cabecera de cada ficha en detalle se lee (título ≥ 3:1, fechas y era ≥ 4,5:1)', async ({ page }) => {
     test.setTimeout(60_000);
     await activarTema(page, 'light');
     await sinTransiciones(page);
