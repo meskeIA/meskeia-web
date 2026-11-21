@@ -342,6 +342,7 @@ const APPS: App[] = [
   // (1,03-3,27) y «Todas» en blanco sobre la página (1,04). Las cuatro pestañas
   { slug: 'visualizador-filosofia', todo: true, secciones: "[role='tablist'] [role='tab']" },
   { slug: 'visualizador-arte-movimientos', todo: true, secciones: "[role='tablist'] [role='tab']" },
+  { slug: 'visualizador-arquitectura-estilos', todo: true, secciones: "[role='tablist'] [role='tab']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type CSSProperties } from 'react';
 import styles from './ArquitecturaEstilos.module.css';
 import {
   MeskeiaLogo,
@@ -12,7 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
-import { rellenoConTinta } from '@/lib/tintaLegible';
+import { mezclar, rellenoConTinta, tonosPorTema } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -248,6 +248,39 @@ const COLORES_CATEGORIA: Record<Categoria, string> = {
 };
 
 // ─────────────────────────────────────────────
+// Texto en el color de cada dato (cabo C0645)
+// ─────────────────────────────────────────────
+// El nombre de cada elemento y su categoría se pintaban en su color puro con style, también sobre
+// un tinte de ese mismo color (comparativa y eras), y el botón y la cabecera de lo elegido eran
+// blanco sobre su color. Cada texto toma el tono de su color que llega a 4,6:1 sobre el fondo REAL
+// donde se pinta en cada tema (el navegador redondea el tinte a su manera: con 4,5 justo salía
+// 4,49), y el blanco sobre color pasa a relleno y tinta de rellenoConTinta. Fondos: la tarjeta
+// (--bg-card) y el panel y las eras (--bg-primary en claro, #1a2633 en oscuro). Receta de
+// visualizador-filosofia.
+const TARJETA = { claro: '#FFFFFF', oscuro: '#2D2D2D' };
+const PANEL = { claro: '#FAFAFA', oscuro: '#1A2633' };
+const ALFA_FILA = 0x18 / 255;
+const ALFA_BADGE = 0x22 / 255;
+const ALFA_ERA = 0x1a / 255;
+
+/** Tono del color sobre su tinte al `alfa` encima de `base`, en cada tema */
+function tonoSobreTinte(color: string, base: { claro: string; oscuro: string }, alfa: number): CSSProperties {
+  return tonosPorTema(color, mezclar(color, base.claro, alfa), mezclar(color, base.oscuro, alfa), 4.6) as CSSProperties;
+}
+
+/** Fondo real de la fila `i` de la comparativa en cada tema: teñida con su color en las pares */
+function filaDe(color: string, i: number): { claro: string; oscuro: string } {
+  const alfa = i % 2 === 0 ? ALFA_FILA : 0;
+  return { claro: mezclar(color, TARJETA.claro, alfa), oscuro: mezclar(color, TARJETA.oscuro, alfa) };
+}
+
+/** Relleno de su color y tinta legible encima, para el botón y la cabecera de lo elegido */
+function rellenoDe(color: string): CSSProperties {
+  const { relleno, tinta } = rellenoConTinta(color);
+  return { background: relleno, borderColor: relleno, color: tinta };
+}
+
+// ─────────────────────────────────────────────
 // Subcomponentes
 // ─────────────────────────────────────────────
 
@@ -256,7 +289,7 @@ function PanelDetalle({ estilo }: { estilo: EstiloArquitectonico }) {
   const anioFinTexto = estilo.anioFin === 9999 ? 'actualidad' : formatAnio(estilo.anioFin);
   return (
     <div className={styles.detallePanel} style={{ borderLeftColor: estilo.color }}>
-      <h3 className={styles.detalleTitulo} style={{ color: estilo.color }}>{estilo.nombre}</h3>
+      <h3 className={`${styles.detalleTitulo} ${styles.tonoDato}`} style={tonoSobreTinte(estilo.color, PANEL, 0)}>{estilo.nombre}</h3>
       <p className={styles.detallePeriodo}>{formatAnio(estilo.anioInicio)} – {anioFinTexto}</p>
       <span className={styles.detalleCategoria}>{ETIQUETAS_CATEGORIA[estilo.categoria]}</span>
 
@@ -457,7 +490,7 @@ function TabDetalle() {
             className={`${styles.movimientoBtn} ${i === indice ? styles.movimientoBtnActivo : ''}`}
             onClick={() => setIndice(i)}
             aria-pressed={i === indice}
-            style={i === indice ? { background: est.color, borderColor: est.color } : {}}
+            style={i === indice ? rellenoDe(est.color) : {}}
           >
             {est.nombre}
           </button>
@@ -465,7 +498,7 @@ function TabDetalle() {
       </div>
 
       <div className={styles.detalleTarjeta} style={{ borderTopColor: estilo.color }}>
-        <div className={styles.detalleTarjetaHeader} style={{ background: estilo.color }}>
+        <div className={styles.detalleTarjetaHeader} style={rellenoDe(estilo.color)}>
           <h3>{estilo.nombre}</h3>
           <p>{formatAnio(estilo.anioInicio)} – {anioFinTexto}</p>
           <span>{ETIQUETAS_CATEGORIA[estilo.categoria]}</span>
@@ -572,7 +605,7 @@ function TabComparativa() {
             className={`${styles.filtroCatBtn} ${categoriaFiltro === cat ? styles.filtroCatBtnActivo : ''}`}
             onClick={() => setCategoriaFiltro(cat)}
             aria-pressed={categoriaFiltro === cat}
-            style={categoriaFiltro === cat ? { background: COLORES_CATEGORIA[cat], borderColor: COLORES_CATEGORIA[cat] } : {}}
+            style={categoriaFiltro === cat ? rellenoDe(COLORES_CATEGORIA[cat]) : {}}
           >
             {ETIQUETAS_CATEGORIA[cat]}
           </button>
@@ -607,10 +640,10 @@ function TabComparativa() {
                   key={est.id}
                   style={i % 2 === 0 ? { background: `${est.color}18` } : {}}
                 >
-                  <td><strong style={{ color: est.color }}>{est.nombre}</strong></td>
+                  <td><strong className={styles.tonoDato} style={tonoSobreTinte(est.color, filaDe(est.color, i), 0)}>{est.nombre}</strong></td>
                   <td>{formatAnio(est.anioInicio)}–{anioFinTexto}</td>
                   <td>
-                    <span className={styles.badgeCategoria} style={{ background: `${COLORES_CATEGORIA[est.categoria]}22`, color: COLORES_CATEGORIA[est.categoria] }}>
+                    <span className={`${styles.badgeCategoria} ${styles.tonoDato}`} style={{ background: `${COLORES_CATEGORIA[est.categoria]}22`, ...tonoSobreTinte(COLORES_CATEGORIA[est.categoria], filaDe(est.color, i), ALFA_BADGE) }}>
                       {ETIQUETAS_CATEGORIA[est.categoria]}
                     </span>
                   </td>
@@ -685,8 +718,8 @@ function TabContexto() {
                   {estilosEra.map((e) => (
                     <span
                       key={e.id}
-                      className={styles.eraEstiloBadge}
-                      style={{ background: `${e.color}1A`, color: e.color, borderColor: `${e.color}55` }}
+                      className={`${styles.eraEstiloBadge} ${styles.tonoDato}`}
+                      style={{ background: `${e.color}1A`, borderColor: `${e.color}55`, ...tonoSobreTinte(e.color, PANEL, ALFA_ERA) }}
                     >
                       {e.nombre}
                     </span>
