@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Generador de Sopas de Letras para Imprimir (Pupiletras) | meskeIA',
   description:
-    'Crea sopas de letras con tus propias palabras y descárgalas para imprimir. Elige tamaño, dirección de las palabras y nivel. Incluye solución y no requiere registro.',
+    'Crea sopas de letras con tus propias palabras e imprímelas o guárdalas en PDF. Elige el tamaño y el nivel, que decide en qué direcciones van las palabras. Incluye solución y no requiere registro.',
   keywords:
     'generador sopa de letras, sopa de letras para imprimir, pupiletras, crear sopa de letras, buscapalabras, sopa de letras personalizada, sopa de letras con solución, actividad para niños',
   authors: [{ name: 'meskeIA' }],
@@ -53,7 +53,7 @@ export const jsonLd = generateWebAppSchema({
     'Hoja de soluciones con las palabras resaltadas',
     'Número de sopa reproducible: el mismo número genera la misma cuadrícula',
     'Impresión optimizada en blanco y negro',
-    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Funciona 100 % en el navegador, sin registro ni instalación',
     'Gratuito y sin publicidad',
   ],
 });
@@ -76,7 +76,7 @@ export const faqJsonLd = {
       name: '¿Qué tamaño de cuadrícula necesito para mis palabras?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La cuadrícula debe tener al menos tantas casillas por lado como letras tenga la palabra más larga. Como referencia práctica, una rejilla de 12×12 admite con holgura entre 10 y 14 palabras de hasta 10 letras. Si alguna palabra no cabe, el generador lo indica en pantalla en lugar de recortarla en silencio.',
+        text: 'La cuadrícula debe tener al menos tantas casillas por lado como letras tenga la palabra más larga. Como referencia práctica, la suma de letras de todas las palabras no debería pasar de la mitad de las casillas: en una rejilla de 12×12 (144 casillas), unas 70 letras, por ejemplo 10 o 12 palabras de 5 a 7 letras. Las palabras largas llenan pronto la rejilla: diez de 10 letras ya no caben todas en 12×12. Si alguna palabra no cabe, el generador lo indica en pantalla en lugar de recortarla en silencio.',
       },
     },
     {
@@ -84,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la diferencia entre los tres niveles de dificultad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En el nivel fácil las palabras solo aparecen de izquierda a derecha y de arriba abajo, que es lo adecuado para lectores principiantes. El nivel medio añade las dos diagonales. El nivel difícil permite además palabras escritas al revés, lo que multiplica por ocho las direcciones posibles y obliga a rastrear la cuadrícula en todos los sentidos.',
+        text: 'En el nivel fácil las palabras solo aparecen de izquierda a derecha y de arriba abajo, que es lo adecuado para lectores principiantes. El nivel medio añade las dos diagonales. El nivel difícil permite además palabras escritas al revés, lo que duplica las direcciones posibles (de 4 a 8) y obliga a rastrear la cuadrícula en todos los sentidos.',
       },
     },
     {

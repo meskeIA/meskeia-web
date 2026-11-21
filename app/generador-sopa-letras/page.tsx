@@ -92,13 +92,14 @@ const LISTAS_TEMATICAS: { id: string; nombre: string; icono: string; palabras: s
     id: 'cuerpo',
     nombre: 'Cuerpo humano',
     icono: '🫀',
-    palabras: ['PULMON', 'ESTOMAGO', 'RODILLA', 'CLAVICULA', 'HIGADO', 'MUNECA', 'CEREBRO', 'TOBILLO', 'COLUMNA', 'RETINA'],
+    // Con ñ: la app dice conservarla, y MUNECA, ALBANIL y MONTANA salían mal escritas (hallazgo 5333)
+    palabras: ['PULMON', 'ESTOMAGO', 'RODILLA', 'CLAVICULA', 'HIGADO', 'MUÑECA', 'CEREBRO', 'TOBILLO', 'COLUMNA', 'RETINA'],
   },
   {
     id: 'oficios',
     nombre: 'Oficios',
     icono: '🧰',
-    palabras: ['CARPINTERO', 'ENFERMERA', 'PANADERO', 'MECANICO', 'ABOGADA', 'FONTANERO', 'PERIODISTA', 'ALBANIL', 'COCINERO', 'MAESTRA'],
+    palabras: ['CARPINTERO', 'ENFERMERA', 'PANADERO', 'MECANICO', 'ABOGADA', 'FONTANERO', 'PERIODISTA', 'ALBAÑIL', 'COCINERO', 'MAESTRA'],
   },
   {
     id: 'deportes',
@@ -110,7 +111,7 @@ const LISTAS_TEMATICAS: { id: string; nombre: string; icono: string; palabras: s
     id: 'geografia',
     nombre: 'Geografía',
     icono: '🌎',
-    palabras: ['MONTANA', 'DESIERTO', 'PENINSULA', 'VOLCAN', 'ARCHIPIELAGO', 'MESETA', 'GLACIAR', 'ESTUARIO', 'SABANA', 'ARRECIFE'],
+    palabras: ['MONTAÑA', 'DESIERTO', 'PENINSULA', 'VOLCAN', 'ARCHIPIELAGO', 'MESETA', 'GLACIAR', 'ESTUARIO', 'SABANA', 'ARRECIFE'],
   },
 ];
 
@@ -140,9 +141,14 @@ const SIN_TILDE: Record<string, string> = {
   'Ç': 'C',
 };
 
-/** Mayúsculas sin tildes ni signos; la ñ se conserva porque es letra propia del español */
+/**
+ * Mayúsculas sin tildes ni signos; la ñ se conserva porque es letra propia del español. Primero a
+ * NFC: una ñ pegada en forma descompuesta (N + U+0303, de algunos PDF o de macOS) perdía la tilde
+ * combinante y se quedaba en N (hallazgo 5334).
+ */
 function normalizar(texto: string): string {
   return texto
+    .normalize('NFC')
     .toUpperCase()
     .split('')
     .map((caracter) => SIN_TILDE[caracter] ?? caracter)
@@ -159,18 +165,68 @@ function barajar<T>(lista: T[], aleatorio: () => number): T[] {
   return copia;
 }
 
+/** Clave de un conjunto de casillas, sin depender del orden (un palíndromo leído al revés es la misma) */
+const claveCeldas = (celdas: Celda[]): string =>
+  celdas
+    .map((c) => `${c.fila}-${c.col}`)
+    .sort()
+    .join('|');
+
+/**
+ * Apariciones de `palabra` en la cuadrícula, en las direcciones del nivel (las que buscará quien
+ * resuelve), como conjuntos de casillas. Las casillas vacías no forman palabra.
+ */
+function apariciones(cuadricula: string[][], palabra: string, direcciones: ReadonlyArray<readonly [number, number]>): Celda[][] {
+  const lado = cuadricula.length;
+  const vistas = new Map<string, Celda[]>();
+  for (let fila = 0; fila < lado; fila++) {
+    for (let col = 0; col < lado; col++) {
+      if (cuadricula[fila][col] !== palabra[0]) continue;
+      for (const [df, dc] of direcciones) {
+        const celdas: Celda[] = [];
+        for (let i = 0; i < palabra.length; i++) {
+          const f = fila + df * i;
+          const c = col + dc * i;
+          if (f < 0 || c < 0 || f >= lado || c >= lado || cuadricula[f][c] !== palabra[i]) break;
+          celdas.push({ fila: f, col: c });
+        }
+        if (celdas.length === palabra.length) vistas.set(claveCeldas(celdas), celdas);
+      }
+    }
+  }
+  return [...vistas.values()];
+}
+
 /**
  * Coloca las palabras en la cuadrícula.
- * Estrategia: de la más larga a la más corta (las largas tienen menos huecos válidos),
- * probando posiciones y direcciones al azar y permitiendo cruces por letra compartida.
+ * Estrategia: de la más larga a la más corta (las largas tienen menos huecos válidos) y, a igual
+ * longitud, por orden alfabético, para que el orden en que se escriben no cambie la sopa
+ * (hallazgo 5337); probando posiciones y direcciones al azar y permitiendo cruces por letra
+ * compartida.
+ *
+ * Ninguna palabra de la lista puede leerse DOS veces en las direcciones del nivel (hallazgos 5331
+ * y 5332, 21/11/2026): el solucionario solo marca una y quien resuelve encontraba la otra.
+ *  · Al colocar, se rechaza la posición si la palabra ya se lee en otro sitio (SOL dentro de
+ *    GIRASOL: entonces solo cabe colocarla ahí dentro) o si sus letras nuevas forman otra copia
+ *    de una ya colocada (LOBO por el cruce de COCODRILO y MARIPOSA).
+ *  · Tras el relleno al azar, cada copia que forme una letra de relleno se deshace sorteando esa
+ *    letra de nuevo.
  */
 function generarSopa(palabras: string[], lado: number, nivel: Nivel, semilla: number): Sopa {
   const aleatorio = crearAleatorio(semilla);
   const cuadricula: string[][] = Array.from({ length: lado }, () => Array<string>(lado).fill(''));
   const colocadas: PalabraColocada[] = [];
   const descartadas: string[] = [];
+  const dirsNivel = DIRECCIONES[nivel];
 
-  const ordenadas = [...palabras].sort((a, b) => b.length - a.length);
+  const ordenadas = [...palabras].sort((a, b) => b.length - a.length || a.localeCompare(b, 'es'));
+
+  /** ¿Alguna palabra (colocada o la nueva) se lee fuera de su sitio? */
+  const hayCopia = (lista: PalabraColocada[]): boolean =>
+    lista.some((p) => {
+      const propia = claveCeldas(p.celdas);
+      return apariciones(cuadricula, p.palabra, dirsNivel).some((a) => claveCeldas(a) !== propia);
+    });
 
   for (const palabra of ordenadas) {
     if (palabra.length > lado) {
@@ -211,10 +267,20 @@ function generarSopa(palabras: string[], lado: number, nivel: Nivel, semilla: nu
         }
 
         if (cabe) {
+          const nuevas = celdas.filter((celda) => cuadricula[celda.fila][celda.col] === '');
           celdas.forEach((celda, i) => {
             cuadricula[celda.fila][celda.col] = palabra[i];
           });
-          colocadas.push({ palabra, celdas });
+          const candidata = { palabra, celdas };
+          // La nueva primero: es la que más a menudo se lee en otro sitio, y corta antes
+          if (hayCopia([candidata, ...colocadas])) {
+            // Se deshace: solo se vacían las casillas que esta palabra había escrito
+            nuevas.forEach((celda) => {
+              cuadricula[celda.fila][celda.col] = '';
+            });
+            continue;
+          }
+          colocadas.push(candidata);
           colocada = true;
           break;
         }
@@ -227,12 +293,37 @@ function generarSopa(palabras: string[], lado: number, nivel: Nivel, semilla: nu
   }
 
   // Relleno de huecos con letras sueltas
+  const relleno = new Set<string>();
+  const sortear = (fila: number, col: number, letras: string) => {
+    cuadricula[fila][col] = letras[Math.floor(aleatorio() * letras.length)];
+  };
   for (let fila = 0; fila < lado; fila++) {
     for (let col = 0; col < lado; col++) {
       if (cuadricula[fila][col] === '') {
-        cuadricula[fila][col] = LETRAS_RELLENO[Math.floor(aleatorio() * LETRAS_RELLENO.length)];
+        sortear(fila, col, LETRAS_RELLENO);
+        relleno.add(`${fila}-${col}`);
       }
     }
+  }
+
+  // Copias formadas por el relleno: se sortea de nuevo una de sus letras de relleno. Si tras 60
+  // vueltas quedara alguna, la letra sale de las que no usa ninguna palabra (no puede formar copia).
+  const letrasDeLasPalabras = new Set(colocadas.flatMap((p) => Array.from(p.palabra)));
+  const ajenas = Array.from(new Set(LETRAS_RELLENO)).filter((l) => !letrasDeLasPalabras.has(l)).join('');
+  for (let vuelta = 0; vuelta < 200; vuelta++) {
+    let cambios = 0;
+    for (const p of colocadas) {
+      const propia = claveCeldas(p.celdas);
+      for (const a of apariciones(cuadricula, p.palabra, dirsNivel)) {
+        if (claveCeldas(a) === propia) continue;
+        const deRelleno = a.filter((c) => relleno.has(`${c.fila}-${c.col}`));
+        if (deRelleno.length === 0) continue;
+        const c = deRelleno[Math.floor(aleatorio() * deRelleno.length)];
+        sortear(c.fila, c.col, vuelta >= 60 && ajenas ? ajenas : LETRAS_RELLENO);
+        cambios++;
+      }
+    }
+    if (cambios === 0) break;
   }
 
   return { cuadricula, colocadas, descartadas, semilla, lado, nivel };
@@ -252,11 +343,32 @@ export default function GeneradorSopaLetrasPage() {
   const [mostrarSolucion, setMostrarSolucion] = useState(false);
   const [aviso, setAviso] = useState('');
 
-  const palabrasNormalizadas = useCallback((): string[] => {
-    const brutas = entrada.split(/[\n,;]+/);
-    const limpias = brutas.map(normalizar).filter((p) => p.length >= 2);
-    return Array.from(new Set(limpias));
+  /**
+   * Las palabras válidas y lo que se ha quedado por el camino, para AVISAR: antes una entrada de
+   * una letra desaparecía y las cifras se quitaban de dentro de las palabras (R2D2 → RD) sin decir
+   * nada (hallazgo 5335). Espacios y guiones no avisan: unirlos es lo que promete la FAQ.
+   */
+  const leerEntrada = useCallback((): { palabras: string[]; ignoradas: string[]; cambiadas: string[] } => {
+    const brutas = entrada
+      .split(/[\n,;]+/)
+      .map((b) => b.trim())
+      .filter((b) => b !== '');
+    const palabras: string[] = [];
+    const ignoradas: string[] = [];
+    const cambiadas: string[] = [];
+    for (const bruta of brutas) {
+      const limpia = normalizar(bruta);
+      if (limpia.length < 2) {
+        if (limpia.length === 1 || /\S/.test(bruta)) ignoradas.push(bruta);
+        continue;
+      }
+      if (!palabras.includes(limpia)) palabras.push(limpia);
+      if (/[^\p{L}\s\-]/u.test(bruta.normalize('NFC').replace(/\p{M}/gu, ''))) cambiadas.push(`${bruta} → ${limpia}`);
+    }
+    return { palabras, ignoradas, cambiadas };
   }, [entrada]);
+
+  const palabrasNormalizadas = useCallback((): string[] => leerEntrada().palabras, [leerEntrada]);
 
   /**
    * `otraDistinta`: «Otra distinta» sortea siempre un n.º nuevo, distinto del de la sopa actual,
@@ -264,7 +376,7 @@ export default function GeneradorSopaLetrasPage() {
    * mismo defecto que el hallazgo 4273 de las fichas y el 4948 del laberinto).
    */
   const generar = useCallback((otraDistinta: boolean) => {
-    const palabras = palabrasNormalizadas();
+    const { palabras, ignoradas, cambiadas } = leerEntrada();
 
     if (palabras.length === 0) {
       setAviso('Escribe al menos una palabra de dos letras o más.');
@@ -283,14 +395,32 @@ export default function GeneradorSopaLetrasPage() {
     setSopa(resultado);
     setMostrarSolucion(false);
 
+    const partes: string[] = [];
     if (resultado.descartadas.length > 0) {
-      setAviso(
+      partes.push(
         `No han cabido ${resultado.descartadas.length} palabra(s): ${resultado.descartadas.join(', ')}. Prueba con una cuadrícula mayor o quita alguna palabra.`,
       );
-    } else {
-      setAviso('');
     }
-  }, [palabrasNormalizadas, lado, nivel, semillaManual, sopa]);
+    // Una palabra que solo ha podido ir DENTRO de otra (SOL en GIRASOL, hallazgo 5332): se dice,
+    // porque la guía lo da por error que arruina la sopa
+    const dentro = resultado.colocadas.flatMap((p) => {
+      const suyas = new Set(p.celdas.map((c) => `${c.fila}-${c.col}`));
+      const madre = resultado.colocadas.find(
+        (q) => q !== p && q.palabra.length > p.palabra.length && p.celdas.every((c) => q.celdas.some((d) => d.fila === c.fila && d.col === c.col)),
+      );
+      return madre && suyas.size > 0 ? [`${p.palabra} va dentro de ${madre.palabra}`] : [];
+    });
+    if (dentro.length > 0) {
+      partes.push(`${dentro.join('; ')}: no se puede esconder aparte sin que aparezca dos veces.`);
+    }
+    if (ignoradas.length > 0) {
+      partes.push(`Se han ignorado por no tener al menos dos letras: ${ignoradas.join(', ')}.`);
+    }
+    if (cambiadas.length > 0) {
+      partes.push(`Se han quitado cifras o signos: ${cambiadas.join(', ')}.`);
+    }
+    setAviso(partes.join(' '));
+  }, [leerEntrada, lado, nivel, semillaManual, sopa]);
 
   const cargarLista = (id: string) => {
     const lista = LISTAS_TEMATICAS.find((l) => l.id === id);
@@ -362,7 +492,7 @@ export default function GeneradorSopaLetrasPage() {
 
             <label className={styles.campo}>
               <span className={styles.etiqueta}>
-                Tus palabras <small>(una por línea · {numPalabras} válidas)</small>
+                Tus palabras <small>{`(una por línea · ${numPalabras} ${numPalabras === 1 ? 'válida' : 'válidas'})`}</small>
               </span>
               <textarea
                 className={styles.textarea}
@@ -446,22 +576,25 @@ export default function GeneradorSopaLetrasPage() {
             ) : (
               <>
                 <p className={styles.resumen}>
-                  <strong>{sopa.colocadas.length}</strong> palabras colocadas en una cuadrícula de{' '}
+                  <strong>{sopa.colocadas.length}</strong>{' '}
+                  <span>{sopa.colocadas.length === 1 ? 'palabra colocada' : 'palabras colocadas'}</span> en una cuadrícula de{' '}
                   <strong>
                     {sopa.lado} × {sopa.lado}
                   </strong>
                   . Número de sopa: <strong>{sopa.semilla}</strong>.
                 </p>
                 <p className={styles.pista}>
-                  Anota ese número: si lo vuelves a introducir con la misma lista y los mismos ajustes,
-                  obtendrás exactamente la misma cuadrícula.
+                  Anota ese número: si lo vuelves a introducir con la misma lista (en cualquier orden)
+                  y los mismos ajustes, obtendrás exactamente la misma cuadrícula.
                 </p>
 
                 <div className={styles.acciones}>
+                  {/* Sin aria-pressed: el nombre ya dice el estado («Ver» / «Ocultar»); con los
+                      dos se anunciaba «Ocultar solución, pulsado» (hallazgo 5342, patrón Button
+                      de WAI-ARIA APG: nombre fijo con aria-pressed, o nombre que cambia sin él) */}
                   <button
                     type="button"
                     className={styles.btnSecundario}
-                    aria-pressed={mostrarSolucion}
                     onClick={() => setMostrarSolucion(!mostrarSolucion)}
                   >
                     <span aria-hidden="true">{mostrarSolucion ? '🙈' : '💡'}</span>{' '}
@@ -495,7 +628,9 @@ export default function GeneradorSopaLetrasPage() {
 
           <table className={`${styles.cuadricula} ${impresion.rejilla}`}>
             <caption className={styles.srOnly}>
-              Cuadrícula de {sopa.lado} por {sopa.lado} letras con {sopa.colocadas.length} palabras escondidas
+              {`Cuadrícula de ${sopa.lado} por ${sopa.lado} letras con ${sopa.colocadas.length} ${
+                sopa.colocadas.length === 1 ? 'palabra escondida' : 'palabras escondidas'
+              }`}
             </caption>
             <tbody>
               {sopa.cuadricula.map((fila, f) => (
@@ -651,7 +786,7 @@ export default function GeneradorSopaLetrasPage() {
                 </h4>
                 <p>
                   Las tildes se eliminan automáticamente porque en una cuadrícula de letras sueltas no
-                  aportan nada y complican la búsqueda: MONTAÑA se escribe MONTAÑA sin acento gráfico. La
+                  aportan nada y complican la búsqueda: CAMIÓN se escribe CAMION, sin acento gráfico. La
                   ñ sí se conserva, porque es una letra distinta de la n y suprimirla cambiaría la
                   palabra. Los espacios y guiones también se eliminan, de modo que una expresión de dos
                   palabras aparece unida en la rejilla.

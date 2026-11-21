@@ -196,9 +196,13 @@ async function generarCon(page: Page, ajustes: Ajustes): Promise<void> {
   await page.getByRole('button', { name: /Generar sopa de letras/ }).click();
 }
 
-/** Ocho palabras propias, una con tilde (RATÓN → RATON). La lista se ordena de la más larga a la más corta */
+/**
+ * Ocho palabras propias, una con tilde (RATÓN → RATON). La lista se ordena de la más larga a la más
+ * corta y, a igual longitud, por orden alfabético (desde el 21/11/2026, hallazgo 5337: antes, por
+ * orden de entrada, y escribir la lista en otro orden daba otra sopa con el mismo n.º).
+ */
 const PROPIAS = 'GATO\nPERRO\nCABALLO\nTORTUGA\nCONEJO\nRATÓN\nOVEJA\nVACA';
-const LISTA_PROPIAS = ['CABALLO', 'TORTUGA', 'CONEJO', 'PERRO', 'RATON', 'OVEJA', 'GATO', 'VACA'];
+const LISTA_PROPIAS = ['CABALLO', 'TORTUGA', 'CONEJO', 'OVEJA', 'PERRO', 'RATON', 'GATO', 'VACA'];
 
 for (const nivel of ['facil', 'medio', 'dificil'] as const) {
   test(`CASO 1 (${nivel}) · cada palabra propia está UNA vez, en una dirección del nivel; la solución marca justo sus casillas; el n.º 4242 la reproduce`, async ({
@@ -269,7 +273,8 @@ test('CASO 2 (límite) · tildes fuera y ñ dentro, igual en la lista que en la 
   // Promesa de la FAQ visible: «Las tildes se eliminan… La ñ sí se conserva»
   await generarCon(page, { palabras: 'CAMIÓN\nmuñeca\nPingüino\nÁRBOL\nACCIÓN', lado: 12, nivel: 'medio', semilla: '777' });
   await expect(numeroDeSopa(page)).toHaveText('777');
-  expect(await leerLista(page)).toEqual(['PINGUINO', 'CAMION', 'MUÑECA', 'ACCION', 'ARBOL']);
+  // A igual longitud, alfabético (hallazgo 5337): ACCION, CAMION, MUÑECA
+  expect(await leerLista(page)).toEqual(['PINGUINO', 'ACCION', 'CAMION', 'MUÑECA', 'ARBOL']);
   const rejilla = await leerRejilla(page);
   for (const palabra of ['PINGUINO', 'CAMION', 'MUÑECA', 'ACCION', 'ARBOL']) {
     expect(enElNivel(rejilla, palabra, 'medio'), palabra).toHaveLength(1);
@@ -313,7 +318,8 @@ test('la hoja impresa basta para reconstruir la sopa: su lista en su orden, su n
   await generarCon(page, { palabras: original, lado: 15, nivel: 'dificil', semilla: '2468' });
   await expect(pieDeHoja(page)).toHaveText('Sopa n.º 2468 · Difícil · las 8 direcciones · meskeia.com');
   const impresa = await leerLista(page);
-  expect(impresa).toEqual(['COCODRILO', 'MARIPOSA', 'PINGUINO', 'ELEFANTE', 'TORTUGA', 'CABALLO', 'ARDILLA', 'DELFIN', 'JIRAFA', 'LOBO']);
+  // De la más larga a la más corta y, a igual longitud, alfabético (hallazgo 5337)
+  expect(impresa).toEqual(['COCODRILO', 'ELEFANTE', 'MARIPOSA', 'PINGUINO', 'ARDILLA', 'CABALLO', 'TORTUGA', 'DELFIN', 'JIRAFA', 'LOBO']);
   const antes = (await leerRejilla(page)).flat().join('');
 
   await generarCon(page, { palabras: 'SOL', lado: 8, nivel: 'facil', semilla: '1' });
@@ -374,7 +380,7 @@ test.describe('móvil (Pixel 7)', () => {
 
 // ─────────────────────────────── Hallazgos abiertos (20/11/2026) ───────────────────────────────
 
-test('HALLAZGO (20/11/2026, ABIERTO) · una palabra corta sale DOS veces y el solucionario solo marca una', async ({
+test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · una palabra corta sale DOS veces y el solucionario solo marca una', async ({
   page,
 }) => {
   // Ni el relleno al azar ni los cruces comprueban que no se forme otra copia de una palabra de la
@@ -384,7 +390,7 @@ test('HALLAZGO (20/11/2026, ABIERTO) · una palabra corta sale DOS veces y el so
   //     una L de relleno; la solución solo pinta la primera.
   //   · La lista «Animales» de la propia app, fácil, n.º 1028: LOBO → bajando por (8,9)-(11,9) y
   //     en la fila 10, (10,7)-(10,10), formada por el cruce de COCODRILO y MARIPOSA.
-  test.fail();
+  // REPARADO el 21/11/2026 (sin test.fail)
   const casos: { palabras: string; semilla: string; palabra: string }[] = [
     { palabras: 'SOL\nMAR\nRIO\nPAN\nLUZ\nOSO\nAVE\nTEA', semilla: '1009', palabra: 'SOL' },
     {
@@ -401,12 +407,12 @@ test('HALLAZGO (20/11/2026, ABIERTO) · una palabra corta sale DOS veces y el so
   }
 });
 
-test('HALLAZGO (20/11/2026, ABIERTO) · SOL junto a GIRASOL sale dos veces y no se avisa', async ({ page }) => {
+test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · SOL junto a GIRASOL sale dos veces y no se avisa', async ({ page }) => {
   // La propia guía lo da por error que arruina la sopa («si están MAR y MARIPOSA, quien resuelve
   // marcará MAR dentro de MARIPOSA…»), pero el generador ni lo evita ni lo avisa: en los n.º 10 a
   // 14 (12 × 12, medio) SOL aparece 2 veces en las cinco. Vale cualquiera de las dos salidas:
   // colocar SOL dentro de GIRASOL (una sola aparición) o avisar nombrando SOL.
-  test.fail();
+  // REPARADO el 21/11/2026 (sin test.fail)
   await generarCon(page, { palabras: 'GIRASOL\nSOL', lado: 12, nivel: 'medio', semilla: '10' });
   await expect(numeroDeSopa(page)).toHaveText('10');
   const rejilla = await leerRejilla(page);
@@ -415,12 +421,12 @@ test('HALLAZGO (20/11/2026, ABIERTO) · SOL junto a GIRASOL sale dos veces y no 
   expect(veces === 1 || avisaDeSol, `SOL aparece ${veces} veces y el aviso no lo nombra`).toBe(true);
 });
 
-test('HALLAZGO (20/11/2026, ABIERTO) · las listas rápidas escriben MUNECA, ALBANIL y MONTANA, sin la ñ que la app dice conservar', async ({
+test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · las listas rápidas escriben MUNECA, ALBANIL y MONTANA, sin la ñ que la app dice conservar', async ({
   page,
 }) => {
   // LISTAS_TEMATICAS de page.tsx. La FAQ visible: «La ñ sí se conserva, porque es una letra
   // distinta de la n y suprimirla cambiaría la palabra».
-  test.fail();
+  // REPARADO el 21/11/2026 (sin test.fail)
   const esperadas: [string, string][] = [
     ['Cuerpo humano', 'MUÑECA'],
     ['Oficios', 'ALBAÑIL'],
@@ -432,23 +438,23 @@ test('HALLAZGO (20/11/2026, ABIERTO) · las listas rápidas escriben MUNECA, ALB
   }
 });
 
-test('HALLAZGO (20/11/2026, ABIERTO) · una ñ pegada en forma descompuesta (N + tilde combinante) se convierte en N', async ({
+test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · una ñ pegada en forma descompuesta (N + tilde combinante) se convierte en N', async ({
   page,
 }) => {
   // normalizar() no pasa a NFC antes de filtrar: «N» + U+0303 pierde la tilde combinante con
   // replace(/[^A-ZÑ]/g, ''). Así llega el texto copiado de algunos PDF o de macOS.
-  test.fail();
+  // REPARADO el 21/11/2026 (sin test.fail)
   await generarCon(page, { palabras: 'MUÑECA', lado: 12, nivel: 'medio', semilla: '777' });
   await expect(numeroDeSopa(page)).toHaveText('777');
   expect(await leerLista(page)).toEqual(['MUÑECA']);
 });
 
-test('HALLAZGO (20/11/2026, ABIERTO) · las palabras de una letra y las cifras se pierden o se cambian sin avisar', async ({
+test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · las palabras de una letra y las cifras se pierden o se cambian sin avisar', async ({
   page,
 }) => {
   // «A\nSOL\nLUNA» → la A desaparece; «R2D2\nMP3\nSOL» → la lista dice RD y MP. Ningún aviso:
   // solo el contador «(… N válidas)» baja. La app avisa de lo que no cabe; de esto, no.
-  test.fail();
+  // REPARADO el 21/11/2026 (sin test.fail)
   const avisoVisible = page.locator('[role="alert"], [role="status"]').filter({ hasText: /\S/ });
   for (const entrada of ['A\nSOL\nLUNA', 'R2D2\nMP3\nSOL']) {
     await generarCon(page, { palabras: entrada, lado: 12, nivel: 'medio', semilla: '5' });
@@ -457,8 +463,8 @@ test('HALLAZGO (20/11/2026, ABIERTO) · las palabras de una letra y las cifras s
   }
 });
 
-test('HALLAZGO (20/11/2026, ABIERTO) · «1 palabras colocadas», «con 1 palabras escondidas» y «1 válidas»', async ({ page }) => {
-  test.fail();
+test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · «1 palabras colocadas», «con 1 palabras escondidas» y «1 válidas»', async ({ page }) => {
+  // REPARADO el 21/11/2026 (sin test.fail)
   await generarCon(page, { palabras: 'SOL', lado: 8, nivel: 'facil', semilla: '3' });
   await expect(numeroDeSopa(page)).toHaveText('3');
   await expect(page.locator('p', { hasText: 'Número de sopa:' })).not.toContainText('1 palabras');
@@ -466,11 +472,11 @@ test('HALLAZGO (20/11/2026, ABIERTO) · «1 palabras colocadas», «con 1 palabr
   await expect(page.locator('label', { has: page.locator('textarea') })).not.toContainText('1 válidas');
 });
 
-test('HALLAZGO (20/11/2026, ABIERTO) · las mismas palabras en otro orden dan otra sopa con el mismo n.º', async ({ page }) => {
+test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · las mismas palabras en otro orden dan otra sopa con el mismo n.º', async ({ page }) => {
   // El orden de colocación es «de la más larga a la más corta» y, a igual longitud, el de la
   // entrada: la FAQ, la pista y la guía («con el mismo número de sopa, todas las hojas son
   // idénticas») no dicen que el orden cuente. Las 10 de «Animales», 15 × 15, difícil, n.º 2468.
-  test.fail();
+  // REPARADO el 21/11/2026 (sin test.fail)
   const original = 'lobo\nMariposa\nDelfín\nJIRAFA\nCocodrilo\nTORTUGA\nCaballo\nArdilla\nPingüino\nElefante';
   await generarCon(page, { palabras: original, lado: 15, nivel: 'dificil', semilla: '2468' });
   await expect(filas(page)).toHaveCount(15);
@@ -498,31 +504,33 @@ async function respuestaFaqPage(page: Page, pregunta: string): Promise<string> {
   }, pregunta);
 }
 
-test('HALLAZGO (20/11/2026, ABIERTO) · el FAQPage promete que 12 × 12 admite «con holgura» 10-14 palabras de hasta 10 letras', async ({
+test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · el FAQPage promete que 12 × 12 admite «con holgura» 10-14 palabras de hasta 10 letras', async ({
   page,
 }) => {
   // Diez palabras de 10 letras en 12 × 12, medio, n.º 501: no caben 3. Con catorce, en los n.º
   // 21-23 y los tres niveles, no caben entre 3 y 7. La FAQ visible da otra regla: ~70 letras
   // (la mitad de 144 casillas) en 10 o 12 palabras.
-  test.fail();
+  // REPARADO el 21/11/2026 (sin test.fail)
   const diez = 'CARPINTERO\nPERIODISTA\nBALONCESTO\nESTUDIANTE\nBIBLIOTECA\nFONTANEROS\nMANDARINAS\nTELEVISION\nCHOCOLATES\nVENTANILLA';
   await generarCon(page, { palabras: diez, lado: 12, nivel: 'medio', semilla: '501' });
-  await expect(aviso(page)).toContainText('No han cabido 3 palabra(s)');
+  // Control: no caben todas. Cuántas exactamente depende del motor de colocación (eran 3 hasta el
+  // 21/11/2026; con la comprobación de copias del hallazgo 5331 el mismo n.º reparte de otra forma).
+  await expect(aviso(page)).toContainText(/No han cabido [1-9]\d* palabra\(s\)/);
   expect(await respuestaFaqPage(page, '¿Qué tamaño de cuadrícula necesito')).not.toContain('entre 10 y 14 palabras de hasta 10 letras');
 });
 
-test('HALLAZGO (20/11/2026, ABIERTO) · el FAQPage dice que el nivel difícil «multiplica por ocho» las direcciones', async ({ page }) => {
+test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · el FAQPage dice que el nivel difícil «multiplica por ocho» las direcciones', async ({ page }) => {
   // DIRECCIONES de page.tsx: fácil 2, medio 4, difícil 8. Difícil dobla las de medio y cuadruplica
   // las de fácil; «ocho» es el total, no el factor.
-  test.fail();
+  // REPARADO el 21/11/2026 (sin test.fail)
   expect(await respuestaFaqPage(page, '¿Cuál es la diferencia entre los tres niveles')).not.toContain('multiplica por ocho');
 });
 
-test('HALLAZGO (20/11/2026, ABIERTO) · la FAQ visible pone de ejemplo de tilde quitada «MONTAÑA se escribe MONTAÑA»', async ({
+test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · la FAQ visible pone de ejemplo de tilde quitada «MONTAÑA se escribe MONTAÑA»', async ({
   page,
 }) => {
   // MONTAÑA no lleva tilde: el ejemplo no ilustra nada (debería ser algo como CAMIÓN → CAMION).
-  test.fail();
+  // REPARADO el 21/11/2026 (sin test.fail)
   // El texto de la guía está en el DOM aunque nazca plegada; fuera los <script> (la carga de RSC)
   const texto = await page.evaluate(() => {
     const clon = document.body.cloneNode(true) as HTMLElement;
@@ -533,22 +541,22 @@ test('HALLAZGO (20/11/2026, ABIERTO) · la FAQ visible pone de ejemplo de tilde 
   expect(texto).not.toContain('MONTAÑA se escribe MONTAÑA');
 });
 
-test('HALLAZGO (20/11/2026, ABIERTO) · la description promete «descárgalas» y elegir la «dirección de las palabras»', async ({
+test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · la description promete «descárgalas» y elegir la «dirección de las palabras»', async ({
   page,
 }) => {
   // No hay descarga (se imprime, o «Guardar como PDF» del diálogo del navegador) ni un control de
   // dirección: las direcciones las fija el nivel.
-  test.fail();
+  // REPARADO el 21/11/2026 (sin test.fail)
   const descripcion = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
   expect(descripcion).not.toContain('descárgalas');
   expect(descripcion).not.toContain('dirección de las palabras');
 });
 
-test('HALLAZGO (20/11/2026, ABIERTO) · el botón de la solución cambia su nombre Y su aria-pressed a la vez', async ({ page }) => {
+test('HALLAZGO (20/11/2026, REPARADO 21/11/2026) · el botón de la solución cambia su nombre Y su aria-pressed a la vez', async ({ page }) => {
   // Pulsado se anuncia «Ocultar solución, botón conmutador, pulsado»: el estado va dos veces y se
   // contradice. Un conmutador mantiene el nombre (WAI-ARIA APG, patrón Button) o, si el nombre
   // cambia, no lleva aria-pressed.
-  test.fail();
+  // REPARADO el 21/11/2026 (sin test.fail)
   await generarCon(page, { palabras: 'SOL\nLUNA', lado: 8, nivel: 'facil', semilla: '3' });
   const boton = page.getByRole('button', { name: /solución/ });
   const nombre = () =>
