@@ -30,6 +30,8 @@ interface Atomo3D {
   y: number;
   z: number;
   color: string;
+  /** Color en tema oscuro, si `color` no llega a 3:1 sobre la tarjeta #2A2A2A (WCAG 1.4.11). */
+  colorOscuro?: string;
   size: number;
   label?: string;
 }
@@ -543,9 +545,11 @@ function diamanteAtomos(): Atomo3D[] {
   const tetra: [number, number, number][] = [
     [-q, -q, -q], [q, q, -q], [q, -q, q], [-q, q, q],
   ];
+  // En oscuro, sobre la tarjeta #2A2A2A, #555555 daba 1,92:1 y #1A1A1A 1,21:1 (hallazgo 5312):
+  // allí #8C8C8C (4,26:1) y los interiores, que son los que se explican, más claros, #D9D9D9.
   return [
-    ...fcc.map(([x, y, z]) => ({ x, y, z, color: '#555555', size: 16 })),
-    ...tetra.map(([x, y, z]) => ({ x, y, z, color: '#1A1A1A', size: 18 })),
+    ...fcc.map(([x, y, z]) => ({ x, y, z, color: '#555555', colorOscuro: '#8C8C8C', size: 16 })),
+    ...tetra.map(([x, y, z]) => ({ x, y, z, color: '#1A1A1A', colorOscuro: '#D9D9D9', size: 18 })),
   ];
 }
 
@@ -589,7 +593,14 @@ function grafitoPuntos(): { capa: number; x: number; y: number; z: number }[] {
 }
 
 function grafitoAtomos(): Atomo3D[] {
-  return grafitoPuntos().map(({ capa, x, y, z }) => ({ x, y, z, color: capa === -1 ? '#333333' : '#666666', size: 12 }));
+  // En oscuro, #333333 daba 1,14:1 y #666666 2,50:1 sobre la tarjeta (hallazgo 5312): allí se
+  // invierte el orden de tonos para que la capa inferior siga siendo la más marcada.
+  return grafitoPuntos().map(({ capa, x, y, z }) => ({
+    x, y, z,
+    color: capa === -1 ? '#333333' : '#666666',
+    colorOscuro: capa === -1 ? '#C4C4C4' : '#8C8C8C',
+    size: 12,
+  }));
 }
 
 function grafitoAristas(): Arista3D[] {
@@ -874,10 +885,11 @@ function Escena3D({ atomos, aristas, caras, tamano = 320, rotacionInicial }: Esc
           {atomos.map((at, i) => (
             <div
               key={`t-${i}`}
-              className={styles.atomo}
+              className={at.colorOscuro ? `${styles.atomo} ${styles.atomoConOscuro}` : styles.atomo}
               style={{
                 transform: `translate3d(${at.x}px, ${at.y}px, ${at.z}px) ${contragiro}`,
                 background: at.color,
+                ...(at.colorOscuro ? ({ '--c-oscuro': at.colorOscuro } as CSSProperties) : {}),
                 width: at.size,
                 height: at.size,
                 marginLeft: -at.size / 2,

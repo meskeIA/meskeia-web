@@ -67,6 +67,9 @@
   box-shadow: inset -3px -3px 8px rgba(0,0,0,0.3), 0 0 10px rgba(0,0,0,0.1);
 }
 [data-theme='dark'] .atomo { box-shadow: inset -3px -3px 8px rgba(0,0,0,0.5), 0 0 12px rgba(255,255,255,0.05); }
+/* Átomos con variante oscura (diamante y grafito, hallazgo 5312): el color de cada uno va inline
+   en el TSX y aquí se sustituye por --c-oscuro, de ahí el !important frente al estilo inline. */
+[data-theme='dark'] .atomoConOscuro { background: var(--c-oscuro, #8C8C8C) !important; }
 
 .arista {
   position: absolute;

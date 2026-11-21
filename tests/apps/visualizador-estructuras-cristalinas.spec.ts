@@ -625,7 +625,9 @@ async function contrastesEscena(page: Page): Promise<{ fondoLum: number; atomos:
         arista = Math.min(arista, k([r * a + fondo[0] * (1 - a), g * a + fondo[1] * (1 - a), b * a + fondo[2] * (1 - a)], fondo));
         continue;
       }
-      atomos.push(k(rgba(el.style.backgroundColor), fondo));
+      // El color PINTADO (calculado): en oscuro, el diamante y el grafito sustituyen por CSS el
+      // color inline (hallazgo 5312). .atomo no tiene transición de color.
+      atomos.push(k(rgba(getComputedStyle(el).backgroundColor), fondo));
     }
     return { fondoLum: lum(fondo), atomos, arista };
   });
@@ -775,7 +777,7 @@ test.describe('Firma 20/11/2026 · movimiento reducido', () => {
 test.describe('Firma 20/11/2026 · tema oscuro', () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
-  test.fail('ABIERTO (firma 20/11/2026) · en oscuro los átomos del diamante y del grafito no se distinguen de la tarjeta', async ({ page }) => {
+  test('REPARADO 5312 (firma 20/11/2026) · en oscuro los átomos del diamante y del grafito no se distinguen de la tarjeta', async ({ page }) => {
     // Tarjeta oscura #2A2A2A. Diamante: #555555 → 1,92:1 y los 4 interiores #1A1A1A → 1,21:1;
     // grafito: capa superior #333333 → 1,14:1 y la inferior #666666 → 2,50:1. Mínimo 3:1.
     await abrir(page);
