@@ -76,7 +76,9 @@
   outline-offset: 2px;
 }
 
-.circuitoBtnActive {
+/* En oscuro, [data-theme='dark'] .circuitoBtn (0,2,0) pisaba el relleno del elegido (C0868) */
+.circuitoBtnActive,
+[data-theme='dark'] .circuitoBtn.circuitoBtnActive {
   background: var(--primary-boton);
   border-color: var(--primary-boton);
   color: white;

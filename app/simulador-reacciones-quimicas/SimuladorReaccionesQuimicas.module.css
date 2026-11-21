@@ -252,7 +252,9 @@
   transition: background 0.12s;
 }
 
-.unidadBtnActivo {
+/* En oscuro, [data-theme='dark'] .unidadBtn (0,2,0) pisaba el relleno del elegido (C0868) */
+.unidadBtnActivo,
+[data-theme='dark'] .unidadBtn.unidadBtnActivo {
   background: var(--primary-boton);
   color: white;
 }

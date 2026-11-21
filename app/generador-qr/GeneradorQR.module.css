@@ -126,7 +126,9 @@
   background: var(--focus);
 }
 
-.tipoBtnActivo {
+/* En oscuro, [data-theme='dark'] .tipoBtn (0,2,0) dejaba el elegido igual que los demás (C0868) */
+.tipoBtnActivo,
+[data-theme='dark'] .tipoBtn.tipoBtnActivo {
   border-color: var(--primary);
   background: var(--focus);
 }
@@ -241,7 +243,8 @@
   border-color: var(--primary);
 }
 
-.estiloBtnActivo {
+.estiloBtnActivo,
+[data-theme='dark'] .estiloBtn.estiloBtnActivo {
   border-color: var(--primary);
   background: var(--focus);
   color: var(--primary-texto);

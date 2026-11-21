@@ -122,7 +122,9 @@
   outline-offset: 2px;
 }
 
-.fpsBtnActive {
+/* En oscuro, [data-theme='dark'] .fpsBtn (0,2,0) pisaba el relleno del elegido (C0868) */
+.fpsBtnActive,
+[data-theme='dark'] .fpsBtn.fpsBtnActive {
   background: var(--primary-boton);
   border-color: var(--primary-boton);
   color: white;

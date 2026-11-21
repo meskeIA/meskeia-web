@@ -136,7 +136,9 @@
 /* Blanco sobre --accent (#7FB3D3) daba ~2,2:1; el acento es claro en todas las marcas y temas: texto oscuro (C0070) */
 .chip:hover { background: var(--accent); color: #1A1A1A; }
 
-.chipActivo {
+/* En oscuro, [data-theme='dark'] .chip (0,2,0) pisaba el relleno del elegido (C0868) */
+.chipActivo,
+[data-theme='dark'] .chip.chipActivo {
   background: var(--primary-boton);
   border-color: var(--primary-boton);
   color: #fff;
