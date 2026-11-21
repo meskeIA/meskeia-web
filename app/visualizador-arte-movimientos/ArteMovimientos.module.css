@@ -331,15 +331,17 @@
   margin: 0 0 0.25rem;
 }
 
+/* Relleno y tinta los pone page.tsx (rellenoConTinta, C0645): sin opacidad ni velo blanco, que
+   rebajaban la tinta por debajo de 4,5:1 */
 .detalleTarjetaHeader p {
   margin: 0 0 0.5rem;
   font-size: 1rem;
-  opacity: 0.9;
 }
 
 .detalleTarjetaHeader span {
   display: inline-block;
-  background: rgba(255, 255, 255, 0.25);
+  background: transparent;
+  border: 1px solid currentColor;
   padding: 0.2rem 0.7rem;
   border-radius: 12px;
   font-size: 0.8rem;
@@ -421,9 +423,22 @@
   color: var(--primary-texto);
 }
 
-.filtroCatBtnActivo {
+/* «Todas» no lleva color de categoría: sin fondo propio quedaba blanco sobre la página (1,04:1) */
+.filtroCatBtnActivo,
+[data-theme='dark'] .filtroCatBtnActivo {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
   font-weight: 600;
+}
+
+/* Texto en el color de un dato: el tono por tema lo calcula page.tsx (tonosPorTema, C0645) */
+.tonoDato {
+  color: var(--tono-claro, var(--text-primary));
+}
+
+[data-theme='dark'] .tonoDato {
+  color: var(--tono-oscuro, var(--text-primary));
 }
 
 .buscadorInput {

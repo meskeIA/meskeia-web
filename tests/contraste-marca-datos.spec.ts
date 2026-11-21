@@ -341,6 +341,7 @@ const APPS: App[] = [
   // el botón y la cabecera (2,24-3,99), con el botón en --text-secondary sobre su color en oscuro
   // (1,03-3,27) y «Todas» en blanco sobre la página (1,04). Las cuatro pestañas
   { slug: 'visualizador-filosofia', todo: true, secciones: "[role='tablist'] [role='tab']" },
+  { slug: 'visualizador-arte-movimientos', todo: true, secciones: "[role='tablist'] [role='tab']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
