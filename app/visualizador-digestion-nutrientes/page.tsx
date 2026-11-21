@@ -11,6 +11,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 type Seccion = 'macronutrientes' | 'digestion' | 'micronutrientes' | 'datos';
 
@@ -22,7 +23,10 @@ interface Macronutriente {
   id: string;
   nombre: string;
   icono: string;
+  /** Color del dato: borde, barra y leyenda */
   color: string;
+  /** Tono de TEXTO del mismo color, por tema: el nombre iba en `color` (grasas #F39C12 a 2,01:1) (C0645) */
+  texto: string;
   fuentes: string;
   composicion: string;
   kcalPorGramo: number;
@@ -59,12 +63,25 @@ interface DatoMetabolismo {
 // Datos: Macronutrientes
 // ─────────────────────────────────────────────
 
+/** Segmento de la barra de proporciones con el porcentaje legible encima */
+function estiloSegmento(color: string, ancho: string): { width: string; backgroundColor: string; color: string } {
+  const { relleno, tinta } = rellenoConTinta(color);
+  return { width: ancho, backgroundColor: relleno, color: tinta };
+}
+
+/** El macronutriente elegido en «Digestión»: blanco sobre la marca daba 4,11:1 y sobre #F39C12 2,19 */
+function estiloSeleccionado(color: string): { backgroundColor: string; borderColor: string; color: string } {
+  const { relleno, tinta } = rellenoConTinta(color);
+  return { backgroundColor: relleno, borderColor: relleno, color: tinta };
+}
+
 const MACRONUTRIENTES: Macronutriente[] = [
   {
     id: 'carbohidratos',
     nombre: 'Carbohidratos',
     icono: '🍞',
     color: '#2E86AB',
+    texto: 'var(--primary-texto)',
     fuentes: '🍞 Pan, 🍚 Arroz, 🍝 Pasta, 🍌 Frutas, 🥔 Patatas, 🍯 Miel',
     composicion: 'C, H, O — Fórmula general: Cₙ(H₂O)ₙ',
     kcalPorGramo: 4,
@@ -76,6 +93,7 @@ const MACRONUTRIENTES: Macronutriente[] = [
     nombre: 'Proteínas',
     icono: '🥩',
     color: '#E74C3C',
+    texto: 'var(--rojo-texto, #B91C1C)',
     fuentes: '🥩 Carne, 🐟 Pescado, 🥚 Huevos, 🫘 Legumbres, 🥛 Lácteos, 🥜 Frutos secos',
     composicion: 'C, H, O, N (+ S en algunas) — 20 aminoácidos, 9 esenciales',
     kcalPorGramo: 4,
@@ -87,6 +105,7 @@ const MACRONUTRIENTES: Macronutriente[] = [
     nombre: 'Grasas (Lípidos)',
     icono: '🫒',
     color: '#F39C12',
+    texto: 'var(--ambar-texto, #8A5A00)',
     fuentes: '🫒 Aceite de oliva, 🥑 Aguacate, 🥜 Frutos secos, 🐟 Pescado azul, 🧈 Mantequilla',
     composicion: 'C, H, O — Triglicéridos: glicerol + 3 ácidos grasos',
     kcalPorGramo: 9,
@@ -323,7 +342,7 @@ export default function VisualizadorDigestionNutrientesPage() {
                   aria-expanded={macroActivo === m.id}
                 >
                   <span className={styles.macroIcono} aria-hidden="true">{m.icono}</span>
-                  <span className={styles.macroNombre} style={{ color: m.color }}>{m.nombre}</span>
+                  <span className={styles.macroNombre} style={{ color: m.texto }}>{m.nombre}</span>
                   <span className={styles.macroKcal}>
                     {m.kcalPorGramo} kcal/g
                   </span>
@@ -379,13 +398,15 @@ export default function VisualizadorDigestionNutrientesPage() {
             <div className={styles.proporcionBloque}>
               <h3 className={styles.proporcionTitulo}>Proporción recomendada en la dieta</h3>
               <div className={styles.proporcionBarra}>
-                <div className={styles.proporcionSegmento} style={{ width: '52.5%', backgroundColor: MACRONUTRIENTES[0].color }}>
+                {/* El porcentaje va encima de cada segmento: relleno y tinta de rellenoConTinta (el
+                    blanco sobre #F39C12 daba 2,19:1, sobre #E74C3C 3,82 y sobre la marca 4,11) (C0645) */}
+                <div className={styles.proporcionSegmento} style={estiloSegmento(MACRONUTRIENTES[0].color, '52.5%')}>
                   <span>50-55%</span>
                 </div>
-                <div className={styles.proporcionSegmento} style={{ width: '17.5%', backgroundColor: MACRONUTRIENTES[1].color }}>
+                <div className={styles.proporcionSegmento} style={estiloSegmento(MACRONUTRIENTES[1].color, '17.5%')}>
                   <span>15-20%</span>
                 </div>
-                <div className={styles.proporcionSegmento} style={{ width: '27.5%', backgroundColor: MACRONUTRIENTES[2].color }}>
+                <div className={styles.proporcionSegmento} style={estiloSegmento(MACRONUTRIENTES[2].color, '27.5%')}>
                   <span>25-30%</span>
                 </div>
               </div>
@@ -417,7 +438,7 @@ export default function VisualizadorDigestionNutrientesPage() {
                   type="button"
                   className={`${styles.selectorBtn} ${macroDigestion === m.id ? styles.selectorActivo : ''}`}
                   onClick={() => setMacroDigestion(m.id)}
-                  style={macroDigestion === m.id ? { backgroundColor: m.color, borderColor: m.color, color: 'white' } : undefined}
+                  style={macroDigestion === m.id ? estiloSeleccionado(m.color) : undefined}
                   aria-pressed={macroDigestion === m.id}
                 >
                   <span aria-hidden="true">{m.icono}</span> {m.nombre}
