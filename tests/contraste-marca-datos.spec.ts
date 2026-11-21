@@ -334,6 +334,13 @@ const APPS: App[] = [
   // en ese color (2,26-4,11) y el valor de referencia de cada monitor en su color sobre su tinte (rojo,
   // teal y ámbar, 1,90-3,07 en claro); en oscuro, el autor de cada teoría en #888 (4,05). Los tres tipos
   { slug: 'visualizador-anestesia', todo: true, secciones: "[role='tablist'][aria-label='Tipos de anestesia'] [role='tab']" },
+  // 21/11/2026 (C0645), familia de las cronologías de movimientos: el nombre de cada corriente y su
+  // categoría en su color con style sobre un tinte de ese color (comparativa y eras: Presocráticos
+  // #8B4513 a 1,54-2,05:1 en oscuro, Existencialismo #2F4F4F 1,54, Medieval #8B008B 1,59; en claro el
+  // oro de la arquitectura griega a 1,90-2,09) y el blanco sobre el color de la corriente elegida en
+  // el botón y la cabecera (2,24-3,99), con el botón en --text-secondary sobre su color en oscuro
+  // (1,03-3,27) y «Todas» en blanco sobre la página (1,04). Las cuatro pestañas
+  { slug: 'visualizador-filosofia', todo: true, secciones: "[role='tablist'] [role='tab']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

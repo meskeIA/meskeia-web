@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type CSSProperties } from 'react';
 import styles from './Filosofia.module.css';
 import {
   MeskeiaLogo,
@@ -12,7 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
-import { rellenoConTinta } from '@/lib/tintaLegible';
+import { mezclar, rellenoConTinta, tonosPorTema } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -244,6 +244,36 @@ const COLORES_CATEGORIA: Record<Categoria, string> = {
 };
 
 // ─────────────────────────────────────────────
+// Texto en el color de cada corriente (cabo C0645)
+// ─────────────────────────────────────────────
+// El nombre de cada corriente y su categoría se pintaban en su color puro con style, también sobre
+// un tinte de ese mismo color (Presocráticos #8B4513 a 1,54-2,05:1 en oscuro, Existencialismo
+// #2F4F4F a 1,54, Medieval #8B008B a 1,59), y el botón y la cabecera de la corriente elegida eran
+// blanco sobre su color (Racionalismo #1E90FF a 3,25). Cada texto toma el tono de su color que
+// llega a 4,5:1 sobre el fondo REAL donde se pinta en cada tema, y el blanco sobre color pasa a
+// relleno y tinta de rellenoConTinta. Fondos: la tarjeta (--bg-card) y el panel y las eras
+// (--bg-primary en claro, #1a2633 en oscuro).
+const TARJETA = { claro: '#FFFFFF', oscuro: '#2D2D2D' };
+const PANEL = { claro: '#FAFAFA', oscuro: '#1A2633' };
+const ALFA_FILA = 0x18 / 255;
+const ALFA_BADGE = 0x22 / 255;
+const ALFA_ERA = 0x1a / 255;
+
+/**
+ * Tono del color sobre su tinte al `alfa` encima de `base`, en cada tema. Con 4,6 y no 4,5: el
+ * navegador redondea el tinte a su manera y un tono justo en 4,50 salía a 4,49
+ */
+function tonoSobreTinte(color: string, base: { claro: string; oscuro: string }, alfa: number): CSSProperties {
+  return tonosPorTema(color, mezclar(color, base.claro, alfa), mezclar(color, base.oscuro, alfa), 4.6) as CSSProperties;
+}
+
+/** Relleno de su color y tinta legible encima, para el botón y la cabecera de lo elegido */
+function rellenoDe(color: string): CSSProperties {
+  const { relleno, tinta } = rellenoConTinta(color);
+  return { background: relleno, borderColor: relleno, color: tinta };
+}
+
+// ─────────────────────────────────────────────
 // Subcomponentes
 // ─────────────────────────────────────────────
 
@@ -251,7 +281,7 @@ function PanelDetalle({ corriente }: { corriente: CorrienteFilosofica }) {
   const anioFinTexto = corriente.anioFin === 9999 ? 'actualidad' : formatAnio(corriente.anioFin);
   return (
     <div className={styles.detallePanel} style={{ borderLeftColor: corriente.color }}>
-      <h3 className={styles.detalleTitulo} style={{ color: corriente.color }}>{corriente.nombre}</h3>
+      <h3 className={`${styles.detalleTitulo} ${styles.tonoDato}`} style={tonoSobreTinte(corriente.color, PANEL, 0)}>{corriente.nombre}</h3>
       <p className={styles.detallePeriodo}>{formatAnio(corriente.anioInicio)} – {anioFinTexto}</p>
       <span className={styles.detalleCategoria}>{ETIQUETAS_CATEGORIA[corriente.categoria]}</span>
 
@@ -446,7 +476,7 @@ function TabDetalle() {
             aria-pressed={i === indice}
             className={`${styles.movimientoBtn} ${i === indice ? styles.movimientoBtnActivo : ''}`}
             onClick={() => setIndice(i)}
-            style={i === indice ? { background: cor.color, borderColor: cor.color } : {}}
+            style={i === indice ? rellenoDe(cor.color) : {}}
           >
             {cor.nombre}
           </button>
@@ -454,7 +484,7 @@ function TabDetalle() {
       </div>
 
       <div className={styles.detalleTarjeta} style={{ borderTopColor: corriente.color }}>
-        <div className={styles.detalleTarjetaHeader} style={{ background: corriente.color }}>
+        <div className={styles.detalleTarjetaHeader} style={rellenoDe(corriente.color)}>
           <h3>{corriente.nombre}</h3>
           <p>{formatAnio(corriente.anioInicio)} – {anioFinTexto}</p>
           <span>{ETIQUETAS_CATEGORIA[corriente.categoria]}</span>
@@ -557,7 +587,7 @@ function TabComparativa() {
             aria-pressed={categoriaFiltro === cat}
             className={`${styles.filtroCatBtn} ${categoriaFiltro === cat ? styles.filtroCatBtnActivo : ''}`}
             onClick={() => setCategoriaFiltro(cat)}
-            style={categoriaFiltro === cat ? { background: COLORES_CATEGORIA[cat], borderColor: COLORES_CATEGORIA[cat] } : {}}
+            style={categoriaFiltro === cat ? rellenoDe(COLORES_CATEGORIA[cat]) : {}}
           >
             {ETIQUETAS_CATEGORIA[cat]}
           </button>
@@ -587,15 +617,19 @@ function TabComparativa() {
           <tbody>
             {corrientesFiltradas.map((cor, i) => {
               const anioFinTexto = cor.anioFin === 9999 ? 'actualidad' : formatAnio(cor.anioFin);
+              const colorCat = COLORES_CATEGORIA[cor.categoria];
+              // Fondo real de la fila en cada tema: teñida con su color en las pares
+              const alfaFila = i % 2 === 0 ? ALFA_FILA : 0;
+              const fila = { claro: mezclar(cor.color, TARJETA.claro, alfaFila), oscuro: mezclar(cor.color, TARJETA.oscuro, alfaFila) };
               return (
                 <tr
                   key={cor.id}
                   style={i % 2 === 0 ? { background: `${cor.color}18` } : {}}
                 >
-                  <td><strong style={{ color: cor.color }}>{cor.nombre}</strong></td>
+                  <td><strong className={styles.tonoDato} style={tonoSobreTinte(cor.color, fila, 0)}>{cor.nombre}</strong></td>
                   <td>{formatAnio(cor.anioInicio)}–{anioFinTexto}</td>
                   <td>
-                    <span className={styles.badgeCategoria} style={{ background: `${COLORES_CATEGORIA[cor.categoria]}22`, color: COLORES_CATEGORIA[cor.categoria] }}>
+                    <span className={`${styles.badgeCategoria} ${styles.tonoDato}`} style={{ background: `${colorCat}22`, ...tonoSobreTinte(colorCat, fila, ALFA_BADGE) }}>
                       {ETIQUETAS_CATEGORIA[cor.categoria]}
                     </span>
                   </td>
@@ -670,8 +704,8 @@ function TabContexto() {
                   {corrientesEra.map((c) => (
                     <span
                       key={c.id}
-                      className={styles.eraEstiloBadge}
-                      style={{ background: `${c.color}1A`, color: c.color, borderColor: `${c.color}55` }}
+                      className={`${styles.eraEstiloBadge} ${styles.tonoDato}`}
+                      style={{ background: `${c.color}1A`, borderColor: `${c.color}55`, ...tonoSobreTinte(c.color, PANEL, ALFA_ERA) }}
                     >
                       {c.nombre}
                     </span>
