@@ -32,6 +32,23 @@ const ESTATICOS = [
   'temporizador-pomodoro', 'visualizador-carbono',
 ];
 
+// calculadora-gelatina (hallazgo 5396): el warningBox del agar sale con el resultado, pero en TODOS
+// los cálculos, así que no es una alerta. Se mide tras calcular, que es cuando existe.
+test('calculadora-gelatina · el aviso del agar, presente en todo resultado, no es una región de alerta', async ({ page }) => {
+  await page.goto('/calculadora-gelatina/');
+  await esperarPaginaAsentada(page);
+  await page.getByRole('button', { name: 'Calcular equivalencias de gelatina' }).click();
+  const cajas = page.locator('[class*="warningBox"]');
+  await expect(cajas.first(), 'el resultado trae su warningBox').toBeVisible();
+  const enAlerta = await page.evaluate(
+    () =>
+      Array.from(document.querySelectorAll('[class*="warningBox"]')).filter(
+        (el) => el.matches('[role="alert"]') || el.closest('[role="alert"], [aria-live="assertive"]'),
+      ).length,
+  );
+  expect(enAlerta, 'warningBox dentro de una alerta').toBe(0);
+});
+
 for (const slug of ESTATICOS) {
   test(`${slug} · el warningBox fijo no es una región de alerta`, async ({ page }) => {
     await page.goto(`/${slug}/`);
