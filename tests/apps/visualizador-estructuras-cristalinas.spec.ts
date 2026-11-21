@@ -27,8 +27,13 @@ import { activarTemaOscuro, prepararParaMedir } from '../_contraste';
  * 4358 (trigonal), 4359 (caras hexagonales), 4360 (grafito), 4361 (cuarzo SiO₄), 4363, 4364,
  * 4365, 4366, 4367 (contraste), 4368 (%) y 4362 (el cuarzo, solo en trigonal).
  *
- * Inspección en MODO FIRMA · 20/11/2026: los bloques «Firma» del final. Sus `test.fail()` son
- * hallazgos ABIERTOS de ese día.
+ * Inspección en MODO FIRMA · 20/11/2026: los bloques «Firma». Sus `test.fail()` son el hallazgo
+ * 5311, ABIERTO; los demás de ese día (5308, 5309, 5310, 5312, 5313 y 5314) se repararon el
+ * 21/11/2026 y sus casos pasaron a «REPARADO».
+ *
+ * Inspección en MODO CAMBIO · 21/11/2026: los bloques «Cambio» del final, sobre el diff de esas
+ * reparaciones (geometría HCP, aristas opacas, contragiro de los átomos, pointer-events). Sin
+ * hallazgos.
  */
 
 const RUTA = '/visualizador-estructuras-cristalinas/';
@@ -866,5 +871,333 @@ test.describe('Firma 20/11/2026 · móvil 390 px', () => {
       return { mitad: r.top + window.scrollY + r.height / 2, alto: window.innerHeight };
     });
     expect(mitad, `mitad de la escena (px desde arriba) frente a ${alto} px de pantalla`).toBeLessThan(alto);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN EN MODO CAMBIO · 21/11/2026
+// ═════════════════════════════════════════════════════════════════════════════════════════════
+/*
+ * Diff 12f56e6c..HEAD de app/visualizador-estructuras-cristalinas/: reparaciones 5308 (la celda
+ * girada se quedaba el clic), 5309 (contragiro de los átomos), 5310 (arrastre con movimiento
+ * reducido), 5312 (átomos del diamante y el grafito en oscuro), 5313 (aristas opacas) y 5314 (HCP
+ * compacta). Esperados resueltos a mano ANTES de ejecutar la app:
+ *
+ *   · HCP: a = 90 · 0,45 = 40,5 px (lado del hexágono = radio); c/2 = a·√(2/3) = 33,07 px, así
+ *     que c = 66,14 px y c/a = 2·√(2/3) = 1,633. Capa intermedia a a/√3 = 23,38 px del eje, en
+ *     30°, 150° y 270°: el centroide de los triángulos (centro, v0, v60), (centro, v120, v180) y
+ *     (centro, v240, v300) de la base. Distancia a cada uno de esos 3 de abajo (y de los 3 de
+ *     arriba): √(a²/3 + c²/4) = √(a²/3 + 2a²/3) = a = 40,5 px. Entre dos de la capa intermedia:
+ *     2·(a/√3)·sen 60° = a. El 4.º más cercano de la base está a √(4a²/3 + 2a²/3) = a√2 = 57,28 px.
+ *     El centro de la base: 6 del plano + 3 de encima = 9 a la distancia a en la celda dibujada, y
+ *     12 al apilarla con su traslación ±c (la capa de debajo es la intermedia de la celda vecina).
+ *     El c/a malo era 2,22 (c = 90 px y la capa intermedia a 50,7 px de la base).
+ *   · Aristas: #2E86AB, luminancia 0,2056 → 4,11:1 contra el blanco de la tarjeta; contra el
+ *     centro del degradado de la escena (4 % de #2E86AB) 3,92:1. #7FB3D3, luminancia 0,4146 →
+ *     6,35:1 contra #2A2A2A. Mínimo para un gráfico necesario: 3:1 (WCAG 1.4.11). Antes, al 30 y
+ *     35 % de opacidad: 1,45:1 y 2,0:1.
+ *   · Contragiro: un disco de cara a la cámara mide su tamaño por el factor de perspectiva
+ *     800/(800 − z), entre 0,91 y 1,11 para |z| ≤ 78 px; de canto mediría 0.
+ */
+
+/**
+ * Contraste de las aristas (color calculado, normalizado en un canvas) contra cada fondo que
+ * pueden tener al lado dentro de la escena: la tarjeta, el centro del degradado radial de la
+ * escena compuesto sobre ella y, si la escena tiene caras, una y dos capas de cara encima (un
+ * rayo que atraviesa un prisma convexo cruza dos caras). Devuelve el peor y la lista.
+ */
+async function contrasteAristasFondoReal(page: Page): Promise<{ peor: number; detalle: string[] }> {
+  return page.locator(ESCENA).evaluate((escena) => {
+    const lienzo = document.createElement('canvas');
+    lienzo.width = lienzo.height = 1;
+    const ctx = lienzo.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
+    const norm = (css: string): number[] => {
+      ctx.clearRect(0, 0, 1, 1);
+      ctx.fillStyle = '#000';
+      ctx.fillStyle = css;
+      ctx.fillRect(0, 0, 1, 1);
+      const v = ctx.getImageData(0, 0, 1, 1).data;
+      return [v[0], v[1], v[2], v[3] / 255];
+    };
+    const canal = (c: number) => {
+      const s = c / 255;
+      return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    };
+    const lum = (p: number[]) => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+    const k = (a: number[], b: number[]) => {
+      const x = lum(a);
+      const y = lum(b);
+      return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+    };
+    const sobre = (c: number[], alfa: number, b: number[]) => [0, 1, 2].map((i) => c[i] * alfa + b[i] * (1 - alfa));
+    let tarjeta = [255, 255, 255];
+    for (let n = escena.parentElement; n; n = n.parentElement) {
+      const c = norm(getComputedStyle(n).backgroundColor);
+      if (c[3] >= 1) {
+        tarjeta = c;
+        break;
+      }
+    }
+    const parada = norm((getComputedStyle(escena).backgroundImage.match(/rgba?\([^)]*\)/) ?? ['rgba(0, 0, 0, 0)'])[0]);
+    const fondos: [string, number[]][] = [['tarjeta', tarjeta], ['centro del degradado', sobre(parada, parada[3], tarjeta)]];
+    let arista: number[] | null = null;
+    for (const nodo of Array.from((escena.firstElementChild as HTMLElement).children)) {
+      const el = nodo as HTMLElement;
+      const cs = getComputedStyle(el);
+      if (/rotateZ/.test(el.style.transform)) {
+        if (fondos.length === 2) {
+          const c = norm(cs.backgroundColor);
+          const alfa = c[3] * Number(cs.opacity);
+          const una = sobre(c, alfa, fondos[1][1]);
+          fondos.push(['una cara', una], ['dos caras', sobre(c, alfa, una)]);
+        }
+      } else if (/rotate3d/.test(el.style.transform) && !arista) {
+        arista = norm(cs.backgroundColor);
+        if (Number(cs.opacity) < 1) arista[3] *= Number(cs.opacity);
+      }
+    }
+    if (!arista) return { peor: 0, detalle: ['sin aristas'] };
+    const a = arista;
+    // Una arista translúcida se compone sobre cada fondo antes de medir
+    const detalle = fondos.map(([nombre, f]) => `${nombre} ${k(sobre(a, a[3], f), f).toFixed(2)}`);
+    const peor = Math.min(...fondos.map(([, f]) => k(sobre(a, a[3], f), f)));
+    return { peor, detalle };
+  });
+}
+
+/**
+ * Contraste por píxel: oculta átomos y caras, fotografía la escena y busca el píxel más alejado
+ * en luminancia del de la esquina (la tarjeta). Es lo que llega a la pantalla, antialias incluido.
+ */
+async function contrastePixelAristas(page: Page): Promise<number> {
+  await page.locator(ESCENA).evaluate((escena) => {
+    for (const nodo of Array.from((escena.firstElementChild as HTMLElement).children)) {
+      const el = nodo as HTMLElement;
+      if (!/rotate3d/.test(el.style.transform)) el.style.visibility = 'hidden';
+    }
+  });
+  await page.locator(ESCENA).scrollIntoViewIfNeeded();
+  const png = await page.locator(ESCENA).screenshot();
+  return page.evaluate(async (b64) => {
+    const im = new Image();
+    im.src = `data:image/png;base64,${b64}`;
+    await im.decode();
+    const c = document.createElement('canvas');
+    c.width = im.width;
+    c.height = im.height;
+    const x = c.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
+    x.drawImage(im, 0, 0);
+    const d = x.getImageData(0, 0, c.width, c.height).data;
+    const canal = (v: number) => {
+      const s = v / 255;
+      return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    };
+    const lum = (i: number) => 0.2126 * canal(d[i]) + 0.7152 * canal(d[i + 1]) + 0.0722 * canal(d[i + 2]);
+    const lf = lum(0);
+    let mejor = 1;
+    for (let i = 0; i < d.length; i += 4) {
+      const l = lum(i);
+      mejor = Math.max(mejor, (Math.max(l, lf) + 0.05) / (Math.min(l, lf) + 0.05));
+    }
+    return mejor;
+  }, png.toString('base64'));
+}
+
+const ESCENAS_CON_ARISTAS: [RegExp | null, string | RegExp][] = [
+  [null, 'Cúbico'], [null, 'Hexagonal'], [null, 'Trigonal'], [null, 'Monoclínico'], [null, 'Triclínico'],
+  [/Metálicas/, /^BCC/], [/Metálicas/, /^FCC/], [/Metálicas/, /^HCP/],
+  [/Cristales Famosos/, /Sal \(NaCl\)/], [/Cristales Famosos/, /Diamante/], [/Cristales Famosos/, /Grafito/], [/Cristales Famosos/, /Cuarzo/],
+];
+
+test.describe('Cambio 21/11/2026 · HCP compacta', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test('HCP: los 3 de la capa intermedia tocan 3 + 3 a la distancia a, c/a = 1,633 y el centro de la base tiene 12 vecinos al apilar la celda', async ({ page }) => {
+    await abrir(page);
+    await irASeccion(page, /Metálicas/);
+    await elegir(page, /^HCP/);
+    const { atomos, aristas, caras } = await leerEscena(page);
+    const ys = [...new Set(atomos.map((p) => Math.round(p[1] * 10) / 10))].sort((x, y) => x - y);
+    expect(ys, 'tres capas').toHaveLength(3);
+    const capa = (y: number) => atomos.filter((p) => Math.abs(p[1] - y) < 0.1);
+    const [base, medio, tapa] = ys.map(capa);
+    expect([base.length, medio.length, tapa.length], 'hexágono + centro, 3 intermedios, hexágono + centro').toEqual([7, 3, 7]);
+
+    // a, c y c/a. Tolerancias: 0,5 px en distancias (el defecto era de 10 px: 50,7 frente a
+    // 40,5) y 0,05 en c/a (el defecto era 2,22 frente a 1,633)
+    const a = Math.min(...base.flatMap((p, i) => base.filter((_, j) => j !== i).map((q) => dist(p, q))));
+    const c = ys[2] - ys[0];
+    expect(a, 'a = 90 · 0,45 = 40,5 px').toBeCloseTo(40.5, 0);
+    expect(c, 'c = 2·√(2/3)·a = 66,14 px').toBeCloseTo(66.14, 0);
+    expect(c / a, 'c/a = 2·√(2/3) = 1,633').toBeCloseTo(1.633, 1);
+
+    for (const m of medio) {
+      expect(Math.hypot(m[0], m[2]), 'capa intermedia a a/√3 = 23,38 px del eje').toBeCloseTo(23.38, 0);
+      const abajo = base.map((q) => dist(m, q)).sort((x, y) => x - y);
+      const arriba = tapa.map((q) => dist(m, q)).sort((x, y) => x - y);
+      for (const [rotulo, lista] of [['abajo', abajo], ['arriba', arriba]] as const) {
+        expect(lista.slice(0, 3).every((x) => Math.abs(x - a) < 0.5), `3 vecinos ${rotulo} a a: ${lista.slice(0, 4).map((x) => x.toFixed(2))}`).toBe(true);
+        expect(lista[3], `el 4.º ${rotulo} ya está a a√2 = 57,28 px`).toBeCloseTo(a * Math.SQRT2, 0);
+      }
+      const entreMedios = medio.filter((q) => q !== m).map((q) => dist(m, q));
+      expect(entreMedios.every((x) => Math.abs(x - a) < 0.5), `los otros dos intermedios a a: ${entreMedios.map((x) => x.toFixed(2))}`).toBe(true);
+    }
+
+    const centro = base.find((p) => Math.hypot(p[0], p[2]) < 0.5) as V3;
+    const aDistanciaA = (nube: V3[]) => nube.filter((q) => dist(q, centro) > 0.5 && Math.abs(dist(q, centro) - a) < 0.5).length;
+    expect(aDistanciaA(atomos), 'centro de la base: 6 del plano + 3 de encima, en la celda dibujada').toBe(9);
+    // La tapa de la celda de debajo es la base de esta: sin repetidos
+    const apilada: V3[] = [...atomos];
+    for (const p of atomos.map((q): V3 => [q[0], q[1] - c, q[2]])) if (masCercano(p, apilada) > 0.5) apilada.push(p);
+    expect(apilada, '17 + 17 − 7 compartidos').toHaveLength(27);
+    expect(aDistanciaA(apilada), 'con la celda de debajo (traslación c): Nº coordinación 12').toBe(12);
+
+    // El prisma mide c: aristas verticales y caras
+    const verticales = aristas.filter((ar) => Math.abs(ar.b[1] - ar.a[1]) > 1).map((ar) => dist(ar.a, ar.b));
+    expect(verticales, '6 aristas verticales').toHaveLength(6);
+    for (const v of verticales) expect(v, 'arista vertical = c').toBeCloseTo(c, 0);
+    for (const cara of caras) expect(Math.max(...cara.map((p) => p[1])) - Math.min(...cara.map((p) => p[1])), 'cara lateral = c').toBeCloseTo(c, 0);
+  });
+});
+
+test.describe('Cambio 21/11/2026 · aristas contra el fondo real (claro)', () => {
+  test.use({ viewport: { width: 1280, height: 800 }, colorScheme: 'light' });
+
+  test('5313: en las 12 escenas con aristas, ≥ 3:1 contra la tarjeta, el degradado y dos capas de cara; y por píxel', async ({ page }) => {
+    // Medido el 21/11/2026: 4,11 contra la tarjeta, 3,92 contra el centro del degradado y 3,29 el
+    // peor, con dos caras grises del diamante encima; por píxel, 4,15.
+    await abrir(page);
+    await prepararParaMedir(page);
+    const fallos: string[] = [];
+    for (const [seccion, nombre] of ESCENAS_CON_ARISTAS) {
+      if (seccion) await irASeccion(page, seccion);
+      await elegir(page, nombre);
+      const { peor, detalle } = await contrasteAristasFondoReal(page);
+      if (peor < 3) fallos.push(`${String(nombre)}: ${detalle.join(' · ')}`);
+    }
+    expect(fallos, 'escenas con alguna arista por debajo de 3:1').toEqual([]);
+    await irASeccion(page, /Los 7 Sistemas/);
+    await elegir(page, 'Monoclínico');
+    expect(await contrastePixelAristas(page), 'Monoclínico, solo aristas: píxel más contrastado frente a la tarjeta').toBeGreaterThanOrEqual(3);
+  });
+});
+
+test.describe('Cambio 21/11/2026 · aristas contra el fondo real (oscuro)', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test('5313: en oscuro, ≥ 3:1 contra #2A2A2A, el degradado y dos capas de cara; y por píxel', async ({ page }) => {
+    // Medido el 21/11/2026: 6,35 contra la tarjeta y 5,24 el peor (dos caras naranjas de FCC y
+    // del cuarzo); por píxel, 6,35.
+    await abrir(page);
+    await prepararParaMedir(page);
+    await activarTemaOscuro(page);
+    const fallos: string[] = [];
+    for (const [seccion, nombre] of ESCENAS_CON_ARISTAS) {
+      if (seccion) await irASeccion(page, seccion);
+      await elegir(page, nombre);
+      await expect.poll(async () => (await contrastesEscena(page)).fondoLum, { message: 'la tarjeta ya es oscura' }).toBeLessThan(0.05);
+      const { peor, detalle } = await contrasteAristasFondoReal(page);
+      if (peor < 3) fallos.push(`${String(nombre)}: ${detalle.join(' · ')}`);
+    }
+    expect(fallos, 'escenas con alguna arista por debajo de 3:1').toEqual([]);
+    await irASeccion(page, /Los 7 Sistemas/);
+    await elegir(page, 'Monoclínico');
+    expect(await contrastePixelAristas(page), 'Monoclínico, solo aristas: píxel más contrastado frente a la tarjeta oscura').toBeGreaterThanOrEqual(3);
+  });
+});
+
+test.describe('Cambio 21/11/2026 · escritorio 1280 px', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test('5309 en el eje X: inclinada −90° arrastrando, los átomos siguen siendo círculos de su tamaño', async ({ page }) => {
+    // Arrastre de 140 px hacia abajo → x = −20 − 140·0,5 = −90°. Un disco que girase con la celda
+    // quedaría de canto (alto ≈ 0); de cara mide su tamaño por la perspectiva, 0,91-1,11.
+    await abrir(page);
+    const escena = page.locator(ESCENA);
+    await escena.scrollIntoViewIfNeeded();
+    const caja = await escena.boundingBox();
+    const cx = (caja?.x ?? 0) + (caja?.width ?? 0) / 2;
+    const cy = (caja?.y ?? 0) + (caja?.height ?? 0) / 2;
+    await page.mouse.move(cx, cy - 70);
+    await page.mouse.down();
+    await page.mouse.move(cx, cy + 70, { steps: 14 });
+    await page.mouse.up();
+    await expect.poll(async () => (await leerGiro(page)).x, { message: 'arrastre de 140 px hacia abajo' }).toBeCloseTo(-90, 0);
+    await esperarGiroAsentado(page);
+    const medidas = await medidasAtomos(page);
+    const minimo = Math.min(...medidas.map((m) => Math.min(m.ancho, m.alto) / m.tamano));
+    const maximo = Math.max(...medidas.map((m) => Math.max(m.ancho, m.alto) / m.tamano));
+    expect(minimo, 'el lado más corto del átomo más pequeño / su tamaño').toBeGreaterThanOrEqual(0.8);
+    expect(maximo, 'el lado más largo del átomo más grande / su tamaño').toBeLessThanOrEqual(1.25);
+  });
+
+  test('5308 en los cuatro botones: 12 pulsaciones de cada uno giran 30° y nada tapa el botón', async ({ page }) => {
+    // Desde (−20°, 30°): derecha ×12 → y = 390 · abajo ×12 → x = 340 · izquierda ×12 → y = 30 ·
+    // arriba ×12 → x = −20. Con .estructura3d sin eventos de puntero, el plano girado no se queda
+    // ningún clic, tampoco al inclinar en X.
+    await abrir(page);
+    await page.getByRole('button', { name: 'Rotar derecha' }).scrollIntoViewIfNeeded();
+    const pasos: [string, 'x' | 'y', number][] = [['Rotar derecha', 'y', 30], ['Rotar abajo', 'x', 30], ['Rotar izquierda', 'y', -30], ['Rotar arriba', 'x', -30]];
+    for (const [nombre, eje, delta] of pasos) {
+      for (let i = 1; i <= 12; i++) {
+        const antes = await leerGiro(page);
+        await esperarGiroAsentado(page);
+        const caja = await page.getByRole('button', { name: nombre }).boundingBox();
+        const enCentro = await page.evaluate(
+          ({ x, y }) => document.elementFromPoint(x, y)?.getAttribute('aria-label') ?? null,
+          { x: (caja?.x ?? 0) + (caja?.width ?? 0) / 2, y: (caja?.y ?? 0) + (caja?.height ?? 0) / 2 },
+        );
+        expect(enCentro, `${nombre} ×${i}: lo que hay en el centro del botón`).toBe(nombre);
+        await pulsarEnSuSitio(page, nombre);
+        await expect.poll(async () => (await leerGiro(page))[eje], { message: `${nombre} ×${i}`, timeout: 2000 }).toBe(antes[eje] + delta);
+      }
+    }
+    expect(await leerGiro(page)).toEqual({ x: -20, y: 30 });
+  });
+});
+
+test.describe('Cambio 21/11/2026 · Pixel 7 (412 × 839)', () => {
+  test.use({
+    viewport: { width: 412, height: 839 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('control de uso: cada sistema tocado cambia la escena, cabe en pantalla y los cuatro botones responden al dedo', async ({ page }) => {
+    // Escena de 220 px (max-width en ≤ 640 px) centrada en 412 px, sin desbordar. Cada toque de
+    // tarjeta deja otra celda dibujada. Seis toques de cada botón: ±30° cada uno.
+    await abrir(page);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), 'sin desbordamiento horizontal').toBeLessThanOrEqual(412);
+    const huella = () =>
+      page.locator(ESCENA).evaluate((e) =>
+        Array.from((e.firstElementChild as HTMLElement).children).map((n) => (n as HTMLElement).style.transform.split(' matrix3d')[0]).join('|'),
+      );
+    let anterior = await huella();
+    for (const nombre of ['Tetragonal', 'Ortorrómbico', 'Hexagonal', 'Trigonal', 'Monoclínico', 'Triclínico', 'Cúbico']) {
+      const tarjeta = page.getByRole('button', { name: nombre, exact: true });
+      await tarjeta.tap();
+      await expect(tarjeta).toHaveAttribute('aria-pressed', 'true');
+      await expect.poll(huella, { message: `${nombre}: otra celda dibujada` }).not.toBe(anterior);
+      anterior = await huella();
+    }
+    const escena = page.locator(ESCENA);
+    await escena.scrollIntoViewIfNeeded();
+    const caja = await escena.boundingBox();
+    expect(caja?.width, 'escena de 220 px').toBeCloseTo(220, 0);
+    expect((caja?.x ?? -1) >= 0 && (caja?.x ?? 0) + (caja?.width ?? 0) <= 412, 'la escena entera dentro del ancho').toBe(true);
+
+    await page.getByRole('button', { name: 'Rotar derecha' }).scrollIntoViewIfNeeded();
+    const pasos: [string, 'x' | 'y', number][] = [['Rotar derecha', 'y', 30], ['Rotar abajo', 'x', 30], ['Rotar izquierda', 'y', -30], ['Rotar arriba', 'x', -30]];
+    for (const [nombre, eje, delta] of pasos) {
+      for (let i = 1; i <= 6; i++) {
+        const antes = await leerGiro(page);
+        await pulsarEnSuSitio(page, nombre, true);
+        await expect.poll(async () => (await leerGiro(page))[eje], { message: `${nombre}, toque ${i}`, timeout: 2000 }).toBe(antes[eje] + delta);
+      }
+    }
+    expect(await leerGiro(page)).toEqual({ x: -20, y: 30 });
   });
 });

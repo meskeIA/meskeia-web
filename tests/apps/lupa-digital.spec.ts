@@ -36,9 +36,11 @@ import { contrasteSobreFondoReal } from './_contraste';
  * La del 15/10/2026 (tras f3e9c635) añade, también al final, el reparto con rangos raros, la imagen
  * congelada con la cámara haciendo todo el zoom y tres hallazgos (3315, 3316 y 3317) que se
  * repararon ese mismo día (3b52f497, 00153144 y 70cee569). La del 16/10/2026 comprueba que esas tres
- * reparaciones se sostienen con casos nuevos. La del 22/10/2026, la última del fichero, comprueba las
+ * reparaciones se sostienen con casos nuevos. La del 22/10/2026 comprueba las
  * reparaciones de 3273, 3274, 3276 y 3327 con casos que las anteriores no miraban (el eje vertical al
  * girar, la rama sin cifra de la nota, el contraste con su valor exacto) y mide el cabo C0260.
+ * La del 21/11/2026, la última del fichero, añade el doble clic con las aperturas desordenadas
+ * (cabo C0715); la guía de lectura de ese cambio se prueba en lupa-digital-guia.spec.ts.
  */
 
 test.use({
@@ -2521,4 +2523,75 @@ test.describe('Inspector 22/10/2026 — re-inspección tras 6ec61bc2, ae8759c4 y
     await page.getByRole('button', { name: '3x', exact: true }).click();
     await expect(nota).toHaveText('Los 3x de esta imagen los hizo la cámara al tomarla, sobre la imagen completa del sensor.');
   });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Inspector 21/11/2026 — modo cambio tras 9915bba7 (cabo C0715). La guía de lectura (054343e6)
+// tiene sus casos en lupa-digital-guia.spec.ts.
+// ═══════════════════════════════════════════════════════════════════════════
+
+interface VentanaAperturas {
+  __aperturas: (MediaStream | undefined)[];
+  __llamadas: number;
+}
+
+/**
+ * El testigo de familia (tests/familias/apertura-medio-doble-clic.spec.ts) abre las dos veces con el
+ * mismo retraso, así que las aperturas llegan EN ORDEN. La lupa no ignora la segunda pulsación
+ * —«gana la última apertura», porque «Cambiar cámara» también reabre—: falta el caso en que la
+ * segunda llega ANTES que la primera.
+ * Esperado a mano: 1.ª llamada con 900 ms de retraso, 2.ª con 100 ms, clics a 150 ms. La 2.ª llega a
+ * los ~250 ms y se queda (es la última generación); la 1.ª llega a los ~900 ms con una generación
+ * vieja y se cierra al llegar. Queda 1 flujo vivo, el <video> enseña el de la 2.ª llamada y corre
+ * (readyState ≥ 2, videoWidth > 0); tras «Detener», ninguno.
+ */
+test('Inspector 21/11/2026 (C0715) — doble clic con las aperturas DESORDENADAS: se queda la última aunque llegue primero, la vieja se cierra al llegar y «Detener» no deja ninguna viva', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const w = window as unknown as VentanaAperturas;
+    w.__aperturas = [];
+    w.__llamadas = 0;
+    const retrasos = [900, 100];
+    const original = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = async (c?: MediaStreamConstraints): Promise<MediaStream> => {
+      const n = w.__llamadas++;
+      await new Promise((r) => window.setTimeout(r, retrasos[n] ?? 100));
+      const flujo = await original(c);
+      w.__aperturas[n] = flujo;
+      return flujo;
+    };
+  });
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['#control-zoom']);
+  const boton = page.getByRole('button', { name: /Activar lupa/i });
+  await boton.scrollIntoViewIfNeeded();
+  const caja = await boton.boundingBox();
+  expect(caja).not.toBeNull();
+  const x = caja!.x + caja!.width / 2;
+  const y = caja!.y + caja!.height / 2;
+  await page.mouse.click(x, y);
+  await page.waitForTimeout(150);
+  await expect(boton).toBeVisible(); // sigue diciendo «Activar lupa» mientras getUserMedia no responde
+  await page.mouse.click(x, y);
+
+  const estado = () =>
+    page.evaluate(() => {
+      const w = window as unknown as VentanaAperturas;
+      const v = document.querySelector('video');
+      const vivo = (f?: MediaStream) => !!f && f.getTracks().some((p) => p.readyState === 'live');
+      return {
+        llamadas: w.__llamadas,
+        llegadas: w.__aperturas.filter(Boolean).length,
+        vivos: w.__aperturas.filter(vivo).length,
+        enElVideo: v ? w.__aperturas.indexOf(v.srcObject as MediaStream) : -2,
+      };
+    });
+  // Las dos han llegado (la vieja, a los ~900 ms)
+  await expect.poll(async () => (await estado()).llegadas, { timeout: 5000 }).toBe(2);
+  await expect.poll(estado).toEqual({ llamadas: 2, llegadas: 2, vivos: 1, enElVideo: 1 });
+  await esperarCamaraEnMarcha(page);
+
+  await page.getByRole('button', { name: /Detener/i }).click();
+  await expect.poll(async () => (await estado()).vivos).toBe(0);
 });

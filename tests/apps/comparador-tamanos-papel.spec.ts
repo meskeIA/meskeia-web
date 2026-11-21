@@ -63,6 +63,20 @@ import { activarTemaOscuro, prepararParaMedir } from '../_contraste';
  *      del sobre «misma letra y número que el papel más uno».
  *   I. «%» con espacio normal (no U+00A0) y «100%» pegado en el JSON-LD.
  *   J. JSON-LD: la serie C no es ISO 216 (es ISO 269) y el «catálogo completo» se para en C8.
+ *
+ * HALLAZGO del 21/11/2026 (cabo C0862), ABIERTO (sus tres test llevan test.fail()):
+ *   K. Los rótulos A1…A5 del dibujo «Por qué al doblar un A4 sale un A5» se pintan con los rellenos
+ *      fijos de COLORES (sin variante de tema, lo que 5344 ya corrigió en las cotas del comparador)
+ *      sobre su propia pieza teñida con fill-opacity 0,14 + 0,05·i. Las piezas no se superponen (cada
+ *      una es la mitad del resto), así que el fondo de cada rótulo es su pieza compuesta sobre el
+ *      lienzo (#FAFAFA / #1A1A1A). Calculado a mano (.inspector-trabajo/c0862-esperados.mjs):
+ *        claro:  A1 3,34 · A2 2,26 · A3 1,83 · A4 4,92 · A5 2,60
+ *        oscuro: A1 3,63 · A2 4,59 · A3 4,81 · A4 1,76 · A5 2,73
+ *      Tamaño en pantalla, peso 700 (fuente en unidades × escala del viewBox): en 1280 × 720 el SVG
+ *      lo limita max-height 46vh (escala 331,2/853): 72,1 · 51,0 · 36,1 · 25,5 · 18,0 px; en Pixel 7
+ *      (312 px de lienzo, escala 312/1201): 48,3 · 34,1 · 24,1 · 17,1 · 12,1 px. Grande (≥ 18,66 px
+ *      en negrita) → 3:1; si no, 4,5:1. Fallan A2, A3 y A5 en claro y A4 y A5 en oscuro, a los dos
+ *      anchos.
  */
 
 const RUTA = '/comparador-tamanos-papel/';
@@ -271,6 +285,115 @@ async function elegirCuatroFormatos(page: Page): Promise<void> {
   }
   await expect(comparador(page).locator('svg rect')).toHaveCount(4);
 }
+
+interface RotuloMedido {
+  etiqueta: string;
+  /** Tamaño en pantalla: font-size computado (unidades del viewBox) × escala de la CTM del SVG */
+  px: number;
+  /** WCAG 1.4.3: 3 si es texto grande (≥ 24 px, o ≥ 18,66 px en negrita); si no, 4,5 */
+  umbral: number;
+  ratio: number;
+  tinta: string;
+  fondo: string;
+}
+
+/**
+ * Contraste POR PÍXEL de los rótulos A1…A5 del dibujo del doblado (hallazgo K, cabo C0862). Cada
+ * rótulo va sobre su pieza teñida con alfa: leer el `fill` y el fondo del lienzo no basta, así que se
+ * captura el SVG y, en la caja de cada rótulo, el fondo es el color más frecuente y la tinta, el píxel
+ * de máximo contraste con él que aparezca al menos 6 veces (el interior del trazo). La captura se
+ * analiza en una pestaña aparte en blanco, sin la CSP de la app.
+ */
+async function contrastesRotulosDoblado(page: Page): Promise<RotuloMedido[]> {
+  const svg = page.locator('section[aria-labelledby="titulo-raiz"] svg');
+  await svg.scrollIntoViewIfNeeded();
+  const datos = await svg.evaluate((s) => {
+    const escala = (s as SVGSVGElement).getScreenCTM()?.a ?? Number.NaN;
+    const c = s.getBoundingClientRect();
+    return {
+      clip: { x: c.x, y: c.y, width: c.width, height: c.height },
+      textos: Array.from(s.querySelectorAll('text')).map((t) => {
+        const cs = getComputedStyle(t);
+        const b = t.getBoundingClientRect();
+        return {
+          etiqueta: t.textContent ?? '',
+          px: parseFloat(cs.fontSize) * escala,
+          peso: Number(cs.fontWeight),
+          caja: { x: b.x - c.x, y: b.y - c.y, ancho: b.width, alto: b.height },
+        };
+      }),
+    };
+  });
+  const png = await page.screenshot({ clip: datos.clip });
+  const analisis = await page.context().newPage();
+  let pixeles: { ratio: number; tinta: string; fondo: string }[];
+  try {
+    pixeles = await analisis.evaluate(
+      async ({ b64, anchoCss, cajas }) => {
+        const img = new Image();
+        img.src = `data:image/png;base64,${b64}`;
+        await img.decode();
+        const lienzo = document.createElement('canvas');
+        lienzo.width = img.naturalWidth;
+        lienzo.height = img.naturalHeight;
+        const g = lienzo.getContext('2d')!;
+        g.drawImage(img, 0, 0);
+        const k = img.naturalWidth / anchoCss;
+        const lin = (v: number): number => {
+          const s = v / 255;
+          return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+        };
+        const lum = (c: number[]): number => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+        const contraste = (a: number[], b: number[]): number => {
+          const x = lum(a);
+          const y = lum(b);
+          return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+        };
+        return cajas.map((caja) => {
+          const x0 = Math.max(0, Math.floor(caja.x * k));
+          const y0 = Math.max(0, Math.floor(caja.y * k));
+          const x1 = Math.min(lienzo.width, Math.ceil((caja.x + caja.ancho) * k));
+          const y1 = Math.min(lienzo.height, Math.ceil((caja.y + caja.alto) * k));
+          const d = g.getImageData(x0, y0, x1 - x0, y1 - y0).data;
+          const cuenta = new Map<string, number>();
+          for (let i = 0; i < d.length; i += 4) {
+            const clave = `${d[i]},${d[i + 1]},${d[i + 2]}`;
+            cuenta.set(clave, (cuenta.get(clave) ?? 0) + 1);
+          }
+          const orden = [...cuenta.entries()].sort((a, b) => b[1] - a[1]);
+          const fondo = orden[0][0].split(',').map(Number);
+          let tinta = fondo;
+          let ratio = 1;
+          for (const [clave, n] of orden) {
+            if (n < 6) continue;
+            const color = clave.split(',').map(Number);
+            const r = contraste(color, fondo);
+            if (r > ratio) {
+              ratio = r;
+              tinta = color;
+            }
+          }
+          return { ratio, tinta: `rgb(${tinta.join(', ')})`, fondo: `rgb(${fondo.join(', ')})` };
+        });
+      },
+      { b64: png.toString('base64'), anchoCss: datos.clip.width, cajas: datos.textos.map((t) => t.caja) },
+    );
+  } finally {
+    await analisis.close();
+  }
+  return datos.textos.map((t, i) => ({
+    etiqueta: t.etiqueta,
+    px: t.px,
+    umbral: t.px >= 24 || (t.px >= 18.66 && t.peso >= 700) ? 3 : 4.5,
+    ...pixeles[i],
+  }));
+}
+
+/** «A3: 1,83:1 < 3 (36,1 px; tinta … sobre …)» de cada rótulo que no llega a su umbral */
+const rotulosPorDebajo = (medidas: RotuloMedido[], tema: string): string[] =>
+  medidas
+    .filter((m) => m.ratio < m.umbral)
+    .map((m) => `${tema} ${m.etiqueta}: ${m.ratio.toFixed(2)}:1 < ${m.umbral} (${m.px.toFixed(1)} px; tinta ${m.tinta} sobre ${m.fondo})`);
 
 test.describe('comparador-tamanos-papel — Inspector 20/11/2026', () => {
   test.beforeEach(async ({ page }) => {
@@ -584,6 +707,30 @@ test.describe('comparador-tamanos-papel — Inspector 20/11/2026', () => {
     const filas = porNombre(await filasDe(page, /Serie C/));
     expect(!/completo/i.test(texto) || filas.has('C10')).toBe(true);
   });
+
+  test.fail('HALLAZGO (21/11/2026, cabo C0862, ABIERTO) · K · claro: los rótulos A1…A5 del doblado llegan a su umbral', async ({ page }) => {
+    // 1280 × 720, lienzo #FAFAFA. Calculado a mano (cabecera): A2 #48A9A6 sobre su pieza al 19 %,
+    // 2,26:1 (51,0 px, umbral 3) · A3 #7FB3D3 al 24 %, 1,83:1 (36,1 px, umbral 3) · A5 #2E86AB al
+    // 34 %, 2,60:1 (18,0 px en negrita, por debajo de 18,66: umbral 4,5; en una ventana de 745 px de
+    // alto o más pasa a 3, y tampoco llega). A1 3,34 (72,1 px) y A4 4,92 (25,5 px) sí llegan a 3.
+    await esperarPaginaAsentada(page);
+    await prepararParaMedir(page);
+    const medidas = await contrastesRotulosDoblado(page);
+    expect(medidas.map((m) => m.etiqueta)).toEqual(['A1', 'A2', 'A3', 'A4', 'A5']);
+    expect(rotulosPorDebajo(medidas, 'claro')).toEqual([]);
+  });
+
+  test.fail('HALLAZGO (21/11/2026, cabo C0862, ABIERTO) · K · oscuro: los rótulos A1…A5 del doblado llegan a su umbral', async ({ page }) => {
+    // 1280 × 720, lienzo #1A1A1A, los mismos rellenos fijos: A4 #1a5278 (el azul del hero) sobre su
+    // pieza al 29 %, 1,76:1 (25,5 px, umbral 3) · A5 #2E86AB al 34 %, 2,73:1 (18,0 px, umbral 4,5).
+    // A1 3,63 · A2 4,59 · A3 4,81 sí llegan a 3.
+    await esperarPaginaAsentada(page);
+    await prepararParaMedir(page);
+    await activarTemaOscuro(page);
+    const medidas = await contrastesRotulosDoblado(page);
+    expect(medidas.map((m) => m.etiqueta)).toEqual(['A1', 'A2', 'A3', 'A4', 'A5']);
+    expect(rotulosPorDebajo(medidas, 'oscuro')).toEqual([]);
+  });
 });
 
 test.describe('comparador-tamanos-papel — móvil (Pixel 7)', () => {
@@ -642,5 +789,17 @@ test.describe('comparador-tamanos-papel — móvil (Pixel 7)', () => {
     const razones = await razonesDibujadas(page);
     for (const r of razones) expect(r.razon, `${r.ancho} × ${r.alto}`).toBeCloseTo(r.alto / r.ancho, 2);
     expect(razones.map((r) => r.ancho).sort((a, b) => a - b)).toEqual([210, 215.9, 215.9, 297]);
+  });
+
+  test.fail('HALLAZGO (21/11/2026, cabo C0862, ABIERTO) · K · Pixel 7: los rótulos del doblado llegan a su umbral en los dos temas', async ({ page }) => {
+    // Lienzo de 312 px (escala 312/1201): A1 48,3 · A2 34,1 · A3 24,1 · A4 17,1 · A5 12,1 px, así que
+    // A4 y A5 ya no son texto grande y piden 4,5:1. Calculado a mano (cabecera): en claro A2 2,26 ·
+    // A3 1,83 · A5 2,60 (A4 4,92 sí llega a 4,5); en oscuro A4 1,76 · A5 2,73.
+    await prepararParaMedir(page);
+    const claro = await contrastesRotulosDoblado(page);
+    await activarTemaOscuro(page);
+    const oscuro = await contrastesRotulosDoblado(page);
+    expect(claro.map((m) => m.etiqueta)).toEqual(['A1', 'A2', 'A3', 'A4', 'A5']);
+    expect([...rotulosPorDebajo(claro, 'claro'), ...rotulosPorDebajo(oscuro, 'oscuro')]).toEqual([]);
   });
 });

@@ -25,18 +25,48 @@ import { sembrarValor, esperarPaginaAsentada } from './_hidratacion';
  *
  *   CASO B (Pixel 7). El mismo flujo por toque: vídeo vivo dentro de los 412 px, sin desborde
  *     horizontal (PASA). Controles táctiles de al menos 24 px: los botones sí; los deslizadores de
- *     brillo y zoom miden 340 × 8 px (HALLAZGO). El recuadro negro dice «Pulsa para activar el
- *     espejo» y lleva cursor: pointer: tocarlo debería abrir la cámara. Medido: 0 llamadas, y
- *     «Activar espejo» empieza en y = 1038 con la pantalla en 839 (HALLAZGO).
+ *     brillo y zoom miden 340 × 8 px (HALLAZGO 4756, REPARADO 15/11/2026). El recuadro negro dice
+ *     «Pulsa para activar el espejo» y lleva cursor: pointer: tocarlo debería abrir la cámara.
+ *     Medido: 0 llamadas, y «Activar espejo» empieza en y = 1038 con la pantalla en 839
+ *     (HALLAZGO 4748, REPARADO 15/11/2026).
  *
  *   CASO C (rechazos, name y message literales de Chrome; el del permiso denegado, medido también
  *     con --use-fake-ui-for-media-stream=deny: «NotAllowedError | Permission denied»). Esperado:
  *     aviso comprensible en un role="alert" y el botón se puede volver a pulsar (2 llamadas). El
- *     aviso sale y el botón reintenta (PASA), pero sin role="alert" ni aria-live (HALLAZGO). Sin
- *     cámara (NotFoundError) y con la cámara ocupada (NotReadableError) dice igualmente «Permiso
- *     de cámara denegado · Activa la cámara en la configuración del navegador» (HALLAZGO).
+ *     aviso sale y el botón reintenta (PASA), pero sin role="alert" ni aria-live (HALLAZGO 4747,
+ *     REPARADO 15/11/2026). Sin cámara (NotFoundError) y con la cámara ocupada (NotReadableError)
+ *     decía igualmente «Permiso de cámara denegado · Activa la cámara en la configuración del
+ *     navegador» (HALLAZGO 4746, REPARADO 15/11/2026).
  *
  *   FAMILIA: tests/familias/apertura-medio-doble-clic.spec.ts, fila `espejo` — PASA (15/11/2026).
+ *
+ * FIRMA DE ROTURA (inspección en modo firma, 21/11/2026)
+ *   Analytics, 30 días hasta el 20/11/2026: 99 visitas, 71,7 % cortas (catálogo 55,5 %) y 5,1 % de
+ *   recargas tras visita corta (catálogo 2,3 %). El arreglo de arriba (9af0e302b) se publicó con el
+ *   push del 15/11/2026 a las 15:42: 88 de las 99 visitas son ANTERIORES, cuando el recuadro no hacía
+ *   nada y el botón quedaba bajo el pliegue en todas las pantallas (y = 1256 en escritorio). De las 5
+ *   recargas, 2 son de antes (30/10 escritorio, 09/11 móvil) y 3 de UNA sola sesión del 20/11 (Android,
+ *   360 × 802): no bastan para decir si es fallo o uso repetido.
+ *   Cabeceras servidas para /espejo/: Permissions-Policy «camera=(self), …» (next.config.ts y
+ *   vercel.json dicen lo mismo): no es el caso de origen de la firma (lupa-digital, camera=()).
+ *
+ *   Esperado, escrito ANTES de ejecutar (de la página: «Pulsa para activar el espejo», la tarjeta
+ *   «Móvil: Usa la pantalla completa…» y el paso 1 de la guía), con la geometría del CSS calculada a
+ *   mano: en móvil el recuadro mide 9/16 × 392 = 697 px de alto y en escritorio 3/4 × 660 = 880 px.
+ *   CASO D (Pixel 7, cámara falsa). Tocar la parte VISIBLE del recuadro, sin el desplazamiento
+ *     automático de Playwright, abre la cámara (1 llamada, vídeo vivo) y el centro de la imagen cae
+ *     dentro de la pantalla (recuadro desde y ≈ 321 → centro ≈ 669 < 839). PASA. «Pantalla completa»
+ *     deja el espejo en 412 × 839 y «Salir» la cierra. PASA.
+ *   CASO E (portátil, ventana útil 1366 × 657). Lo mismo con un clic: el centro del espejo debería
+ *     verse sin desplazar. Medido: recuadro de 660 × 880 desde y = 356, centro en y = 796 y solo el
+ *     34 % de la imagen dentro de la ventana (41 % a 1280 × 720, 43 % a 1536 × 730) (HALLAZGO, ABIERTO).
+ *   CASO F (móvil sin pantalla completa de elementos, como Safari en iPhone, donde solo <video> tiene
+ *     la suya). «Pantalla completa» debería agrandar el espejo o no ofrecerse. Medido: «TypeError:
+ *     requestFullscreen is not a function», sin «Salir» y el espejo igual (HALLAZGO, ABIERTO).
+ *   El permiso denegado de verdad, con su propio juego de opciones: espejo-permiso-denegado.spec.ts.
+ *
+ * Los test con test.fail() son HALLAZGOS ABIERTOS: afirman lo CORRECTO; el día que se reparen
+ * fallarán por pasar y habrá que quitarles el test.fail() (y cambiar ABIERTO por REPARADO).
  */
 
 test.use({
@@ -197,6 +227,61 @@ async function faqVisible(page: Page): Promise<Record<string, string>> {
 }
 
 const normalizar = (t: string): string => t.replace(/\s+/g, ' ').trim();
+
+/**
+ * Toca (o pulsa) donde lo haría una persona: en el centro de la parte VISIBLE del recuadro. Con
+ * `.tap()` o `.click()` Playwright desplaza antes la página para centrar el elemento, y entonces
+ * mediría una geometría que nadie ve al entrar.
+ */
+async function pulsarParteVisible(page: Page, tactil: boolean): Promise<void> {
+  const punto = await page.getByRole('button', { name: /Pulsa para/ }).evaluate((b) => {
+    const r = b.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: (Math.max(r.top, 0) + Math.min(r.bottom, window.innerHeight)) / 2 };
+  });
+  if (tactil) await page.touchscreen.tap(punto.x, punto.y);
+  else await page.mouse.click(punto.x, punto.y);
+}
+
+interface Geometria {
+  top: number;
+  alto: number;
+  ancho: number;
+  centroY: number;
+  ventana: number;
+  visiblePct: number;
+  scrollY: number;
+}
+
+async function geometriaDelVideo(page: Page): Promise<Geometria> {
+  return page.locator('video').evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    const alto = window.innerHeight;
+    return {
+      top: Math.round(r.top),
+      alto: Math.round(r.height),
+      ancho: Math.round(r.width),
+      centroY: Math.round(r.top + r.height / 2),
+      ventana: alto,
+      visiblePct: Math.round((100 * Math.max(0, Math.min(r.bottom, alto) - Math.max(r.top, 0))) / r.height),
+      scrollY: Math.round(window.scrollY),
+    };
+  });
+}
+
+async function esperarVideoVivo(page: Page): Promise<void> {
+  await expect
+    .poll(
+      () =>
+        page.locator('video').evaluate((el) => {
+          const v = el as HTMLVideoElement;
+          return v.readyState >= 2 && v.videoWidth > 0;
+        }),
+      { timeout: 15000 },
+    )
+    .toBe(true);
+  // La transición CSS del transform dura 0,2 s
+  await page.waitForTimeout(400);
+}
 
 test.describe('Escritorio · el medio arranca de verdad, se ajusta y se libera', () => {
   test('CASO A · al cargar no se pide la cámara; con un clic el vídeo está vivo, es la frontal y sale espejado', async ({ page }) => {
@@ -424,6 +509,32 @@ test.describe('Escritorio · rechazos', () => {
   });
 });
 
+test.describe('Portátil (ventana útil de 1366 × 657, la de una pantalla de 1366 × 768)', () => {
+  test.use({ viewport: { width: 1366, height: 657 } });
+
+  test('HALLAZGO (21/11/2026, ABIERTO) · CASO E · tras pulsar el recuadro, el centro del espejo queda bajo el borde de la ventana', async ({
+    page,
+  }) => {
+    test.fail();
+    // Esperado: un espejo que se ve sin desplazar; como mínimo, su centro dentro de la ventana.
+    // Medido: el recuadro (aspect-ratio 3/4 sobre 660 px = 880 px de alto) empieza en y = 356;
+    // centro en y = 796 con la ventana en 657, y el 34 % de la imagen a la vista. La página no lo
+    // trae a la vista al activarse, y «Apagar» y los ajustes quedan en y ≥ 1256.
+    await registrarAperturas(page);
+    await abrir(page);
+    await esperarPaginaAsentada(page);
+    await pulsarParteVisible(page, false);
+    await expect(apagar(page)).toBeVisible();
+    await esperarVideoVivo(page);
+    const g = await geometriaDelVideo(page);
+    expect(await page.evaluate(() => (window as unknown as Ventana).__llamadas)).toBe(1);
+    expect(g.alto).toBeGreaterThan(0);
+    expect(g.centroY, `centro del espejo en y = ${g.centroY}, ventana de ${g.ventana} px, ${g.visiblePct} % a la vista`).toBeLessThanOrEqual(
+      g.ventana,
+    );
+  });
+});
+
 test.describe('Textos y datos estructurados', () => {
   test('HALLAZGO 4752 (REPARADO 15/11/2026) · features del JSON-LD con 4-8 características (CLAUDE.md §1.ter)', async ({ page }) => {
     await page.goto('/espejo/');
@@ -568,5 +679,67 @@ test.describe('Móvil (Pixel 7)', () => {
       expect(caja, `${id} en pantalla`).not.toBeNull();
       expect(caja?.height ?? 0, `${id}: alto de la caja táctil`).toBeGreaterThanOrEqual(24);
     }
+  });
+
+  test('FIRMA 21/11/2026 · CASO D · tocando la parte visible del recuadro, sin desplazar, el espejo arranca y su centro cae en la pantalla', async ({
+    page,
+  }) => {
+    // Esperado: recuadro de 392 × 697 px (9/16) desde y ≈ 321 → centro ≈ 669, dentro de los 839.
+    await registrarAperturas(page);
+    await abrir(page);
+    await esperarPaginaAsentada(page);
+    await pulsarParteVisible(page, true);
+    await expect(apagar(page)).toBeVisible();
+    await esperarVideoVivo(page);
+    const g = await geometriaDelVideo(page);
+    expect(await page.evaluate(() => (window as unknown as Ventana).__llamadas)).toBe(1);
+    expect(g.scrollY).toBe(0);
+    expect(g.ancho).toBe(392);
+    expect(g.alto).toBe(697);
+    expect(g.centroY).toBeLessThanOrEqual(g.ventana);
+    expect(await transformDelVideo(page)).toBe('matrix(-1, 0, 0, 1, 0, 0)');
+  });
+
+  test('FIRMA 21/11/2026 · CASO D · «Pantalla completa» en el móvil deja el espejo en 412 × 839 y «Salir» la cierra', async ({ page }) => {
+    // Tarjeta «Móvil»: «Usa la pantalla completa para tener un espejo más grande y cómodo».
+    await registrarAperturas(page);
+    await arrancar(page, true);
+    await page.getByRole('button', { name: /Pantalla completa/ }).tap();
+    await expect.poll(() => page.evaluate(() => document.fullscreenElement?.contains(document.querySelector('video')) ?? false)).toBe(true);
+    await page.waitForTimeout(400);
+    const g = await geometriaDelVideo(page);
+    expect({ top: g.top, ancho: g.ancho, alto: g.alto }).toEqual({ top: 0, ancho: 412, alto: 839 });
+    await page.getByRole('button', { name: /Salir/ }).tap();
+    await expect.poll(() => page.evaluate(() => document.fullscreenElement === null)).toBe(true);
+    expect(await pistasVivas(page)).toBe(1);
+  });
+
+  test('HALLAZGO (21/11/2026, ABIERTO) · CASO F · sin pantalla completa de elementos (Safari en iPhone), «Pantalla completa» lanza un error y no hace nada', async ({
+    page,
+  }) => {
+    test.fail();
+    // Safari en iPhone solo tiene pantalla completa para <video> (webkitEnterFullscreen): ni
+    // Element.requestFullscreen ni document.fullscreenEnabled = true. Se simula retirándolos.
+    // togglePantallaCompleta llama a containerRef.current.requestFullscreen() sin comprobarlo:
+    // medido «TypeError: …requestFullscreen is not a function», sin «Salir» y el espejo igual.
+    // Esperado: el espejo ocupa la pantalla (la clase .fullscreen ya lo hace por CSS) o el botón
+    // no se ofrece; en ningún caso un botón que no responde.
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(String(e)));
+    await page.addInitScript(() => {
+      delete (Element.prototype as unknown as Record<string, unknown>).requestFullscreen;
+      delete (Element.prototype as unknown as Record<string, unknown>).webkitRequestFullscreen;
+      Object.defineProperty(Document.prototype, 'fullscreenEnabled', { get: () => false, configurable: true });
+    });
+    await registrarAperturas(page);
+    await arrancar(page, true);
+    expect(await page.evaluate(() => typeof (Element.prototype as unknown as Record<string, unknown>).requestFullscreen)).toBe('undefined');
+    const boton = page.getByRole('button', { name: /Pantalla completa/ });
+    if ((await boton.count()) === 0) return; // reparado quitando el botón donde no hay API
+    await boton.tap();
+    await page.waitForTimeout(600);
+    expect(errores, 'errores de la página al pulsar «Pantalla completa»').toEqual([]);
+    const g = await geometriaDelVideo(page);
+    expect({ ancho: g.ancho, alto: g.alto }).toEqual({ ancho: 412, alto: 839 });
   });
 });
