@@ -669,7 +669,7 @@ test.describe('Firma 20/11/2026 · escritorio 1280 px', () => {
     expect(errores, 'errores en consola').toEqual([]);
   });
 
-  test.fail('ABIERTO (firma 20/11/2026) · «Rotar derecha» deja de responder a la 4.ª pulsación: la celda girada tapa el botón', async ({ page }) => {
+  test('REPARADO 5308 (firma 20/11/2026) · «Rotar derecha» deja de responder a la 4.ª pulsación: la celda girada tapa el botón', async ({ page }) => {
     // Desde y = 30° cada pulsación suma 30°: 60, 90, 120, 150. Obtenido: 60, 90, 120 y 120. A 120°
     // el plano de .estructura3d (100 % × 100 % de la escena, con preserve-3d y perspective 800px)
     // proyecta su esquina cercana por debajo de la escena, sobre la fila de botones, y se queda el
@@ -835,7 +835,7 @@ test.describe('Firma 20/11/2026 · móvil 390 px', () => {
     await expect.poll(async () => page.evaluate(() => window.scrollY), { message: 'fuera de la escena el dedo desplaza' }).toBeGreaterThan(scroll0);
   });
 
-  test.fail('ABIERTO (firma 20/11/2026) · tocar 4 veces «Rotar derecha» deja la celda en 120°', async ({ page }) => {
+  test('REPARADO 5308 (firma 20/11/2026) · tocar 4 veces «Rotar derecha» deja la celda en 120°', async ({ page }) => {
     // Mismo defecto que en escritorio, con el dedo: esperado 60, 90, 120, 150 · obtenido 60, 90,
     // 120, 120 (el cuarto toque cae en el plano girado de la estructura, no en el botón).
     await abrir(page);

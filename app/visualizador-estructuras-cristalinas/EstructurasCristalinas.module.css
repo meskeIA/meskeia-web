@@ -48,11 +48,15 @@
 }
 .scene3d:active { cursor: grabbing; }
 
+/* Sin eventos de puntero: girada, su plano (100 % × 100 % de la escena, en 3D) proyecta una
+   esquina por debajo de la escena, encima de los botones de giro, y se quedaba el clic (a 120°
+   tapaba «Rotar derecha»; hallazgo 5308). El arrastre lo recoge .scene3d, que es plana. */
 .estructura3d {
   width: 100%; height: 100%;
   position: relative;
   transform-style: preserve-3d;
   transition: transform 0.05s linear;
+  pointer-events: none;
 }
 
 .atomo {
