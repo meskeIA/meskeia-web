@@ -735,7 +735,7 @@ test.describe('Firma 20/11/2026 · escritorio 1280 px', () => {
     expect(Math.abs(entreCapas - enPlano), `vecino de la capa contigua ${entreCapas.toFixed(2)} px · del plano ${enPlano.toFixed(2)} px`).toBeLessThan(1);
   });
 
-  test.fail('ABIERTO (firma 20/11/2026) · aristas a 1,45:1 en claro: el contorno de la celda apenas se ve', async ({ page }) => {
+  test('REPARADO 5313 (firma 20/11/2026) · aristas a 1,45:1 en claro: el contorno de la celda apenas se ve', async ({ page }) => {
     // .arista: rgba(46, 134, 171, 0.3) sobre la tarjeta blanca = rgb(192,3; 218,7; 229,8) → 1,45:1.
     // En trigonal, monoclínico y triclínico (sin caras) son lo único que dibuja la celda, y en el
     // grafito y la sal, los enlaces. Mínimo para un gráfico necesario: 3:1 (WCAG 1.4.11).
@@ -744,6 +744,10 @@ test.describe('Firma 20/11/2026 · escritorio 1280 px', () => {
     await elegir(page, 'Monoclínico');
     const { arista } = await contrastesEscena(page);
     expect(arista, 'contraste de las aristas contra la tarjeta').toBeGreaterThanOrEqual(3);
+    // En oscuro: rgba(127, 179, 211, 0.35) sobre #2A2A2A daba 2,0:1.
+    await activarTemaOscuro(page);
+    await expect.poll(async () => (await contrastesEscena(page)).fondoLum, { message: 'la tarjeta ya es oscura' }).toBeLessThan(0.05);
+    expect((await contrastesEscena(page)).arista, 'contraste de las aristas contra la tarjeta oscura').toBeGreaterThanOrEqual(3);
   });
 });
 

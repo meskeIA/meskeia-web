@@ -71,15 +71,18 @@
    en el TSX y aquí se sustituye por --c-oscuro, de ahí el !important frente al estilo inline. */
 [data-theme='dark'] .atomoConOscuro { background: var(--c-oscuro, #8C8C8C) !important; }
 
+/* Aristas opacas: en trigonal, monoclínico y triclínico son lo único que dibuja la celda, y en
+   la sal y el grafito, los enlaces (gráfico necesario, 3:1, WCAG 1.4.11). Al 30 y 35 % de
+   opacidad daban 1,45:1 en claro y 2,0:1 en oscuro (hallazgo 5313); así, 4,1:1 y 6,4:1. */
 .arista {
   position: absolute;
-  background: rgba(46,134,171,0.3);
+  background: #2E86AB;
   transform-style: preserve-3d;
   height: 2px;
   transform-origin: 0 50%;
   top: 50%; left: 50%;
 }
-[data-theme='dark'] .arista { background: rgba(127,179,211,0.35); }
+[data-theme='dark'] .arista { background: #7FB3D3; }
 
 .cara {
   position: absolute;
