@@ -617,7 +617,9 @@
   color: var(--primary-texto);
 }
 
-.tabActivo {
+/* En oscuro, [data-theme='dark'] .tab (0,2,0) pisaba el relleno del elegido (C0868) */
+.tabActivo,
+[data-theme='dark'] .tab.tabActivo {
   background: var(--primary-boton);
   color: #fff;
 }

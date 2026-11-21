@@ -248,7 +248,11 @@
   color: var(--primary-texto);
 }
 
-.btnFiltro_todos.btnFiltroIGActivo {
+/* El filtro elegido lleva .btnFiltroIG delante (0,3,0): con 0,2,0, [data-theme='dark'] .btnFiltroIG,
+   declarada al final, le quitaba el relleno y en oscuro quedaba como los demás (C0868). Y el
+   relleno de color va oscurecido lo justo para el texto blanco: #22C55E daba 2,28:1, #F59E0B 2,15 y
+   #EF4444 3,76; ahora 5,0, 5,0 y 5,5, iguales en los dos temas. */
+.btnFiltroIG.btnFiltro_todos.btnFiltroIGActivo {
   background: var(--primary-boton);
   color: white;
 }
@@ -258,8 +262,8 @@
   color: var(--verde-texto, #22C55E);
 }
 
-.btnFiltro_bajo.btnFiltroIGActivo {
-  background: #22C55E;
+.btnFiltroIG.btnFiltro_bajo.btnFiltroIGActivo {
+  background: #15803D;
   color: white;
 }
 
@@ -268,8 +272,8 @@
   color: var(--ambar-texto, #F59E0B);
 }
 
-.btnFiltro_medio.btnFiltroIGActivo {
-  background: #F59E0B;
+.btnFiltroIG.btnFiltro_medio.btnFiltroIGActivo {
+  background: #B45309;
   color: white;
 }
 
@@ -278,8 +282,8 @@
   color: var(--rojo-texto, #EF4444);
 }
 
-.btnFiltro_alto.btnFiltroIGActivo {
-  background: #EF4444;
+.btnFiltroIG.btnFiltro_alto.btnFiltroIGActivo {
+  background: #C53030;
   color: white;
 }
 

@@ -479,7 +479,9 @@
   border-color: rgba(46, 134, 171, 0.4);
 }
 
-.tipoTabActivo {
+/* En oscuro, [data-theme='dark'] .tipoTab (0,2,0) pisaba el relleno del elegido (C0868) */
+.tipoTabActivo,
+[data-theme='dark'] .tipoTab.tipoTabActivo {
   background: var(--primary-boton);
   color: #fff;
   border-color: var(--primary-boton) !important;

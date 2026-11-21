@@ -58,12 +58,15 @@
 }
 .tabBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .tabBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.tabBtnActivo {
+/* En oscuro, [data-theme='dark'] .tabBtn (0,2,0) pisaba el degradado, el borde y el blanco del elegido (C0868) */
+.tabBtnActivo,
+[data-theme='dark'] .tabBtn.tabBtnActivo {
   border-color: var(--primary-boton);
   background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
 }
-.tabBtnActivo:hover { color: white; }
+.tabBtnActivo:hover,
+[data-theme='dark'] .tabBtn.tabBtnActivo:hover { color: white; }
 .tabIcon { font-size: 1.3rem; }
 
 [data-theme='dark'] .tabBtn { background: var(--bg-card); border-color: var(--border); color: var(--text-secondary); }

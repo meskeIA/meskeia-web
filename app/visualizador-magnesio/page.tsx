@@ -395,6 +395,7 @@ export default function VisualizadorMagnesio() {
                 aria-selected={estadoMuscular === estado.id}
                 className={`${styles.muscleStateBtn} ${estadoMuscular === estado.id ? styles.muscleStateBtnActive : ''}`}
                 onClick={() => setEstadoMuscular(estado.id)}
+                aria-pressed={estadoMuscular === estado.id}
               >
                 {estado.titulo}
               </button>

@@ -62,6 +62,21 @@ const APPS: App[] = [
   { slug: 'generador-qr', activoTexto: 'URL' },
   { slug: 'simulador-logica-secuencial' },
   { slug: 'simulador-reacciones-quimicas' },
+  { slug: 'visualizador-agujeros-negros', atributo: 'aria-selected' },
+  { slug: 'visualizador-cerebro-emociones', atributo: 'aria-selected' },
+  { slug: 'visualizador-desempleo-tipos', atributo: 'aria-selected', activoTexto: 'Políticas Activas' },
+  { slug: 'visualizador-escalas-musicales' },
+  { slug: 'visualizador-geopolitica-energetica', activoTexto: 'Gas natural' },
+  { slug: 'visualizador-geopolitica-energetica', activoTexto: 'Post-2022' },
+  { slug: 'visualizador-insulina-glucosa', activoTexto: 'Todos' },
+  // Los filtros de IG llevan relleno de su color con texto blanco: se mide cada uno elegido
+  { slug: 'visualizador-insulina-glucosa', antes: 'IG Bajo (< 55)', activoTexto: 'IG Bajo' },
+  { slug: 'visualizador-insulina-glucosa', antes: 'IG Medio (55-70)', activoTexto: 'IG Medio' },
+  { slug: 'visualizador-insulina-glucosa', antes: 'IG Alto (> 70)', activoTexto: 'IG Alto' },
+  { slug: 'visualizador-magnesio' },
+  { slug: 'visualizador-mecanica-fluidos' },
+  { slug: 'visualizador-oceanos-corrientes' },
+  { slug: 'visualizador-silicio' },
 ];
 
 interface Lectura {
@@ -110,7 +125,9 @@ async function fondos(page: Page, grupo: string, atributo: string, activoTexto =
 
 for (const { slug, grupo: grupoFila, atributo = 'aria-pressed', antes, activoTexto } of APPS) {
   const grupo = grupoFila ?? `:has(> button[${atributo}="true"]):has(> button[${atributo}="false"])`;
-  test(`${slug}: el botón activo conserva su relleno en oscuro (C0868)`, async ({ page }) => {
+  // Dos grupos de la misma app se distinguen en el título por el texto de su activo
+  const cual = APPS.filter((a) => a.slug === slug).length > 1 ? ` («${activoTexto}»)` : '';
+  test(`${slug}${cual}: el botón activo conserva su relleno en oscuro (C0868)`, async ({ page }) => {
     await page.goto(`/${slug}/`);
     await prepararParaMedir(page);
     if (antes) await page.getByRole('button', { name: antes, exact: true }).first().click();

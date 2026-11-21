@@ -81,7 +81,9 @@
   color: var(--primary-texto);
 }
 
-.toggleTabActive {
+/* En oscuro, [data-theme='dark'] .toggleTab y .compBtn (0,2,0) pisaban el relleno del elegido (C0868) */
+.toggleTabActive,
+[data-theme='dark'] .toggleTab.toggleTabActive {
   background: var(--primary-boton);
   border-color: var(--primary-boton);
   color: white;
@@ -182,7 +184,8 @@
   transition: all 0.2s ease;
 }
 
-.compBtnActive {
+.compBtnActive,
+[data-theme='dark'] .compBtn.compBtnActive {
   background: var(--secondary-boton);
   border-color: var(--secondary-boton);
   color: white;

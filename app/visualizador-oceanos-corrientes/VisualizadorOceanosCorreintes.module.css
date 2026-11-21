@@ -123,7 +123,9 @@
   transform: translateY(-2px);
 }
 
-.navBtnActivo {
+/* En oscuro, [data-theme='dark'] .navBtn (0,2,0) pisaba el relleno del elegido (C0868) */
+.navBtnActivo,
+[data-theme='dark'] .navBtn.navBtnActivo {
   border-color: var(--primary-boton);
   background: var(--primary-boton);
   color: #fff;

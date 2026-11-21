@@ -82,7 +82,9 @@
   outline-offset: 2px;
 }
 
-.navBtnActivo {
+/* En oscuro, [data-theme='dark'] .navBtn (0,2,0) pisaba el relleno del elegido (C0868) */
+.navBtnActivo,
+[data-theme='dark'] .navBtn.navBtnActivo {
   background: var(--primary-boton);
   color: #fff;
   border-color: var(--primary-boton);
@@ -176,7 +178,8 @@
   outline-offset: 2px;
 }
 
-.estructuraBtnActiva {
+.estructuraBtnActiva,
+[data-theme='dark'] .estructuraBtn.estructuraBtnActiva {
   background: color-mix(in srgb, var(--estructura-color, var(--primary)) 12%, transparent);
   border-color: var(--estructura-color, var(--primary));
 }
@@ -352,7 +355,8 @@
   outline-offset: 2px;
 }
 
-.neuroCardActiva {
+.neuroCardActiva,
+[data-theme='dark'] .neuroCard.neuroCardActiva {
   background: color-mix(in srgb, var(--neuro-color, var(--primary)) 10%, var(--bg-card));
   border-color: var(--neuro-color, var(--primary));
 }

@@ -983,6 +983,8 @@ details[open] .faqPregunta::before {
   background: #333;
 }
 
+/* La tónica elegida faltaba aquí y en oscuro quedaba como las demás notas (C0868) */
+[data-theme='dark'] .notaBtnActiva,
 [data-theme='dark'] .escalaBtnActiva,
 [data-theme='dark'] .afinacionBtnActiva {
   background: var(--primary-boton);
