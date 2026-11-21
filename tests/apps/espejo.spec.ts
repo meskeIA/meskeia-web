@@ -67,6 +67,24 @@ import { sembrarValor, esperarPaginaAsentada } from './_hidratacion';
  *     21/11/2026: sin la API, la clase .fullscreen fija el espejo a la ventana, con su «Salir»).
  *   El permiso denegado de verdad, con su propio juego de opciones: espejo-permiso-denegado.spec.ts.
  *
+ * MODO CAMBIO (inspector 21/11/2026, diff 6997334c..d93bfd158: reparación de 5353-5356)
+ *   Esperado, calculado ANTES de ejecutar con el CSS nuevo (tope max-height: calc(100vh − 140px)
+ *   desde 601 px de ancho; el aviso vacío es display:none, así que el recuadro sigue en y = 356):
+ *   · 1366 × 657 → alto = min(3/4 × 660 = 880, 517) = 517, centro 356 + 258 = 614, sin desplazar.
+ *     Medido: 660 × 517, centro 614, scrollY 0 (58 % a la vista). PASA.
+ *   · 1280 × 800 → alto = min(880, 660) = 660, centro 686 < 800, sin desplazar. PASA.
+ *   · 1366 × 500 → alto = min(880, 360) = 360, centro 536 > 500 → se trae a la vista: arriba en el
+ *     scroll-padding de la barra (96 px), centro 276. PASA. (Lo mismo a 375 × 553, un iPhone SE con
+ *     sus barras: 355 × 631 desde y = 321 → arriba en 66 tras pulsar.)
+ *   · Sin pantalla completa de elementos: «Pantalla completa» pone .fullscreen (412 × 839 en el
+ *     Pixel 7, 1366 × 657 en el portátil) con «Salir», Escape la cierra en escritorio y un
+ *     requestFullscreen que RECHAZA cae igualmente al modo por CSS. PASA, sin errores de página.
+ *   · Modo .fullscreen por CSS (iPhone) y la pista termina sola (el caso del hallazgo 4751) con un
+ *     reintento que no puede salir bien (permiso en «denied»): debería quedar una salida. Medido: la
+ *     capa negra sigue en 412 × 839, sin «Salir» (solo se pinta con el espejo activo), el aviso
+ *     queda DEBAJO de la capa y el único control pulsable es «Pulsa para reintentar…», que vuelve a
+ *     fallar. En un móvil no hay Escape: solo sale recargando (HALLAZGO NUEVO, ABIERTO).
+ *
  * Los test con test.fail() son HALLAZGOS ABIERTOS: afirman lo CORRECTO; el día que se reparen
  * fallarán por pasar y habrá que quitarles el test.fail() (y cambiar ABIERTO por REPARADO).
  */
@@ -268,6 +286,23 @@ async function geometriaDelVideo(page: Page): Promise<Geometria> {
       scrollY: Math.round(window.scrollY),
     };
   });
+}
+
+/**
+ * Safari en iPhone solo tiene pantalla completa para <video> (webkitEnterFullscreen): ni
+ * Element.requestFullscreen ni document.fullscreenEnabled = true. Se simula retirándolos.
+ */
+async function sinPantallaCompletaNativa(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    delete (Element.prototype as unknown as Record<string, unknown>).requestFullscreen;
+    delete (Element.prototype as unknown as Record<string, unknown>).webkitRequestFullscreen;
+    Object.defineProperty(Document.prototype, 'fullscreenEnabled', { get: () => false, configurable: true });
+  });
+}
+
+/** ¿Lleva el contenedor del espejo la clase .fullscreen del módulo? (el build la compila con hash) */
+async function enModoCss(page: Page): Promise<boolean> {
+  return page.locator('video').evaluate((v) => /(^|_)fullscreen(\s|$)/.test(v.parentElement?.className ?? ''));
 }
 
 async function esperarVideoVivo(page: Page): Promise<void> {
@@ -536,6 +571,113 @@ test.describe('Portátil (ventana útil de 1366 × 657, la de una pantalla de 13
     // El recuadro cabe entero en la ventana: con desplazarse una vez se ve todo el espejo
     expect(g.alto).toBeLessThanOrEqual(g.ventana - 140 + 1);
   });
+
+  test('CAMBIO 21/11/2026 · el tope deja el recuadro en 660 × 517 (min(3/4 × 660, 657 − 140)) y, con el centro ya dentro, no mueve la página', async ({
+    page,
+  }) => {
+    // Esperado a mano: ancho útil 660 (700 − 2 × 20); alto min(880, 517) = 517; arriba en y = 356
+    // (el aviso vacío no ocupa sitio) → centro 356 + 258,5 ≈ 614 < 657 → el rAF no desplaza.
+    await registrarAperturas(page);
+    await abrir(page);
+    await esperarPaginaAsentada(page);
+    await pulsarParteVisible(page, false);
+    await expect(apagar(page)).toBeVisible();
+    await esperarVideoVivo(page);
+    const g = await geometriaDelVideo(page);
+    expect({ ancho: g.ancho, alto: g.alto, scrollY: g.scrollY }).toEqual({ ancho: 660, alto: 517, scrollY: 0 });
+    expect(Math.abs(g.centroY - 614)).toBeLessThanOrEqual(2);
+  });
+
+  test('HALLAZGO 5356 (REPARADO 21/11/2026) · sin pantalla completa de elementos, en escritorio el modo por CSS se cierra con Escape', async ({
+    page,
+  }) => {
+    // useEffect nuevo: «En el modo por CSS no hay Escape del navegador: se atiende aquí».
+    // Esperado: .fullscreen a 1366 × 657 con «Salir»; Escape → recuadro de 660 × 517, sin «Salir».
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(String(e)));
+    await sinPantallaCompletaNativa(page);
+    await registrarAperturas(page);
+    await arrancar(page);
+    await page.getByRole('button', { name: /Pantalla completa/ }).click();
+    await expect.poll(() => enModoCss(page)).toBe(true);
+    await page.waitForTimeout(400);
+    const dentro = await geometriaDelVideo(page);
+    expect({ top: dentro.top, ancho: dentro.ancho, alto: dentro.alto }).toEqual({ top: 0, ancho: 1366, alto: 657 });
+    await expect(page.getByRole('button', { name: /Salir/ })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect.poll(() => enModoCss(page)).toBe(false);
+    await page.waitForTimeout(400);
+    const fuera = await geometriaDelVideo(page);
+    expect({ ancho: fuera.ancho, alto: fuera.alto }).toEqual({ ancho: 660, alto: 517 });
+    await expect(page.getByRole('button', { name: /Salir/ })).toHaveCount(0);
+    expect(errores).toEqual([]);
+  });
+
+  test('HALLAZGO 5356 (REPARADO 21/11/2026) · si el navegador RECHAZA requestFullscreen, el espejo pasa igual al modo por CSS con su «Salir»', async ({
+    page,
+  }) => {
+    // .catch(() => setPantallaCompleta(true)) del diff. Esperado: 1366 × 657 desde (0, 0) y «Salir»
+    // lo devuelve a 660 × 517; ningún error de página.
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(String(e)));
+    await page.addInitScript(() => {
+      Element.prototype.requestFullscreen = function (): Promise<void> {
+        return Promise.reject(new TypeError('Permissions check failed'));
+      };
+    });
+    await registrarAperturas(page);
+    await arrancar(page);
+    await page.getByRole('button', { name: /Pantalla completa/ }).click();
+    await expect.poll(() => enModoCss(page)).toBe(true);
+    await page.waitForTimeout(400);
+    const dentro = await geometriaDelVideo(page);
+    expect({ top: dentro.top, ancho: dentro.ancho, alto: dentro.alto }).toEqual({ top: 0, ancho: 1366, alto: 657 });
+    await page.getByRole('button', { name: /Salir/ }).click();
+    await expect.poll(() => enModoCss(page)).toBe(false);
+    expect(errores).toEqual([]);
+  });
+});
+
+test.describe('Escritorio 1280 × 800', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test('HALLAZGO 5355 (REPARADO 21/11/2026) · recuadro de 660 × 660 (min(880, 800 − 140)) con el centro en y ≈ 686, sin desplazar', async ({
+    page,
+  }) => {
+    await registrarAperturas(page);
+    await abrir(page);
+    await esperarPaginaAsentada(page);
+    await pulsarParteVisible(page, false);
+    await expect(apagar(page)).toBeVisible();
+    await esperarVideoVivo(page);
+    const g = await geometriaDelVideo(page);
+    expect({ ancho: g.ancho, alto: g.alto, scrollY: g.scrollY }).toEqual({ ancho: 660, alto: 660, scrollY: 0 });
+    expect(Math.abs(g.centroY - 686)).toBeLessThanOrEqual(2);
+    expect(g.centroY).toBeLessThanOrEqual(g.ventana);
+  });
+});
+
+test.describe('Ventana baja (1366 × 500)', () => {
+  test.use({ viewport: { width: 1366, height: 500 } });
+
+  test('HALLAZGO 5355 (REPARADO 21/11/2026) · con el centro bajo el borde (356 + 180 = 536 > 500), el espejo se trae a la vista bajo la barra', async ({
+    page,
+  }) => {
+    // Esperado: alto min(880, 500 − 140) = 360; scrollIntoView({ block: 'start' }) lo deja en el
+    // scroll-padding-top del documento (la barra del logo) y entero en la ventana.
+    await registrarAperturas(page);
+    await abrir(page);
+    await esperarPaginaAsentada(page);
+    await pulsarParteVisible(page, false);
+    await expect(apagar(page)).toBeVisible();
+    await esperarVideoVivo(page);
+    const g = await geometriaDelVideo(page);
+    const barra = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0);
+    expect(g.alto).toBe(360);
+    expect(g.scrollY).toBeGreaterThan(0);
+    expect(Math.abs(g.top - barra), `arriba en y = ${g.top}, barra de ${barra} px`).toBeLessThanOrEqual(2);
+    expect(g.top + g.alto).toBeLessThanOrEqual(g.ventana);
+  });
 });
 
 test.describe('Textos y datos estructurados', () => {
@@ -749,5 +891,51 @@ test.describe('Móvil (Pixel 7)', () => {
     const despues = await geometriaDelVideo(page);
     expect({ ancho: despues.ancho, alto: despues.alto }).toEqual({ ancho: 392, alto: 697 });
     expect(errores).toEqual([]);
+  });
+
+  test('HALLAZGO NUEVO (ABIERTO, inspector 21/11/2026) · en el modo por CSS (iPhone), si la pista termina y el reintento falla, queda una salida', async ({
+    page,
+    context,
+  }) => {
+    // El modo .fullscreen por CSS (reparación de 5356) cubre la ventana con z-index 9999 y su
+    // «Salir» solo se pinta con `activo && pantallaCompleta`. Si la pista termina sola (permiso
+    // retirado, cámara que deja de dar imagen: el caso del hallazgo 4751), detenerCamara pone
+    // activo = false pero no toca pantallaCompleta: la capa negra se queda, sin «Salir», con el
+    // aviso («Pulsa «Activar espejo»…») DEBAJO de ella. En un móvil no hay Escape.
+    // Esperado: tras el reintento fallido, o la capa se retira o hay un «Salir» pulsable, y el aviso
+    // se puede leer. Medido: capa 412 × 839 desde (0, 0), único control pulsable «Pulsa para
+    // reintentar cuando hayas permitido la cámara», aviso tapado por el recuadro.
+    test.fail();
+    await sinPantallaCompletaNativa(page);
+    await registrarAperturas(page);
+    await arrancar(page, true);
+    await page.getByRole('button', { name: /Pantalla completa/ }).tap();
+    await expect.poll(() => enModoCss(page)).toBe(true);
+    // A partir de aquí la cámara no se deja abrir: el navegador la tiene en «denied»
+    await page.evaluate(() => {
+      navigator.mediaDevices.getUserMedia = (): Promise<MediaStream> =>
+        Promise.reject(new DOMException('Permission denied', 'NotAllowedError'));
+      navigator.permissions.query = (() => Promise.resolve({ state: 'denied' })) as unknown as Permissions['query'];
+    });
+    await context.clearPermissions();
+    const aviso = page.getByRole('alert').filter({ hasText: /cámara/ });
+    await expect(aviso).toContainText('La cámara se ha desconectado');
+    // La persona toca lo único que ve, y vuelve a fallar
+    await page.touchscreen.tap(206, 420);
+    await expect(aviso).toContainText('no volverá a preguntar');
+    const estado = await page.evaluate(() => {
+      const c = document.querySelector('video')?.parentElement;
+      const r = c?.getBoundingClientRect();
+      const capa = Boolean(r && r.top <= 0 && r.left <= 0 && r.width >= innerWidth && r.height >= innerHeight);
+      const pulsable = (b: Element): boolean => {
+        const rb = b.getBoundingClientRect();
+        if (rb.width === 0 || rb.bottom < 0 || rb.top > innerHeight) return false;
+        const e = document.elementFromPoint(rb.left + rb.width / 2, rb.top + rb.height / 2);
+        return e === b || b.contains(e);
+      };
+      const salir = Array.from(document.querySelectorAll('button')).some((b) => /Salir/.test(b.textContent ?? '') && pulsable(b));
+      return { atrapado: capa && !salir };
+    });
+    expect(estado).toEqual({ atrapado: false });
   });
 });

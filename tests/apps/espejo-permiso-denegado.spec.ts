@@ -30,14 +30,14 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *   · El aviso sale y se anuncia (role="alert") y el recuadro vuelve a pedir la cámara: PASA.
  *   · El aviso empieza en y = 1030 con la pantalla en 839 (Pixel 7), y = 937 con 740 (Android de
  *     360 px), y = 1248 con 657 (portátil) e incluso con 947 (1920 × 1080). En la primera pantalla
- *     solo se lee «🚫 Pulsa para volver a intentarlo» (HALLAZGO, ABIERTO). Es una REGRESIÓN del
+ *     solo se lee «🚫 Pulsa para volver a intentarlo» (HALLAZGO 5353, REPARADO 21/11/2026). Era una REGRESIÓN del
  *     arreglo del 15/11/2026 (9af0e302b): hasta entonces «Permiso de cámara denegado · Activa la
  *     cámara en la configuración del navegador» se pintaba DENTRO del recuadro; el arreglo lo sacó a
  *     un role="alert" debajo del recuadro (para anunciarlo) y dejó dentro solo la invitación.
  *   · Con el permiso bloqueado, el segundo toque llama otra vez a getUserMedia, que rechaza al
  *     instante, y no cambia NADA: 0 mutaciones en el aviso y en el recuadro, el mismo texto, nada
  *     que anunciar. «Pulsa para volver a intentarlo» invita a un bucle que no puede salir bien hasta
- *     desbloquear el permiso en el navegador, y la app no lo dice (HALLAZGO, ABIERTO).
+ *     desbloquear el permiso en el navegador, y la app no lo dice (HALLAZGO 5354, REPARADO 21/11/2026).
  *
  * REPARADOS (reparar 21/11/2026)
  *   · Hallazgo 5353: el aviso va ENCIMA del recuadro (y se trae a la vista si quedó fuera), sin
@@ -46,6 +46,21 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *     la tiene bloqueada y cómo permitirla junto a la dirección de la página, y el recuadro pasa a
  *     «Pulsa para reintentar cuando hayas permitido la cámara». Cada rechazo vuelve a montar los
  *     párrafos del aviso (key = número de intento), así que se anuncia otra vez aunque diga lo mismo.
+ *
+ * MODO CAMBIO (inspector 21/11/2026, diff 6997334c..d93bfd158)
+ *   Esperado, escrito ANTES de ejecutar: quien pulsa «Activar espejo» tiene que BAJAR para verlo
+ *   (está bajo el recuadro: y ≈ 1038 en el Pixel 7, ≈ 893 en el portátil), así que el aviso, ahora
+ *   encima del recuadro, aparece fuera por arriba; traerALaVista lo sube: arriba en el
+ *   scroll-padding de la barra (66 px en el móvil, 96 en el portátil) y abajo dentro de la ventana,
+ *   sin que lo tape la barra. Un segundo intento con la persona desplazada al final de la página lo
+ *   vuelve a traer y sus párrafos son nodos NUEVOS (key con el número de intento).
+ *   Medido: Pixel 7 aviso 66-261 (scrollY 255); 360 × 740 aviso 66-284; portátil 96-220 (scrollY
+ *   260); tras el 2.º intento, igual y con los dos <p> nuevos. PASA.
+ *   Tocando el RECUADRO (el camino corto) con la página arriba, el aviso del permiso bloqueado mide
+ *   195 px en el Pixel 7 y empuja el recuadro a y = 532: su invitación «Pulsa para reintentar cuando
+ *   hayas permitido la cámara» (centrada en sus 697 px) queda en y = 921-977 con la pantalla en 839
+ *   (898-955 con 740 a 360 px; 810-838 con 657 en el portátil). En la primera pantalla se lee el
+ *   aviso y debajo un recuadro negro vacío (HALLAZGO NUEVO, bajo, ABIERTO).
  */
 
 test.use({
@@ -145,8 +160,79 @@ async function cajaDelAviso(page: Page): Promise<Caja> {
   });
 }
 
+interface AvisoALaVista {
+  top: number;
+  bottom: number;
+  ventana: number;
+  barra: number;
+  scrollY: number;
+  loTapa: boolean;
+}
+
+/** Caja del aviso, la barra fija (scroll-padding-top) y si lo que hay en su esquina es el propio aviso. */
+async function avisoALaVista(page: Page): Promise<AvisoALaVista> {
+  return avisoDeLaApp(page).evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    const encima = document.elementFromPoint(r.left + 20, Math.min(Math.max(r.top + 6, 0), window.innerHeight - 1));
+    return {
+      top: Math.round(r.top),
+      bottom: Math.round(r.bottom),
+      ventana: window.innerHeight,
+      barra: parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0,
+      scrollY: Math.round(window.scrollY),
+      loTapa: !(encima && el.contains(encima)),
+    };
+  });
+}
+
+/**
+ * Baja hasta «Activar espejo» (bajo el recuadro) y lo pulsa: el camino de quien ya había bajado.
+ * Después comprueba que el aviso, encima del recuadro, se ha traído a la vista bajo la barra.
+ */
+async function pulsarActivarYMedirAviso(page: Page, tactil: boolean, intento: number): Promise<AvisoALaVista> {
+  const boton = page.getByRole('button', { name: /Activar espejo/ });
+  await boton.scrollIntoViewIfNeeded();
+  if (tactil) await boton.tap();
+  else await boton.click();
+  await expect.poll(() => llamadas(page)).toBe(intento);
+  await expect(avisoDeLaApp(page)).toHaveCount(1);
+  await page.waitForTimeout(400);
+  return avisoALaVista(page);
+}
+
+function comprobarALaVista(a: AvisoALaVista): void {
+  const contexto = `aviso en y = ${a.top}-${a.bottom}, barra de ${a.barra} px, ventana de ${a.ventana} px, scrollY ${a.scrollY}`;
+  expect(a.scrollY, contexto).toBeGreaterThan(0);
+  expect(a.top, contexto).toBeGreaterThanOrEqual(a.barra - 1);
+  expect(a.bottom, contexto).toBeLessThanOrEqual(a.ventana);
+  expect(a.loTapa, contexto).toBe(false);
+}
+
+/** Marca los párrafos actuales del aviso (parrafosNuevos cuenta luego los que NO llevan la marca). */
+async function marcarParrafos(page: Page): Promise<void> {
+  await avisoDeLaApp(page).evaluate((el) => el.querySelectorAll('p').forEach((p) => p.setAttribute('data-viejo', '1')));
+}
+
+async function parrafosNuevos(page: Page): Promise<number> {
+  return avisoDeLaApp(page).evaluate((el) => Array.from(el.querySelectorAll('p')).filter((p) => !p.hasAttribute('data-viejo')).length);
+}
+
 test.describe('Portátil (ventana útil de 1366 × 657)', () => {
   test.use({ viewport: { width: 1366, height: 657 } });
+
+  test('HALLAZGO 5353 (REPARADO 21/11/2026) · CAMBIO · pulsando «Activar espejo» tras bajar, el aviso de encima del recuadro se trae a la vista, también en el 2.º intento', async ({
+    page,
+  }) => {
+    // Esperado: aviso con arriba ≥ 96 (scroll-padding) y abajo ≤ 657, sin que lo tape la barra.
+    // Medido: 96-220 con scrollY 260, las dos veces, y los dos <p> nuevos en el 2.º intento.
+    await abrir(page);
+    comprobarALaVista(await pulsarActivarYMedirAviso(page, false, 1));
+    await expect(avisoDeLaApp(page)).toContainText(COMO_DESBLOQUEAR);
+    await marcarParrafos(page);
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    comprobarALaVista(await pulsarActivarYMedirAviso(page, false, 2));
+    expect(await parrafosNuevos(page)).toBe(2);
+  });
 
   test('CASO · denegado de verdad: el aviso sale en un role="alert", dice cómo desbloquear la cámara y el recuadro vuelve a pedirla', async ({
     page,
@@ -231,5 +317,38 @@ test.describe('Móvil (Pixel 7)', () => {
     await page.waitForTimeout(800);
     const mutaciones = await page.evaluate(() => (window as unknown as Ventana).__mutaciones);
     expect(mutaciones, 'cambios en el aviso o en el recuadro tras el segundo toque').toBeGreaterThan(0);
+  });
+
+  test('HALLAZGO 5353 (REPARADO 21/11/2026) · CAMBIO · en el móvil, tocando «Activar espejo» tras bajar, el aviso se trae a la vista bajo la barra, también en el 2.º intento', async ({
+    page,
+  }) => {
+    // Esperado: aviso con arriba ≥ 66 (scroll-padding del móvil) y abajo ≤ 839, sin que lo tape la
+    // barra. Medido: 66-261 con scrollY 255, las dos veces, y los dos <p> nuevos en el 2.º intento.
+    await abrir(page);
+    comprobarALaVista(await pulsarActivarYMedirAviso(page, true, 1));
+    await expect(recuadro(page)).toHaveAccessibleName(RECUADRO_BLOQUEADO);
+    await marcarParrafos(page);
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    comprobarALaVista(await pulsarActivarYMedirAviso(page, true, 2));
+    expect(await parrafosNuevos(page)).toBe(2);
+  });
+
+  test('HALLAZGO NUEVO (bajo, ABIERTO, inspector 21/11/2026) · tras tocar el recuadro, su invitación «Pulsa para reintentar…» sigue en la primera pantalla', async ({
+    page,
+  }) => {
+    // El aviso del permiso bloqueado (195 px) entra ENCIMA del recuadro y lo empuja a y = 532; el
+    // icono y la invitación van centrados en sus 697 px. El aviso dice «pulsa de nuevo el recuadro».
+    // Esperado: la invitación del recuadro dentro de los 839 px. Medido: y = 921-977; en la primera
+    // pantalla solo se ve la parte de arriba del recuadro, negra y sin texto.
+    test.fail();
+    await abrir(page);
+    await pulsarParteVisible(page, true);
+    await expect(recuadro(page)).toHaveAccessibleName(RECUADRO_BLOQUEADO);
+    const caja = await recuadro(page).getByText(RECUADRO_BLOQUEADO).evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      return { top: Math.round(r.top), bottom: Math.round(r.bottom), ventana: window.innerHeight, scrollY: Math.round(window.scrollY) };
+    });
+    expect(caja.scrollY).toBe(0);
+    expect(caja.bottom, `invitación en y = ${caja.top}-${caja.bottom} con la pantalla en ${caja.ventana}`).toBeLessThanOrEqual(caja.ventana);
   });
 });
