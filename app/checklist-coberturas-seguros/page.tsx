@@ -111,11 +111,14 @@ const perfiles: Perfil[] = [
   },
 ];
 
+// Pastel y tinta FIJOS, iguales en los dos temas. La tinta era el tono medio de cada color (#d97706
+// a 2,86:1 sobre su pastel, #dc2626 3,95, #2563eb 4,24, #6b7280 4,39); ahora el tono 700-800 de la
+// misma familia, de 5,7 a 6,8:1 (C0645)
 const tipoColores: Record<string, { bg: string; text: string; label: string }> = {
-  'obligatorio': { bg: '#fee2e2', text: '#dc2626', label: 'Obligatorio' },
-  'muy-recomendable': { bg: '#fef3c7', text: '#d97706', label: 'Muy recomendable' },
-  'recomendable': { bg: '#dbeafe', text: '#2563eb', label: 'Recomendable' },
-  'opcional': { bg: '#f3f4f6', text: '#6b7280', label: 'Opcional' },
+  'obligatorio': { bg: '#fee2e2', text: '#b91c1c', label: 'Obligatorio' },
+  'muy-recomendable': { bg: '#fef3c7', text: '#92400e', label: 'Muy recomendable' },
+  'recomendable': { bg: '#dbeafe', text: '#1d4ed8', label: 'Recomendable' },
+  'opcional': { bg: '#f3f4f6', text: '#4b5563', label: 'Opcional' },
 };
 
 export default function ChecklistCoberturasSeguroPage() {

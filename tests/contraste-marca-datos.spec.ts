@@ -315,6 +315,11 @@ const APPS: App[] = [
   // («Gratis» en #06B6D4 a 2,33:1 y el rosa de JetBrains a 3,04-3,17 en claro; #084C61 a 1,84 en
   // oscuro, además del violeta prohibido de Cursor) y --text-muted sobre la fila desplegada (4,49).
   // Las cuatro pestañas, con todas las filas de la tabla desplegadas
+  // 21/11/2026 (C0645): la tinta de cada tipo de cobertura sobre su pastel fijo, igual en los dos temas
+  // («Muy recomendable» en #d97706 a 2,86:1, «Obligatorio» 3,95, «Recomendable» 4,24, «Opcional» 4,39),
+  // «❌ No» en --text-muted sobre su gris translúcido (3,70-4,11) y en oscuro los casos en
+  // --primary-texto sobre su tinte (4,32)
+  { slug: 'checklist-coberturas-seguros', todo: true },
   { slug: 'comparador-ides-ia', todo: true, secciones: "[role='tablist'][aria-label='Secciones del comparador de IDEs'] [role='tab']" },
   { slug: 'visualizador-tipos-activos', todo: true, secciones: "[role='tablist'][aria-label='Secciones del visualizador'] [role='tab']" },
   { slug: 'visualizador-digestion-nutrientes', todo: true, secciones: "nav[aria-label='Secciones del explicador'] button" },
