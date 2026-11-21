@@ -411,7 +411,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
         variant="financial"
         severity="critical"
         collapsible={false}
-        detalle="Bono Joven al Alquiler 2026-2030 (RD 326/2026): las cuantías son orientativas. Los requisitos concretos, límite de ingresos y condiciones específicas los fija cada Comunidad Autónoma en su convocatoria. Consulta siempre con tu CA antes de tomar decisiones económicas."
+        detalle="Bono Joven al Alquiler 2026-2030 (RD 326/2026): las cuantías son orientativas. El límite de ingresos lo fija el Real Decreto para toda España (art. 133.1.d); cada Comunidad Autónoma puede añadir requisitos (art. 8.1) y subir la renta máxima del alquiler (art. 135) en su convocatoria. Consulta siempre con tu CA antes de tomar decisiones económicas."
       />
 
       <DataReference

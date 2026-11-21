@@ -2947,7 +2947,9 @@ test.describe('Inspector 20/11/2026 — aviso propio del DisclaimerCard (C0829)'
     expect(await contrasteSobreFondoReal(propio)).toBeGreaterThanOrEqual(4.5);
   });
 
-  // H32 (MEDIO) — ABIERTO a 20/11/2026. El aviso que se lee primero atribuye a la comunidad
+  // H32 (MEDIO) — REPARADO el 21/11/2026 (hallazgo 5315): el aviso dice ahora que el límite de
+  // ingresos lo fija el Real Decreto (art. 133.1.d) y que la comunidad puede añadir requisitos
+  // (art. 8.1) y subir la renta máxima del alquiler (art. 135). Era: el aviso que se lee primero atribuía a la comunidad
   // autónoma el límite de ingresos, y lo fija el art. 133.1.d del RD 326/2026 para toda España
   // (5 veces el IPREM; 5,5 y 6 con discapacidad). Las comunidades solo pueden subir la renta
   // máxima del ALQUILER (art. 135) y añadir requisitos (art. 8.1). La tarjeta de ingresos de la
@@ -2958,7 +2960,6 @@ test.describe('Inspector 20/11/2026 — aviso propio del DisclaimerCard (C0829)'
   // y el aviso de arriba, que el límite de ingresos «lo fija cada Comunidad Autónoma en su
   // convocatoria», así que podría esperar otro en la suya.
   test('H32 — el aviso no debería atribuir a la comunidad autónoma el límite de ingresos que fija el art. 133.1.d', async ({ page }) => {
-    test.fail();
     await abrirHidratado(page);
 
     // Lo que dice la propia app en la tarjeta de ingresos (5 × 8.400 = 42.000, data/fiscal)
@@ -2973,5 +2974,7 @@ test.describe('Inspector 20/11/2026 — aviso propio del DisclaimerCard (C0829)'
     const primero = avisoCritico(page).locator('p').first();
     const propio = norm(await primero.innerText());
     expect(propio).not.toMatch(/límite de ingresos[^.]*los fija cada Comunidad Autónoma/);
+    // Y dice lo mismo que la tarjeta y la FAQ: el Estado fija el umbral
+    expect(propio).toContain('El límite de ingresos lo fija el Real Decreto para toda España (art. 133.1.d)');
   });
 });
