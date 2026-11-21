@@ -39,7 +39,7 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [
     'Escala de pH interactiva con slider y colores arcoíris',
-    'Más de 15 sustancias cotidianas con su pH exacto',
+    'Sustancias cotidianas, del ácido de batería a la sosa cáustica, con su pH típico',
     'Ácidos y bases: fuertes vs débiles con ejemplos',
     'Neutralización y aplicaciones prácticas',
     'Curiosidades: lluvia ácida, pH del estómago, escala logarítmica',
@@ -55,7 +55,7 @@ export const faqJsonLd = {
       name: '¿Qué es el pH y cómo se mide?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El pH mide la concentración de iones hidrógeno (H⁺) en una solución en una escala del 0 al 14. Un pH de 7 es neutro (agua pura), por debajo de 7 es ácido (el limón tiene ~2,2) y por encima de 7 es básico o alcalino (la lejía alcanza ~13). La escala es logarítmica: una diferencia de 1 unidad representa una concentración 10 veces mayor o menor de iones H⁺.',
+        text: 'El pH mide la concentración de iones hidrógeno (H⁺) en una solución en una escala del 0 al 14. Un pH de 7 es neutro (agua pura), por debajo de 7 es ácido (el limón tiene ~2,0) y por encima de 7 es básico o alcalino (la lejía alcanza ~12,5). La escala es logarítmica: una diferencia de 1 unidad representa una concentración 10 veces mayor o menor de iones H⁺.',
       },
     },
     {
@@ -71,7 +71,7 @@ export const faqJsonLd = {
       name: '¿Qué es la lluvia ácida y qué pH tiene?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La lluvia normal ya es ligeramente ácida (pH ~5,6) porque el CO₂ atmosférico se disuelve formando ácido carbónico. Se habla de lluvia ácida cuando el pH cae por debajo de 5,0 debido a emisiones de dióxido de azufre (SO₂) y óxidos de nitrógeno (NOₓ), que forman ácido sulfúrico y nítrico. La lluvia ácida daña ecosistemas acuáticos, bosques y edificios de piedra caliza.',
+        text: 'La lluvia normal ya es ligeramente ácida (pH ~5,6) porque el CO₂ atmosférico se disuelve formando ácido carbónico. Se habla de lluvia ácida cuando el pH cae por debajo de 5,6 debido a emisiones de dióxido de azufre (SO₂) y óxidos de nitrógeno (NOₓ), que forman ácido sulfúrico y nítrico. La lluvia ácida daña ecosistemas acuáticos, bosques y edificios de piedra caliza.',
       },
     },
     {
@@ -79,7 +79,7 @@ export const faqJsonLd = {
       name: '¿Qué ocurre cuando se mezcla un ácido con una base?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Cuando un ácido y una base reaccionan se produce una neutralización: los iones H⁺ del ácido se combinan con los iones OH⁻ de la base para formar agua. Si las cantidades son equivalentes, el resultado es una solución de pH neutro (~7) junto con una sal. Este principio se aplica desde antiácidos estomacales (base neutraliza exceso de ácido) hasta tratamiento de aguas residuales industriales.',
+        text: 'Cuando un ácido y una base reaccionan se produce una neutralización: los iones H⁺ del ácido se combinan con los iones OH⁻ de la base para formar agua y una sal. Con cantidades equivalentes de un ácido fuerte y una base fuerte (ácido clorhídrico y sosa, por ejemplo), el resultado tiene pH neutro (7 a 25 °C). Si uno de los dos es débil, la sal reacciona con el agua y el pH no queda en 7: ácido acético con sosa da una disolución básica (pH ≈ 8,7 con acetato 0,05 M) y ácido clorhídrico con amoníaco, una ácida (pH ≈ 5,3). Este principio se aplica desde antiácidos estomacales (base neutraliza exceso de ácido) hasta tratamiento de aguas residuales industriales.',
       },
     },
     {

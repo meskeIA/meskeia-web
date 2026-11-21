@@ -11,6 +11,8 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { formatNumber } from '@/lib';
+import { tonoSobre } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -46,9 +48,9 @@ interface Sustancia {
 
 const SUSTANCIAS: Sustancia[] = [
   { nombre: 'Ácido de batería', ph: 0.5, icono: '🔋', descripcion: 'Ácido sulfúrico concentrado. Extremadamente corrosivo.', color: '#FF0000' },
-  { nombre: 'Ácido gástrico', ph: 1.5, icono: '🫁', descripcion: 'El estómago produce HCl para digerir alimentos.', color: '#FF2200' },
+  { nombre: 'Ácido gástrico', ph: 1.5, icono: '🍽️', descripcion: 'El estómago produce HCl para digerir alimentos.', color: '#FF2200' },
   { nombre: 'Zumo de limón', ph: 2.0, icono: '🍋', descripcion: 'Ácido cítrico natural. Le da el sabor agrio.', color: '#FF4400' },
-  { nombre: 'Vinagre', ph: 2.5, icono: '🫙', descripcion: 'Ácido acético al 5%. Usado en cocina y limpieza.', color: '#FF5500' },
+  { nombre: 'Vinagre', ph: 2.5, icono: '🫙', descripcion: 'Ácido acético al 5 %. Usado en cocina y limpieza.', color: '#FF5500' },
   { nombre: 'Zumo de naranja', ph: 3.5, icono: '🍊', descripcion: 'Ácido cítrico y ascórbico (vitamina C).', color: '#FF8800' },
   { nombre: 'Tomate', ph: 4.2, icono: '🍅', descripcion: 'Ligeramente ácido. Base de muchas salsas.', color: '#FFAA00' },
   { nombre: 'Café solo', ph: 5.0, icono: '☕', descripcion: 'Contiene ácidos orgánicos que le dan su sabor.', color: '#CCBB00' },
@@ -81,15 +83,74 @@ function obtenerColorPh(ph: number): string {
   return '#AA11BB';
 }
 
+/**
+ * Rótulo de ACIDEZ del pH, no de la fuerza del ácido o la base. La fuerza depende de cuánto se
+ * disocia la sustancia, no del pH: el vinagre al 5 % (ácido acético, pKa 4,76) da pH 2,4 y está
+ * disociado un 0,46 %, y un HCl 1 × 10⁻⁵ M, disociado al 100 %, da pH 5 (hallazgo 5399). Neutro
+ * solo es pH 7 (a 25 °C, [H⁺] = [OH⁻] = √Kw = 10⁻⁷): la leche (6,5) es ligeramente ácida y la
+ * sangre (7,4) ligeramente básica (hallazgo 5400). Se compara en décimas enteras, el paso del
+ * deslizador, para no depender de la coma flotante.
+ */
 function obtenerTipoPh(ph: number): string {
-  if (ph < 3) return 'Ácido fuerte';
-  if (ph < 6) return 'Ácido débil';
-  if (ph < 6.5) return 'Ligeramente ácido';
-  if (ph <= 7.5) return 'Neutro';
-  if (ph <= 8.5) return 'Ligeramente básico';
-  if (ph < 11) return 'Base débil';
-  return 'Base fuerte';
+  const decimas = Math.round(ph * 10);
+  if (decimas < 30) return 'Muy ácido';
+  if (decimas < 60) return 'Ácido';
+  if (decimas < 70) return 'Ligeramente ácido';
+  if (decimas === 70) return 'Neutro';
+  if (decimas <= 85) return 'Ligeramente básico';
+  if (decimas < 110) return 'Básico';
+  return 'Muy básico';
 }
+
+/** pH en formato español con un decimal: «2,5», «14,0». */
+function formatPh(ph: number): string {
+  return formatNumber(ph, 1);
+}
+
+/**
+ * Fondos reales sobre los que se pinta el pH en su color (hallazgos 5404 y 5405): la tarjeta
+ * (--bg-card) y la página (--bg-primary), en cada tema.
+ */
+const FONDO_TARJETA = { claro: '#FFFFFF', oscuro: '#2A2A2A' };
+const FONDO_PAGINA = { claro: '#FAFAFA', oscuro: '#1A1A1A' };
+
+/**
+ * El tono más cercano a `color` que, como texto, llega a `minimo` sobre `fondo` en cada tema. Lo
+ * lee la clase .tono del módulo (--tono-claro / --tono-oscuro).
+ */
+function tonos(
+  color: string,
+  fondo: { claro: string; oscuro: string } = FONDO_TARJETA,
+  minimo = 4.5,
+): React.CSSProperties {
+  return {
+    '--tono-claro': tonoSobre(color, fondo.claro, minimo),
+    '--tono-oscuro': tonoSobre(color, fondo.oscuro, minimo),
+  } as React.CSSProperties;
+}
+
+/**
+ * Fila de cada punto del «Mapa completo de sustancias» (hallazgo 5403). En una sola fila, los
+ * puntos de 28 px con pH cercano se tapaban (Agua de mar 8,1 y Bicarbonato 8,3 quedaban a 12 px
+ * en escritorio) y el clic elegía otra sustancia. Cada punto va a la primera fila en la que dista
+ * al menos 1,2 de pH del anterior: 1,2/14 del mapa son 28 px con un mapa de 330 px, el más
+ * estrecho que se pinta en un móvil de 360 px.
+ */
+const SEPARACION_MINIMA_PH = 1.2;
+
+function filasDelMapa(sustancias: Sustancia[]): Map<string, number> {
+  const ultimoPorFila: number[] = [];
+  const filas = new Map<string, number>();
+  for (const s of [...sustancias].sort((a, b) => a.ph - b.ph)) {
+    let fila = ultimoPorFila.findIndex(ultimo => s.ph - ultimo >= SEPARACION_MINIMA_PH - 1e-9);
+    if (fila === -1) fila = ultimoPorFila.length;
+    ultimoPorFila[fila] = s.ph;
+    filas.set(s.nombre, fila);
+  }
+  return filas;
+}
+
+const FILAS_MAPA = filasDelMapa(SUSTANCIAS);
 
 // ─────────────────────────────────────────────
 // Ácidos y bases: datos
@@ -107,7 +168,7 @@ const ACIDOS_BASES: AcidoBase[] = [
   { nombre: 'Ácido clorhídrico', formula: 'HCl', tipo: 'acido-fuerte', icono: '🧪', uso: 'Estómago, limpieza industrial' },
   { nombre: 'Ácido sulfúrico', formula: 'H₂SO₄', tipo: 'acido-fuerte', icono: '🔋', uso: 'Baterías, industria' },
   { nombre: 'Ácido nítrico', formula: 'HNO₃', tipo: 'acido-fuerte', icono: '💥', uso: 'Fertilizantes, explosivos' },
-  { nombre: 'Ácido acético', formula: 'CH₃COOH', tipo: 'acido-debil', icono: '🫙', uso: 'Vinagre (5% en agua)' },
+  { nombre: 'Ácido acético', formula: 'CH₃COOH', tipo: 'acido-debil', icono: '🫙', uso: 'Vinagre (5 % en agua)' },
   { nombre: 'Ácido cítrico', formula: 'C₆H₈O₇', tipo: 'acido-debil', icono: '🍋', uso: 'Cítricos, conservante E330' },
   { nombre: 'Ácido carbónico', formula: 'H₂CO₃', tipo: 'acido-debil', icono: '🥤', uso: 'Bebidas con gas' },
   { nombre: 'Hidróxido de sodio', formula: 'NaOH', tipo: 'base-fuerte', icono: '⚠️', uso: 'Jabón, desatascadores' },
@@ -213,9 +274,9 @@ interface Curiosidad {
 
 const CURIOSIDADES: Curiosidad[] = [
   { icono: '🌧️', titulo: 'Lluvia ácida', texto: 'La lluvia normal ya es ligeramente ácida (pH 5,6) por el CO₂ atmosférico. Se habla de lluvia ácida cuando el pH baja de 5,6, por contaminantes como SO₂ y NOₓ de fábricas y coches.', destacado: 'pH < 5,6' },
-  { icono: '🫁', titulo: 'pH del estómago', texto: 'Tu estómago produce ácido clorhídrico con pH entre 1,5 y 3,5. Es tan corrosivo que disolvería un clavo de hierro, pero el moco gástrico protege las paredes del estómago.', destacado: 'pH 1,5 - 3,5' },
+  { icono: '🍽️', titulo: 'pH del estómago', texto: 'Tu estómago produce ácido clorhídrico con pH entre 1,5 y 3,5. Es tan corrosivo que disolvería un clavo de hierro, pero el moco gástrico protege las paredes del estómago.', destacado: 'pH 1,5 - 3,5' },
   { icono: '🩸', titulo: 'Sangre: rango vital', texto: 'El pH de tu sangre se mantiene entre 7,35 y 7,45. Si baja de 7,0 (acidosis) o sube de 7,8 (alcalosis) puede ser mortal. Tu cuerpo tiene sistemas tampón que lo regulan constantemente.', destacado: '7,35 - 7,45' },
-  { icono: '🌊', titulo: 'Océanos acidificándose', texto: 'Desde la Revolución Industrial, los océanos han absorbido un 30% del CO₂ emitido por humanos. El pH ha bajado de 8,2 a 8,1. Parece poco, pero al ser logarítmica, es un 26% más de acidez, amenazando corales y moluscos.', destacado: '8,2 → 8,1 = +26% acidez' },
+  { icono: '🌊', titulo: 'Océanos acidificándose', texto: 'Desde la Revolución Industrial, los océanos han absorbido un 30 % del CO₂ emitido por humanos. El pH ha bajado de 8,2 a 8,1. Parece poco, pero al ser logarítmica, es un 26 % más de acidez, amenazando corales y moluscos.', destacado: '8,2 → 8,1 = +26 % acidez' },
   { icono: '📐', titulo: 'Escala logarítmica', texto: 'La escala de pH es logarítmica en base 10: un pH de 3 es 10 veces más ácido que un pH de 4, y 100 veces más ácido que un pH de 5. El zumo de limón (pH 2) es 100.000 veces más ácido que el agua pura (pH 7).', destacado: '10x por cada unidad' },
   { icono: '🏊', titulo: 'pH de piscinas', texto: 'El pH ideal de una piscina es 7,2-7,6. Demasiado bajo irrita los ojos y la piel. Demasiado alto reduce la efectividad del cloro. Se ajusta con ácido muriático (baja pH) o carbonato de sodio (sube pH).', destacado: 'pH 7,2 - 7,6' },
   { icono: '🧴', titulo: '¿Por qué el jabón es básico?', texto: 'El jabón se fabrica mezclando grasa con una base fuerte (NaOH). El resultado es una sal de ácido graso con pH 9-10. Las partes hidrofóbicas capturan la grasa y las hidrofílicas se disuelven en agua.', destacado: 'pH 9 - 10' },
@@ -232,10 +293,11 @@ export default function VisualizadorPhAcidosBases() {
   const [acidoBaseTab, setAcidoBaseTab] = useState<'acidos' | 'bases'>('acidos');
   const [neutralizacionActiva, setNeutralizacionActiva] = useState(0);
 
-  // Sustancias cercanas al pH del slider
-  const sustanciasCercanas = SUSTANCIAS.filter(
-    s => Math.abs(s.ph - phSlider) <= 1.5
-  ).sort((a, b) => Math.abs(a.ph - phSlider) - Math.abs(b.ph - phSlider));
+  // Sustancias cercanas al pH del slider (±1,5). Se compara en décimas enteras: en coma flotante
+  // |8,3 − 6,8| = 1,5000000000000009 dejaba fuera al Bicarbonato a pH 6,8 (hallazgo 5401)
+  const distanciaDecimas = (s: Sustancia): number => Math.round(Math.abs(s.ph - phSlider) * 10);
+  const sustanciasCercanas = SUSTANCIAS.filter(s => distanciaDecimas(s) <= 15)
+    .sort((a, b) => distanciaDecimas(a) - distanciaDecimas(b));
 
   const colorActual = obtenerColorPh(phSlider);
   const tipoPh = obtenerTipoPh(phSlider);
@@ -290,7 +352,7 @@ export default function VisualizadorPhAcidosBases() {
                     className={styles.phBarMarker}
                     style={{ left: `${(phSlider / 14) * 100}%` }}
                   >
-                    <span className={styles.phBarMarkerValue}>{phSlider.toFixed(1)}</span>
+                    <span className={styles.phBarMarkerValue}>{formatPh(phSlider)}</span>
                   </div>
                 </div>
                 <div className={styles.phBarZones}>
@@ -317,20 +379,21 @@ export default function VisualizadorPhAcidosBases() {
               {/* Info del pH actual */}
               <div className={styles.phInfoBox} style={{ borderColor: colorActual }}>
                 <div className={styles.phInfoHeader}>
-                  <span className={styles.phInfoValue} style={{ color: colorActual }}>
-                    pH {phSlider.toFixed(1)}
+                  {/* Texto grande (28,8 px y 800): pide 3:1 sobre la tarjeta (hallazgos 5404 y 5405) */}
+                  <span className={`${styles.tono} ${styles.phInfoValue}`} style={tonos(colorActual, FONDO_TARJETA, 3)}>
+                    pH {formatPh(phSlider)}
                   </span>
                   <span className={styles.phInfoTipo}>{tipoPh}</span>
                 </div>
                 <p className={styles.phInfoConcentracion}>
-                  Concentración H⁺: 10⁻{phSlider.toFixed(1)} mol/L
+                  Concentración H⁺: 10<sup>{phSlider === 0 ? '0' : `−${formatPh(phSlider)}`}</sup> mol/L
                 </p>
               </div>
             </div>
 
             {/* Sustancias cercanas */}
             <h3 className={styles.subtituloSeccion}>
-              Sustancias cercanas a pH {phSlider.toFixed(1)}
+              Sustancias cercanas a pH {formatPh(phSlider)}
             </h3>
             {sustanciasCercanas.length > 0 ? (
               <div className={styles.sustanciasGrid}>
@@ -344,8 +407,8 @@ export default function VisualizadorPhAcidosBases() {
                       <span className={styles.sustanciaIcono} aria-hidden="true">{s.icono}</span>
                       <div>
                         <span className={styles.sustanciaNombre}>{s.nombre}</span>
-                        <span className={styles.sustanciaPh} style={{ color: s.color }}>
-                          pH {s.ph.toFixed(1)}
+                        <span className={`${styles.tono} ${styles.sustanciaPh}`} style={tonos(s.color)}>
+                          pH {formatPh(s.ph)}
                         </span>
                       </div>
                     </div>
@@ -355,7 +418,7 @@ export default function VisualizadorPhAcidosBases() {
               </div>
             ) : (
               <p className={styles.noResultados}>
-                No hay sustancias comunes registradas cerca de pH {phSlider.toFixed(1)}
+                No hay sustancias comunes registradas cerca de pH {formatPh(phSlider)}
               </p>
             )}
 
@@ -369,11 +432,12 @@ export default function VisualizadorPhAcidosBases() {
                   className={styles.mapaPunto}
                   style={{
                     left: `${(s.ph / 14) * 100}%`,
+                    '--fila': FILAS_MAPA.get(s.nombre) ?? 0,
                     backgroundColor: s.color,
-                  }}
+                  } as React.CSSProperties}
                   onClick={() => setPhSlider(s.ph)}
-                  title={`${s.nombre} (pH ${s.ph})`}
-                  aria-label={`${s.nombre}, pH ${s.ph}`}
+                  title={`${s.nombre} (pH ${formatPh(s.ph)})`}
+                  aria-label={`${s.nombre}, pH ${formatPh(s.ph)}`}
                 >
                   <span className={styles.mapaPuntoLabel} aria-hidden="true">{s.icono}</span>
                 </button>
@@ -425,18 +489,18 @@ export default function VisualizadorPhAcidosBases() {
             <div className={styles.tabSelector}>
               <button
                 type="button"
-                className={`${styles.tabBtn} ${acidoBaseTab === 'acidos' ? styles.tabActivo : ''}`}
+                className={`${styles.tabBtn} ${acidoBaseTab === 'acidos' ? `${styles.tabActivo} ${styles.tono}` : ''}`}
                 onClick={() => setAcidoBaseTab('acidos')}
-                style={acidoBaseTab === 'acidos' ? { borderColor: '#FF4444', color: '#FF4444' } : {}}
+                style={acidoBaseTab === 'acidos' ? { borderColor: '#FF4444', ...tonos('#FF4444') } : {}}
                 aria-pressed={acidoBaseTab === 'acidos'}
               >
                 Ácidos (fuertes y débiles)
               </button>
               <button
                 type="button"
-                className={`${styles.tabBtn} ${acidoBaseTab === 'bases' ? styles.tabActivo : ''}`}
+                className={`${styles.tabBtn} ${acidoBaseTab === 'bases' ? `${styles.tabActivo} ${styles.tono}` : ''}`}
                 onClick={() => setAcidoBaseTab('bases')}
-                style={acidoBaseTab === 'bases' ? { borderColor: '#4444FF', color: '#4444FF' } : {}}
+                style={acidoBaseTab === 'bases' ? { borderColor: '#4444FF', ...tonos('#4444FF') } : {}}
                 aria-pressed={acidoBaseTab === 'bases'}
               >
                 Bases (fuertes y débiles)
@@ -479,8 +543,10 @@ export default function VisualizadorPhAcidosBases() {
               <div>
                 <p>
                   <strong>Fuerte vs. Débil:</strong> Un ácido/base <em>fuerte</em> se disocia completamente
-                  en agua (100% de moléculas liberan H⁺ u OH⁻). Uno <em>débil</em> solo se disocia parcialmente.
+                  en agua (100{' '}% de moléculas liberan H⁺ u OH⁻). Uno <em>débil</em> solo se disocia parcialmente.
                   El vinagre (ácido débil) tiene muchas moléculas de ácido acético sin disociar.
+                  Por eso el pH no dice si un ácido es fuerte: el vinagre llega a pH 2,4 siendo débil,
+                  y un ácido clorhídrico muy diluido (0,00001 mol/L) da pH 5 siendo fuerte.
                 </p>
               </div>
             </div>
@@ -492,8 +558,8 @@ export default function VisualizadorPhAcidosBases() {
                 <thead>
                   <tr>
                     <th>Propiedad</th>
-                    <th style={{ color: '#CC3333' }}>Ácidos</th>
-                    <th style={{ color: '#3333CC' }}>Bases</th>
+                    <th className={styles.tono} style={tonos('#CC3333', FONDO_PAGINA)}>Ácidos</th>
+                    <th className={styles.tono} style={tonos('#3333CC', FONDO_PAGINA)}>Bases</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -649,7 +715,7 @@ export default function VisualizadorPhAcidosBases() {
                 { ph: 7, factor: '1x', label: 'Referencia' },
               ].map(item => (
                 <div key={item.ph} className={styles.logItem}>
-                  <span className={styles.logPh} style={{ color: obtenerColorPh(item.ph) }}>
+                  <span className={`${styles.tono} ${styles.logPh}`} style={tonos(obtenerColorPh(item.ph))}>
                     pH {item.ph}
                   </span>
                   <span className={styles.logFactor}>{item.factor}</span>

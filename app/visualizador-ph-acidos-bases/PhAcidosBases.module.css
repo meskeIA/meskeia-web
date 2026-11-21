@@ -94,6 +94,13 @@
 .phZoneAcido { color: var(--rojo-texto, #CC3333); font-weight: 600; }
 .phZoneNeutro { color: var(--verde-texto, #33AA66); font-weight: 600; }
 .phZoneBase { color: #6644CC; font-weight: 600; }
+/* #6644CC daba 2,70:1 sobre #1A1A1A (hallazgo 5405); #A08CFF, 6,4:1 */
+[data-theme='dark'] .phZoneBase { color: #A08CFF; }
+
+/* Texto en el color de un pH: su tono que llega al umbral sobre su fondo en cada tema, calculado
+   en la página con tonoSobre (función tonos). Hallazgos 5404 y 5405 */
+.tono { color: var(--tono-claro); }
+[data-theme='dark'] .tono { color: var(--tono-oscuro); }
 
 .sliderContainer { padding: 0 2px; margin-bottom: var(--spacing-lg); }
 
@@ -150,7 +157,9 @@
 .noResultados { text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: var(--spacing-lg); }
 
 /* Mapa completo de sustancias */
-.mapaCompleto { position: relative; height: 80px; margin: var(--spacing-md) 0 var(--spacing-xl); padding: 30px 16px 10px; }
+/* Tres filas de puntos (--fila, calculada en la página) para que los de pH cercano no se tapen
+   (hallazgo 5403): 16 px de base + 3 × 32 px + holgura para el aumento al pasar el ratón */
+.mapaCompleto { position: relative; height: 124px; margin: var(--spacing-md) 0 var(--spacing-xl); padding: 0 16px; }
 
 .mapaGradient {
   position: absolute; bottom: 0; left: 16px; right: 16px; height: 8px; border-radius: 4px;
@@ -162,7 +171,7 @@
 }
 
 .mapaPunto {
-  position: absolute; bottom: 16px; width: 28px; height: 28px;
+  position: absolute; bottom: calc(16px + var(--fila, 0) * 32px); width: 28px; height: 28px;
   border-radius: 50%; border: 2px solid white; transform: translateX(-50%);
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: transform 0.2s;
@@ -253,6 +262,8 @@
 }
 .neutralizacionAcido { font-family: 'Courier New', monospace; color: var(--rojo-texto, #CC3333); font-weight: 600; }
 .neutralizacionBase { font-family: 'Courier New', monospace; color: #3333CC; font-weight: 600; }
+/* #3333CC daba 1,50:1 sobre --hover #333333 (hallazgo 5405); #A3A3FF, 5,6:1 */
+[data-theme='dark'] .neutralizacionBase { color: #A3A3FF; }
 .neutralizacionResultado { font-family: 'Courier New', monospace; color: var(--primary-texto); font-weight: 600; }
 .neutralizacionDescripcion { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }
 
@@ -342,5 +353,4 @@
   .logGrid { grid-template-columns: repeat(3, 1fr); }
   .neutralizacionGrid { grid-template-columns: 1fr; }
   .neutralizacionReaccion { flex-direction: column; text-align: center; }
-  .mapaCompleto { height: 100px; padding-top: 40px; }
 }
