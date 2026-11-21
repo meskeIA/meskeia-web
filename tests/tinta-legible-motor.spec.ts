@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { contraste, luminancia, rellenoConTinta, rgbDeHex, tintaSobre, tonoSobre, TINTA_CLARA, TINTA_OSCURA } from '../lib/tintaLegible';
+import { contraste, luminancia, mezclar, rellenoConTinta, rgbDeHex, tintaSobre, tonoSobre, tonosPorTema, TINTA_CLARA, TINTA_OSCURA } from '../lib/tintaLegible';
 
 /**
  * lib/tintaLegible.ts (cabo C0297, 06/11/2026). Casos a mano con la fórmula WCAG 2.x:
@@ -80,6 +80,8 @@ test.describe('tintaLegible', () => {
     expect(luminancia(enOscuro)).toBeGreaterThan(luminancia('#2E86AB'));
     expect(contraste(enOscuro, '#2D2D2D')).toBeGreaterThanOrEqual(4.5);
     expect(tonoSobre('var(--x)', '#FFFFFF')).toBe('var(--x)');
+    // tonosPorTema: el mismo cálculo, una variable por tema
+    expect(tonosPorTema('#2E86AB', '#FFFFFF', '#2D2D2D')).toEqual({ '--tono-claro': '#2C7FA2', '--tono-oscuro': enOscuro });
     // La garantía, para una rejilla de colores sobre fondos claros y oscuros
     for (const fondo of ['#FFFFFF', '#EAFAF1', '#FDEDEC', '#2D2D2D', '#1A1A1A']) {
       for (let r = 0; r <= 255; r += 51) {
@@ -91,5 +93,20 @@ test.describe('tintaLegible', () => {
         }
       }
     }
+  });
+
+  /**
+   * mezclar (cabo C0645, cronologías de movimientos, 21/11/2026). A mano, #DAA520 con el sufijo 18
+   * (24/255 = 0,0941) sobre blanco: R 218·0,0941 + 255·0,9059 = 251,5 → 252 (FC); G 165·0,0941 +
+   * 255·0,9059 = 246,5 → 247 (F7); B 32·0,0941 + 255·0,9059 = 234,0 (EA) → #FCF7EA, el fondo que el
+   * navegador pintó bajo «Arquitectura Griega Clásica» en la comparativa (rgb 252, 247, 234).
+   * Negro al 50 % sobre blanco: 127,5 → 128 → #808080.
+   */
+  test('mezclar da el color que se ve de un tinte sobre su base', () => {
+    expect(mezclar('#DAA520', '#FFFFFF', 0x18 / 255)).toBe('#FCF7EA');
+    expect(mezclar('#000000', '#FFFFFF', 0.5)).toBe('#808080');
+    expect(mezclar('#2E86AB', '#2D2D2D', 0)).toBe('#2D2D2D');
+    expect(mezclar('#2E86AB', '#2D2D2D', 1)).toBe('#2E86AB');
+    expect(mezclar('var(--x)', '#FFFFFF', 0.5)).toBe('#FFFFFF');
   });
 });

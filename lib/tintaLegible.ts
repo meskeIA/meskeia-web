@@ -72,6 +72,35 @@ export function rellenoConTinta(relleno: string, minimo = 4.5): { relleno: strin
 }
 
 /**
+ * El color que se VE al pintar `color` con opacidad `alfa` (0 a 1) sobre `base`, en hexadecimal:
+ * el fondo real de un tinte como `${color}18` o `${color}22`, para dárselo a `tonoSobre`. Nace de
+ * las cronologías de movimientos (cabo C0645, 21/11/2026): el nombre de cada corriente iba en su
+ * color sobre una fila teñida con ese mismo color (1,54-4,49:1). Si algún color no es
+ * hexadecimal, devuelve `base` tal cual.
+ */
+export function mezclar(color: string, base: string, alfa: number): string {
+  const c = rgbDeHex(color);
+  const b = rgbDeHex(base);
+  if (!c || !b) return base;
+  const a = Math.min(1, Math.max(0, alfa));
+  return hexDeRgb(c.map((v, i) => v * a + b[i] * (1 - a)));
+}
+
+/**
+ * Las dos variables `--tono-claro` y `--tono-oscuro` con el tono de `color` que llega a `minimo`
+ * sobre el fondo más desfavorable donde aparece en cada tema; el módulo CSS las lee con una clase
+ * (`color: var(--tono-claro)` y, bajo `[data-theme='dark']`, `var(--tono-oscuro)`).
+ */
+export function tonosPorTema(
+  color: string,
+  fondoClaro: string,
+  fondoOscuro: string,
+  minimo = 4.5,
+): { '--tono-claro': string; '--tono-oscuro': string } {
+  return { '--tono-claro': tonoSobre(color, fondoClaro, minimo), '--tono-oscuro': tonoSobre(color, fondoOscuro, minimo) };
+}
+
+/**
  * El tono más cercano a `color` que, como TEXTO sobre `fondo`, llega a `minimo` (4,5:1 por
  * defecto): el color tal cual si ya llega; si no, oscurecido hacia el negro (fondo claro) o
  * aclarado hacia el blanco (fondo oscuro) en pasos del 5 %. Para el texto en el color de un dato
