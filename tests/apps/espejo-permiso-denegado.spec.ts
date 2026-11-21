@@ -39,8 +39,13 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *     que anunciar. «Pulsa para volver a intentarlo» invita a un bucle que no puede salir bien hasta
  *     desbloquear el permiso en el navegador, y la app no lo dice (HALLAZGO, ABIERTO).
  *
- * Los test con test.fail() son HALLAZGOS ABIERTOS: afirman lo CORRECTO; el día que se reparen
- * fallarán por pasar y habrá que quitarles el test.fail() (y cambiar ABIERTO por REPARADO).
+ * REPARADOS (reparar 21/11/2026)
+ *   · Hallazgo 5353: el aviso va ENCIMA del recuadro (y se trae a la vista si quedó fuera), sin
+ *     perder el role="alert".
+ *   · Hallazgo 5354: con el permiso en «denied» (permissions.query) el aviso dice que el navegador
+ *     la tiene bloqueada y cómo permitirla junto a la dirección de la página, y el recuadro pasa a
+ *     «Pulsa para reintentar cuando hayas permitido la cámara». Cada rechazo vuelve a montar los
+ *     párrafos del aviso (key = número de intento), así que se anuncia otra vez aunque diga lo mismo.
  */
 
 test.use({
@@ -63,6 +68,9 @@ interface Ventana {
 
 const AVISO = 'Permiso de cámara denegado';
 const DETALLE = 'Activa la cámara en la configuración del navegador';
+// Hallazgo 5354: con el permiso bloqueado, el recuadro ya no invita a «volver a intentarlo» sin más
+const RECUADRO_BLOQUEADO = 'Pulsa para reintentar cuando hayas permitido la cámara';
+const COMO_DESBLOQUEAR = 'junto a la dirección de la página';
 const recuadro = (page: Page): Locator => page.getByRole('button', { name: /Pulsa para/ });
 // getByRole('alert') casa también con el anunciador de rutas de Next: se acota por el texto
 const avisoDeLaApp = (page: Page): Locator => page.getByRole('alert').filter({ hasText: AVISO });
@@ -140,7 +148,7 @@ async function cajaDelAviso(page: Page): Promise<Caja> {
 test.describe('Portátil (ventana útil de 1366 × 657)', () => {
   test.use({ viewport: { width: 1366, height: 657 } });
 
-  test('CASO · denegado de verdad: el aviso sale en un role="alert", el recuadro invita a reintentar y vuelve a pedir la cámara', async ({
+  test('CASO · denegado de verdad: el aviso sale en un role="alert", dice cómo desbloquear la cámara y el recuadro vuelve a pedirla', async ({
     page,
   }) => {
     await abrir(page);
@@ -149,17 +157,18 @@ test.describe('Portátil (ventana útil de 1366 × 657)', () => {
     await expect(avisoDeLaApp(page)).toContainText(DETALLE);
     expect(await page.evaluate(() => (window as unknown as Ventana).__errores)).toEqual(['NotAllowedError | Permission denied']);
     expect(await page.evaluate(async () => (await navigator.permissions.query({ name: 'camera' as PermissionName })).state)).toBe('denied');
-    await expect(recuadro(page)).toHaveAccessibleName('Pulsa para volver a intentarlo');
+    // Hallazgo 5354 (REPARADO): antes «Pulsa para volver a intentarlo» con el permiso bloqueado
+    await expect(avisoDeLaApp(page)).toContainText(COMO_DESBLOQUEAR);
+    await expect(recuadro(page)).toHaveAccessibleName(RECUADRO_BLOQUEADO);
     await expect(page.getByRole('button', { name: /Apagar/ })).toHaveCount(0);
     await pulsarParteVisible(page, false);
     await expect.poll(() => llamadas(page)).toBe(2);
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · el porqué del fallo sale debajo del recuadro, fuera de la ventana: solo se ve «Pulsa para volver a intentarlo»', async ({
+  test('HALLAZGO 5353 (REPARADO 21/11/2026) · el porqué del fallo se lee en la primera pantalla, no debajo del recuadro', async ({
     page,
   }) => {
-    test.fail();
-    // Medido: aviso en y = 1248 con la ventana en 657 (y también con 947, a 1920 × 1080).
+    // Medido antes: aviso en y = 1248 con la ventana en 657 (y también con 947, a 1920 × 1080).
     await abrir(page);
     await pulsarParteVisible(page, false);
     await expect(avisoDeLaApp(page)).toHaveCount(1);
@@ -179,17 +188,16 @@ test.describe('Móvil (Pixel 7)', () => {
     await pulsarParteVisible(page, true);
     await expect(avisoDeLaApp(page)).toHaveCount(1);
     await expect(avisoDeLaApp(page)).toContainText(DETALLE);
-    await expect(recuadro(page)).toHaveAccessibleName('Pulsa para volver a intentarlo');
+    await expect(recuadro(page)).toHaveAccessibleName(RECUADRO_BLOQUEADO);
     await pulsarParteVisible(page, true);
     await expect.poll(() => llamadas(page)).toBe(2);
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · en el móvil el porqué del fallo sale bajo el recuadro de 697 px, fuera de la primera pantalla', async ({
+  test('HALLAZGO 5353 (REPARADO 21/11/2026) · en el móvil el porqué del fallo se lee en la primera pantalla', async ({
     page,
   }) => {
-    test.fail();
-    // Medido: aviso en y = 1030 con la pantalla en 839. Antes del 15/11 el texto iba DENTRO del
-    // recuadro y se leía sin desplazar.
+    // Medido antes: aviso en y = 1030 con la pantalla en 839, bajo el recuadro de 697 px. Antes del
+    // 15/11 el texto iba DENTRO del recuadro y se leía sin desplazar; ahora va encima.
     await abrir(page);
     await pulsarParteVisible(page, true);
     await expect(avisoDeLaApp(page)).toHaveCount(1);
@@ -198,11 +206,10 @@ test.describe('Móvil (Pixel 7)', () => {
     expect(caja.top, `aviso en y = ${caja.top} con la pantalla en ${caja.ventana}`).toBeLessThan(caja.ventana);
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · con el permiso bloqueado, volver a tocar «Pulsa para volver a intentarlo» no cambia nada ni se anuncia', async ({
+  test('HALLAZGO 5354 (REPARADO 21/11/2026) · con el permiso bloqueado, volver a tocar el recuadro vuelve a anunciar el aviso', async ({
     page,
   }) => {
-    test.fail();
-    // Medido: 2.ª llamada a getUserMedia, rechazo inmediato, setAviso('denegado') con el mismo valor
+    // Medido antes: 2.ª llamada a getUserMedia, rechazo inmediato, setAviso('denegado') con el mismo valor
     // → React no vuelve a pintar: 0 mutaciones en el aviso y en el recuadro.
     // Esperado: cada toque tiene respuesta (el aviso se vuelve a anunciar, o dice que el permiso
     // sigue bloqueado y que hay que desbloquearlo en el navegador: permissions.query ya da «denied»).

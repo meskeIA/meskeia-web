@@ -59,10 +59,12 @@ import { sembrarValor, esperarPaginaAsentada } from './_hidratacion';
  *     deja el espejo en 412 × 839 y «Salir» la cierra. PASA.
  *   CASO E (portátil, ventana útil 1366 × 657). Lo mismo con un clic: el centro del espejo debería
  *     verse sin desplazar. Medido: recuadro de 660 × 880 desde y = 356, centro en y = 796 y solo el
- *     34 % de la imagen dentro de la ventana (41 % a 1280 × 720, 43 % a 1536 × 730) (HALLAZGO, ABIERTO).
+ *     34 % de la imagen dentro de la ventana (41 % a 1280 × 720, 43 % a 1536 × 730) (HALLAZGO 5355,
+ *     REPARADO 21/11/2026: tope de alto en escritorio y, si el centro queda fuera, se trae a la vista).
  *   CASO F (móvil sin pantalla completa de elementos, como Safari en iPhone, donde solo <video> tiene
  *     la suya). «Pantalla completa» debería agrandar el espejo o no ofrecerse. Medido: «TypeError:
- *     requestFullscreen is not a function», sin «Salir» y el espejo igual (HALLAZGO, ABIERTO).
+ *     requestFullscreen is not a function», sin «Salir» y el espejo igual (HALLAZGO 5356, REPARADO
+ *     21/11/2026: sin la API, la clase .fullscreen fija el espejo a la ventana, con su «Salir»).
  *   El permiso denegado de verdad, con su propio juego de opciones: espejo-permiso-denegado.spec.ts.
  *
  * Los test con test.fail() son HALLAZGOS ABIERTOS: afirman lo CORRECTO; el día que se reparen
@@ -512,14 +514,13 @@ test.describe('Escritorio · rechazos', () => {
 test.describe('Portátil (ventana útil de 1366 × 657, la de una pantalla de 1366 × 768)', () => {
   test.use({ viewport: { width: 1366, height: 657 } });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · CASO E · tras pulsar el recuadro, el centro del espejo queda bajo el borde de la ventana', async ({
+  test('HALLAZGO 5355 (REPARADO 21/11/2026) · CASO E · tras pulsar el recuadro, el centro del espejo queda dentro de la ventana', async ({
     page,
   }) => {
-    test.fail();
     // Esperado: un espejo que se ve sin desplazar; como mínimo, su centro dentro de la ventana.
-    // Medido: el recuadro (aspect-ratio 3/4 sobre 660 px = 880 px de alto) empieza en y = 356;
-    // centro en y = 796 con la ventana en 657, y el 34 % de la imagen a la vista. La página no lo
-    // trae a la vista al activarse, y «Apagar» y los ajustes quedan en y ≥ 1256.
+    // Medido antes: el recuadro (aspect-ratio 3/4 sobre 660 px = 880 px de alto) empezaba en y = 356;
+    // centro en y = 796 con la ventana en 657, y el 34 % de la imagen a la vista. Ahora, en
+    // escritorio, max-height: calc(100vh − 140px) = 517 px → centro en y ≈ 356 + 259 = 615.
     await registrarAperturas(page);
     await abrir(page);
     await esperarPaginaAsentada(page);
@@ -532,6 +533,8 @@ test.describe('Portátil (ventana útil de 1366 × 657, la de una pantalla de 13
     expect(g.centroY, `centro del espejo en y = ${g.centroY}, ventana de ${g.ventana} px, ${g.visiblePct} % a la vista`).toBeLessThanOrEqual(
       g.ventana,
     );
+    // El recuadro cabe entero en la ventana: con desplazarse una vez se ve todo el espejo
+    expect(g.alto).toBeLessThanOrEqual(g.ventana - 140 + 1);
   });
 });
 
@@ -714,10 +717,9 @@ test.describe('Móvil (Pixel 7)', () => {
     expect(await pistasVivas(page)).toBe(1);
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · CASO F · sin pantalla completa de elementos (Safari en iPhone), «Pantalla completa» lanza un error y no hace nada', async ({
+  test('HALLAZGO 5356 (REPARADO 21/11/2026) · CASO F · sin pantalla completa de elementos (Safari en iPhone), «Pantalla completa» ocupa la ventana con la clase .fullscreen y «Salir» la cierra', async ({
     page,
   }) => {
-    test.fail();
     // Safari en iPhone solo tiene pantalla completa para <video> (webkitEnterFullscreen): ni
     // Element.requestFullscreen ni document.fullscreenEnabled = true. Se simula retirándolos.
     // togglePantallaCompleta llama a containerRef.current.requestFullscreen() sin comprobarlo:
@@ -741,5 +743,11 @@ test.describe('Móvil (Pixel 7)', () => {
     expect(errores, 'errores de la página al pulsar «Pantalla completa»').toEqual([]);
     const g = await geometriaDelVideo(page);
     expect({ ancho: g.ancho, alto: g.alto }).toEqual({ ancho: 412, alto: 839 });
+    // «Salir» devuelve el espejo a su recuadro (392 × 697)
+    await page.getByRole('button', { name: /Salir/ }).tap();
+    await page.waitForTimeout(400);
+    const despues = await geometriaDelVideo(page);
+    expect({ ancho: despues.ancho, alto: despues.alto }).toEqual({ ancho: 392, alto: 697 });
+    expect(errores).toEqual([]);
   });
 });

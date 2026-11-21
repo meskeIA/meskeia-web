@@ -38,11 +38,21 @@
   margin-bottom: 20px;
 }
 
+/* Hallazgo 5355: en un portátil (ventana útil de 657 px) el recuadro de 3/4 sobre 660 px medía
+   880 px y solo se veía su 34 % superior; con este tope cabe en la ventana. En el móvil (9/16) no
+   se aplica: ahí el centro ya cae en la primera pantalla */
+@media (min-width: 601px) {
+  .espejoContainer {
+    max-height: calc(100vh - 140px);
+  }
+}
+
 .espejoContainer.fullscreen {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
+  max-height: none;
   aspect-ratio: unset;
   border-radius: 0;
   z-index: 9999;
@@ -76,9 +86,10 @@
   font-size: 1.1rem;
 }
 
-/* Aviso de por qué no se abrió la cámara (hallazgos 4746 y 4747); vacío no ocupa sitio */
+/* Aviso de por qué no se abrió la cámara (hallazgos 4746 y 4747); vacío no ocupa sitio.
+   Encima del recuadro desde el hallazgo 5353 */
 .avisoCamara {
-  margin: -8px 0 20px;
+  margin: 0 0 16px;
   padding: 12px 16px;
   border-left: 4px solid var(--rojo-texto, #b91c1c);
   background: rgba(185, 28, 28, 0.06);

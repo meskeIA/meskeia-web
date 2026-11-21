@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './Espejo.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, traerALaVista } from '@/lib';
 import { PREGUNTA_PRIVACIDAD } from './metadata';
 
 /**
@@ -12,12 +12,18 @@ import { PREGUNTA_PRIVACIDAD } from './metadata';
  * todo era «permiso denegado» y mandaba a la configuración a quien no tiene cámara o la tiene
  * ocupada en una videollamada). Mismo criterio que prueba-camara (hallazgo 4429).
  */
-type AvisoCamara = 'denegado' | 'sin-camara' | 'ocupada' | 'desconectada' | 'otro';
+type AvisoCamara = 'denegado' | 'bloqueado' | 'sin-camara' | 'ocupada' | 'desconectada' | 'otro';
 
 const AVISOS: Record<AvisoCamara, { titulo: string; detalle: string }> = {
   denegado: {
     titulo: 'Permiso de cámara denegado',
     detalle: 'Activa la cámara en la configuración del navegador',
+  },
+  // Hallazgo 5354: con el permiso en «denied» el navegador ya no pregunta y getUserMedia rechaza
+  // al instante; «volver a intentarlo» invitaba a un bucle. Se dice cómo desbloquearlo.
+  bloqueado: {
+    titulo: 'Permiso de cámara denegado',
+    detalle: 'Activa la cámara en la configuración del navegador: el navegador la tiene bloqueada para esta página y no volverá a preguntar. Pulsa el icono que hay junto a la dirección de la página (el candado o «Ajustes del sitio»), permite la cámara y pulsa de nuevo el recuadro.',
   },
   'sin-camara': {
     titulo: 'No se ha encontrado ninguna cámara',
@@ -45,6 +51,21 @@ function avisoDeError(error: unknown): AvisoCamara {
   return 'otro';
 }
 
+/** ¿El navegador tiene la cámara bloqueada para esta página? Sin la API (o si falla), no se sabe: false. */
+async function camaraBloqueada(): Promise<boolean> {
+  try {
+    const estado = await navigator.permissions?.query({ name: 'camera' as PermissionName });
+    return estado?.state === 'denied';
+  } catch {
+    return false;
+  }
+}
+
+/** Pantalla completa de elementos: Safari en iPhone no la tiene, solo la del <video> (hallazgo 5356). */
+function hayPantallaCompletaNativa(el: HTMLElement): boolean {
+  return document.fullscreenEnabled === true && typeof el.requestFullscreen === 'function';
+}
+
 export default function EspejoPage() {
   const [activo, setActivo] = useState(false);
   const [aviso, setAviso] = useState<AvisoCamara | null>(null);
@@ -52,9 +73,13 @@ export default function EspejoPage() {
   const [brillo, setBrillo] = useState(100);
   const [zoom, setZoom] = useState(1);
   const [pantallaCompleta, setPantallaCompleta] = useState(false);
+  // Sube con cada intento fallido: el aviso se vuelve a montar y el lector lo anuncia otra vez
+  // aunque diga lo mismo (hallazgo 5354: un segundo rechazo no cambiaba nada en pantalla)
+  const [intentosFallidos, setIntentosFallidos] = useState(0);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const avisoRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
   // Una apertura cada vez (cabo C0715, alcance del hallazgo 4487 de prueba-camara): el botón
@@ -104,10 +129,24 @@ export default function EspejoPage() {
       }
 
       setActivo(true);
+      setIntentosFallidos(0);
+
+      // Hallazgo 5355: en un portátil el recuadro empieza a media pantalla; si el centro del
+      // espejo queda bajo el borde, se trae a la vista (en el móvil ya cae dentro y no se mueve)
+      requestAnimationFrame(() => {
+        const caja = containerRef.current?.getBoundingClientRect();
+        if (caja && caja.top + caja.height / 2 > window.innerHeight) {
+          containerRef.current?.scrollIntoView({ block: 'start', behavior: 'auto' });
+        }
+      });
     } catch (error) {
       if (generacion !== generacionRef.current) return;
       console.error('Error al acceder a la cámara:', error);
-      setAviso(avisoDeError(error));
+      let tipo = avisoDeError(error);
+      if (tipo === 'denegado' && (await camaraBloqueada())) tipo = 'bloqueado';
+      if (generacion !== generacionRef.current) return;
+      setAviso(tipo);
+      setIntentosFallidos(n => n + 1);
     } finally {
       if (generacion === generacionRef.current) abriendoRef.current = false;
     }
@@ -125,16 +164,26 @@ export default function EspejoPage() {
   };
 
   const togglePantallaCompleta = () => {
-    if (!containerRef.current) return;
+    const contenedor = containerRef.current;
+    if (!contenedor) return;
 
-    if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen().then(() => {
-        setPantallaCompleta(true);
-      }).catch(console.error);
-    } else {
+    if (document.fullscreenElement) {
       document.exitFullscreen().then(() => {
         setPantallaCompleta(false);
       }).catch(console.error);
+    } else if (pantallaCompleta) {
+      // Salir del modo por CSS (sin pantalla completa nativa)
+      setPantallaCompleta(false);
+    } else if (hayPantallaCompletaNativa(contenedor)) {
+      contenedor.requestFullscreen().then(() => {
+        setPantallaCompleta(true);
+      }).catch(() => {
+        // Si el navegador la rechaza, la clase .fullscreen fija igual el espejo a toda la ventana
+        setPantallaCompleta(true);
+      });
+    } else {
+      // Safari en iPhone: sin pantalla completa de elementos, la clase .fullscreen ocupa la ventana
+      setPantallaCompleta(true);
     }
   };
 
@@ -150,6 +199,23 @@ export default function EspejoPage() {
     };
   }, []);
 
+  // En el modo por CSS no hay Escape del navegador: se atiende aquí
+  useEffect(() => {
+    if (!pantallaCompleta) return;
+    const alPulsar = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !document.fullscreenElement) setPantallaCompleta(false);
+    };
+    document.addEventListener('keydown', alPulsar);
+    return () => document.removeEventListener('keydown', alPulsar);
+  }, [pantallaCompleta]);
+
+  // Hallazgo 5353: el porqué del fallo tiene que leerse sin buscarlo; si quedó fuera de la
+  // pantalla (la persona había bajado), se trae a la vista
+  useEffect(() => {
+    if (aviso === null) return;
+    traerALaVista(avisoRef.current, avisoRef.current);
+  }, [aviso, intentosFallidos]);
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -163,6 +229,19 @@ export default function EspejoPage() {
 
       <LegalNotice />
 
+      {/* Por qué no se abrió la cámara (hallazgos 4746 y 4747): siempre montado para que el
+          lector anuncie el cambio; vacío, no ocupa sitio. Va ENCIMA del recuadro (hallazgo 5353):
+          debajo quedaba bajo los 697-880 px del recuadro, fuera de la primera pantalla. Los
+          párrafos llevan el número de intento como key: cada rechazo se vuelve a anunciar. */}
+      <div ref={avisoRef} className={styles.avisoCamara} role="alert">
+        <p key={`t${intentosFallidos}`} className={styles.avisoTitulo}>
+          {aviso ? AVISOS[aviso].titulo : ''}
+        </p>
+        <p key={`d${intentosFallidos}`} className={styles.avisoDetalle}>
+          {aviso ? AVISOS[aviso].detalle : ''}
+        </p>
+      </div>
+
       {/* Espejo */}
       <div
         ref={containerRef}
@@ -174,7 +253,9 @@ export default function EspejoPage() {
           <button type="button" className={styles.espejoPlaceholder} onClick={iniciarCamara}>
             <span className={styles.placeholderIcon} aria-hidden="true">{aviso ? '🚫' : '🪞'}</span>
             <span className={styles.placeholderTexto}>
-              {aviso ? 'Pulsa para volver a intentarlo' : 'Pulsa para activar el espejo'}
+              {aviso === 'bloqueado'
+                ? 'Pulsa para reintentar cuando hayas permitido la cámara'
+                : aviso ? 'Pulsa para volver a intentarlo' : 'Pulsa para activar el espejo'}
             </span>
           </button>
         ) : null}
@@ -200,13 +281,6 @@ export default function EspejoPage() {
             </button>
           </div>
         )}
-      </div>
-
-      {/* Por qué no se abrió la cámara (hallazgos 4746 y 4747): siempre montado para que el
-          lector anuncie el cambio; vacío, no ocupa sitio */}
-      <div className={styles.avisoCamara} role="alert">
-        <p className={styles.avisoTitulo}>{aviso ? AVISOS[aviso].titulo : ''}</p>
-        <p className={styles.avisoDetalle}>{aviso ? AVISOS[aviso].detalle : ''}</p>
       </div>
 
       {/* Botón principal */}
