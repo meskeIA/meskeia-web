@@ -14,13 +14,15 @@ interface Task {
   createdAt: number;
 }
 
-// Configuración de cuadrantes
-const QUADRANTS: Record<Quadrant, { title: string; subtitle: string; icon: string; color: string; action: string }> = {
+// Configuración de cuadrantes. `color` es el del cuadrante (bordes); `texto`, su tono de TEXTO por
+// tema: el contador de la barra iba en `color` (#f39c12 a 2,19:1 y #95a5a6 a 2,5:1 sobre blanco) (C0645)
+const QUADRANTS: Record<Quadrant, { title: string; subtitle: string; icon: string; color: string; texto: string; action: string }> = {
   hacer: {
     title: 'Hacer',
     subtitle: 'Urgente + Importante',
     icon: '🔥',
     color: '#e74c3c',
+    texto: 'var(--rojo-texto, #B91C1C)',
     action: 'Hazlo ahora mismo. Son crisis, plazos inmediatos o problemas críticos.',
   },
   planificar: {
@@ -28,6 +30,7 @@ const QUADRANTS: Record<Quadrant, { title: string; subtitle: string; icon: strin
     subtitle: 'No Urgente + Importante',
     icon: '📅',
     color: '#2E86AB',
+    texto: 'var(--primary-texto)',
     action: 'Agenda tiempo específico. Son metas, proyectos estratégicos y desarrollo personal.',
   },
   delegar: {
@@ -35,6 +38,7 @@ const QUADRANTS: Record<Quadrant, { title: string; subtitle: string; icon: strin
     subtitle: 'Urgente + No Importante',
     icon: '👥',
     color: '#f39c12',
+    texto: 'var(--ambar-texto, #8A5A00)',
     action: 'Delega si puedes. Son interrupciones, algunas llamadas y emails urgentes de otros.',
   },
   eliminar: {
@@ -42,6 +46,7 @@ const QUADRANTS: Record<Quadrant, { title: string; subtitle: string; icon: strin
     subtitle: 'No Urgente + No Importante',
     icon: '🗑️',
     color: '#95a5a6',
+    texto: 'var(--text-secondary)',
     action: 'Elimina o minimiza. Son distracciones, tiempo perdido y actividades sin valor.',
   },
 };
@@ -204,16 +209,16 @@ export default function MatrizEisenhowerPage() {
             <strong>{totalTasks}</strong> tareas totales
           </span>
           <span className={styles.statDivider}>|</span>
-          <span className={styles.statItem} style={{ color: QUADRANTS.hacer.color }}>
+          <span className={styles.statItem} style={{ color: QUADRANTS.hacer.texto }}>
             <span aria-hidden="true">🔥</span> {tasksByQuadrant.hacer}
           </span>
-          <span className={styles.statItem} style={{ color: QUADRANTS.planificar.color }}>
+          <span className={styles.statItem} style={{ color: QUADRANTS.planificar.texto }}>
             <span aria-hidden="true">📅</span> {tasksByQuadrant.planificar}
           </span>
-          <span className={styles.statItem} style={{ color: QUADRANTS.delegar.color }}>
+          <span className={styles.statItem} style={{ color: QUADRANTS.delegar.texto }}>
             <span aria-hidden="true">👥</span> {tasksByQuadrant.delegar}
           </span>
-          <span className={styles.statItem} style={{ color: QUADRANTS.eliminar.color }}>
+          <span className={styles.statItem} style={{ color: QUADRANTS.eliminar.texto }}>
             <span aria-hidden="true">🗑️</span> {tasksByQuadrant.eliminar}
           </span>
           <button type="button" onClick={clearAll} className={styles.clearButton} aria-label="Limpiar todo">

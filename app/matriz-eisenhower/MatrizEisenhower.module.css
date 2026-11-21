@@ -654,12 +654,17 @@
 }
 .eduEscenarioTip {
   font-size: 0.8rem;
-  color: var(--primary-texto);
+  /* Más oscuro que --primary-texto: sobre el tinte de marca encima de la tarjeta gris daba 4,48:1
+     (5,7 ahora); en oscuro, un azul claro propio (--primary-texto daba 3,65) (C0645) */
+  color: #1F5F79;
   font-weight: 500;
   padding: 0.25rem 0.5rem;
   background: rgba(46, 134, 171, 0.1);
   border-radius: 6px;
   border-left: 3px solid var(--primary, #2E86AB);
+}
+[data-theme='dark'] .eduEscenarioTip {
+  color: #7CC3E3;
 }
 [data-theme='dark'] .eduEscenarioCard {
   background: rgba(255,255,255,0.05);

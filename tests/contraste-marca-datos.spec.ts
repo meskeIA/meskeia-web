@@ -299,6 +299,10 @@ const APPS: App[] = [
   // y con dos autores elegidos el movimiento y las obras en el color del autor con style (#1A3A4A,
   // #2C3E50, #6C3483 sobre la tarjeta oscura) y el blanco sobre los colores medios (#16A085, 3,3).
   // Cada botón «+ A» y «+ B» de los diez autores, como sección: recorre todos los colores
+  // 21/11/2026 (C0645): «Por qué funciona» de los escenarios en --primary-texto sobre el tinte de marca
+  // encima de la tarjeta gris (4,48:1 en claro, 3,65 en oscuro). El contador de los cuadrantes, que
+  // sale al añadir tareas, en tests/apps/matriz-eisenhower.spec.ts
+  { slug: 'matriz-eisenhower', todo: true },
   { slug: 'comparador-voces-narrativas', todo: true, secciones: "[class*='autorBotones'] button" },
   { slug: 'visualizador-como-funciona-el-dolor', todo: true, secciones: "nav[aria-label='Fases de la nocicepción'] button, [role='tablist'][aria-label='Tipos de dolor'] [role='tab']" },
 ];
