@@ -6,7 +6,9 @@
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;
   --text-secondary: #666666;
-  --text-muted: #6E6E6E;
+  /* #656565 y no #6E6E6E: la empresa y «Parcial» de la fila desplegada caían a 4,49:1 sobre su
+     tinte de marca (5,1 ahora) (C0645) */
+  --text-muted: #656565;
   --border: #E5E5E5;
   --hover: #F5F5F5;
   --hero-bg: #1a5278;
@@ -146,6 +148,9 @@
 .detalleEtiqueta { font-weight: 700; color: var(--text-primary); min-width: 140px; }
 .mejorParaRow { display: flex; flex-wrap: wrap; gap: 6px; margin: var(--spacing-sm) 0; }
 .mejorTag { padding: 2px 8px; border: 1.5px solid; border-radius: 40px; font-size: 0.75rem; font-weight: 600; }
+/* Texto en el color de un IDE: su tono que llega a 4,5:1 en cada tema, de tonosIde() en la página */
+.tonoIde { color: var(--tono-claro); }
+[data-theme='dark'] .tonoIde { color: var(--tono-oscuro); }
 .enlaceOficial { font-size: 0.82rem; color: var(--primary-texto); text-decoration: none; }
 .enlaceOficial:hover { text-decoration: underline; }
 

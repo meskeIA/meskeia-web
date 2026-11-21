@@ -1,8 +1,9 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import styles from './ComparadorIdesIa.module.css';
+import { rellenoConTinta, tonoSobre } from '@/lib/tintaLegible';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import LegalNotice from '@/components/LegalNotice';
@@ -69,7 +70,8 @@ const IDES: IDE[] = [
     nombre: 'Cursor',
     empresa: 'Anysphere',
     icono: '⚡',
-    color: '#7C3AED',
+    // Gris pizarra: el violeta que llevaba es uno de los dos colores prohibidos de meskeIA
+    color: '#374151',
     basado: 'Fork de VS Code',
     planGratuito: true,
     detallePlanGratuito: '500 peticiones IA/mes — sin tarjeta',
@@ -279,6 +281,30 @@ function getIde(id: string, ides: IDE[]): IDE | undefined {
   return ides.find((i) => i.id === id);
 }
 
+// ─── Texto en el color de cada IDE (C0645) ───
+// El texto se medía en el color puro sobre el fondo: «Gratis» en #06B6D4 a 2,33:1 sobre la página,
+// el rosa de JetBrains a 3,04-3,17 en claro y #084C61 a 1,84 en oscuro. Se calcula el tono del color
+// que llega a 4,5:1 sobre el fondo MÁS desfavorable donde aparece en cada tema: la fila desplegada
+// (tinte de marca al 7 % sobre la página, #EBF1F4) en claro y --hover (#333333) en oscuro.
+const FONDO_PEOR_CLARO = '#EBF1F4';
+const FONDO_PEOR_OSCURO = '#333333';
+
+function tonosIde(color: string): CSSProperties {
+  return {
+    '--tono-claro': tonoSobre(color, FONDO_PEOR_CLARO),
+    '--tono-oscuro': tonoSobre(color, FONDO_PEOR_OSCURO),
+  } as CSSProperties;
+}
+
+/** Etiqueta con fondo del color del IDE: relleno y tinta de rellenoConTinta (blanco sobre #06B6D4, 2,4:1) */
+function rellenoIde(color: string): CSSProperties {
+  const { relleno, tinta } = rellenoConTinta(color);
+  return { background: relleno, color: tinta };
+}
+
+// Gris de la etiqueta «Alternativa»: el blanco sobre #888 daba 3,54:1; sobre #666 da 5,74
+const GRIS_ALTERNATIVA = '#666666';
+
 // ─── Componente ───
 
 export default function ComparadorIdesIa() {
@@ -376,7 +402,7 @@ export default function ComparadorIdesIa() {
                         </td>
                         <td className={styles.td}><span className={styles.basadoLabel}>{ide.basado}</span></td>
                         <td className={styles.td}>{ide.planGratuito ? <span className={styles.siTag}><span role="img" aria-label="A favor:">✅</span> Sí</span> : <span className={styles.noTag}><span role="img" aria-label="En contra:">❌</span> No</span>}</td>
-                        <td className={styles.td}><span className={styles.precioTag} style={{ borderColor: ide.color, color: ide.color }}>{ide.precioDesde}</span></td>
+                        <td className={styles.td}><span className={`${styles.precioTag} ${styles.tonoIde}`} style={{ borderColor: ide.color, ...tonosIde(ide.color) }}>{ide.precioDesde}</span></td>
                         <td className={styles.td}>{dispIcon(ide.iaNativa)}</td>
                         <td className={styles.td}><span aria-hidden="true">{dispIcon(ide.agenteAutonomo)}</span> <span className={styles.dispLabel}>{dispLabel(ide.agenteAutonomo)}</span></td>
                         <td className={styles.td}>{dispIcon(ide.extensionesVSCode)}</td>
@@ -412,7 +438,7 @@ export default function ComparadorIdesIa() {
                               </div>
                               <div className={styles.mejorParaRow}>
                                 {ide.mejorPara.map((t) => (
-                                  <span key={t} className={styles.mejorTag} style={{ borderColor: ide.color, color: ide.color }}>{t}</span>
+                                  <span key={t} className={`${styles.mejorTag} ${styles.tonoIde}`} style={{ borderColor: ide.color, ...tonosIde(ide.color) }}>{t}</span>
                                 ))}
                               </div>
                               <a href={ide.urlPrecios} target="_blank" rel="noopener noreferrer" className={styles.enlaceOficial}>
@@ -499,14 +525,14 @@ export default function ComparadorIdesIa() {
                     <div className={styles.lenguajeOpciones}>
                       {primera && (
                         <div className={styles.lenguajeOpcion}>
-                          <span className={styles.lenguajeOpcionLabel} style={{ background: primera.color }}>1ª opción</span>
-                          <span style={{ color: primera.color, fontWeight: 700 }}><span aria-hidden="true">{primera.icono}</span> {primera.nombre}</span>
+                          <span className={styles.lenguajeOpcionLabel} style={rellenoIde(primera.color)}>1ª opción</span>
+                          <span className={styles.tonoIde} style={{ fontWeight: 700, ...tonosIde(primera.color) }}><span aria-hidden="true">{primera.icono}</span> {primera.nombre}</span>
                         </div>
                       )}
                       {alt && (
                         <div className={styles.lenguajeOpcion}>
-                          <span className={styles.lenguajeOpcionLabel} style={{ background: '#888' }}>Alternativa</span>
-                          <span style={{ color: alt.color, fontWeight: 700 }}><span aria-hidden="true">{alt.icono}</span> {alt.nombre}</span>
+                          <span className={styles.lenguajeOpcionLabel} style={{ background: GRIS_ALTERNATIVA }}>Alternativa</span>
+                          <span className={styles.tonoIde} style={{ fontWeight: 700, ...tonosIde(alt.color) }}><span aria-hidden="true">{alt.icono}</span> {alt.nombre}</span>
                         </div>
                       )}
                     </div>
@@ -554,7 +580,7 @@ export default function ComparadorIdesIa() {
                   <div className={styles.recomCards}>
                     {rec && (
                       <div className={styles.recomCard} style={{ borderColor: rec.color }}>
-                        <div className={styles.recomBadge} style={{ background: rec.color }}>Primera opción</div>
+                        <div className={styles.recomBadge} style={rellenoIde(rec.color)}>Primera opción</div>
                         <span style={{ fontSize: '2rem', color: rec.color }} aria-hidden="true">{rec.icono}</span>
                         <p className={styles.recomNombre}>{rec.nombre}</p>
                         <p className={styles.recomPrecio}>{rec.precioDesde}</p>
@@ -562,7 +588,7 @@ export default function ComparadorIdesIa() {
                     )}
                     {alt && (
                       <div className={styles.recomCard} style={{ borderColor: '#CCC' }}>
-                        <div className={styles.recomBadge} style={{ background: '#888' }}>Alternativa</div>
+                        <div className={styles.recomBadge} style={{ background: GRIS_ALTERNATIVA }}>Alternativa</div>
                         <span style={{ fontSize: '2rem', color: alt.color }} aria-hidden="true">{alt.icono}</span>
                         <p className={styles.recomNombre}>{alt.nombre}</p>
                         <p className={styles.recomPrecio}>{alt.precioDesde}</p>

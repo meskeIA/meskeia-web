@@ -311,6 +311,11 @@ const APPS: App[] = [
   // la leyenda en texto claro sobre sus pasteles fijos en oscuro y blanco sobre el gris de la
   // diagonal. Las cuatro pestañas; el nombre de cada clase en su detalle, en
   // tests/apps/visualizador-tipos-activos.spec.ts
+  // 21/11/2026 (C0645): el precio y las etiquetas «mejor para» en el color de cada IDE con style
+  // («Gratis» en #06B6D4 a 2,33:1 y el rosa de JetBrains a 3,04-3,17 en claro; #084C61 a 1,84 en
+  // oscuro, además del violeta prohibido de Cursor) y --text-muted sobre la fila desplegada (4,49).
+  // Las cuatro pestañas, con todas las filas de la tabla desplegadas
+  { slug: 'comparador-ides-ia', todo: true, secciones: "[role='tablist'][aria-label='Secciones del comparador de IDEs'] [role='tab']" },
   { slug: 'visualizador-tipos-activos', todo: true, secciones: "[role='tablist'][aria-label='Secciones del visualizador'] [role='tab']" },
   { slug: 'visualizador-digestion-nutrientes', todo: true, secciones: "nav[aria-label='Secciones del explicador'] button" },
   { slug: 'comparador-voces-narrativas', todo: true, secciones: "[class*='autorBotones'] button" },
