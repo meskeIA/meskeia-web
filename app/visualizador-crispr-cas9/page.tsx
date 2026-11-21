@@ -328,21 +328,27 @@ function TabMecanismo() {
       {/* Slider de pasos */}
       <div className={styles.sliderGroup}>
         <div className={styles.pasoIndicadores} role="list" aria-label="Pasos del mecanismo CRISPR">
-          {PASOS_CRISPR.map((p) => (
-            <button
-              key={p.paso}
-              type="button"
-              role="listitem"
-              onClick={() => setPasoActivo(p.paso)}
-              aria-pressed={pasoActivo === p.paso}
-              aria-label={`Paso ${p.paso}: ${p.titulo}`}
-              className={`${styles.pasoBtn} ${pasoActivo === p.paso ? styles.pasoBtnActivo : ''}`}
-              style={pasoActivo === p.paso ? { backgroundColor: p.color, borderColor: p.color } : {}}
-            >
-              <span aria-hidden="true">{p.icono}</span>
-              <span className={styles.pasoBtnNum}>{p.paso}</span>
-            </button>
-          ))}
+          {PASOS_CRISPR.map((p) => {
+            // Relleno opaco con la tinta que le llega, también en oscuro: el número iba en blanco
+            // sobre el color del paso (#2E86AB, 4,11:1) y en oscuro en el gris de los inactivos
+            // (2,1:1), porque [data-theme='dark'] .pasoBtn pisaba el blanco (C0868)
+            const r = rellenoConTinta(p.color);
+            return (
+              <button
+                key={p.paso}
+                type="button"
+                role="listitem"
+                onClick={() => setPasoActivo(p.paso)}
+                aria-pressed={pasoActivo === p.paso}
+                aria-label={`Paso ${p.paso}: ${p.titulo}`}
+                className={`${styles.pasoBtn} ${pasoActivo === p.paso ? styles.pasoBtnActivo : ''}`}
+                style={pasoActivo === p.paso ? { backgroundColor: r.relleno, borderColor: r.relleno, color: r.tinta } : {}}
+              >
+                <span aria-hidden="true">{p.icono}</span>
+                <span className={styles.pasoBtnNum}>{p.paso}</span>
+              </button>
+            );
+          })}
         </div>
 
         <input

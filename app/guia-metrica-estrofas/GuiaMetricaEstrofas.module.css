@@ -62,7 +62,10 @@
   color: var(--primary-texto);
 }
 
-.tabBtnActive {
+/* En oscuro, [data-theme='dark'] .tabBtn (0,2,0) ponía su gris #B0B0B0 sobre el relleno del
+   elegido, a 2,5:1 (C0868) */
+.tabBtnActive,
+[data-theme='dark'] .tabBtn.tabBtnActive {
   background: var(--primary-boton);
   color: #fff;
   border-color: var(--primary-boton);

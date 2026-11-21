@@ -77,6 +77,11 @@ const APPS: App[] = [
   { slug: 'visualizador-mecanica-fluidos' },
   { slug: 'visualizador-oceanos-corrientes' },
   { slug: 'visualizador-silicio' },
+  // El activo conservaba el relleno, pero la regla oscura de la base le ponía su texto gris encima
+  { slug: 'guia-metrica-estrofas', atributo: 'aria-selected' },
+  { slug: 'visualizador-volumenes' },
+  { slug: 'visualizador-crispr-cas9' },
+  { slug: 'calculadora-filtro-nd-video' },
 ];
 
 interface Lectura {

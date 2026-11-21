@@ -69,7 +69,10 @@
   transform: translateY(-1px);
 }
 
-.figBtnActivo {
+/* En oscuro, [data-theme='dark'] .figBtn (0,2,0) ponía el gris de los inactivos sobre el
+   relleno del elegido, a 2,5:1 (C0868) */
+.figBtnActivo,
+[data-theme='dark'] .figBtn.figBtnActivo {
   border-color: var(--primary-boton);
   background: var(--primary-boton);
   color: white;
