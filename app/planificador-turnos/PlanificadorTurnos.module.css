@@ -1040,9 +1040,11 @@
   border-radius: 0 var(--radius) var(--radius) 0;
 }
 
+/* En oscuro, --text-muted (#9B9B9B) sobre el tinte teal daba 4,43:1: --text-secondary (5,7) (C0645) */
 [data-theme='dark'] .escenarioTip {
   background: rgba(72, 169, 166, 0.1);
   border-left-color: var(--secondary);
+  color: var(--text-secondary);
 }
 
 /* ============ FAQ ============ */
@@ -1094,6 +1096,7 @@
 
 [data-theme='dark'] .faqTip {
   background: rgba(72, 169, 166, 0.1);
+  color: var(--text-secondary) !important;
 }
 
 /* ============ GUÍA PASO A PASO ============ */

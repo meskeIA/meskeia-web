@@ -356,7 +356,10 @@ const APPS: App[] = [
   // comparador (Desierto #FFC107 a 1,63:1, Tundra 1,91, Templado 2,10, Sabana 2,19, Tropical 2,87),
   // el % protegido en rojo, naranja y verde puros (2,85-2,87 en claro, el rojo 2,64 en oscuro) y la
   // severidad de cada amenaza en su color (naranja 2,85 en claro, violeta 2,45 en oscuro). Las pestañas
-  { slug: 'visualizador-biomas-terrestres', todo: true, secciones: "nav[aria-label='Secciones del visualizador'] [role='tab']" },];
+  { slug: 'visualizador-biomas-terrestres', todo: true, secciones: "nav[aria-label='Secciones del visualizador'] [role='tab']" },
+  // 21/11/2026 (C0645): en oscuro, los consejos de los escenarios y de la FAQ en --text-muted sobre su
+  // tinte teal (4,43:1)
+  { slug: 'planificador-turnos', todo: true },];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
   return page.evaluate(({ marca, todo }) => {
