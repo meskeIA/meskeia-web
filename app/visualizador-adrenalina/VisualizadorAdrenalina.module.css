@@ -405,7 +405,10 @@
   outline-offset: 2px;
 }
 
-.medicamentoCardActiva {
+/* En oscuro, [data-theme='dark'] .medicamentoCard (0,2,0) le quitaba el borde a la tarjeta
+   abierta (C0868) */
+.medicamentoCardActiva,
+[data-theme='dark'] .medicamentoCard.medicamentoCardActiva {
   border-color: #2E86AB;
   box-shadow: 0 3px 14px rgba(46, 134, 171, 0.2);
 }

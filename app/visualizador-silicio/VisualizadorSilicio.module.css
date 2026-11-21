@@ -693,7 +693,9 @@
   outline-offset: 2px;
 }
 
-.procesoStepActivo {
+/* En oscuro, [data-theme='dark'] .procesoStep (0,2,0) le quitaba el borde al paso abierto (C0868) */
+.procesoStepActivo,
+[data-theme='dark'] .procesoStep.procesoStepActivo {
   border-color: var(--primary, #2E86AB);
   box-shadow: 0 2px 8px rgba(46, 134, 171, 0.15);
 }

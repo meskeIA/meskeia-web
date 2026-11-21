@@ -369,6 +369,12 @@
   border-color: rgba(255, 255, 255, 0.15);
 }
 
+/* El favorito se marca con el borde ámbar, que esta regla oscura borraba (C0868); en oscuro, el
+   ámbar claro: #B45309 sobre el fondo de la estrella daba 2,9:1, #F59E0B da 6,4 */
+[data-theme='dark'] .btnEstrella.btnEstrellaActiva {
+  border-color: #F59E0B;
+}
+
 /* Tab favoritos */
 .categoriaTabFavoritos {
   font-weight: 700;

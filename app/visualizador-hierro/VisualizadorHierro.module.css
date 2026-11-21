@@ -124,7 +124,9 @@
   border-color: var(--accent, #7FB3D3);
 }
 
-.leyendaItemActivo {
+/* En oscuro, [data-theme='dark'] .leyendaItem (0,2,0) dejaba el elegido igual que los demás (C0868) */
+.leyendaItemActivo,
+[data-theme='dark'] .leyendaItem.leyendaItemActivo {
   border-color: var(--sector-color, var(--primary));
   background-color: color-mix(in srgb, var(--sector-color, var(--primary)) 8%, var(--bg-card));
 }

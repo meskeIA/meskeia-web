@@ -192,7 +192,10 @@
   line-height: 1;
 }
 
-.reformaToggleActivo {
+/* En oscuro, [data-theme='dark'] .reformaToggle (0,2,0) ponía el ✓ en --text-muted sobre el
+   relleno, a 1,97:1 (C0868) */
+.reformaToggleActivo,
+[data-theme='dark'] .reformaToggle.reformaToggleActivo {
   background: var(--primary-boton);
   border-color: var(--primary-boton);
   color: white;

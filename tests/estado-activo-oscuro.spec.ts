@@ -34,11 +34,19 @@ interface App {
   /** Contenedor de los botones; por defecto, el padre directo de un activo y un inactivo */
   grupo?: string;
   /** Atributo que marca el elegido (por defecto aria-pressed) */
-  atributo?: 'aria-pressed' | 'aria-selected';
-  /** Botón que hay que pulsar antes para que aparezca el grupo */
-  antes?: string;
+  atributo?: 'aria-pressed' | 'aria-selected' | 'aria-expanded';
+  /** Botón que hay que pulsar antes para que aparezca el grupo o haya un elegido */
+  antes?: string | RegExp;
   /** Texto del botón activo del grupo que se mide, cuando el primero de la página es otro */
   activoTexto?: string;
+  /** Qué distingue al elegido: su relleno (por defecto) o su borde, en las tarjetas que se marcan con él */
+  marca?: 'fondo' | 'borde';
+  /** Elemento que lleva el atributo, si no es un <button> (por defecto 'button') */
+  elemento?: string;
+  /** Parte del botón que lleva la marca, si no es el propio botón */
+  parte?: string;
+  /** El texto lo pintan sus hijos con su propio color: el `color` del botón no dice nada */
+  sinTinta?: boolean;
 }
 
 const GRUPO_FILTROS = "[role='group']";
@@ -76,7 +84,16 @@ const APPS: App[] = [
   { slug: 'visualizador-magnesio' },
   { slug: 'visualizador-mecanica-fluidos' },
   { slug: 'visualizador-oceanos-corrientes' },
-  { slug: 'visualizador-silicio' },
+  { slug: 'visualizador-silicio', activoTexto: 'Semiconductor' },
+  // Los que solo aparecen al elegir uno, y las tarjetas que marcan el elegido con el borde
+  { slug: 'visualizador-silicio', elemento: '[role="button"]', atributo: 'aria-expanded', marca: 'borde', antes: /Lingote Czochralski/, activoTexto: 'Lingote' },
+  { slug: 'visualizador-hierro', antes: /Ferritina/, sinTinta: true },
+  { slug: 'visualizador-teoria-grafos', antes: /^Origen:/, activoTexto: 'Origen' },
+  { slug: 'visualizador-endorfinas', atributo: 'aria-expanded', marca: 'borde', antes: /Ver detalle de Reír/ },
+  { slug: 'visualizador-adrenalina', atributo: 'aria-expanded', marca: 'borde', antes: /Parada cardíaca/ },
+  { slug: 'tablero-comunicacion', grupo: 'body', elemento: 'button[aria-label$="en favoritos"]', marca: 'borde', antes: /en favoritos$/ },
+  // El círculo de la reforma elegida: relleno de marca con el ✓, que en oscuro iba en --text-muted
+  { slug: 'estimador-reformas-hogar', grupo: 'body', parte: 'span:last-child', antes: /Cocina completa/, activoTexto: 'Cocina completa' },
   // El activo conservaba el relleno, pero la regla oscura de la base le ponía su texto gris encima
   { slug: 'guia-metrica-estrofas', atributo: 'aria-selected' },
   { slug: 'visualizador-volumenes' },
@@ -92,10 +109,23 @@ interface Lectura {
   tinta: string;
 }
 
-/** Fondo calculado del primer botón activo y del primer inactivo del mismo grupo */
-async function fondos(page: Page, grupo: string, atributo: string, activoTexto = ''): Promise<Lectura> {
-  return page.evaluate(([sel, attr, texto]) => {
-    const canales = (c: string): number[] => (c.match(/[\d.]+/g) ?? []).map(Number);
+interface Que {
+  grupo: string;
+  atributo: string;
+  activoTexto: string;
+  marca: 'fondo' | 'borde';
+  elemento: string;
+  parte: string;
+}
+
+/** Fondo (o borde) calculado del botón activo y del primer inactivo del mismo grupo */
+async function fondos(page: Page, que: Que): Promise<Lectura> {
+  return page.evaluate(({ grupo: sel, atributo: attr, activoTexto: texto, marca, elemento, parte }) => {
+    // Chrome da el resultado de un color-mix() como color(srgb r g b), con canales de 0 a 1 (C0866)
+    const canales = (c: string): number[] => {
+      const n = (c.match(/[\d.]+/g) ?? []).map(Number);
+      return c.startsWith('color(srgb') ? n.map((v, i) => (i < 3 ? v * 255 : v)) : n;
+    };
     const lum = (rgb: number[]): number => {
       const [r, g, b] = rgb.slice(0, 3).map((v) => {
         const s = v / 255;
@@ -103,11 +133,21 @@ async function fondos(page: Page, grupo: string, atributo: string, activoTexto =
       });
       return 0.2126 * r + 0.7152 * g + 0.0722 * b;
     };
+    const propiedad = (el: Element): string => {
+      const cs = getComputedStyle(el);
+      return marca === 'borde' ? cs.borderTopColor : cs.backgroundColor;
+    };
     for (const g of Array.from(document.querySelectorAll(sel))) {
-      const activo = g.querySelector(`button[${attr}="true"]`);
-      const inactivo = g.querySelector(`button[${attr}="false"]`);
-      if (activo && inactivo && (activo.textContent ?? '').includes(texto)) {
-        const ca = getComputedStyle(activo);
+      const activo = Array.from(g.querySelectorAll(`${elemento}[${attr}="true"]`)).find((el) =>
+        (el.textContent ?? '').includes(texto),
+      );
+      const inactivo = Array.from(g.querySelectorAll(`${elemento}[${attr}="false"]`)).find(
+        (el) => !parte || el.querySelector(parte),
+      );
+      const ma = parte ? activo?.querySelector(parte) : activo;
+      const mi = parte ? inactivo?.querySelector(parte) : inactivo;
+      if (ma && mi) {
+        const ca = getComputedStyle(ma);
         const fondo = canales(ca.backgroundColor);
         const opaco = fondo.length === 3 || fondo[3] === 1;
         let contraste: number | null = null;
@@ -117,33 +157,42 @@ async function fondos(page: Page, grupo: string, atributo: string, activoTexto =
           contraste = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
         }
         return {
-          activo: ca.backgroundColor,
-          inactivo: getComputedStyle(inactivo).backgroundColor,
+          activo: propiedad(ma),
+          inactivo: propiedad(mi),
           contraste,
           tinta: `${ca.color} sobre ${ca.backgroundColor}`,
         };
       }
     }
     return { activo: 'sin grupo', inactivo: 'sin grupo', contraste: null, tinta: '' };
-  }, [grupo, atributo, activoTexto]);
+  }, que);
 }
 
-for (const { slug, grupo: grupoFila, atributo = 'aria-pressed', antes, activoTexto } of APPS) {
-  const grupo = grupoFila ?? `:has(> button[${atributo}="true"]):has(> button[${atributo}="false"])`;
+for (const fila of APPS) {
+  const { slug, atributo = 'aria-pressed', antes, activoTexto = '', marca = 'fondo', elemento = 'button', parte = '', sinTinta } = fila;
+  const grupo = fila.grupo ?? `:has(> ${elemento}[${atributo}="true"]):has(> ${elemento}[${atributo}="false"])`;
+  const que: Que = { grupo, atributo, activoTexto, marca, elemento, parte };
+  const lo = marca === 'borde' ? 'borde' : 'fondo';
   // Dos grupos de la misma app se distinguen en el título por el texto de su activo
   const cual = APPS.filter((a) => a.slug === slug).length > 1 ? ` («${activoTexto}»)` : '';
   test(`${slug}${cual}: el botón activo conserva su relleno en oscuro (C0868)`, async ({ page }) => {
     await page.goto(`/${slug}/`);
     await prepararParaMedir(page);
-    if (antes) await page.getByRole('button', { name: antes, exact: true }).first().click();
-    await expect(page.locator(`${grupo} button[${atributo}="true"]`).first()).toBeVisible();
-    const claro = await fondos(page, grupo, atributo, activoTexto);
+    if (antes) {
+      await page.getByRole('button', { name: antes, exact: typeof antes === 'string' }).first().click();
+    }
+    await expect(page.locator(`${grupo} ${elemento}[${atributo}="true"]`).first()).toBeVisible();
+    const claro = await fondos(page, que);
     expect(claro.activo, 'claro: el grupo existe').not.toBe('sin grupo');
-    expect(claro.activo, 'claro: el activo tiene otro fondo (control)').not.toBe(claro.inactivo);
-    if (claro.contraste !== null) expect(claro.contraste, `claro: texto del activo (${claro.tinta})`).toBeGreaterThanOrEqual(4.5);
+    expect(claro.activo, `claro: el activo tiene otro ${lo} (control)`).not.toBe(claro.inactivo);
+    if (claro.contraste !== null && !sinTinta) {
+      expect(claro.contraste, `claro: texto del activo (${claro.tinta})`).toBeGreaterThanOrEqual(4.5);
+    }
     await activarTemaOscuro(page);
-    const oscuro = await fondos(page, grupo, atributo, activoTexto);
-    expect(oscuro.activo, `oscuro: el activo tiene otro fondo que el inactivo (${oscuro.inactivo})`).not.toBe(oscuro.inactivo);
-    if (oscuro.contraste !== null) expect(oscuro.contraste, `oscuro: texto del activo (${oscuro.tinta})`).toBeGreaterThanOrEqual(4.5);
+    const oscuro = await fondos(page, que);
+    expect(oscuro.activo, `oscuro: el activo tiene otro ${lo} que el inactivo (${oscuro.inactivo})`).not.toBe(oscuro.inactivo);
+    if (oscuro.contraste !== null && !sinTinta) {
+      expect(oscuro.contraste, `oscuro: texto del activo (${oscuro.tinta})`).toBeGreaterThanOrEqual(4.5);
+    }
   });
 }
