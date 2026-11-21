@@ -447,18 +447,23 @@ export default function LupaDigitalPage() {
     }
   };
 
-  /** Teclado del asa, como cualquier deslizador: flechas, Re Pág / Av Pág, Inicio y Fin. */
+  /**
+   * Teclado del asa, como cualquier deslizador: flechas, Re Pág / Av Pág, Inicio y Fin. El valor
+   * que anuncia es la ALTURA desde abajo (hallazgo 5357), así que ↑, → y Re Pág la suben, Inicio
+   * la lleva abajo del todo (el mínimo) y Fin arriba (el máximo), como manda el patrón de
+   * deslizador de ARIA. `posGuia` sigue contándose desde arriba: es lo que pinta `top`.
+   */
   const moverGuiaConTeclado = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const paso = e.shiftKey ? 10 : 2;
     const destinos: Record<string, number> = {
       ArrowUp: posGuia - paso,
-      ArrowLeft: posGuia - paso,
+      ArrowRight: posGuia - paso,
       ArrowDown: posGuia + paso,
-      ArrowRight: posGuia + paso,
+      ArrowLeft: posGuia + paso,
       PageUp: posGuia - 10,
       PageDown: posGuia + 10,
-      Home: 0,
-      End: 100,
+      Home: 100,
+      End: 0,
     };
     const destino = destinos[e.key];
     if (destino === undefined) return;
@@ -469,6 +474,12 @@ export default function LupaDigitalPage() {
   const ventana = bordesVentana(posGuia, altoVentana);
   const posMin = acotarGuia(0, guia, altoVentana);
   const posMax = acotarGuia(100, guia, altoVentana);
+  // Lo que ven y oyen los dos controles: la altura de la guía contada desde ABAJO (0 % = abajo del
+  // todo). Contada desde arriba, «Altura … 100 %» era la guía pegada abajo, y el deslizador de
+  // debajo (que con ↑ suma) la bajaba mientras ↑ en el asa la subía (hallazgo 5357)
+  const alturaGuia = 100 - posGuia;
+  const alturaMin = 100 - posMax;
+  const alturaMax = 100 - posMin;
 
   const getFiltroStyle = (): string => {
     const filtros: string[] = [];
@@ -585,10 +596,10 @@ export default function LupaDigitalPage() {
               tabIndex={0}
               aria-label="Posición de la guía de lectura"
               aria-orientation="vertical"
-              aria-valuemin={posMin}
-              aria-valuemax={posMax}
-              aria-valuenow={posGuia}
-              aria-valuetext={`${formatPercentage(posGuia / 100, 0)} de la altura del visor, desde arriba`}
+              aria-valuemin={alturaMin}
+              aria-valuemax={alturaMax}
+              aria-valuenow={alturaGuia}
+              aria-valuetext={`${formatPercentage(alturaGuia / 100, 0)} de la altura del visor, desde abajo`}
               className={styles.guiaAsa}
               style={{ top: `${posGuia}%` }}
               onPointerDown={iniciarArrastreGuia}
@@ -860,16 +871,16 @@ export default function LupaDigitalPage() {
           <div className={styles.guiaAjustes}>
             <div className={styles.ajuste}>
               <label htmlFor="control-guia-posicion">
-                Altura de la guía en el visor: {formatPercentage(posGuia / 100, 0)}
+                Altura de la guía en el visor: {formatPercentage(alturaGuia / 100, 0)}
               </label>
               <input
                 id="control-guia-posicion"
                 type="range"
-                min={posMin}
-                max={posMax}
+                min={alturaMin}
+                max={alturaMax}
                 step="1"
-                value={posGuia}
-                onChange={(e) => setPosGuia(acotarGuia(parseInt(e.target.value, 10), guia, altoVentana))}
+                value={alturaGuia}
+                onChange={(e) => setPosGuia(acotarGuia(100 - parseInt(e.target.value, 10), guia, altoVentana))}
                 className={styles.ajusteSlider}
               />
             </div>

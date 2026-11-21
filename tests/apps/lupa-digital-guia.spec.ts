@@ -19,8 +19,14 @@ import { esperarHidratacion } from './_hidratacion';
  * Cámara simulada de Chromium, como en lupa-digital.spec.ts.
  *
  * Inspector 21/11/2026 (modo cambio): la ventana mínima y el paso por la línea, la máscara negra
- * con «Invertir» que promete la FAQ, el giro del móvil y un hallazgo nuevo marcado con test.fail()
- * (la escala de la guía crece hacia abajo y sus dos controles la mueven en sentidos opuestos).
+ * con «Invertir» que promete la FAQ, el giro del móvil y un hallazgo nuevo (5357: la escala de la
+ * guía crecía hacia abajo y sus dos controles la movían en sentidos opuestos).
+ *
+ * REPARADO el 21/11/2026 (hallazgo 5357): el asa y el control de debajo anuncian la ALTURA desde
+ * abajo (0 % = la guía abajo del todo). Por eso aria-valuenow vale 100 − (distancia desde arriba):
+ * la geometría que miden los test no cambia, pero los números del asa sí (centro en el 60 % desde
+ * arriba = altura 40), y como en cualquier deslizador de ARIA, «Inicio» la lleva al mínimo (abajo)
+ * y «Fin» al máximo (arriba).
  */
 
 test.use({
@@ -84,23 +90,24 @@ test('S0275 — la máscara deja ver solo su franja, se mueve con el teclado den
   expect(abajo?.arriba).toBeCloseTo(0.6, 2);
   expect(abajo?.abajo).toBeCloseTo(1, 2);
 
-  // Cinco flechas abajo, de 2 en 2: centro en el 60 % → velo de arriba hasta el 50 %.
+  // Cinco flechas abajo, de 2 en 2: centro en el 60 % desde arriba (altura 40) → velo de arriba hasta el 50 %.
   await asa.focus();
   for (let i = 0; i < 5; i++) await asa.press('ArrowDown');
-  await expect(asa).toHaveAttribute('aria-valuenow', '60');
+  await expect(asa).toHaveAttribute('aria-valuenow', '40');
   arriba = await cajaEnVisor(page, 'velo-arriba');
   expect(arriba?.abajo).toBeCloseTo(0.5, 2);
 
-  // «Fin» lleva al tope: la ventana entera sigue dentro del visor (centro en el 90 %).
-  await asa.press('End');
-  await expect(asa).toHaveAttribute('aria-valuenow', '90');
+  // «Inicio» lleva al tope de abajo: la ventana entera sigue dentro del visor (centro en el 90 %
+  // desde arriba, altura 10).
+  await asa.press('Home');
+  await expect(asa).toHaveAttribute('aria-valuenow', '10');
   abajo = await cajaEnVisor(page, 'velo-abajo');
   expect(abajo?.arriba).toBeCloseTo(1, 2);
 
-  // Ventana de 40 %: el tope baja al 80 % y la guía se recoloca, sin salirse por abajo.
+  // Ventana de 40 %: el tope baja al 80 % desde arriba (altura 20) y la guía se recoloca, sin salirse por abajo.
   await page.locator('#control-guia-alto').fill('40');
   await expect(page.locator('label[for="control-guia-alto"]')).toHaveText(/40\s%/);
-  await expect(asa).toHaveAttribute('aria-valuenow', '80');
+  await expect(asa).toHaveAttribute('aria-valuenow', '20');
   await expect(asa).toHaveAttribute('aria-valuemax', '80');
   arriba = await cajaEnVisor(page, 'velo-arriba');
   abajo = await cajaEnVisor(page, 'velo-abajo');
@@ -135,10 +142,12 @@ async function centroDeLaLinea(page: Page): Promise<number> {
  * Esperados a mano, de acotarGuia (guia.ts: el centro de la máscara va de alto/2 a 100 − alto/2;
  * el de la línea, de 0 a 100) y del teclado del asa (flecha ±2, Mayús+flecha y Re/Av Pág ±10):
  *   · ventana de 10 %: tope 5-95; centro 50 → velo de arriba hasta el 45 %, el de abajo desde el 55 %
- *   · «Inicio» → 5 (velo de arriba de alto 0, el de abajo desde el 10 %); «Av Pág» → 15;
+ *   · «Fin» → 5 (velo de arriba de alto 0, el de abajo desde el 10 %); «Av Pág» → 15;
  *     Mayús+↓ → 25; ↑ → 23
- *   · «Línea guía»: el centro sigue en 23 y el tope pasa a 0-100; «Inicio» → 0; de vuelta a la
+ *   · «Línea guía»: el centro sigue en 23 y el tope pasa a 0-100; «Fin» → 0; de vuelta a la
  *     máscara de 10 %, el centro se reacota a 5
+ *   (posiciones del centro desde arriba; el asa anuncia 100 − eso desde el hallazgo 5357, y por
+ *   eso es «Fin», el máximo de la altura, lo que la lleva arriba)
  *   · ventana de 40 %: tope 20-80, el centro 5 sube a 20 y el velo de abajo empieza en el 40 %
  */
 test('Inspector 21/11/2026 — con la ventana mínima (10 %) el teclado del asa respeta su tope 5-95, y al pasar por la línea y ensanchar a 40 % la guía se reacota', async ({
@@ -156,33 +165,34 @@ test('Inspector 21/11/2026 — con la ventana mínima (10 %) el teclado del asa 
   expect((await cajaEnVisor(page, 'velo-arriba'))?.abajo).toBeCloseTo(0.45, 2);
   expect((await cajaEnVisor(page, 'velo-abajo'))?.arriba).toBeCloseTo(0.55, 2);
 
+  // Desde el 5-95 de la cabecera, en altura desde abajo (hallazgo 5357): «Fin» = arriba del todo
   await asa.focus();
-  await asa.press('Home');
-  await expect(asa).toHaveAttribute('aria-valuenow', '5');
+  await asa.press('End');
+  await expect(asa).toHaveAttribute('aria-valuenow', '95');
   expect((await cajaEnVisor(page, 'velo-arriba'))?.abajo).toBeCloseTo(0, 2);
   expect((await cajaEnVisor(page, 'velo-abajo'))?.arriba).toBeCloseTo(0.1, 2);
   await asa.press('PageDown');
-  await expect(asa).toHaveAttribute('aria-valuenow', '15');
+  await expect(asa).toHaveAttribute('aria-valuenow', '85');
   await asa.press('Shift+ArrowDown');
-  await expect(asa).toHaveAttribute('aria-valuenow', '25');
+  await expect(asa).toHaveAttribute('aria-valuenow', '75');
   await asa.press('ArrowUp');
-  await expect(asa).toHaveAttribute('aria-valuenow', '23');
+  await expect(asa).toHaveAttribute('aria-valuenow', '77');
 
   await page.getByRole('button', { name: /Línea guía/ }).click();
-  await expect(asa).toHaveAttribute('aria-valuenow', '23');
+  await expect(asa).toHaveAttribute('aria-valuenow', '77');
   await expect(asa).toHaveAttribute('aria-valuemin', '0');
   expect(await centroDeLaLinea(page)).toBeCloseTo(0.23, 2);
   await asa.focus();
-  await asa.press('Home');
-  await expect(asa).toHaveAttribute('aria-valuenow', '0');
+  await asa.press('End');
+  await expect(asa).toHaveAttribute('aria-valuenow', '100');
 
   await page.getByRole('button', { name: /Máscara/ }).click();
-  await expect(asa).toHaveAttribute('aria-valuenow', '5');
+  await expect(asa).toHaveAttribute('aria-valuenow', '95');
   expect((await cajaEnVisor(page, 'velo-abajo'))?.arriba).toBeCloseTo(0.1, 2);
 
   await page.locator('#control-guia-alto').fill('40');
   await expect(page.locator('label[for="control-guia-alto"]')).toHaveText(/40\s%/);
-  await expect(asa).toHaveAttribute('aria-valuenow', '20');
+  await expect(asa).toHaveAttribute('aria-valuenow', '80');
   await expect(asa).toHaveAttribute('aria-valuemin', '20');
   await expect(asa).toHaveAttribute('aria-valuemax', '80');
   expect((await cajaEnVisor(page, 'velo-arriba'))?.abajo).toBeCloseTo(0, 2);
@@ -251,10 +261,9 @@ test('Inspector 21/11/2026 — con «Invertir» la máscara sigue siendo negra (
  * se cuenta. Reparación natural: contar desde abajo (altura = 100 − distancia desde arriba).
  * Marcado con test.fail(): afirma lo que debería pasar y hoy falla en el primer expect.
  */
-test('HALLAZGO NUEVO (accesibilidad) — la flecha ↑ debe mover la guía hacia el mismo lado en el asa y en el control de debajo, y «Altura … %» no debe valer 100 con la guía abajo del todo', async ({
+test('HALLAZGO 5357 (accesibilidad, REPARADO 21/11/2026) — la flecha ↑ debe mover la guía hacia el mismo lado en el asa y en el control de debajo, y «Altura … %» no debe valer 100 con la guía abajo del todo', async ({
   page,
 }) => {
-  test.fail();
   await activarLupa(page);
   await page.getByRole('button', { name: /Línea guía/ }).click();
   const asa = page.getByRole('slider', { name: NOMBRE_ASA });
@@ -280,6 +289,9 @@ test('HALLAZGO NUEVO (accesibilidad) — la flecha ↑ debe mover la guía hacia
   expect(await centroDeLaLinea(page)).toBeCloseTo(1, 1);
   const texto = (await rotulo.textContent()) ?? '';
   expect(/desde arriba/i.test(texto) || /:\s0\s%/.test(texto), `rótulo con la guía abajo: «${texto}»`).toBe(true);
+  // El asa dice lo mismo que el rótulo: altura 0, contada desde abajo
+  await expect(asa).toHaveAttribute('aria-valuenow', '0');
+  await expect(asa).toHaveAttribute('aria-valuetext', /desde abajo/);
 });
 
 test.describe('en móvil (Pixel 7)', () => {
@@ -322,7 +334,7 @@ test.describe('en móvil (Pixel 7)', () => {
     await page.getByRole('button', { name: /Línea guía/ }).click();
     await page.evaluate(() => document.querySelector('canvas')?.parentElement?.scrollIntoView({ block: 'center' }));
 
-    // El asa, del 50 % al 25 % de la altura del visor con el dedo.
+    // El asa, del 50 % al 25 % de la altura del visor (desde arriba) con el dedo: altura 75 desde abajo.
     const asa = page.getByRole('slider', { name: NOMBRE_ASA });
     const cajaAsa = await asa.boundingBox();
     let visor = await cajaDelVisor(page);
@@ -331,8 +343,8 @@ test.describe('en móvil (Pixel 7)', () => {
     await arrastrarConElDedo(page, centroAsa, { x: centroAsa.x, y: visor.y + visor.alto * 0.25 });
     await expect
       .poll(async () => Number(await asa.getAttribute('aria-valuenow')))
-      .toBeGreaterThanOrEqual(24);
-    expect(Number(await asa.getAttribute('aria-valuenow'))).toBeLessThanOrEqual(26);
+      .toBeLessThanOrEqual(76);
+    expect(Number(await asa.getAttribute('aria-valuenow'))).toBeGreaterThanOrEqual(74);
 
     // Máscara en directo: un gesto vertical sobre el velo desplaza la página (C0067), no la guía.
     await page.getByRole('button', { name: /Máscara/ }).click();
@@ -352,7 +364,8 @@ test.describe('en móvil (Pixel 7)', () => {
     await expect(lienzo).toBeVisible();
     await page.evaluate(() => document.querySelector('canvas')?.parentElement?.scrollIntoView({ block: 'center' }));
     visor = await cajaDelVisor(page);
-    const centro = Number(await asa.getAttribute('aria-valuenow')) / 100;
+    // aria-valuenow es la altura desde abajo: la fracción desde arriba es 1 − altura
+    const centro = 1 - Number(await asa.getAttribute('aria-valuenow')) / 100;
     const enLaVentana = { x: visor.x + visor.ancho / 2, y: visor.y + visor.alto * centro };
     await arrastrarConElDedo(page, enLaVentana, { x: enLaVentana.x - 80, y: enLaVentana.y });
     await expect(lienzo).toHaveAttribute('style', /translate\(-80px, 0px\) scale\(4\)/);
@@ -361,7 +374,8 @@ test.describe('en móvil (Pixel 7)', () => {
 
   /**
    * Inspector 21/11/2026 — guia.ts promete que «la guía se queda en el mismo renglón al girar el
-   * móvil». Esperado a mano: máscara de 20 % con el centro en 30 (diez ↑ de 2 desde 50) → velo de
+   * móvil». Esperado a mano: máscara de 20 % con el centro en 30 desde arriba (diez ↑ de 2 desde
+   * 50; el asa anuncia altura 70 desde el hallazgo 5357) → velo de
    * arriba de 0 a 0,20 y el de abajo desde 0,40, con el visor en vertical (medido: 294 px de alto) y
    * en horizontal (495 px), sin tocar nada entre medias.
    */
@@ -373,7 +387,7 @@ test.describe('en móvil (Pixel 7)', () => {
     const asa = page.getByRole('slider', { name: NOMBRE_ASA });
     await asa.focus();
     for (let i = 0; i < 10; i++) await asa.press('ArrowUp');
-    await expect(asa).toHaveAttribute('aria-valuenow', '30');
+    await expect(asa).toHaveAttribute('aria-valuenow', '70');
 
     const comprobar = async () => {
       expect((await cajaEnVisor(page, 'velo-arriba'))?.abajo).toBeCloseTo(0.2, 2);
@@ -384,7 +398,7 @@ test.describe('en móvil (Pixel 7)', () => {
 
     await page.setViewportSize({ width: PIXEL_7.viewport.height, height: PIXEL_7.viewport.width });
     await expect.poll(async () => (await cajaDelVisor(page)).alto).toBeGreaterThan(altoVertical + 100);
-    await expect(asa).toHaveAttribute('aria-valuenow', '30');
+    await expect(asa).toHaveAttribute('aria-valuenow', '70');
     await comprobar();
   });
 });
