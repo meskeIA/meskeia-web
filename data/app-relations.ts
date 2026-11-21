@@ -1582,7 +1582,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-deuda-publica/', icon: '🏛️', name: 'Deuda Pública', description: 'Bonos soberanos y prima de riesgo' },
     { url: '/estimador-inversiones/', icon: '📊', name: 'Simulador de Inversión', description: 'Cuánto crece tu dinero' },
     { url: '/selector-tipo-hipoteca/', icon: '🏦', name: 'Comparador Hipotecas', description: 'Tipos fijo vs variable' },
-    { url: '/estimador-inversiones/', icon: '💹', name: 'Rentabilidad de Inversión', description: 'ROI e interés compuesto' },
+    { url: '/visualizador-burbuja-especulativa/', icon: '🫧', name: 'Burbujas Especulativas', description: 'Las fases de una burbuja y sus casos históricos' },
   ],
   'visualizador-cambio-climatico-tipping-points': [
     { url: '/visualizador-efecto-invernadero/', icon: '🌍', name: 'Efecto Invernadero', description: 'Gases y calentamiento' },
@@ -1593,7 +1593,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-deuda-publica': [
     { url: '/visualizador-mercados-financieros/', icon: '📈', name: 'Mercados Financieros', description: 'Cómo se negocian los bonos' },
     { url: '/estimador-inversiones/', icon: '💹', name: 'Rentabilidad de Inversión', description: 'ROI e interés compuesto' },
-    { url: '/estimador-inversiones/', icon: '📊', name: 'Simulador de Inversión', description: 'Cuánto rinde tu capital' },
+    { url: '/visualizador-inflacion/', icon: '📉', name: 'Inflación', description: 'Cómo la inflación cambia el valor real de la deuda' },
   ],
   'visualizador-farmacocinetica': [
     { url: '/visualizador-higado/', icon: '🧪', name: 'El Hígado', description: 'Metabolismo hepático y CYP450 en detalle' },
@@ -1711,9 +1711,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-falacias-logicas': [
     { url: '/visualizador-sesgos-cognitivos/', icon: '🧠', name: 'Sesgos Cognitivos', description: 'Errores sistemáticos en el pensamiento' },
-    { url: '/visualizador-falacias-logicas/', icon: '🔍', name: 'Test Pensamiento Crítico', description: 'Evalúa tu razonamiento lógico' },
+    { url: '/detector-sesgos-cognitivos/', icon: '🔍', name: 'Detector de Sesgos Cognitivos', description: 'Reflexiona sobre cómo decides' },
     { url: '/visualizador-evolucion-humana/', icon: '🦴', name: 'Evolución Humana', description: 'El origen cognitivo de nuestros razonamientos' },
-    { url: '/visualizador-falacias-logicas/', icon: '❌', name: 'Falacias Lógicas', description: 'Guía visual de errores de razonamiento' },
+    { url: '/visualizador-desinformacion/', icon: '📰', name: 'Desinformación', description: 'Cómo se propaga un bulo y cómo verificarlo' },
   ],
   'visualizador-evolucion-humana': [
     { url: '/visualizador-falacias-logicas/', icon: '🧠', name: 'Falacias Lógicas', description: 'Cómo razona el cerebro humano' },
@@ -2264,7 +2264,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'calculadora-tiempo-lectura': seoApps,
   'generador-palabras-clave': seoApps,
-  'generador-schema-markup': [...seoApps.slice(0, 2), ...seoExtraApps.slice(2, 4)],
+  // Sin seoExtraApps[2], que es ella misma (C0859)
+  'generador-schema-markup': [...seoApps.slice(0, 2), seoExtraApps[1], seoExtraApps[3]],
   'analizador-geo': seoApps,
   'generador-hashtags': [...seoApps.slice(0, 2), ...negociosApps.slice(2, 4)],
 
@@ -2411,7 +2412,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
 
   // TEXTO
-  'contador-palabras': [...textoApps.filter(a => a.url !== '/contador-palabras/'), textoExtraApps[0]],
+  // textoExtraApps[0] es Contador Sílabas, que ya trae textoApps (C0859)
+  'contador-palabras': [...textoApps.filter(a => a.url !== '/contador-palabras/'), textoExtraApps[1]],
   'conversor-texto': [
     ...textoApps.filter(a => a.url !== '/conversor-texto/'),
     { url: '/conversor-numeros-letras/', icon: '✍️', name: 'Números a Letras', description: 'Cifras e importes escritos en palabras' },
@@ -4819,8 +4821,8 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-alzheimer-parkinson': [
     { url: '/visualizador-proteinas-plegamiento/', icon: '🧬', name: 'Plegamiento de Proteínas', description: 'Alzheimer y Parkinson son proteinopatías: enfermedades causadas por proteínas mal plegadas (Aβ, Tau, α-sinucleína)' },
     { url: '/visualizador-sistema-nervioso/', icon: '⚡', name: 'La Neurona', description: 'Cómo funciona una neurona sana: potencial de acción, sinapsis y neurotransmisores que se alteran en estas enfermedades' },
-    { url: '/visualizador-sistema-nervioso/', icon: '🧠', name: 'Sistema Nervioso', description: 'La anatomía del sistema nervioso central donde se desarrollan los procesos neurodegenerativos' },
-    { url: '/visualizador-sistema-nervioso/', icon: '💬', name: 'Neurotransmisores', description: 'La dopamina (Parkinson) y la acetilcolina (Alzheimer) son los neurotransmisores más afectados' },
+    { url: '/visualizador-cerebro/', icon: '🧠', name: 'El Cerebro', description: 'La anatomía del cerebro, donde se desarrollan los procesos neurodegenerativos' },
+    { url: '/visualizador-dopamina/', icon: '💬', name: 'Dopamina', description: 'El circuito de la dopamina, el neurotransmisor que se pierde en el Parkinson' },
   ],
   'visualizador-cancer': [
     { url: '/visualizador-adn-polimerasa/', icon: '🔬', name: 'ADN y Replicación', description: 'Los errores en la replicación del ADN y los fallos en su reparación son el origen de las mutaciones cancerígenas' },
@@ -6024,7 +6026,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-historia/historia-inteligencia-artificial/', icon: '🤖', name: 'Historia de la IA', description: 'La IA generativa está redefiniendo el contenido de las redes sociales: algoritmos de recomendación basados en deep learning, chatbots integrados (Grok, Meta AI) y la automatización de la creación de contenido son el próximo capítulo de la historia de las redes sociales.' },
     { url: '/visualizador-historia/internet/', icon: '🌐', name: 'Historia de Internet', description: 'Las redes sociales son una capa construida sobre internet: la web (1991), el correo electrónico, los foros y el HTML pusieron la infraestructura sobre la que Facebook, Twitter e Instagram construyeron sus plataformas. Sin HTTP y el navegador, no habría red social.' },
     { url: '/visualizador-historia/ordenadores/', icon: '💻', name: 'Historia de los Ordenadores', description: 'Los smartphones que pusieron las redes sociales en el bolsillo de 5.000 millones de personas son la culminación de 80 años de miniaturización del ordenador: de los mainframes a los chips M3 y Snapdragon que procesan algoritmos de recomendación en tiempo real.' },
-    { url: '/visualizador-historia/historia-inteligencia-artificial/', icon: '🧠', name: 'IA y Algoritmos Sociales', description: 'El algoritmo de TikTok (ForYouPage) y el EdgeRank de Facebook son aplicaciones de machine learning: redes neuronales entrenadas para maximizar el engagement prediciendo qué contenido verá cada usuario. La historia de la IA y la historia de las redes sociales convergen en la era actual.' },
+    { url: '/visualizador-ia-redes-neuronales/', icon: '🧠', name: 'IA y Algoritmos Sociales', description: 'El algoritmo de TikTok (ForYouPage) y el EdgeRank de Facebook son aplicaciones de machine learning: redes neuronales entrenadas para maximizar el engagement prediciendo qué contenido verá cada usuario. La historia de la IA y la historia de las redes sociales convergen en la era actual.' },
   ],
   'visualizador-historia-silicon-valley': [
     { url: '/visualizador-historia/ordenadores/', icon: '💻', name: 'Historia de los Ordenadores', description: 'Silicon Valley es el epicentro de la historia del ordenador personal: Intel (microprocesador), Apple (Mac, iPhone), HP (calculadoras científicas) y NVIDIA (GPUs para IA) son empresas del Valley que han definido cada generación de hardware en los últimos 70 años.' },
