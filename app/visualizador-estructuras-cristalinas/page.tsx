@@ -803,12 +803,11 @@ function Escena3D({ atomos, aristas, caras, tamano = 320, rotacionInicial }: Esc
   const [rotation, setRotation] = useState<Rotation>(rotacionInicial ?? { x: -20, y: 30 });
   const [isDragging, setIsDragging] = useState(false);
   const lastPos = useRef({ x: 0, y: 0 });
-  const prefersReducedMotion = useRef(
-    typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false
-  );
 
+  // El arrastre gira también con movimiento reducido: es manipulación directa, no una animación,
+  // y la app lo pide en el subtítulo, bajo la escena y en el aria-label. Hasta el 21/11/2026 se
+  // desactivaba y a ese usuario solo le quedaban los botones (hallazgo 5310).
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    if (prefersReducedMotion.current) return;
     setIsDragging(true);
     lastPos.current = { x: e.clientX, y: e.clientY };
     (e.target as HTMLElement).setPointerCapture(e.pointerId);

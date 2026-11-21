@@ -748,7 +748,8 @@ test.describe('Firma 20/11/2026 · escritorio 1280 px', () => {
 test.describe('Firma 20/11/2026 · movimiento reducido', () => {
   test.use({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
 
-  test.fail('ABIERTO (firma 20/11/2026) · con movimiento reducido el arrastre no gira y la app sigue diciendo «Arrastra para rotar»', async ({ page }) => {
+  test('REPARADO 5310 (firma 20/11/2026) · con movimiento reducido el arrastre no gira y la app sigue diciendo «Arrastra para rotar»', async ({ page }) => {
+    // Reparado por la primera vía: el arrastre gira (es manipulación directa) y el cursor es «grab».
     // handlePointerDown sale sin hacer nada si prefers-reduced-motion: el arrastre es manipulación
     // directa, no una animación. Arrastrar 40 px → y = 30 + 40·0,5 = 50°. Obtenido: 30°, cursor
     // «default», y el texto bajo la escena, el aria-label y el subtítulo siguen pidiendo arrastrar.
@@ -767,6 +768,7 @@ test.describe('Firma 20/11/2026 · movimiento reducido', () => {
     const prometeArrastre =
       (await page.getByText(/Arrastra para rotar/i).count()) > 0 || /Arrastra/i.test((await escena.getAttribute('aria-label')) ?? '');
     expect(gira || !prometeArrastre, `gira: ${gira} · promete arrastrar: ${prometeArrastre}`).toBe(true);
+    if (gira) expect(await escena.evaluate((e) => getComputedStyle(e).cursor), 'el cursor dice que se puede agarrar').toBe('grab');
   });
 });
 

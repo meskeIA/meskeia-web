@@ -212,8 +212,6 @@
 /* Accesibilidad: movimiento reducido */
 @media (prefers-reduced-motion: reduce) {
   .estructura3d { transition: none; }
-  .scene3d { cursor: default; }
-  .scene3d:active { cursor: default; }
   .sistemaCard,
   .cristalCard,
   .navBtn,
