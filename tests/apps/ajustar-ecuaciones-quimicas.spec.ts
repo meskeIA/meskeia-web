@@ -23,12 +23,16 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   3 · rechazo  · H2 + O2 → H2O + H2O2 (dos reacciones independientes) · «Xx» · paréntesis sin cerrar ·
  *                  Zn + HCl → ZnCl2 (sin solución) · dos semirreacciones de reducción.
  *
- * HALLAZGOS ABIERTOS (test.fail(), cada uno falla en la aserción que lo mide):
+ * HALLAZGOS REPARADOS (reparar 21/11/2026; antes test.fail()):
  *   H1 (alto)  · La carga se lee mal sin «^»: normalizarTexto convierte los superíndices en cifras
  *                normales y parseEspecie se come la última cifra del cuerpo como carga. «NH₄⁺» y «NH4+»
  *                se analizan como NH⁴⁺ (N +3, esperado −3); «SO₄²⁻» como SO⁴²⁻ (S −40, esperado +6). La
  *                propia ecuación que pinta la app («MnO₄⁻ + Fe²⁺ + H⁺ → Mn²⁺ + Fe³⁺ + H₂O») se rechaza
  *                al pegarla, y «MnO₄⁻ → Mn²⁺» sale como oxidación.
+ *                REPARADO: los superíndices pasan a «^n±» antes de normalizar. «NH4+» sin «^» es
+ *                ambiguo en un ion poliatómico (subíndice o carga, como en «SO42-»): la app pide el «^»
+ *                en vez de suponer NH⁴⁺, que es la salida que proponía la ficha. Fe3+ (monoatómico) sigue
+ *                leyéndose sin «^».
  *   H2 (medio) · NH4NO3: N +1 sin aviso de valor medio (el amonio tiene −3 y el nitrato +5); el aviso
  *                solo sale si el promedio no es entero.
  *   H3 (bajo)  · O2F2: O +2 fijo con flúor → suma +2 con carga 0, sin aviso (esperado O +1).
@@ -43,7 +47,13 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   H9 (bajo)  · Un elemento en un solo lado (H2 + O2 → H2O + NaCl) da «comprueba que las especies
  *                estén en el lado correcto de la flecha»: cambiar NaCl de lado no lo arregla.
  *   H10 (bajo) · El resultado no está en una región viva: tras «Ajustar» el lector no anuncia nada
- *                (los errores sí, con role="alert").
+ *                (los errores sí, con role="alert"). Y aria-controls de las pestañas inactivas apuntaba
+ *                a paneles que no estaban en el DOM.
+ *   H2-H10 REPARADOS en la misma tanda: el valor despejado para varios átomos avisa de que es medio
+ *   (NH4NO3), el O con flúor se despeja por la carga (O2F2 +1, OF2 +2), vacío con aviso en español,
+ *   el punto separa el agua también en «Números de oxidación», el multiplicador del hidrato va a
+ *   tamaño normal, concordancia con 1, «cuatro métodos», el aviso nombra el elemento de un solo lado
+ *   y los resultados van en región viva (aria-controls solo en la pestaña activa).
  */
 
 const RUTA = '/ajustar-ecuaciones-quimicas/';
@@ -175,29 +185,49 @@ test.describe('Ajustar ecuación: coeficientes enteros mínimos', () => {
   });
 
   test('H6 · el hidrato se escribe CuSO₄·5H₂O, con el 5 a tamaño normal', async ({ page }) => {
-    test.fail(); // ABIERTO: bonita() pasa a subíndice todas las cifras y pinta «CuSO₄·₅H₂O»
+    // REPARADO: bonita() pasaba a subíndice todas las cifras y pintaba «CuSO₄·₅H₂O»
     await ajustar(page, 'CuSO4·5H2O -> CuSO4 + H2O');
     await expect(coeficientes(page)).toHaveText('Coeficientes: 1 : 1 : 5');
     await expect(ecuacionAjustada(page)).toHaveText('CuSO₄·5H₂O → CuSO₄ + 5 H₂O');
   });
 
   test('H1 · la ecuación que pinta la propia app, pegada tal cual, da 1:5:8:1:5:4', async ({ page }) => {
-    test.fail(); // ABIERTO: «MnO₄⁻» se lee como MnO con carga −4 y el sistema solo tiene solución negativa
+    // REPARADO: «MnO₄⁻» se leía como MnO con carga −4 y el sistema solo tenía solución negativa
     await ajustar(page, 'MnO₄⁻ + Fe²⁺ + H⁺ → Mn²⁺ + Fe³⁺ + H₂O');
     await expect(coeficientes(page)).toHaveText('Coeficientes: 1 : 5 : 8 : 1 : 5 : 4');
+    await expect(fila(panelAjustar(page), page, 'Carga total').locator('td')).toHaveText(['Carga total', '+17', '+17', /conservada/]);
+  });
+
+  test('H1 · «NH4+» sin «^» en una ecuación pide el «^» en vez de suponer NH⁴⁺; Fe3+ monoatómico sí se lee', async ({ page }) => {
+    // NH4+ + OH- → NH3 + H2O con NH⁴⁺ (1 N, 1 H) no conserva el H: antes daba un error engañoso
+    await ajustar(page, 'NH4+ + OH- -> NH3 + H2O');
+    const aviso = panelAjustar(page).getByRole('alert');
+    await expect(aviso).toContainText('escribe la carga con «^»');
+    await expect(coeficientes(page)).toHaveCount(0);
+    // Fe: a = c · Cl: 3a = 3 → 1 : 3 : 1, con la carga +3 − 3 = 0
+    await ajustar(page, 'Fe3+ + Cl- -> FeCl3');
+    await expect(coeficientes(page)).toHaveText('Coeficientes: 1 : 3 : 1');
   });
 
   test('H9 · un elemento que solo está en un lado se nombra en el aviso', async ({ page }) => {
-    test.fail(); // ABIERTO: dice «comprueba que las especies estén en el lado correcto de la flecha»
+    // REPARADO: decía «comprueba que las especies estén en el lado correcto de la flecha»
     // Na y Cl solo aparecen a la derecha: el coeficiente de NaCl sale 0, y pasarlo a la izquierda tampoco ajusta
     await ajustar(page, 'H2 + O2 -> H2O + NaCl');
     const aviso = panelAjustar(page).getByRole('alert');
     await expect(aviso).toBeVisible();
-    await expect(aviso).toContainText(/\bNa\b|\bCl\b/);
+    await expect(aviso).toContainText('Na y Cl solo aparecen a la derecha');
+    await expect(aviso).not.toContainText('lado correcto de la flecha');
+    // KClO3 → KCl + O2 + H2O: el H solo está a la derecha
+    await ajustar(page, 'KClO3 -> KCl + O2 + H2O');
+    await expect(aviso).toContainText('H solo aparece a la derecha');
   });
 
-  test('H10 · el resultado del ajuste se anuncia (región viva)', async ({ page }) => {
-    test.fail(); // ABIERTO: ningún ancestro del resultado lleva aria-live ni role="status"
+  test('H10 · el resultado del ajuste se anuncia (región viva) y aria-controls no apunta a la nada', async ({ page }) => {
+    // REPARADO: ningún ancestro del resultado llevaba aria-live ni role="status"
+    for (const tab of await page.getByRole('tab').all()) {
+      const destino = await tab.getAttribute('aria-controls');
+      if (destino) await expect(page.locator(`#${destino}`), `aria-controls=${destino}`).toHaveCount(1);
+    }
     await ajustar(page, 'C3H8 + O2 -> CO2 + H2O');
     await expect(coeficientes(page)).toHaveText('Coeficientes: 1 : 5 : 3 : 4');
     const region = await ecuacionAjustada(page).evaluate((el) => {
@@ -287,53 +317,68 @@ test.describe('Números de oxidación', () => {
   });
 
   test('H1 · «NH₄⁺» con superíndice: N −3', async ({ page }) => {
-    test.fail(); // ABIERTO: se analiza NH⁴⁺ (1 N, 1 H, carga +4) y da N +3
+    // REPARADO: se analizaba NH⁴⁺ (1 N, 1 H, carga +4) y daba N +3
     await calcularEO(page, 'NH₄⁺');
+    await expect(panelEO(page).locator('p', { hasText: 'Especie analizada' }).locator('xpath=following-sibling::p[1]')).toHaveText('NH₄⁺');
     await expect(eoDe(page, 'N')).toHaveText('−3');
   });
 
-  test('H1 · «NH4+» sin «^»: N −3', async ({ page }) => {
-    test.fail(); // ABIERTO: el 4 se toma como carga → NH⁴⁺, N +3
+  test('H1 · «NH4+» sin «^»: pide el «^» en vez de suponer NH⁴⁺ (N +3)', async ({ page }) => {
+    // REPARADO: el 4 se tomaba como carga → NH⁴⁺, N +3. En un ion poliatómico, «NH4+» y «SO42-»
+    // tienen la misma forma y la cifra final es subíndice en uno y carga en el otro: no se adivina.
     await calcularEO(page, 'NH4+');
-    await expect(eoDe(page, 'N')).toHaveText('−3');
+    const aviso = panelEO(page).getByRole('alert');
+    await expect(aviso).toContainText('escribe la carga con «^»');
+    await expect(aviso).toContainText('NH4^+');
+    await expect(fila(panelEO(page), page, 'N')).toHaveCount(0);
   });
 
   test('H1 · «SO₄²⁻» con superíndices: S +6', async ({ page }) => {
-    test.fail(); // ABIERTO: «SO42-» → SO con carga −42 → S −40
+    // REPARADO: «SO42-» → SO con carga −42 → S −40
     await calcularEO(page, 'SO₄²⁻');
     await expect(eoDe(page, 'S')).toHaveText('+6');
+    await expect(panelEO(page)).toContainText('Carga total: −2 · Suma de los números de oxidación: −2');
   });
 
   test('H2 · NH4NO3: el N no es +1 sin más (−3 en el amonio, +5 en el nitrato)', async ({ page }) => {
-    test.fail(); // ABIERTO: N +1 con «Se despeja…» y sin el aviso de valor medio
+    // REPARADO: N +1 con «Se despeja…» y sin el aviso de valor medio
     await calcularEO(page, 'NH4NO3');
     await expect(eoDe(page, 'O')).toHaveText('−2');
     const valoresN = await fila(panelEO(page), page, 'N').locator('td:nth-child(3)').allInnerTexts();
     const texto = await panelEO(page).innerText();
     const avisaMedio = /oxidación medio|valor medio|promedio/i.test(texto);
     expect(valoresN.includes('−3') || avisaMedio, `N = ${valoresN.join(', ')} y sin aviso de valor medio`).toBe(true);
+    // Con un solo átomo despejado no hay media que avisar: KMnO4
+    await calcularEO(page, 'KMnO4');
+    await expect(panelEO(page)).not.toContainText('número de oxidación medio');
   });
 
-  test('H3 · O2F2: O +1 (2·O + 2·(−1) = 0)', async ({ page }) => {
-    test.fail(); // ABIERTO: O +2 fijo «unido al flúor» → suma +2 con carga 0
+  test('H3 · O2F2: O +1 (2·O + 2·(−1) = 0), y OF2 sigue en +2', async ({ page }) => {
+    // REPARADO: O +2 fijo «unido al flúor» → suma +2 con carga 0
     await calcularEO(page, 'O2F2');
     await expect(eoDe(page, 'F')).toHaveText('−1');
     await expect(eoDe(page, 'O')).toHaveText('+1');
+    await expect(panelEO(page)).toContainText('Carga total: 0 · Suma de los números de oxidación: 0');
+    // O + 2·(−1) = 0
+    await calcularEO(page, 'OF2');
+    await expect(eoDe(page, 'O')).toHaveText('+2');
   });
 
   test('H4 · fórmula vacía: aviso en español', async ({ page }) => {
-    test.fail(); // ABIERTO: «Cannot read properties of undefined (reading 'split')»
+    // REPARADO: «Cannot read properties of undefined (reading 'split')»
     await calcularEO(page, '');
     const aviso = panelEO(page).getByRole('alert');
     await expect(aviso).toBeVisible();
     await expect(aviso).toContainText(/fórmula/i);
+    await expect(aviso).not.toContainText('undefined');
   });
 
   test('H5 · CuSO4.5H2O (hidrato con punto): Cu +2 y S +6 como con «·»', async ({ page }) => {
-    test.fail(); // ABIERTO: Cu y S «—» y suma −8 con carga 0
+    // REPARADO: Cu y S «—» y suma −8 con carga 0
     await calcularEO(page, 'CuSO4.5H2O');
     await expect(eoDe(page, 'Cu')).toHaveText('+2');
     await expect(eoDe(page, 'S')).toHaveText('+6');
+    await expect(panelEO(page)).toContainText('sal anhidra');
   });
 });
 
@@ -405,23 +450,34 @@ test.describe('Redox por ion-electrón', () => {
   });
 
   test('H1 · las semirreacciones con superíndices dan lo mismo que con «^»', async ({ page }) => {
-    test.fail(); // ABIERTO: «MnO₄⁻ → Mn²⁺» sale como oxidación de 4 e⁻ y avisa de «dos oxidaciones»
+    // REPARADO: «MnO₄⁻ → Mn²⁺» salía como oxidación de 4 e⁻ y avisaba de «dos oxidaciones»
     await desarrollar(page, 'MnO₄⁻ → Mn²⁺', 'Fe²⁺ → Fe³⁺', 'ácido');
     await expect(ecuacionGlobal(page)).toHaveText('MnO₄⁻ + 8 H⁺ + 5 Fe²⁺ → Mn²⁺ + 4 H₂O + 5 Fe³⁺');
   });
 
   test('H7 · con un electrón, en singular', async ({ page }) => {
-    test.fail(); // ABIERTO: «supera en 1 unidades… se añaden 1 electrones»
+    // REPARADO: «supera en 1 unidades… se añaden 1 electrones»
     await desarrollar(page, 'MnO4^- -> Mn^2+', 'Fe^2+ -> Fe^3+', 'ácido');
     await expect(ecuacionGlobal(page)).toHaveText('MnO₄⁻ + 8 H⁺ + 5 Fe²⁺ → Mn²⁺ + 4 H₂O + 5 Fe³⁺');
-    await expect(panelRedox(page)).not.toContainText(/\s1 (electrones|unidades|moléculas)/);
+    await expect(panelRedox(page)).not.toContainText(/\s1 (electrones|unidades|moléculas|iones)/);
+    await expect(panelRedox(page)).toContainText('supera en 1 unidad a la del izquierdo, así que se añade 1 electrón a la derecha');
+    // SO3²⁻ + H2O → SO4²⁻ + 2 H⁺ + 2 e⁻: una sola molécula de agua
+    await desarrollar(page, 'MnO4^- -> Mn^2+', 'SO3^2- -> SO4^2-', 'ácido');
+    await expect(panelRedox(page)).toContainText('Se añade 1 molécula de agua');
+  });
+
+  test('H10 · la ecuación global del desarrollo se anuncia en una región viva', async ({ page }) => {
+    await desarrollar(page, 'MnO4^- -> Mn^2+', 'Fe^2+ -> Fe^3+', 'ácido');
+    await expect(panelRedox(page).locator('[aria-live="polite"]')).toHaveText(
+      'Ecuación iónica global ajustada: MnO₄⁻ + 8 H⁺ + 5 Fe²⁺ → Mn²⁺ + 4 H₂O + 5 Fe³⁺',
+    );
   });
 });
 
 // ─── Guía educativa ─────────────────────────────────────────────────────────
 
 test('H8 · el número de métodos del título coincide con las filas de su tabla', async ({ page }) => {
-  test.fail(); // ABIERTO: «Los tres métodos de ajuste» sobre cuatro filas (tanteo, algebraico, ion-electrón, número de oxidación)
+  // REPARADO: «Los tres métodos de ajuste» sobre cuatro filas (tanteo, algebraico, ion-electrón, número de oxidación)
   await abrir(page);
   await page.getByRole('button', { name: /Ver guía educativa/ }).click();
   const titulo = page.getByRole('heading', { name: /métodos de ajuste/ });

@@ -48,6 +48,8 @@ interface ResultadoOxidacion {
   incompleto: boolean;
   suma: number;
   hidrato: boolean;
+  /** Elemento despejado por la carga con más de un átomo: su valor es una media */
+  medioDespejado: string | null;
 }
 
 type Terminos = Map<string, number>;
@@ -195,12 +197,20 @@ const SUPERINDICES = '⁰¹²³⁴⁵⁶⁷⁸⁹';
 
 function normalizarTexto(texto: string): string {
   let s = texto;
+  // Una carga en superíndice (²⁺, ⁻, ³⁺) pasa a la forma «^2+»: si se convirtiera en cifras
+  // normales, la última cifra del cuerpo se tomaría por la carga (NH₄⁺ → NH⁴⁺, SO₄²⁻ → SO⁴²⁻)
+  s = s.replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹]*)([⁺⁻]+)/g, (_, cifras: string, signos: string) => {
+    const n = cifras.split('').map(c => String(SUPERINDICES.indexOf(c))).join('');
+    return `^${n}${signos.replace(/⁺/g, '+').replace(/⁻/g, '-')}`;
+  });
+  s = s.replace(/\^(\d*)\^/g, '^$1');
   for (let i = 0; i < 10; i++) {
     s = s.split(SUBINDICES[i]).join(String(i));
     s = s.split(SUPERINDICES[i]).join(String(i));
   }
   s = s.replace(/⁺/g, '+').replace(/[⁻–—−]/g, '-');
-  s = s.replace(/[→⟶➔⇒]/g, '->').replace(/[⇌⇄]/g, '->');
+  // Con espacios alrededor: «OH⁻→» no debe convertirse en «OH^-->»
+  s = s.replace(/[→⟶➔⇒⇌⇄]/g, ' -> ');
   s = s.replace(/=>/g, '->').replace(/-->/g, '->');
   return s;
 }
@@ -209,7 +219,17 @@ function normalizarTexto(texto: string): string {
 function bonita(formula: string): string {
   if (formula === 'e^-') return 'e⁻';
   const partes = formula.split('^');
-  const cuerpo = partes[0].replace(/\d/g, d => SUBINDICES[Number(d)]);
+  const subindices = (t: string): string => t.replace(/\d/g, d => SUBINDICES[Number(d)]);
+  // En un hidrato, la cifra que abre cada trozo tras el «·» es un multiplicador, no un
+  // subíndice: CuSO4·5H2O → CuSO₄·5H₂O
+  const cuerpo = partes[0]
+    .split('·')
+    .map((trozo, i) => {
+      if (i === 0) return subindices(trozo);
+      const mult = trozo.match(/^\d*/)?.[0] ?? '';
+      return mult + subindices(trozo.slice(mult.length));
+    })
+    .join('·');
   if (partes.length === 1) return cuerpo;
   const carga = partes[1]
     .replace(/\d/g, d => SUPERINDICES[Number(d)])
@@ -296,13 +316,31 @@ function parseEspecie(entrada: string): Especie {
 
   // Carga: SO4^2-, Fe3+, Na+, Ca++
   let carga = 0;
-  for (;;) {
-    const m = s.match(/\^?(\d*)([+-])$/);
-    if (!m) break;
-    const n = m[1] ? parseInt(m[1], 10) : 1;
-    carga += m[2] === '+' ? n : -n;
-    s = s.slice(0, m.index);
-    if (m[1]) break;
+  const valorSignos = (signos: string): number =>
+    signos.split('').reduce((acc, c) => acc + (c === '+' ? 1 : -1), 0);
+  const conMarca = s.match(/\^(\d*)([+-]+)$/);
+  const sinMarca = conMarca ? null : s.match(/(\d+)([+-])$/);
+  if (conMarca) {
+    carga = conMarca[1]
+      ? parseInt(conMarca[1], 10) * Math.sign(valorSignos(conMarca[2]))
+      : valorSignos(conMarca[2]);
+    s = s.slice(0, conMarca.index);
+  } else if (sinMarca) {
+    const resto = s.slice(0, sinMarca.index);
+    // Sin «^», la cifra final solo es carga sin ambigüedad en un ion monoatómico (Fe3+, Al3+).
+    // En un ion poliatómico puede ser un subíndice (NH4+ es NH₄⁺, no NH⁴⁺) o la carga (SO42-):
+    // se pide el «^» en vez de adivinar
+    if (!/^[A-Z][a-z]?$/.test(resto)) {
+      throw new Error(`En «${entrada.trim()}» no se sabe si la última cifra es un subíndice o la carga: escribe la carga con «^», por ejemplo NH4^+ (amonio) o SO4^2- (sulfato).`);
+    }
+    carga = parseInt(sinMarca[1], 10) * (sinMarca[2] === '+' ? 1 : -1);
+    s = resto;
+  } else {
+    const signos = s.match(/[+-]+$/);
+    if (signos) {
+      carga = valorSignos(signos[0]);
+      s = s.slice(0, signos.index);
+    }
   }
   s = s.replace(/\^$/, '');
 
@@ -405,6 +443,23 @@ function ajustarEcuacion(reactivos: Especie[], productos: Especie[]): number[] {
   if (nCols < 2) throw new Error('La ecuación necesita al menos una especie a cada lado.');
 
   const elementos = Array.from(new Set(especies.flatMap(e => Object.keys(e.atomos))));
+
+  // Un elemento que solo está a un lado no se puede conservar con coeficientes positivos, y
+  // mover especies de lado no lo arregla: se nombra para que se vea qué especie sobra o falta
+  const enLado = (lado: Especie[], el: string): boolean => lado.some(e => (e.atomos[el] ?? 0) > 0);
+  const soloIzq = elementos.filter(el => enLado(reactivos, el) && !enLado(productos, el));
+  const soloDer = elementos.filter(el => enLado(productos, el) && !enLado(reactivos, el));
+  if (soloIzq.length > 0 || soloDer.length > 0) {
+    const lista = (els: string[]): string =>
+      els.length === 1 ? els[0] : `${els.slice(0, -1).join(', ')} y ${els[els.length - 1]}`;
+    const frase = (els: string[], lado: string): string =>
+      `${lista(els)} solo ${els.length === 1 ? 'aparece' : 'aparecen'} a la ${lado} de la flecha`;
+    const partes: string[] = [];
+    if (soloIzq.length > 0) partes.push(frase(soloIzq, 'izquierda'));
+    if (soloDer.length > 0) partes.push(frase(soloDer, 'derecha'));
+    const varios = soloIzq.length + soloDer.length > 1;
+    throw new Error(`La ecuación no se puede ajustar: ${partes.join(', y ')}. Los átomos no aparecen ni desaparecen en una reacción, así que falta al otro lado una especie que ${varios ? 'los' : 'lo'} contenga, o sobra la que ${varios ? 'los' : 'lo'} aporta.`);
+  }
 
   const filas: Frac[][] = elementos.map(el =>
     especies.map((esp, j) => fr((j < reactivos.length ? 1 : -1) * (esp.atomos[el] ?? 0)))
@@ -512,7 +567,9 @@ function resolverAjuste(texto: string): ResultadoAjuste {
 // ============================================
 function calcularOxidacion(entrada: string): ResultadoOxidacion {
   // El agua de hidratación no altera los números de oxidación: se analiza la sal anhidra
-  const trozos = normalizarTexto(entrada).split(/[·*]/).filter(Boolean);
+  // El punto también separa el agua, como en «Ajustar»: es lo que se teclea sin «·» a mano
+  const trozos = normalizarTexto(entrada).split(/[·.*]/).filter(t => t.trim());
+  if (trozos.length === 0) throw new Error('Falta una fórmula: escribe una especie, por ejemplo KMnO4 o NH4^+.');
   const hidrato = trozos.length > 1;
   const especie = parseEspecie(trozos[0]);
   const elementos = Object.keys(especie.atomos);
@@ -534,6 +591,7 @@ function calcularOxidacion(entrada: string): ResultadoOxidacion {
       incompleto: false,
       suma: especie.carga,
       hidrato,
+      medioDespejado: null,
     };
   }
 
@@ -566,7 +624,8 @@ function calcularOxidacion(entrada: string): ResultadoOxidacion {
     } else if (SUPEROXIDOS.has(cuerpo)) {
       asignadas.O = { eo: -0.5, regla: 'Superóxido: el oxígeno presenta el valor fraccionario −1/2' };
     } else if (especie.atomos.F) {
-      asignadas.O = { eo: 2, regla: 'Unido al flúor, el oxígeno actúa con valor positivo' };
+      // Unido al flúor el oxígeno es positivo, pero no siempre +2 (OF2 +2, O2F2 +1): se despeja
+      // por la carga más abajo, como cualquier elemento sin regla fija
     } else {
       asignadas.O = { eo: -2, regla: 'El oxígeno actúa con −2 salvo en peróxidos, superóxidos y compuestos con flúor' };
     }
@@ -631,11 +690,15 @@ function calcularOxidacion(entrada: string): ResultadoOxidacion {
   }
 
   let incompleto = false;
+  let despejado: string | null = null;
   if (pendientes.length === 1) {
     const el = pendientes[0];
+    despejado = el;
     asignadas[el] = {
       eo: (especie.carga - sumaConocida) / especie.atomos[el],
-      regla: 'Se despeja imponiendo que la suma de todos los números de oxidación sea igual a la carga de la especie',
+      regla: el === 'O' && especie.atomos.F
+        ? 'Unido al flúor, el oxígeno actúa con valor positivo: se despeja imponiendo que la suma de todos los números de oxidación sea igual a la carga de la especie'
+        : 'Se despeja imponiendo que la suma de todos los números de oxidación sea igual a la carga de la especie',
     };
   } else if (pendientes.length > 1) {
     incompleto = true;
@@ -650,7 +713,11 @@ function calcularOxidacion(entrada: string): ResultadoOxidacion {
 
   const suma = asignaciones.reduce((acc, a) => acc + (a.eo ?? 0) * a.atomos, 0);
 
-  return { especie, asignaciones, incompleto, suma, hidrato };
+  // Un valor despejado para varios átomos es su media, aunque salga entero: en NH4NO3 el N
+  // sale +1, la media del amonio (−3) y el nitrato (+5)
+  const medioDespejado = despejado !== null && especie.atomos[despejado] > 1 ? despejado : null;
+
+  return { especie, asignaciones, incompleto, suma, hidrato, medioDespejado };
 }
 
 // ============================================
@@ -733,7 +800,9 @@ function ajustarSemirreaccion(entrada: string, medio: Medio): SemiResultado {
     ecuacion: ecuacionDe(izq, der),
     explicacion: oIzq === oDer
       ? 'Los oxígenos ya están igualados: no hace falta añadir agua.'
-      : `Se añaden ${Math.abs(oIzq - oDer)} moléculas de agua al lado con menos oxígeno (el disolvente aporta el oxígeno que falta).`,
+      : Math.abs(oIzq - oDer) === 1
+        ? 'Se añade 1 molécula de agua al lado con menos oxígeno (el disolvente aporta el oxígeno que falta).'
+        : `Se añaden ${Math.abs(oIzq - oDer)} moléculas de agua al lado con menos oxígeno (el disolvente aporta el oxígeno que falta).`,
   });
 
   // 3 — Hidrógenos con H⁺
@@ -749,7 +818,9 @@ function ajustarSemirreaccion(entrada: string, medio: Medio): SemiResultado {
     ecuacion: ecuacionDe(izq, der),
     explicacion: hIzq === hDer
       ? 'Los hidrógenos ya están igualados: no hace falta añadir protones.'
-      : `Se añaden ${Math.abs(hIzq - hDer)} iones H⁺ al lado con menos hidrógeno. En medio ácido el protón está disponible en la disolución.`,
+      : Math.abs(hIzq - hDer) === 1
+        ? 'Se añade 1 ion H⁺ al lado con menos hidrógeno. En medio ácido el protón está disponible en la disolución.'
+        : `Se añaden ${Math.abs(hIzq - hDer)} iones H⁺ al lado con menos hidrógeno. En medio ácido el protón está disponible en la disolución.`,
   });
 
   // 4 — Carga con electrones
@@ -774,12 +845,15 @@ function ajustarSemirreaccion(entrada: string, medio: Medio): SemiResultado {
   if (delta > 0) anadir(izq, 'e^-', electrones);
   else anadir(der, 'e^-', electrones);
 
+  const unidades = electrones === 1 ? '1 unidad' : `${electrones} unidades`;
+  const seAnaden = electrones === 1 ? 'se añade 1 electrón' : `se añaden ${electrones} electrones`;
+  const pronombre = electrones === 1 ? 'lo' : 'los';
   pasos.push({
     titulo: 'Ajustar la carga con electrones',
     ecuacion: ecuacionDe(izq, der),
     explicacion: delta > 0
-      ? `La carga del lado izquierdo supera en ${electrones} unidades a la del derecho, así que se añaden ${electrones} electrones a la izquierda: la especie los gana, luego es una reducción.`
-      : `La carga del lado derecho supera en ${electrones} unidades a la del izquierdo, así que se añaden ${electrones} electrones a la derecha: la especie los cede, luego es una oxidación.`,
+      ? `La carga del lado izquierdo supera en ${unidades} a la del derecho, así que ${seAnaden} a la izquierda: la especie ${pronombre} gana, luego es una reducción.`
+      : `La carga del lado derecho supera en ${unidades} a la del izquierdo, así que ${seAnaden} a la derecha: la especie ${pronombre} cede, luego es una oxidación.`,
   });
 
   // 5 — Medio básico: neutralizar los H⁺ con OH⁻
@@ -811,7 +885,7 @@ function ajustarSemirreaccion(entrada: string, medio: Medio): SemiResultado {
       pasos.push({
         titulo: 'Pasar a medio básico con OH⁻',
         ecuacion: ecuacionDe(izq, der),
-        explicacion: `En medio básico no puede quedar H⁺ libre: se añaden ${nH} iones OH⁻ a ambos lados. En el lado del protón, cada pareja H⁺ + OH⁻ forma una molécula de agua; después se simplifican las aguas repetidas.`,
+        explicacion: `En medio básico no puede quedar H⁺ libre: ${nH === 1 ? 'se añade 1 ion OH⁻' : `se añaden ${nH} iones OH⁻`} a ambos lados. En el lado del protón, cada pareja H⁺ + OH⁻ forma una molécula de agua; después se simplifican las aguas repetidas.`,
       });
     }
   }
@@ -1016,7 +1090,7 @@ export default function AjustarEcuacionesQuimicas() {
           role="tab"
           id="tab-ajustar"
           aria-selected={pestana === 'ajustar'}
-          aria-controls="panel-ajustar"
+          aria-controls={pestana === 'ajustar' ? 'panel-ajustar' : undefined}
           className={`${styles.tab} ${pestana === 'ajustar' ? styles.tabActiva : ''}`}
           onClick={() => setPestana('ajustar')}
         >
@@ -1027,7 +1101,7 @@ export default function AjustarEcuacionesQuimicas() {
           role="tab"
           id="tab-oxidacion"
           aria-selected={pestana === 'oxidacion'}
-          aria-controls="panel-oxidacion"
+          aria-controls={pestana === 'oxidacion' ? 'panel-oxidacion' : undefined}
           className={`${styles.tab} ${pestana === 'oxidacion' ? styles.tabActiva : ''}`}
           onClick={() => setPestana('oxidacion')}
         >
@@ -1038,7 +1112,7 @@ export default function AjustarEcuacionesQuimicas() {
           role="tab"
           id="tab-redox"
           aria-selected={pestana === 'redox'}
-          aria-controls="panel-redox"
+          aria-controls={pestana === 'redox' ? 'panel-redox' : undefined}
           className={`${styles.tab} ${pestana === 'redox' ? styles.tabActiva : ''}`}
           onClick={() => setPestana('redox')}
         >
@@ -1089,8 +1163,9 @@ export default function AjustarEcuacionesQuimicas() {
             </div>
           )}
 
-          {ajuste && (
-            <>
+          {/* Región viva siempre montada: el lector anuncia la ecuación ajustada al aparecer */}
+          <div aria-live="polite">
+            {ajuste && (
               <div className={styles.resultadoDestacado}>
                 <p className={styles.resultadoLabel}>Ecuación ajustada</p>
                 <p className={styles.resultadoEcuacion}>{ecuacionAjustada}</p>
@@ -1098,7 +1173,11 @@ export default function AjustarEcuacionesQuimicas() {
                   Coeficientes: {ajuste.coeficientes.join(' : ')}
                 </p>
               </div>
+            )}
+          </div>
 
+          {ajuste && (
+            <>
               <h2 className={styles.subtitulo}>Comprobación de la conservación</h2>
               <div className={styles.tablaWrapper}>
                 <table className={styles.tabla}>
@@ -1180,8 +1259,8 @@ export default function AjustarEcuacionesQuimicas() {
             </div>
           )}
 
-          {resultadoEO && (
-            <>
+          <div aria-live="polite">
+            {resultadoEO && (
               <div className={styles.resultadoDestacado}>
                 <p className={styles.resultadoLabel}>Especie analizada</p>
                 <p className={styles.resultadoEcuacion}>{bonita(resultadoEO.especie.formula)}</p>
@@ -1190,7 +1269,11 @@ export default function AjustarEcuacionesQuimicas() {
                   {formatearEO(resultadoEO.suma)}
                 </p>
               </div>
+            )}
+          </div>
 
+          {resultadoEO && (
+            <>
               <div className={styles.tablaWrapper}>
                 <table className={styles.tabla}>
                   <thead>
@@ -1221,11 +1304,26 @@ export default function AjustarEcuacionesQuimicas() {
                 </p>
               )}
 
-              {resultadoEO.asignaciones.some(a => a.eo !== null && !Number.isInteger(a.eo)) && (
+              {resultadoEO.asignaciones.some(a => a.eo !== null && !Number.isInteger(a.eo)) ? (
                 <p className={styles.notaResultado}>
                   Alguno de los valores no es entero: se trata de un <strong>número de oxidación medio</strong>. La
                   fórmula empírica no distingue átomos del mismo elemento que en realidad se encuentran en
                   entornos distintos, como ocurre en la magnetita Fe₃O₄, donde conviven hierro(II) y hierro(III).
+                </p>
+              ) : resultadoEO.medioDespejado !== null && (
+                <p className={styles.notaResultado}>
+                  El valor del {resultadoEO.medioDespejado} es un <strong>número de oxidación medio</strong> de sus{' '}
+                  {resultadoEO.especie.atomos[resultadoEO.medioDespejado]} átomos. Si esos átomos están en entornos
+                  distintos, cada uno tiene el suyo: en el nitrato de amonio NH₄NO₃, el nitrógeno del amonio (NH₄⁺)
+                  tiene −3 y el del nitrato (NO₃⁻) +5, y la media de los dos es +1.
+                </p>
+              )}
+
+              {!resultadoEO.incompleto && Math.abs(resultadoEO.suma - resultadoEO.especie.carga) > 1e-9 && (
+                <p className={styles.notaResultado}>
+                  La suma de los números de oxidación no coincide con la carga de la especie: alguna de las reglas
+                  fijas no se cumple en esta fórmula, así que los valores anteriores no son fiables. Revisa la
+                  fórmula introducida.
                 </p>
               )}
 
@@ -1317,6 +1415,11 @@ export default function AjustarEcuacionesQuimicas() {
             </div>
           )}
 
+          {/* El desarrollo es largo: se anuncia solo la ecuación global, que va al final */}
+          <p className="sr-only" aria-live="polite">
+            {redox ? `Ecuación iónica global ajustada: ${formatearLado(redox.globalIzq)} → ${formatearLado(redox.globalDer)}` : ''}
+          </p>
+
           {redox && (
             <>
               <div className={styles.semisResultado}>
@@ -1358,7 +1461,8 @@ export default function AjustarEcuacionesQuimicas() {
                   {redox.semiB.electrones === 1 ? 'electrón' : 'electrones'}. Para que los electrones cedidos
                   igualen a los captados se multiplica la primera por <strong>{redox.factorA}</strong> y la
                   segunda por <strong>{redox.factorB}</strong>, de modo que ambas intercambien{' '}
-                  <strong>{redox.semiA.electrones * redox.factorA}</strong> electrones y puedan sumarse.
+                  <strong>{redox.semiA.electrones * redox.factorA}</strong>{' '}
+                  {redox.semiA.electrones * redox.factorA === 1 ? 'electrón' : 'electrones'} y puedan sumarse.
                 </p>
               </div>
 
@@ -1444,7 +1548,7 @@ export default function AjustarEcuacionesQuimicas() {
         </section>
 
         <section>
-          <h3>Los tres métodos de ajuste: cuándo usar cada uno</h3>
+          <h3>Los cuatro métodos de ajuste: cuándo usar cada uno</h3>
           <div className={styles.tablaWrapper}>
             <table className={styles.tabla}>
               <thead>
