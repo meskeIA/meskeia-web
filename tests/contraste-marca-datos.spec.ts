@@ -345,7 +345,7 @@ const APPS: App[] = [
   { slug: 'visualizador-arquitectura-estilos', todo: true, secciones: "[role='tablist'] [role='tab']" },
   { slug: 'visualizador-literatura-movimientos', todo: true, secciones: "[role='tablist'] [role='tab']" },
   { slug: 'visualizador-musica-movimientos', todo: true, secciones: "[role='tablist'] [role='tab']" },
-];
+  { slug: 'visualizador-revoluciones-industriales', todo: true, secciones: "[role='tablist'] [role='tab']" },];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
   return page.evaluate(({ marca, todo }) => {
