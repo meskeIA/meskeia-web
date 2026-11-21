@@ -371,18 +371,18 @@ test.describe('CASO 3 · móvil Pixel 7', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HALLAZGOS (21/11/2026, ABIERTOS): los test con test.fail() describen lo que DEBERÍA pasar. El
-// día que se reparen fallarán por pasar: quitar el test.fail() y cambiar ABIERTO por REPARADO.
+// HALLAZGOS (21/11/2026): los test con test.fail() describen lo que DEBERÍA pasar. El día que se
+// reparen fallarán por pasar: quitar el test.fail() y cambiar ABIERTO por REPARADO. Reparados en
+// /reparar del 21/11/2026 todos menos 5382 (duraciones del FAQPage: espera fuente y decisión).
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Hallazgos de contenido', () => {
-  test('HALLAZGO (21/11/2026, ABIERTO) · riesgo 2: aviso sanitario visible sin desplegar nada', async ({ page }) => {
+  test('HALLAZGO 5380 (21/11/2026, REPARADO) · riesgo 2: aviso sanitario visible sin desplegar nada', async ({ page }) => {
     // Suites salud + estudiantes + cultura → nivel 2 ALTO (DISCLAIMER-POLICY §3, regla
     // multi-suite): DisclaimerCard severity high, no colapsable, fuera de <EducationalSection>.
-    // La app va `// @disclaimer: exempt` y da consejos de cuidado de heridas (hidrocoloide, «agua
-    // corriente limpia es suficiente», proteger del sol 1 año, cuándo ir al médico) solo dentro
-    // de la guía, que nace plegada. Precedente: visualizador-ciclo-viral, hallazgo 1358.
-    test.fail();
+    // La app iba `// @disclaimer: exempt` y daba consejos de cuidado de heridas solo dentro de la
+    // guía plegada. Ahora monta el DisclaimerCard médico tras el aviso legal (como
+    // visualizador-ciclo-viral, hallazgo 1358).
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await expect(page.getByRole('button', { name: 'Ver guía educativa' })).toHaveAttribute('aria-expanded', 'false');
@@ -391,22 +391,21 @@ test.describe('Hallazgos de contenido', () => {
     await expect(aviso).toContainText('profesional sanitario');
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · primera intención no puede prometer «resistencia completa en semanas»', async ({ page }) => {
+  test('HALLAZGO 5381 (21/11/2026, REPARADO) · primera intención no puede prometer «resistencia completa en semanas»', async ({ page }) => {
     // La propia app: fase 4 «Resistencia final: máximo 70-80% del tejido original», su resumen
     // «nunca recupera el 100% de la resistencia original» y la FAQ «hasta 2 años… solo alcanza el
     // 70-80%». ENTRADA Tipos de herida → Primera intención → ESPERADO un resultado coherente con
-    // eso · OBTENIDO «Cicatriz mínima. Resistencia completa en semanas.»
-    test.fail();
+    // eso · ANTES «Cicatriz mínima. Resistencia completa en semanas.»
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await seccion(page, 'Tipos de herida').click();
     await conmutadores(page).filter({ hasText: 'Primera intención' }).click();
-    await expect(page.locator('main [class*="_tipoDetalleResultado"]')).not.toContainText(/resistencia completa/i, {
-      timeout: 5_000,
-    });
+    const resultado = page.locator('main [class*="_tipoDetalleResultado"]');
+    await expect(resultado).not.toContainText(/resistencia completa/i, { timeout: 5_000 });
+    await expect(resultado).toContainText('70-80');
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · el FAQPage da a hemostasia e inflamación otra duración que la página', async ({ page }) => {
+  test('HALLAZGO 5382 (21/11/2026, ABIERTO: espera decisión con fuente) · el FAQPage da a hemostasia e inflamación otra duración que la página', async ({ page }) => {
     // FAQPage: «hemostasia (0-24 horas)», «inflamación (1-4 días)». Tabla de la guía: «Segundos–15
     // min» y «1–5 días»; línea temporal: «Segundos a minutos». Se compara el FINAL de cada
     // intervalo en minutos: hemostasia 1.440 frente a 15; inflamación 5.760 frente a 7.200.
@@ -427,9 +426,8 @@ test.describe('Hallazgos de contenido', () => {
     expect(distintas).toEqual([]);
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · el jsonLd declara al menos 4 características', async ({ page }) => {
-    // CLAUDE.md §1.ter: `features` con 4-8 características reales. ESPERADO ≥ 4 · OBTENIDO ninguna.
-    test.fail();
+  test('HALLAZGO 5387 (21/11/2026, REPARADO) · el jsonLd declara al menos 4 características', async ({ page }) => {
+    // CLAUDE.md §1.ter: `features` con 4-8 características reales. ESPERADO ≥ 4 · ANTES ninguna.
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     const app = (await jsonLd(page)).find((n) => n['@type'] === 'WebApplication');
@@ -437,38 +435,36 @@ test.describe('Hallazgos de contenido', () => {
     expect(Array.isArray(lista) ? lista.length : String(lista).split(',').length).toBeGreaterThanOrEqual(4);
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · los neutrófilos son el leucocito más abundante, no la célula más abundante de la sangre', async ({ page }) => {
+  test('HALLAZGO 5383 (21/11/2026, REPARADO) · los neutrófilos son el leucocito más abundante, no la célula más abundante de la sangre', async ({ page }) => {
     // La propia ficha dice «(50-70% de leucocitos)»; visualizador-sangre-componentes (con fuente
     // MSD Manual) da eritrocitos ≥ 4 millones/µL frente a 4.500-11.000 leucocitos/µL y llama a
     // los neutrófilos «el leucocito más abundante». ENTRADA Células → Neutrófilos → ESPERADO «el
-    // leucocito más abundante» · OBTENIDO «Son las células más abundantes en sangre».
-    test.fail();
+    // leucocito más abundante» · ANTES «Son las células más abundantes en sangre».
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await seccion(page, 'Células protagonistas').click();
     await conmutadores(page).filter({ hasText: 'Neutrófilos' }).click();
-    await expect(page.locator('main [class*="_warningBox"] p')).not.toContainText('células más abundantes en sangre', {
-      timeout: 5_000,
-    });
+    const dato = page.locator('main [class*="_warningBox"] p');
+    await expect(dato).not.toContainText('células más abundantes en sangre', { timeout: 5_000 });
+    await expect(dato).toContainText('leucocito más abundante');
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · la tabla no pone las MMPs (enzimas) entre las células del remodelado', async ({ page }) => {
+  test('HALLAZGO 5388 (21/11/2026, REPARADO) · la tabla no pone las MMPs (enzimas) entre las células del remodelado', async ({ page }) => {
     // La ficha de la fase 4 da «Células protagonistas: Fibroblastos, Macrófagos residuales» y pone
     // las MMPs entre los mediadores («MMPs (metaloproteasas)»). ENTRADA guía → tabla, fila
-    // Remodelado, columna «Células protagonistas» → ESPERADO sin MMPs · OBTENIDO «MMPs, fibroblastos».
-    test.fail();
+    // Remodelado, columna «Células protagonistas» → ESPERADO sin MMPs · ANTES «MMPs, fibroblastos».
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const celda = page.locator('table tbody tr').filter({ hasText: 'Remodelado' }).locator('td').nth(2);
     await expect(celda).not.toContainText('MMPs', { timeout: 5_000 });
+    await expect(celda).toHaveText('Fibroblastos, macrófagos');
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · formato: «70-80 %» con espacio duro y «48-72 h»', async ({ page }) => {
+  test('HALLAZGO 5390 (21/11/2026, REPARADO) · formato: «70-80 %» con espacio duro y «48-72 h»', async ({ page }) => {
     // CLAUDE.md global §2 (25/09/2026): el % separado con U+00A0; las horas, «24 h». ENTRADA fase
     // Remodelado y fase Inflamación → ESPERADO «70-80 %» y «48-72 h» · OBTENIDO «70-80%» y
-    // «48-72h» (también «50-70%», «40%», «100%», «24h»).
-    test.fail();
+    // «48-72h» (también «50-70%», «40%», «100%», «24h»). REPARADO (hallazgo 5390).
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await conmutadores(page).filter({ hasText: 'Remodelado' }).click();
@@ -479,29 +475,30 @@ test.describe('Hallazgos de contenido', () => {
     expect(inflamacion).not.toMatch(/\d+h\b/);
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · «un 40% más rápido» con apósito húmedo lleva fuente y año', async ({ page }) => {
+  test('HALLAZGO 5389 (21/11/2026, REPARADO: sin cifra) · «un 40% más rápido» con apósito húmedo lleva fuente y año', async ({ page }) => {
     // CLAUDE.md §1.quinquies, antipatrón 1: cifra redonda sin fuente. ENTRADA Factores → Ambiente
-    // húmedo → ESPERADO la cifra con su fuente (autor/año) o sin cifra · OBTENIDO «cicatrizan un
-    // 40% más rápido que las expuestas al aire» sin fuente.
-    test.fail();
+    // húmedo → ESPERADO la cifra con su fuente (autor/año) o sin cifra · ANTES «cicatrizan un
+    // 40% más rápido que las expuestas al aire» sin fuente. Se quitó la cifra.
     test.setTimeout(60_000);
     await irAlVisualizador(page);
     await seccion(page, 'Factores').click();
     await page.locator('main section button[aria-expanded]').filter({ hasText: 'Ambiente húmedo' }).click();
     const texto = (await page.locator('main [class*="_factorDetalle"]').textContent()) ?? '';
+    // Control: el detalle abierto es el de la humedad
+    expect(texto).toContain('humedad');
     const conCifra = /\b40\s?%/.test(texto);
     expect(!conCifra || /\b(19|20)\d{2}\b/.test(texto), texto).toBe(true);
   });
 });
 
 test.describe('Hallazgos de accesibilidad y modo oscuro', () => {
-  test('HALLAZGO (21/11/2026, ABIERTO) · claro: el color de fase, célula y tipo como texto, y el blanco sobre él, llegan a su umbral', async ({ page }) => {
+  test('HALLAZGO 5385 (21/11/2026, REPARADO) · claro: el color de fase, célula y tipo como texto, y el blanco sobre él, llegan a su umbral', async ({ page }) => {
     // Medido en claro (umbral 3:1 si ≥ 18,66 px negrita, 4,5:1 si no): «Fase 3: Proliferación»
     // 1,66, «Fase 2: Inflamación» 2,85, «Fase 4: Remodelado» 2,87; sus «Procesos principales» igual
     // y el de Hemostasia 3,82; los números blancos de la línea temporal 3,82 / 2,85 / 1,66 / 2,87;
     // «Macrófagos M1» 2,19, sus etiquetas de fase 1,95; «Primera intención» blanco sobre verde
-    // 2,87, «Segunda» sobre naranja 2,85.
-    test.fail();
+    // 2,87, «Segunda» sobre naranja 2,85. REPARADO (hallazgo 5385): tono legible por tema con
+    // tonoSobre y relleno/tinta con rellenoConTinta (coloresDeDato en la página).
     test.setTimeout(120_000);
     await irAlVisualizador(page);
     await prepararParaMedir(page);
@@ -509,11 +506,11 @@ test.describe('Hallazgos de accesibilidad y modo oscuro', () => {
     expect(suspensos(await medidasColorDeDato(page))).toEqual([]);
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · oscuro: el color de fase, célula y tipo como texto, y el blanco sobre él, llegan a su umbral', async ({ page }) => {
+  test('HALLAZGO 5385 (21/11/2026, REPARADO) · oscuro: el color de fase, célula y tipo como texto, y el blanco sobre él, llegan a su umbral', async ({ page }) => {
     // Medido en oscuro sobre #2D2D2D: «Procesos principales» de Hemostasia 3,60; «Miofibroblastos»
     // 2,35, «Queratinocitos» 2,95, «Fibroblastos» 3,20 y sus etiquetas 2,11-2,74; «Tercera
     // intención» 2,35; y los números blancos de la línea temporal, iguales que en claro.
-    test.fail();
+    // REPARADO (hallazgo 5385).
     test.setTimeout(120_000);
     await irAlVisualizador(page);
     await prepararParaMedir(page);
@@ -521,12 +518,12 @@ test.describe('Hallazgos de accesibilidad y modo oscuro', () => {
     expect(suspensos(await medidasColorDeDato(page))).toEqual([]);
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · oscuro: la sección, la fase, la célula y el tipo activos se distinguen de los demás', async ({ page }) => {
+  test('HALLAZGO 5384 (21/11/2026, REPARADO) · oscuro: la sección, la fase, la célula y el tipo activos se distinguen de los demás', async ({ page }) => {
     // `[data-theme='dark'] .navBtn|.timelineItem|.celulaCard|.tipoBtn` (especificidad 0,2,0) pisa
     // a `.navBtnActivo|.timelineItemActivo|.celulaCardActiva|.tipoBtnActivo` (0,1,0). ENTRADA tema
     // oscuro, la 1.ª de cada grupo activa → ESPERADO su fondo, borde o texto distinto del de las
-    // inactivas (en claro lo es) · OBTENIDO los cuatro grupos idénticos: rgb(45,45,45), #444.
-    test.fail();
+    // inactivas (en claro lo es) · ANTES los cuatro grupos idénticos: rgb(45,45,45), #444.
+    // REPARADO (hallazgo 5384): reglas oscuras de los activos con la misma especificidad, después.
     test.setTimeout(90_000);
     await irAlVisualizador(page);
     await prepararParaMedir(page);
@@ -557,11 +554,12 @@ test.describe('Hallazgos de accesibilidad y modo oscuro', () => {
     expect(iguales).toEqual([]);
   });
 
-  test('HALLAZGO (21/11/2026, ABIERTO) · tokens de marca sobre sus tintes: etiquetas y duración activa a 4,5:1', async ({ page }) => {
+  test('HALLAZGO 5386 (21/11/2026, REPARADO) · tokens de marca sobre sus tintes: etiquetas y duración activa a 4,5:1', async ({ page }) => {
     // Medido: etiqueta de célula (--primary-texto sobre su tinte) 3,91:1 en oscuro; etiqueta de
     // mediador (--secondary-texto) 4,49:1 en claro; duración de la fase activa (--text-muted
     // sobre el tinte de la fase) 4,49:1 en claro. Texto de 11,5-12,5 px: 4,5:1.
-    test.fail();
+    // REPARADO (hallazgo 5386): etiquetas en --text-primary sobre su tinte y la duración activa en
+    // --text-secondary.
     test.setTimeout(90_000);
     await irAlVisualizador(page);
     await prepararParaMedir(page);

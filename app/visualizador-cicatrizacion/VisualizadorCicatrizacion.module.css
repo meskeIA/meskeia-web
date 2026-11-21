@@ -145,12 +145,14 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
+/* Relleno y tinta de rellenoConTinta (coloresDeDato en la página): el blanco sobre el color de la
+   fase no llegaba a 4,5:1 (1,66:1 sobre el amarillo de Proliferación). Hallazgo 5385 */
 .timelineNumero {
   width: 1.6rem;
   height: 1.6rem;
   border-radius: 50%;
-  background: var(--fase-color, var(--primary-boton));
-  color: white;
+  background: var(--fase-relleno, var(--primary-boton));
+  color: var(--fase-tinta, white);
   font-size: 0.75rem;
   font-weight: 700;
   display: flex;
@@ -173,6 +175,11 @@
   font-size: 0.72rem;
   color: var(--text-muted, #999);
   text-align: center;
+}
+
+/* Sobre el tinte de la fase activa, --text-muted se quedaba en 4,49:1 (hallazgo 5386) */
+.timelineItemActivo .timelineDuracion {
+  color: var(--text-secondary);
 }
 
 .timelineConector {
@@ -215,7 +222,7 @@
 .faseDetalleNombre {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--fase-color, var(--primary-texto));
+  color: var(--fase-texto-claro, var(--primary-texto));
   margin: 0 0 0.25rem;
 }
 
@@ -251,7 +258,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--fase-color, var(--primary-texto));
+  color: var(--fase-texto-claro, var(--primary-texto));
   margin: 0 0 0.5rem;
 }
 
@@ -276,11 +283,14 @@
   margin-bottom: 0.5rem;
 }
 
+/* Las etiquetas distinguen célula y mediador por su tinte; el texto va en --text-primary, porque
+   el token de marca sobre su propio tinte se quedaba corto (3,91:1 la de célula en oscuro, 4,49:1
+   la de mediador en claro). Hallazgo 5386 */
 .tagCelula {
   display: inline-block;
   padding: 0.25rem 0.6rem;
   background: color-mix(in srgb, var(--primary) 15%, transparent);
-  color: var(--primary-texto);
+  color: var(--text-primary);
   border-radius: 1rem;
   font-size: 0.78rem;
   font-weight: 500;
@@ -290,7 +300,7 @@
   display: inline-block;
   padding: 0.25rem 0.6rem;
   background: color-mix(in srgb, var(--secondary) 15%, transparent);
-  color: var(--secondary-texto);
+  color: var(--text-primary);
   border-radius: 1rem;
   font-size: 0.78rem;
   font-weight: 500;
@@ -300,7 +310,7 @@
   display: inline-block;
   padding: 0.2rem 0.5rem;
   background: color-mix(in srgb, var(--celula-color, var(--primary)) 15%, transparent);
-  color: var(--celula-color, var(--primary-texto));
+  color: var(--celula-tag-claro, var(--primary-texto));
   border-radius: 1rem;
   font-size: 0.75rem;
   font-weight: 500;
@@ -393,7 +403,7 @@
 .celulaDetalleHeader h3 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--celula-color, var(--primary-texto));
+  color: var(--celula-texto-claro, var(--primary-texto));
   margin: 0 0 0.4rem;
 }
 
@@ -451,18 +461,20 @@
 
 .tipoBtn:hover {
   border-color: var(--tipo-color, var(--primary));
-  color: var(--tipo-color, var(--primary-texto));
+  color: var(--tipo-texto-claro, var(--primary-texto));
 }
 
+/* Relleno y tinta de rellenoConTinta: el blanco sobre el verde y el naranja daba 2,85-2,87:1
+   (hallazgo 5385) */
 .tipoBtnActivo {
-  background: var(--tipo-color, var(--primary-boton));
-  border-color: var(--tipo-color, var(--primary-boton));
-  color: white;
+  background: var(--tipo-relleno, var(--primary-boton));
+  border-color: var(--tipo-relleno, var(--primary-boton));
+  color: var(--tipo-tinta, white);
 }
 
 .tipoBtnActivo:hover {
   filter: brightness(0.9);
-  color: white;
+  color: var(--tipo-tinta, white);
 }
 
 .tipoBtn:focus-visible {
@@ -493,7 +505,7 @@
 .tipoDetalleHeader h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--tipo-color, var(--primary-texto));
+  color: var(--tipo-texto-claro, var(--primary-texto));
   margin: 0;
 }
 
@@ -523,7 +535,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--tipo-color, var(--primary-texto));
+  color: var(--tipo-texto-claro, var(--primary-texto));
   margin: 0 0 0.5rem;
 }
 
@@ -738,6 +750,65 @@
 
 [data-theme='dark'] .warningBox {
   background: color-mix(in srgb, var(--primary) 12%, var(--bg-card));
+}
+
+/* Estados activos en oscuro: las reglas de arriba ([data-theme='dark'] .navBtn, .timelineItem,
+   .celulaCard y .tipoBtn, especificidad 0,2,0) pisaban a .navBtnActivo y compañía (0,1,0), y el
+   activo se pintaba igual que los demás (hallazgo 5384). Misma especificidad y declaradas
+   después: ganan */
+[data-theme='dark'] .navBtnActivo {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: white;
+}
+
+[data-theme='dark'] .navBtnActivo:hover {
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
+  color: white;
+}
+
+[data-theme='dark'] .timelineItemActivo {
+  border-color: var(--fase-color, var(--primary));
+  background: color-mix(in srgb, var(--fase-color, var(--primary)) 14%, var(--bg-card));
+}
+
+[data-theme='dark'] .celulaCardActiva {
+  border-color: var(--celula-color, var(--primary));
+  background: color-mix(in srgb, var(--celula-color, var(--primary)) 14%, var(--bg-card));
+}
+
+[data-theme='dark'] .tipoBtnActivo {
+  background: var(--tipo-relleno, var(--primary-boton));
+  border-color: var(--tipo-relleno, var(--primary-boton));
+  color: var(--tipo-tinta, white);
+}
+
+/* Texto en el color del dato, con su tono para el fondo oscuro (hallazgo 5385) */
+[data-theme='dark'] .faseDetalleNombre,
+[data-theme='dark'] .faseDetalleBloque h4 {
+  color: var(--fase-texto-oscuro, var(--primary-texto));
+}
+
+[data-theme='dark'] .celulaDetalleHeader h3 {
+  color: var(--celula-texto-oscuro, var(--primary-texto));
+}
+
+[data-theme='dark'] .tagFase {
+  color: var(--celula-tag-oscuro, var(--primary-texto));
+}
+
+[data-theme='dark'] .tipoBtn:hover {
+  color: var(--tipo-texto-oscuro, var(--primary-texto));
+}
+
+[data-theme='dark'] .tipoBtnActivo:hover {
+  color: var(--tipo-tinta, white);
+}
+
+[data-theme='dark'] .tipoDetalleHeader h3,
+[data-theme='dark'] .tipoDetalleGrid h4 {
+  color: var(--tipo-texto-oscuro, var(--primary-texto));
 }
 
 /* ─── Responsive ───────────────────────────────── */

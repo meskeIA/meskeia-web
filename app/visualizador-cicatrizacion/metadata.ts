@@ -26,6 +26,14 @@ export const jsonLd = {
   applicationCategory: 'EducationalApplication',
   inLanguage: 'es',
   isAccessibleForFree: true,
+  featureList: [
+    'Línea temporal de las 4 fases (hemostasia, inflamación, proliferación y remodelado) con la duración de cada una',
+    'Ficha de cada fase con sus procesos, células protagonistas y mediadores químicos',
+    'Siete células de la reparación (plaquetas, neutrófilos, macrófagos M1 y M2, fibroblastos, miofibroblastos y queratinocitos) con su función y su fase',
+    'Comparación de los cierres por primera, segunda y tercera intención',
+    'Diez factores que favorecen o dificultan la cicatrización, con su mecanismo',
+    'Tabla comparativa de las fases y guía paso a paso de la lesión a la cicatriz',
+  ],
   offers: {
     '@type': 'Offer',
     price: '0',

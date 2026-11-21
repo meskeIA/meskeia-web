@@ -1,5 +1,4 @@
 'use client';
-// @disclaimer: exempt
 
 import { useState } from 'react';
 import styles from './VisualizadorCicatrizacion.module.css';
@@ -10,7 +9,47 @@ import {
   RelatedApps,
   LegalNotice,
   ShareCard,
+  DisclaimerCard,
 } from '@/components';
+import { rellenoConTinta, tonoSobre } from '@/lib/tintaLegible';
+
+// ─────────────────────────────────────────────
+// Color de dato legible (hallazgo 5385)
+// ─────────────────────────────────────────────
+
+/** Fondo de las tarjetas (--bg-card de globals.css) en cada tema. */
+const FONDO_TARJETA = { claro: '#FFFFFF', oscuro: '#2D2D2D' };
+
+/** Mezcla `color` al `alfa` sobre `fondo` (hexadecimales de 6 cifras), como color-mix(). */
+function mezclar(color: string, fondo: string, alfa: number): string {
+  const canal = (hex: string, i: number): number => parseInt(hex.slice(1 + 2 * i, 3 + 2 * i), 16);
+  return '#' + [0, 1, 2]
+    .map((i) => Math.round(canal(color, i) * alfa + canal(fondo, i) * (1 - alfa)).toString(16).padStart(2, '0'))
+    .join('');
+}
+
+/**
+ * Variables CSS para pintar texto en el color de una fase, célula o tipo de cierre, y texto sobre
+ * ese color, con contraste en los dos temas. El color de cada dato como texto (amarillo #f1c40f a
+ * 1,66:1 sobre blanco) y el blanco sobre él (número de la línea temporal, tipo activo) no llegaban.
+ *   --<p>-texto-claro / -oscuro: el tono del color que llega a 4,5:1 sobre la tarjeta
+ *   --<p>-tag-claro / -oscuro: el que llega a 4,5:1 sobre su etiqueta teñida (15 % sobre el 10 % de
+ *     la tarjeta activa, el fondo más desfavorable)
+ *   --<p>-relleno / -tinta: relleno y tinta (blanca o casi negra) de un texto SOBRE el color
+ */
+function coloresDeDato(prefijo: string, color: string): React.CSSProperties {
+  const tag = (fondo: string): string => mezclar(color, mezclar(color, fondo, 0.1), 0.15);
+  const { relleno, tinta } = rellenoConTinta(color);
+  return {
+    [`--${prefijo}-color`]: color,
+    [`--${prefijo}-texto-claro`]: tonoSobre(color, FONDO_TARJETA.claro),
+    [`--${prefijo}-texto-oscuro`]: tonoSobre(color, FONDO_TARJETA.oscuro),
+    [`--${prefijo}-tag-claro`]: tonoSobre(color, tag(FONDO_TARJETA.claro)),
+    [`--${prefijo}-tag-oscuro`]: tonoSobre(color, tag(FONDO_TARJETA.oscuro)),
+    [`--${prefijo}-relleno`]: relleno,
+    [`--${prefijo}-tinta`]: tinta,
+  } as React.CSSProperties;
+}
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -73,12 +112,12 @@ const FASES: Fase[] = [
     numero: 2,
     nombre: 'Inflamación',
     icono: '🟠',
-    duracion: 'Horas a días (pico 48-72h)',
+    duracion: 'Horas a días (pico 48-72 h)',
     color: '#e67e22',
     resumen: 'El cuerpo limpia la herida de bacterias y detritus celulares. Los signos clásicos (dolor, calor, rubor, tumor) son fisiológicos y necesarios, no patológicos.',
     procesos: [
       'Vasodilatación y aumento de permeabilidad vascular: eritema, calor, edema',
-      'Quimiotaxis de neutrófilos (primeras 24h): fagocitosis y enzimas proteolíticas',
+      'Quimiotaxis de neutrófilos (primeras 24 h): fagocitosis y enzimas proteolíticas',
       'Macrófagos M1 (días 2-5): eliminan neutrófilos apoptóticos, señal inflamatoria',
       'Macrófagos M2 (transición): señal antiinflamatoria para iniciar proliferación',
       'Cicatrización crónica si persiste > 3 semanas sin resolverse',
@@ -111,11 +150,11 @@ const FASES: Fase[] = [
     icono: '🟢',
     duracion: 'Semanas a años (hasta 2 años)',
     color: '#27ae60',
-    resumen: 'El colágeno provisional se reemplaza por colágeno más resistente. La cicatriz se consolida, aunque nunca recupera el 100% de la resistencia original.',
+    resumen: 'El colágeno provisional se reemplaza por colágeno más resistente. La cicatriz se consolida, aunque nunca recupera el 100 % de la resistencia original.',
     procesos: [
       'Colágeno tipo III → colágeno tipo I (más resistente, fibras organizadas)',
       'MMPs (metaloproteasas) + TIMPs: equilibrio entre síntesis y degradación',
-      'Resistencia final: máximo 70-80% del tejido original',
+      'Resistencia final: máximo 70-80 % del tejido original',
       'Cicatriz madura: avascular, acelular, pálida',
       'Cicatrices patológicas: hipertrófica (dentro de márgenes) vs queloide (invade tejido sano)',
     ],
@@ -154,7 +193,7 @@ const CELULAS: Celula[] = [
     icono: '🟠',
     fases: ['Fase 2 (precoz)'],
     funcion: 'Primera línea de defensa antimicrobiana. Fagocitan bacterias, liberan enzimas proteolíticas que limpian tejido necrótico y expulsan NETs (trampas extracelulares).',
-    dato: 'Son las células más abundantes en sangre (50-70% de leucocitos). Llegan a la herida en las primeras horas pero solo duran 1-2 días en el tejido.',
+    dato: 'Son el leucocito más abundante en sangre (50-70 % de los leucocitos). Llegan a la herida en las primeras horas pero solo duran 1-2 días en el tejido.',
     color: '#e67e22',
   },
   {
@@ -231,7 +270,7 @@ const TIPOS_CIERRE: TipoCierre[] = [
       'Mínima fase proliferativa necesaria',
       'Cicatriz fina, lineal y bien consolidada',
     ],
-    resultado: 'Cicatriz mínima. Resistencia completa en semanas.',
+    resultado: 'Cicatriz mínima. Gana resistencia en semanas y sigue madurando durante meses, sin llegar nunca a la del tejido original (máximo 70-80 %).',
     ejemplos: 'Incisiones quirúrgicas, laceraciones limpias y recientes',
     color: '#27ae60',
   },
@@ -288,7 +327,7 @@ const FACTORES_POSITIVOS: Factor[] = [
   {
     id: 'humedad',
     nombre: 'Ambiente húmedo',
-    descripcion: 'Las heridas cubiertas con apósitos húmedos cicatrizan un 40% más rápido que las expuestas al aire. La humedad favorece la migración celular.',
+    descripcion: 'Las heridas cubiertas con apósitos que mantienen la humedad suelen re-epitelizarse antes que las expuestas al aire. La humedad favorece la migración celular.',
     mecanismo: 'Las costras secas crean una barrera física que los queratinocitos deben "cavar" por debajo. La humedad elimina esa barrera.',
   },
   {
@@ -376,6 +415,14 @@ export default function VisualizadorCicatrizacion() {
 
       <LegalNotice />
 
+      {/* Suite salud → nivel 2 ALTO (regla multi-suite de la política de disclaimers): visible, sin
+          pliegue y fuera de la guía, porque la página da consejos de cuidado de heridas (hallazgo 5380) */}
+      <DisclaimerCard variant="medical" severity="high" collapsible={false} title="Aviso sanitario">
+        Este visualizador explica la biología de la cicatrización con fines educativos. No sirve para
+        valorar una herida concreta ni sustituye el consejo de un profesional sanitario: ante una herida
+        profunda, que no deja de sangrar, con signos de infección o que no mejora, consulta con él.
+      </DisclaimerCard>
+
       {/* Navegación de secciones */}
       <nav className={styles.navSecciones} aria-label="Secciones del visualizador">
         {SECCIONES.map(sec => (
@@ -408,7 +455,7 @@ export default function VisualizadorCicatrizacion() {
                   type="button"
                   className={`${styles.timelineItem} ${faseSeleccionada === fase.id ? styles.timelineItemActivo : ''}`}
                   onClick={() => setFaseSeleccionada(fase.id)}
-                  style={{ '--fase-color': fase.color } as React.CSSProperties}
+                  style={coloresDeDato('fase', fase.color)}
                   aria-pressed={faseSeleccionada === fase.id}
                 >
                   <span className={styles.timelineNumero}>{fase.numero}</span>
@@ -421,7 +468,7 @@ export default function VisualizadorCicatrizacion() {
             </div>
 
             {/* Detalle de la fase */}
-            <div className={styles.faseDetalle} style={{ '--fase-color': faseActual.color } as React.CSSProperties}>
+            <div className={styles.faseDetalle} style={coloresDeDato('fase', faseActual.color)}>
               <div className={styles.faseDetalleHeader}>
                 <span className={styles.faseDetalleIcono} aria-hidden="true">{faseActual.icono}</span>
                 <div>
@@ -472,7 +519,7 @@ export default function VisualizadorCicatrizacion() {
                   type="button"
                   className={`${styles.celulaCard} ${celulaSeleccionada === celula.id ? styles.celulaCardActiva : ''}`}
                   onClick={() => setCelulaSeleccionada(prev => prev === celula.id ? null : celula.id)}
-                  style={{ '--celula-color': celula.color } as React.CSSProperties}
+                  style={coloresDeDato('celula', celula.color)}
                   aria-pressed={celulaSeleccionada === celula.id}
                 >
                   <span className={styles.celulaIcono} aria-hidden="true">{celula.icono}</span>
@@ -487,7 +534,7 @@ export default function VisualizadorCicatrizacion() {
             </div>
 
             {celulaActual && (
-              <div className={styles.celulaDetalle} style={{ '--celula-color': celulaActual.color } as React.CSSProperties}>
+              <div className={styles.celulaDetalle} style={coloresDeDato('celula', celulaActual.color)}>
                 <div className={styles.celulaDetalleHeader}>
                   <span className={styles.celulaDetalleIcono} aria-hidden="true">{celulaActual.icono}</span>
                   <div>
@@ -529,7 +576,7 @@ export default function VisualizadorCicatrizacion() {
                   type="button"
                   className={`${styles.tipoBtn} ${tipoCierreSeleccionado === tipo.id ? styles.tipoBtnActivo : ''}`}
                   onClick={() => setTipoCierreSeleccionado(tipo.id)}
-                  style={{ '--tipo-color': tipo.color } as React.CSSProperties}
+                  style={coloresDeDato('tipo', tipo.color)}
                   aria-pressed={tipoCierreSeleccionado === tipo.id}
                 >
                   <span aria-hidden="true">{tipo.icono}</span>
@@ -538,7 +585,7 @@ export default function VisualizadorCicatrizacion() {
               ))}
             </div>
 
-            <div className={styles.tipoDetalle} style={{ '--tipo-color': tipoActual.color } as React.CSSProperties}>
+            <div className={styles.tipoDetalle} style={coloresDeDato('tipo', tipoActual.color)}>
               <div className={styles.tipoDetalleHeader}>
                 <span className={styles.tipoDetalleIcono} aria-hidden="true">{tipoActual.icono}</span>
                 <h3>{tipoActual.nombre}</h3>
@@ -667,7 +714,7 @@ export default function VisualizadorCicatrizacion() {
               </tr>
               <tr>
                 <td><strong>Inflamación</strong></td>
-                <td>1–5 días (pico 48-72h)</td>
+                <td>1–5 días (pico 48-72{' '}h)</td>
                 <td>Neutrófilos → Macrófagos</td>
                 <td>No</td>
                 <td>Histamina, bradicinina</td>
@@ -682,7 +729,7 @@ export default function VisualizadorCicatrizacion() {
               <tr>
                 <td><strong>Remodelado</strong></td>
                 <td>Semanas–2 años</td>
-                <td>MMPs, fibroblastos</td>
+                <td>Fibroblastos, macrófagos</td>
                 <td>Tipo I (definitivo)</td>
                 <td>Balance MMPs/TIMPs</td>
               </tr>
@@ -748,7 +795,7 @@ export default function VisualizadorCicatrizacion() {
           </div>
           <div className={styles.faqItem}>
             <dt>¿Cuánto tiempo tarda una herida en alcanzar su resistencia máxima?</dt>
-            <dd>El proceso de remodelado puede durar hasta 2 años. Incluso al final, la cicatriz solo alcanza el 70-80% de la resistencia del tejido original porque el colágeno cicatricial tiene una organización diferente al tejido nativo.</dd>
+            <dd>El proceso de remodelado puede durar hasta 2 años. Incluso al final, la cicatriz solo alcanza el 70-80{' '}% de la resistencia del tejido original porque el colágeno cicatricial tiene una organización diferente al tejido nativo.</dd>
             <div className={styles.faqTip}>Por eso las cicatrices de intervenciones quirúrgicas abdominales requieren cuidados especiales durante meses.</div>
           </div>
           <div className={styles.faqItem}>
@@ -807,7 +854,7 @@ export default function VisualizadorCicatrizacion() {
             <span className={styles.stepNumber} aria-hidden="true">7</span>
             <div className={styles.stepContent}>
               <strong>Meses–años: remodelado y maduración</strong>
-              <p>Las MMPs degradan el colágeno tipo III mientras los fibroblastos depositan colágeno tipo I más resistente. La cicatriz palidece, se endurece y alcanza hasta el 70-80% de la resistencia original.</p>
+              <p>Las MMPs degradan el colágeno tipo III mientras los fibroblastos depositan colágeno tipo I más resistente. La cicatriz palidece, se endurece y alcanza hasta el 70-80{' '}% de la resistencia original.</p>
             </div>
           </li>
         </ol>
@@ -847,7 +894,7 @@ export default function VisualizadorCicatrizacion() {
             <span className={styles.tipIcon} aria-hidden="true">🩺</span>
             <div>
               <strong>Vigilar signos de infección</strong>
-              <p>Si la herida empeora después de 48h —más calor, pus, fiebre o bordes rojos que se expanden— es necesario consultar un médico. El biofilm bacteriano bloquea la cicatrización.</p>
+              <p>Si la herida empeora después de 48{' '}h —más calor, pus, fiebre o bordes rojos que se expanden— es necesario consultar un médico. El biofilm bacteriano bloquea la cicatrización.</p>
             </div>
           </div>
         </div>
