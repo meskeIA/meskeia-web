@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import styles from './BiomasTerrestres.module.css';
+import { rellenoConTinta, tonosPorTema } from '@/lib/tintaLegible';
 import { RESPUESTA_FAQ_CAMBIO_CLIMATICO } from './metadata';
 import {
   MeskeiaLogo,
@@ -566,6 +567,23 @@ function Climograma({ biomaId }: { biomaId: string }) {
 }
 
 // ─────────────────────────────────────────────
+// Texto sobre el color de cada bioma (cabo C0645)
+// ─────────────────────────────────────────────
+// Los botones del bioma (diagrama de latitudes y chips del comparador) eran blanco sobre su color
+// (Desierto #FFC107 a 1,63:1, Tundra 1,91, Bosque Templado 2,10, Sabana 2,19, Tropical 2,87), y
+// los de latitud además al 75 % de opacidad. Relleno y tinta de rellenoConTinta en --bioma-relleno
+// y --bioma-tinta, que el módulo lee; el color del bioma se queda en --bioma-color para los bordes.
+function variablesBioma(color: string): React.CSSProperties {
+  const { relleno, tinta } = rellenoConTinta(color);
+  return { '--bioma-color': color, '--bioma-relleno': relleno, '--bioma-tinta': tinta } as React.CSSProperties;
+}
+
+/** Clase del % protegido según el umbral: rojo bajo el 10 %, naranja bajo el 20 %, verde desde el 20 % */
+function clasePorcentaje(pct: number): string {
+  return pct < 10 ? styles.pctRojo : pct < 20 ? styles.pctNaranja : styles.pctVerde;
+}
+
+// ─────────────────────────────────────────────
 // Componente: Diagrama de latitudes
 // ─────────────────────────────────────────────
 
@@ -622,11 +640,7 @@ function DiagramaLatitudes({
                           ? styles.latitudBiomaBtnActivo
                           : '',
                       ].join(' ')}
-                      style={
-                        {
-                          '--bioma-color': bioma.color,
-                        } as React.CSSProperties
-                      }
+                      style={variablesBioma(bioma.color)}
                       onClick={() => onSelectBioma(bid)}
                       aria-label={`Seleccionar bioma: ${bioma.nombre}`}
                       aria-pressed={biomaActivo === bid}
@@ -885,7 +899,7 @@ export default function VisualizadorBiomasTerrestres() {
                   styles.biomaChip,
                   biomaActivo === b.id ? styles.biomaChipActivo : '',
                 ].join(' ')}
-                style={{ '--bioma-color': b.color } as React.CSSProperties}
+                style={variablesBioma(b.color)}
                 onClick={() => setBiomaActivo(b.id)}
                 aria-pressed={biomaActivo === b.id}
               >
@@ -1014,7 +1028,9 @@ export default function VisualizadorBiomasTerrestres() {
                   </div>
                   <span
                     className={styles.severidadValor}
-                    style={{ color: a.color }}
+                    // El valor en el color de la amenaza: naranja a 2,85:1 en claro, rojo 2,64 y
+                    // violeta 2,45 en oscuro. Tono por tema sobre la tarjeta (C0645)
+                    style={tonosPorTema(a.color, '#FFFFFF', '#2A2A2A') as React.CSSProperties}
                   >
                     {a.severidad}/100
                   </span>
@@ -1045,16 +1061,7 @@ export default function VisualizadorBiomasTerrestres() {
                     </td>
                     <td>{row.superficie}</td>
                     <td>
-                      <strong
-                        style={{
-                          color:
-                            row.porcentajeProtegida < 10
-                              ? '#C0392B'
-                              : row.porcentajeProtegida < 20
-                              ? '#E67E22'
-                              : '#27AE60',
-                        }}
-                      >
+                      <strong className={clasePorcentaje(row.porcentajeProtegida)}>
                         {row.porcentajeProtegida} %
                       </strong>
                     </td>
@@ -1136,7 +1143,7 @@ export default function VisualizadorBiomasTerrestres() {
                 <td>2.000–4.000 mm</td>
                 <td>Muy alta (50 % especies)</td>
                 <td>Deforestación</td>
-                <td><strong style={{ color: '#E67E22' }}>18 %</strong></td>
+                <td><strong className={styles.pctNaranja}>18 %</strong></td>
               </tr>
               <tr>
                 <td><span aria-hidden="true">🌳</span> Templado</td>
@@ -1144,7 +1151,7 @@ export default function VisualizadorBiomasTerrestres() {
                 <td>500–1.500 mm</td>
                 <td>Media-alta</td>
                 <td>Fragmentación</td>
-                <td><strong style={{ color: '#E67E22' }}>14 %</strong></td>
+                <td><strong className={styles.pctNaranja}>14 %</strong></td>
               </tr>
               <tr>
                 <td><span aria-hidden="true">🌲</span> Taiga / Boreal</td>
@@ -1152,7 +1159,7 @@ export default function VisualizadorBiomasTerrestres() {
                 <td>300–900 mm</td>
                 <td>Baja diversidad</td>
                 <td>Deshielo permafrost</td>
-                <td><strong style={{ color: '#E67E22' }}>12 %</strong></td>
+                <td><strong className={styles.pctNaranja}>12 %</strong></td>
               </tr>
               <tr>
                 <td><span aria-hidden="true">🏔️</span> Tundra ártica</td>
@@ -1160,7 +1167,7 @@ export default function VisualizadorBiomasTerrestres() {
                 <td>150–250 mm</td>
                 <td>Muy baja</td>
                 <td>Cambio climático</td>
-                <td><strong style={{ color: '#27AE60' }}>22 %</strong></td>
+                <td><strong className={styles.pctVerde}>22 %</strong></td>
               </tr>
               <tr>
                 <td><span aria-hidden="true">🏜️</span> Desierto</td>
@@ -1168,7 +1175,7 @@ export default function VisualizadorBiomasTerrestres() {
                 <td>&lt; 250 mm</td>
                 <td>Baja, alta endemicidad</td>
                 <td>Desertificación</td>
-                <td><strong style={{ color: '#C0392B' }}>8 %</strong></td>
+                <td><strong className={styles.pctRojo}>8 %</strong></td>
               </tr>
               <tr>
                 <td><span aria-hidden="true">🦁</span> Sabana</td>
@@ -1176,7 +1183,7 @@ export default function VisualizadorBiomasTerrestres() {
                 <td>500–1.500 mm estacionales</td>
                 <td>Alta (grandes herbívoros)</td>
                 <td>Caza furtiva</td>
-                <td><strong style={{ color: '#E67E22' }}>15 %</strong></td>
+                <td><strong className={styles.pctNaranja}>15 %</strong></td>
               </tr>
               <tr>
                 <td><span aria-hidden="true">🌿</span> Mediterráneo</td>
@@ -1184,7 +1191,7 @@ export default function VisualizadorBiomasTerrestres() {
                 <td>300–900 mm (invierno)</td>
                 <td>Alta endemicidad</td>
                 <td>Incendios forestales</td>
-                <td><strong style={{ color: '#C0392B' }}>5 %</strong></td>
+                <td><strong className={styles.pctRojo}>5 %</strong></td>
               </tr>
             </tbody>
           </table>

@@ -319,10 +319,12 @@
   color: var(--text-primary);
 }
 
+/* Relleno y tinta del bioma los pone page.tsx (rellenoConTinta, C0645): blanco sobre su color
+   daba 1,63-2,87:1 */
 .biomaChipActivo {
-  border-color: var(--bioma-color, var(--primary-boton));
-  background: var(--bioma-color, var(--primary-boton));
-  color: white;
+  border-color: var(--bioma-relleno, var(--primary-boton));
+  background: var(--bioma-relleno, var(--primary-boton));
+  color: var(--bioma-tinta, white);
 }
 
 /* ── Climograma ── */
@@ -447,26 +449,27 @@
   gap: 0.4rem;
 }
 
+/* Sin opacidad: al 75 % el relleno se mezclaba con la tarjeta y la tinta dejaba de llegar a
+   4,5:1. El elegido se distingue por el contorno, la sombra y la escala (C0645) */
 .latitudBiomaBtn {
-  background: var(--bioma-color, var(--primary-boton));
+  background: var(--bioma-relleno, var(--primary-boton));
   border: none;
   border-radius: 20px;
   padding: 0.3rem 0.75rem;
   font-size: 0.78rem;
   font-weight: 600;
-  color: white;
+  color: var(--bioma-tinta, white);
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s;
-  opacity: 0.75;
+  transition: transform 0.15s;
 }
 
 .latitudBiomaBtn:hover {
-  opacity: 0.9;
   transform: scale(1.04);
 }
 
 .latitudBiomaBtnActivo {
-  opacity: 1;
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   transform: scale(1.04);
 }
@@ -573,12 +576,32 @@
   transition: width 0.5s ease;
 }
 
+/* El tono de la amenaza por tema lo calcula page.tsx (tonosPorTema, C0645) */
 .severidadValor {
   font-size: 0.8rem;
   font-weight: 700;
   flex-shrink: 0;
   min-width: 48px;
   text-align: right;
+  color: var(--tono-claro, var(--text-primary));
+}
+
+[data-theme='dark'] .severidadValor {
+  color: var(--tono-oscuro, var(--text-primary));
+}
+
+/* % protegido: rojo bajo el 10 %, naranja bajo el 20 %, verde desde el 20 %, con los tonos de
+   texto de globals (en oscuro, uno claro). En su color puro daba 2,64-2,87:1 (C0645) */
+.pctRojo {
+  color: var(--rojo-texto, #C0392B);
+}
+
+.pctNaranja {
+  color: var(--naranja-texto, #E67E22);
+}
+
+.pctVerde {
+  color: var(--verde-texto, #27AE60);
 }
 
 .amenazaTexto {

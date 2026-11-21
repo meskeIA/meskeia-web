@@ -351,7 +351,12 @@ const APPS: App[] = [
   // misma forma; «Todos» además en blanco sobre --primary (4,11 en claro, 2,79 en oscuro). Dos
   // cronologías con paletas distintas
   { slug: 'visualizador-historia/revolucion-francesa', todo: true, secciones: "[role='tablist'] [role='tab']" },
-  { slug: 'visualizador-historia/china-dinastias', todo: true, secciones: "[role='tablist'] [role='tab']" },];
+  { slug: 'visualizador-historia/china-dinastias', todo: true, secciones: "[role='tablist'] [role='tab']" },
+  // 21/11/2026 (C0645): blanco sobre el color de cada bioma en los botones de latitud y los chips del
+  // comparador (Desierto #FFC107 a 1,63:1, Tundra 1,91, Templado 2,10, Sabana 2,19, Tropical 2,87),
+  // el % protegido en rojo, naranja y verde puros (2,85-2,87 en claro, el rojo 2,64 en oscuro) y la
+  // severidad de cada amenaza en su color (naranja 2,85 en claro, violeta 2,45 en oscuro). Las pestañas
+  { slug: 'visualizador-biomas-terrestres', todo: true, secciones: "nav[aria-label='Secciones del visualizador'] [role='tab']" },];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
   return page.evaluate(({ marca, todo }) => {
