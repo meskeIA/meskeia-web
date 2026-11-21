@@ -343,6 +343,7 @@ const APPS: App[] = [
   { slug: 'visualizador-filosofia', todo: true, secciones: "[role='tablist'] [role='tab']" },
   { slug: 'visualizador-arte-movimientos', todo: true, secciones: "[role='tablist'] [role='tab']" },
   { slug: 'visualizador-arquitectura-estilos', todo: true, secciones: "[role='tablist'] [role='tab']" },
+  { slug: 'visualizador-literatura-movimientos', todo: true, secciones: "[role='tablist'] [role='tab']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
