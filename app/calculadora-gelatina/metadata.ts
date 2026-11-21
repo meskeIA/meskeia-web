@@ -42,13 +42,12 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/calculadora-gelatina/',
   category: 'UtilityApplication',
   features: [
-    'Conversión entre 7 tipos de gelatina (4 hojas + 2 polvos + agar-agar)',
-    'Resultados en gramos y número de hojas simultáneamente',
-    'Advertencia sobre el comportamiento diferente del agar-agar',
-    'Destaque de la gelatina hoja de oro (la más habitual en supermercados)',
-    'Selector de unidad: gramos o número de hojas',
-    'Tabla de equivalencias de bloom (gelatina hoja) con conversión a gramos exactos',
-    'Guía sobre cuándo usar cada tipo según el postre: bavarois, panna cotta, mousses',
+    'Conversión entre 7 gelificantes: 4 tipos de hoja, 2 de polvo y agar-agar',
+    'Cantidad de origen en gramos o en hojas (hojas solo para los tipos en hoja)',
+    'Equivalencias en gramos y en número de hojas a la vez',
+    'Aviso de que el agar-agar no reproduce la textura de la gelatina',
+    'Hoja de oro marcada como la más habitual en supermercados',
+    'Guía de hidratación de hojas, polvo y agar-agar',
   ],
 });
 

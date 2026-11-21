@@ -336,6 +336,14 @@
   line-height: 1.5;
 }
 
+/* Aviso de cantidad no válida (hallazgo 5394) */
+.errorTexto {
+  margin: calc(-1 * var(--spacing-sm, 0.5rem)) 0 var(--spacing-md, 1rem);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--rojo-texto, #b91c1c);
+}
+
 [data-theme='dark'] .warningBox {
   background: #3a3000;
   border-color: #f0c040;

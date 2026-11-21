@@ -44,7 +44,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     «-5», «0» y vacío → ninguna equivalencia y un aviso
  *     «1.500» = mil quinientos (parseSpanishNumber) → bronce 2500 g; nunca 1,5 g
  *
- * HALLAZGOS del 21/11/2026 (los abiertos llevan test.fail())
+ * HALLAZGOS del 21/11/2026 (los abiertos llevan test.fail(); C a H, reparados en /reparar del
+ * 21/11/2026; A y B esperan la decisión de los pesos y el factor del agar con fuente)
  *   A. El FAQPage contradice al motor y a la página en el peso de cada hoja (oro 2 g frente a 2,5 g;
  *      bronce 3,3 g frente a 1,7 g): «1 hoja de oro = 2 g de polvo 200» en el FAQ, 2,5 g en la app.
  *   B. La «fórmula estándar» (proporción inversa al bloom), el factor 1:5 del agar y la tabla de
@@ -122,7 +123,11 @@ async function leerResultado(page: Page): Promise<Resultado> {
           hojas: c.children[1]?.children[1] ? limpio(c.children[1].children[1].textContent) : null,
         }))
       : [];
-    const aviso = r.querySelector('[role="alert"]');
+    // El aviso del agar es texto del resultado, no una alerta (hallazgo F, reparado): se busca por
+    // su contenido, fuera de la rejilla de tarjetas
+    const aviso = Array.from(r.querySelectorAll('div')).find(
+      (d) => !grid?.contains(d) && d.children.length <= 1 && /El agar-agar gelifica/.test(d.textContent ?? ''),
+    );
     return { tienes: limpio(tienes?.textContent), tarjetas, aviso: aviso ? limpio(aviso.textContent) : null };
   });
   const tarjetas: Partial<Record<Clave, Tarjeta>> = {};
@@ -312,10 +317,11 @@ test.describe('calculadora-gelatina — Inspector 21/11/2026', () => {
     }
   });
 
-  // HALLAZGO D (21/11/2026, ABIERTO): if (isNaN(num) || num <= 0) return; — sale sin avisar.
-  test('CASO 3 · «-5», «0» y vacío avisan de que la cantidad no es válida', async ({ page }) => {
-    test.fail(true, 'HALLAZGO D (ABIERTO): el botón no hace nada y no dice por qué');
-    for (const valor of ['-5', '0', '']) {
+  // HALLAZGO D (21/11/2026, REPARADO): antes `if (isNaN(num) || num <= 0) return;` salía sin
+  // avisar; ahora un role="alert" junto al campo pide una cantidad mayor que 0. «1e3» lo rechaza
+  // parseSpanishNumber (NaN), que antes parseFloat aceptaba como 1000 g.
+  test('CASO 3 · «-5», «0», vacío y «1e3» avisan de que la cantidad no es válida', async ({ page }) => {
+    for (const valor of ['-5', '0', '', '1e3']) {
       await escribir(page, valor);
       await pulsarCalcular(page);
       const aviso = page
@@ -324,13 +330,14 @@ test.describe('calculadora-gelatina — Inspector 21/11/2026', () => {
         .filter({ hasText: /\S/ })
         .filter({ hasNotText: /agar/i });
       await expect(aviso.first(), `«${valor}»: aviso`).toBeVisible();
+      await expect(aviso.first()).toContainText('mayor que 0');
+      await expect(page.getByRole('heading', { name: 'Equivalencias', exact: true }), `«${valor}»`).toHaveCount(0);
     }
   });
 
-  // HALLAZGO D (21/11/2026, ABIERTO): parseFloat(cantidad.replace(',', '.')) lee «1.500» como 1,5
-  // (check:parser: el canónico es parseSpanishNumber, que da 1500).
+  // HALLAZGO D (21/11/2026, REPARADO): parseFloat(cantidad.replace(',', '.')) leía «1.500» como 1,5;
+  // ahora parseSpanishNumber, que da 1500.
   test('CASO 3 · «1.500» se lee mil quinientos gramos, no 1,5 g', async ({ page }) => {
-    test.fail(true, 'HALLAZGO D (ABIERTO): parseo casero, «1.500» → 1,5 g');
     await teclear(page, '1.500');
     await esperarValorEnReact(page, INPUT, '1.500');
     await pulsarCalcular(page);
@@ -341,15 +348,17 @@ test.describe('calculadora-gelatina — Inspector 21/11/2026', () => {
   });
 
   // ── Formato español ────────────────────────────────────────────────────────
-  // HALLAZGO C (21/11/2026, ABIERTO): formatCantidad interpola el número de JS y las hojas van crudas.
+  // HALLAZGO C (21/11/2026, REPARADO): formatCantidad interpolaba el número de JS y las hojas iban
+  // crudas; ahora formatNumber con los decimales que tiene la cifra.
   test('Formato · las cifras llevan coma decimal y separador de millares español', async ({ page }) => {
-    test.fail(true, 'HALLAZGO C (ABIERTO): «8.3 g», «≈ 4.9 hojas», «16666.7 g»');
     await pulsarCalcular(page);
     let r = await leerResultado(page);
-    // Obtenido: «8.3 g» y «≈ 4.9 hojas»
+    // Antes: «8.3 g» y «≈ 4.9 hojas»
+    expect.soft(r.tienes).toBe('5 g ≈ 2 hojas');
     expect.soft(r.tarjetas.bronce?.gramos).toBe('8,3 g');
     expect.soft(r.tarjetas.bronce?.hojas).toBe('≈ 4,9 hojas');
     expect.soft(r.tarjetas.plata?.gramos).toBe('6,3 g');
+    expect.soft(r.tarjetas.platino?.gramos, 'sin «,0» en una cifra entera').toBe('4 g');
     await escribir(page, '10000');
     await pulsarCalcular(page);
     r = await leerResultado(page);
@@ -412,9 +421,9 @@ test.describe('calculadora-gelatina — Inspector 21/11/2026', () => {
   });
 
   // ── Operativa ──────────────────────────────────────────────────────────────
-  // HALLAZGO E (21/11/2026, ABIERTO): setUnidad no borra el resultado (el tipo y la cantidad sí).
+  // HALLAZGO E (21/11/2026, REPARADO): setUnidad no borraba el resultado (el tipo y la cantidad sí);
+  // ahora cambiar de unidad lo retira.
   test('Operativa · cambiar a «Hojas» no deja a la vista el resultado de los gramos', async ({ page }) => {
-    test.fail(true, 'HALLAZGO E (ABIERTO): sigue «Tienes 2 hojas» con «5» en el campo de hojas');
     await pulsarCalcular(page);
     expect((await leerResultado(page)).tienes).toBe('5 g ≈ 2 hojas');
     await elegirUnidad(page, 'Hojas');
@@ -422,13 +431,26 @@ test.describe('calculadora-gelatina — Inspector 21/11/2026', () => {
     // Esperado: resultado borrado o recalculado para 5 hojas (12,5 g). Obtenido: «Tienes 2 hojas»
     // y las equivalencias de 5 g (bronce 8.3 g)
     await expect(zonaResultado(page).getByText('2 hojas', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Tienes', { exact: true })).toHaveCount(0);
+    // Y al calcular de nuevo sale el de 5 hojas: 5 × 2,5 = 12,5 g
+    await pulsarCalcular(page);
+    expect((await leerResultado(page)).tienes).toBe('5 hojas');
   });
 
   // ── Accesibilidad ──────────────────────────────────────────────────────────
-  // HALLAZGO F (21/11/2026, ABIERTO): {resultado && <div role="status" aria-live>}: la región nace llena.
+  // HALLAZGO F (21/11/2026, REPARADO): {resultado && <div role="status" aria-live>}: la región nacía
+  // llena; ahora está montada desde la carga. Y el aviso fijo del agar ya no es role="alert".
   test('A11y · la región aria-live existe antes de que llegue el resultado', async ({ page }) => {
-    test.fail(true, 'HALLAZGO F (ABIERTO): 0 regiones aria-live en <main> antes de calcular');
     await expect(page.locator('main [aria-live]').first()).toBeAttached();
+    await expect(page.locator('main [role="status"]')).toHaveCount(1);
+  });
+
+  test('A11y · el aviso del agar, que sale en todos los cálculos, no es una alerta', async ({ page }) => {
+    await pulsarCalcular(page);
+    const r = await leerResultado(page);
+    // Control: el aviso está en el resultado
+    expect(r.aviso).toContain('El agar-agar gelifica a temperatura ambiente');
+    await expect(page.locator('main [role="alert"]')).toHaveCount(0);
   });
 
   // ── JSON-LD ────────────────────────────────────────────────────────────────
@@ -439,23 +461,26 @@ test.describe('calculadora-gelatina — Inspector 21/11/2026', () => {
     expect(lista.length).toBeGreaterThanOrEqual(4);
   });
 
-  // HALLAZGO G (21/11/2026, ABIERTO): «Guía sobre cuándo usar cada tipo según el postre: bavarois,
-  // panna cotta, mousses» — la página no la tiene.
+  // HALLAZGO G (21/11/2026, REPARADO): «Guía sobre cuándo usar cada tipo según el postre: bavarois,
+  // panna cotta, mousses» — la página no la tiene — y «gramos exactos» de unas tarjetas redondeadas
+  // a 0,1 g. La lista se bajó a lo que hace la app.
   test('JSON-LD · featureList no promete postres que la página no trata', async ({ page }) => {
-    test.fail(true, 'HALLAZGO G (ABIERTO): «bavarois» solo está en el JSON-LD');
     const app = await ldDeTipo(page, 'WebApplication');
     const lista = (app.featureList as string[]).join(' ').toLowerCase();
     const cuerpo = (await textoDelCuerpo(page)).toLowerCase();
+    expect(lista).not.toContain('bavarois');
+    expect(lista).not.toContain('exactos');
     for (const postre of ['bavarois', 'panna cotta', 'mousse']) {
       if (lista.includes(postre)) expect(cuerpo, postre).toContain(postre);
     }
   });
 
   // ── Redacción ──────────────────────────────────────────────────────────────
-  // HALLAZGO H (21/11/2026, ABIERTO): «6,67%» (CLAUDE.md global §2, 25/09/2026), «gelificase» y
+  // HALLAZGO H (21/11/2026, REPARADO): «6,67%» (CLAUDE.md global §2, 25/09/2026), «gelificase» y
   // «≈ 1 hojas».
   test('Redacción · porcentaje con espacio, subjuntivo y singular de «hoja»', async ({ page }) => {
-    test.fail(true, 'HALLAZGO H (ABIERTO): «6,67%», «gelificase», «≈ 1 hojas»');
+    const crudo = (await page.locator('body').textContent()) ?? '';
+    expect.soft(crudo, 'espacio duro antes del %').toContain('6,67 %');
     const cuerpo = await textoDelCuerpo(page);
     // textoDelCuerpo normaliza el espacio duro a espacio
     expect.soft(cuerpo).toContain('al 6,67 %');

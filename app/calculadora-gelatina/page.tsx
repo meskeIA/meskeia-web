@@ -11,6 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import {
   calcularSustitucionGelatina,
   type TipoGelatina,
@@ -79,9 +80,30 @@ const OPCIONES_GELATINA: OpcionGelatina[] = [
   },
 ];
 
+/**
+ * Cifra en formato español con los decimales que de verdad tiene, hasta `maxDecimales`:
+ * 8,3 · 4 · 16.666,7 (no «4,0» ni «8.3»).
+ */
+function formatCifra(n: number, maxDecimales: number): string {
+  const factor = 10 ** maxDecimales;
+  const redondeado = Math.round(n * factor) / factor;
+  let decimales = 0;
+  while (
+    decimales < maxDecimales &&
+    Math.abs(Math.round(redondeado * 10 ** decimales) - redondeado * 10 ** decimales) > 1e-9
+  ) {
+    decimales++;
+  }
+  return formatNumber(redondeado, decimales);
+}
+
 function formatCantidad(g: number): string {
-  if (g < 1) return `${Math.round(g * 100) / 100} g`;
-  return `${Math.round(g * 10) / 10} g`;
+  return `${formatCifra(g, g < 1 ? 2 : 1)} g`;
+}
+
+/** «1 hoja», «2,5 hojas»: singular solo cuando el número es exactamente 1. */
+function formatHojas(n: number): string {
+  return `${formatCifra(n, 1)} ${n === 1 ? 'hoja' : 'hojas'}`;
 }
 
 export default function CalculadoraGelatinaPage() {
@@ -89,20 +111,35 @@ export default function CalculadoraGelatinaPage() {
   const [unidad, setUnidad] = useState<'gramos' | 'hojas'>('gramos');
   const [cantidad, setCantidad] = useState<string>('5');
   const [resultado, setResultado] = useState<ResultadoSustitucionGelatina | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const opcionActual = OPCIONES_GELATINA.find(o => o.tipo === tipoOrigen)!;
   const unidadEfectiva: 'gramos' | 'hojas' = opcionActual.admiteHojas ? unidad : 'gramos';
 
   const calcular = useCallback(() => {
-    const num = parseFloat(cantidad.replace(',', '.'));
-    if (isNaN(num) || num <= 0) return;
+    // parseSpanishNumber: «1.500» son mil quinientos y «1e3» no es una cantidad (NaN)
+    const num = parseSpanishNumber(cantidad);
+    if (!Number.isFinite(num) || num <= 0) {
+      setResultado(null);
+      setError(`Escribe una cantidad mayor que 0 en ${unidadEfectiva === 'hojas' ? 'hojas' : 'gramos'}.`);
+      return;
+    }
+    setError(null);
     const res = calcularSustitucionGelatina(tipoOrigen, num, unidadEfectiva);
     setResultado(res);
   }, [tipoOrigen, cantidad, unidadEfectiva]);
 
+  const handleUnidadChange = (nueva: 'gramos' | 'hojas') => {
+    setUnidad(nueva);
+    // El resultado era de la otra unidad: con «5» en el campo, 5 g y 5 hojas no son lo mismo
+    setResultado(null);
+    setError(null);
+  };
+
   const handleTipoChange = (tipo: TipoGelatina) => {
     setTipoOrigen(tipo);
     setResultado(null);
+    setError(null);
     const nueva = OPCIONES_GELATINA.find(o => o.tipo === tipo)!;
     if (!nueva.admiteHojas && unidad === 'hojas') {
       setUnidad('gramos');
@@ -157,7 +194,7 @@ export default function CalculadoraGelatinaPage() {
               <button
                 type="button"
                 className={`${styles.unidadBtn} ${unidadEfectiva === 'gramos' ? styles.unidadBtnActivo : ''}`}
-                onClick={() => setUnidad('gramos')}
+                onClick={() => handleUnidadChange('gramos')}
                 aria-pressed={unidadEfectiva === 'gramos'}
               >
                 Gramos
@@ -165,7 +202,7 @@ export default function CalculadoraGelatinaPage() {
               <button
                 type="button"
                 className={`${styles.unidadBtn} ${unidadEfectiva === 'hojas' ? styles.unidadBtnActivo : ''} ${!opcionActual.admiteHojas ? styles.unidadBtnDisabled : ''}`}
-                onClick={() => opcionActual.admiteHojas && setUnidad('hojas')}
+                onClick={() => opcionActual.admiteHojas && handleUnidadChange('hojas')}
                 disabled={!opcionActual.admiteHojas}
                 aria-pressed={unidadEfectiva === 'hojas'}
                 aria-disabled={!opcionActual.admiteHojas}
@@ -188,15 +225,23 @@ export default function CalculadoraGelatinaPage() {
                 min="0.1"
                 step="0.1"
                 value={cantidad}
-                onChange={e => { setCantidad(e.target.value); setResultado(null); }}
+                onChange={e => { setCantidad(e.target.value); setResultado(null); setError(null); }}
                 className={styles.cantidadInput}
                 aria-label={`Cantidad en ${unidadEfectiva}`}
+                aria-invalid={error !== null}
+                aria-describedby={error ? 'cantidad-error' : undefined}
               />
               <span className={styles.cantidadUnidad}>
                 {unidadEfectiva === 'hojas' ? 'hojas' : 'gramos'}
               </span>
             </div>
           </div>
+
+          {error && (
+            <p id="cantidad-error" className={styles.errorTexto} role="alert">
+              {error}
+            </p>
+          )}
 
           <button
             type="button"
@@ -217,27 +262,35 @@ export default function CalculadoraGelatinaPage() {
             </div>
           )}
 
+          {/* Región viva SIEMPRE montada: si naciera ya con el resultado dentro, el lector de
+              pantalla podría no anunciarlo (hallazgo 5396) */}
+          <div role="status" aria-live="polite" aria-atomic="true">
           {resultado && (
-            <div className={styles.resultadoWrapper} role="status" aria-live="polite" aria-atomic="true">
+            <div className={styles.resultadoWrapper}>
               {/* Resumen origen */}
               <div className={styles.origenCard}>
                 <h3 className={styles.origenTitulo}>Tienes</h3>
                 <p className={styles.origenValor}>
-                  {unidadEfectiva === 'hojas' && resultado.origen.hojas !== undefined
-                    ? `${resultado.origen.hojas} ${resultado.origen.hojas === 1 ? 'hoja' : 'hojas'}`
-                    : formatCantidad(resultado.origen.cantidad_g)
-                  }
-                  {unidadEfectiva === 'gramos' && resultado.origen.hojas !== undefined && (
-                    <span className={styles.origenHojas}> ≈ {resultado.origen.hojas} hojas</span>
-                  )}
+                  <span>
+                    {unidadEfectiva === 'hojas' && resultado.origen.hojas !== undefined
+                      ? formatHojas(resultado.origen.hojas)
+                      : formatCantidad(resultado.origen.cantidad_g)
+                    }
+                  </span>
+                  <span className={styles.origenHojas}>
+                    {unidadEfectiva === 'gramos' && resultado.origen.hojas !== undefined
+                      ? ` ≈ ${formatHojas(resultado.origen.hojas)}`
+                      : ''}
+                  </span>
                 </p>
                 <p className={styles.origenNombre}>{resultado.origen.nombre}</p>
                 <p className={styles.origenNotas}>{resultado.origen.notas}</p>
               </div>
 
-              {/* Advertencia agar */}
+              {/* Advertencia agar: sale en todos los cálculos (el agar siempre está, como origen o
+                  como equivalencia), así que es texto del resultado, no una alerta (hallazgo 5396) */}
               {resultado.advertencia_agar && (
-                <div className={styles.warningBox} role="alert">
+                <div className={styles.warningBox}>
                   <span aria-hidden="true">⚠️</span> {resultado.advertencia_agar}
                 </div>
               )}
@@ -259,7 +312,7 @@ export default function CalculadoraGelatinaPage() {
                     <div className={styles.equipValores}>
                       <span className={styles.equipGramos}>{formatCantidad(equiv.cantidad_g)}</span>
                       {equiv.hojas !== undefined && (
-                        <span className={styles.equipHojas}>≈ {equiv.hojas} hojas</span>
+                        <span className={styles.equipHojas}>≈ {formatHojas(equiv.hojas)}</span>
                       )}
                     </div>
                     <p className={styles.equipNotas}>{equiv.notas}</p>
@@ -268,6 +321,7 @@ export default function CalculadoraGelatinaPage() {
               </div>
             </div>
           )}
+          </div>
         </div>
       </main>
 
@@ -280,7 +334,7 @@ export default function CalculadoraGelatinaPage() {
           <p>
             El <strong>bloom strength</strong> (o grado bloom) mide la rigidez del gel que forma
             una gelatina. Se mide con un texturómetro y expresa la fuerza necesaria para hundir
-            un émbolo 4 mm en una gelatina al 6,67% a 10°C. A mayor valor bloom, más firme es
+            un émbolo 4 mm en una gelatina al 6,67{' '}% a 10 °C. A mayor valor bloom, más firme es
             el gel y menor cantidad de gelatina se necesita para obtener la misma textura.
           </p>
           <p>
@@ -315,7 +369,7 @@ export default function CalculadoraGelatinaPage() {
             <li><strong>Temperatura de gelificación:</strong> la gelatina gelifica en nevera (~4°C); el agar-agar gelifica a temperatura ambiente (30–40°C) y aguanta más calor.</li>
             <li><strong>Punto de fusión:</strong> la gelatina se funde en boca (37°C), de ahí la textura melosa de las panna cottas; el agar-agar no se funde en boca y da una textura más firme y quebradiza.</li>
             <li><strong>Adecuado para veganos:</strong> el agar-agar sí, la gelatina animal no.</li>
-            <li><strong>Compatibilidad con frutas ácidas:</strong> la piña, el kiwi, la papaya y el mango frescos contienen enzimas proteolíticas que impiden que la gelatina animal gelificase. El agar-agar no tiene este problema (aunque la acidez puede reducir su poder gelificante).</li>
+            <li><strong>Compatibilidad con frutas ácidas:</strong> la piña, el kiwi, la papaya y el mango frescos contienen enzimas proteolíticas que impiden que la gelatina animal gelifique. El agar-agar no tiene este problema (aunque la acidez puede reducir su poder gelificante).</li>
           </ul>
 
           <h2>Cómo hidratar la gelatina correctamente</h2>

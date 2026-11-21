@@ -12,11 +12,13 @@ import { esperarPaginaAsentada } from './apps/_hidratacion';
  *
  * CRITERIO, APP POR APP: el role="alert" sobra si el contenido es fijo (consejos, errores
  * frecuentes, aviso permanente) y es legítimo si el warningBox aparece por una acción o un estado
- * del usuario. Se quedaron con su alerta, por eso: calculadora-1rm-gimnasio, calculadora-gelatina,
+ * del usuario. Se quedaron con su alerta, por eso: calculadora-1rm-gimnasio,
  * calculadora-porcentaje-panadero, calculadora-puntos-azucar y calculadora-tiempos-running (la
  * advertencia sale del resultado), recortador-video (navegador sin WebCodecs),
  * visualizador-enzimas-cuerpo-humano (temperatura por encima de 42 °C) y
  * selector-regimen-fiscal-autonomo (va dentro del resultado, que aparece al responder).
+ * calculadora-gelatina la perdió el 21/11/2026 (hallazgo 5396): su aviso del agar sale en TODOS
+ * los cálculos, así que es texto del resultado y no una alerta.
  *
  * Mide, en cada una de las 21 de abajo, que la página TIENE su warningBox (control: si se
  * renombra la clase, el caso no pasa en falso) y que ninguno de ellos está en una alerta,
