@@ -320,6 +320,10 @@ const APPS: App[] = [
   // «❌ No» en --text-muted sobre su gris translúcido (3,70-4,11) y en oscuro los casos en
   // --primary-texto sobre su tinte (4,32)
   { slug: 'checklist-coberturas-seguros', todo: true },
+  // 21/11/2026 (C0645): el nombre de cada madera en blanco sobre su color (Álamo #FFFACD 1,06:1, Arce
+  // 1,17, Haya 1,97, Alerce 2,99…) y el blanco de las insignias de tipo, dificultad y sostenibilidad
+  // sobre su color (2,65-4,12). Igual en los dos temas
+  { slug: 'guia-maderas', todo: true },
   { slug: 'comparador-ides-ia', todo: true, secciones: "[role='tablist'][aria-label='Secciones del comparador de IDEs'] [role='tab']" },
   { slug: 'visualizador-tipos-activos', todo: true, secciones: "[role='tablist'][aria-label='Secciones del visualizador'] [role='tab']" },
   { slug: 'visualizador-digestion-nutrientes', todo: true, secciones: "nav[aria-label='Secciones del explicador'] button" },

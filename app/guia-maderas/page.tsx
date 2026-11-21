@@ -13,6 +13,7 @@ import {
 } from '@/components';
 
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 // --- Tipos ---
 
 type TipoMadera = 'Frondosa' | 'Conífera' | 'Tropical' | 'Exótica' | 'Reconst.';
@@ -706,6 +707,16 @@ const SOSTENIBILIDAD_COLORES: Record<'Alta' | 'Media' | 'Baja', string> = {
   Baja: '#B71C1C',
 };
 
+/**
+ * Fondo de un color de la guía con el texto encima legible: el blanco fijo daba de 1,06:1 (Álamo,
+ * #FFFACD) a 4,12 (Conífera, #388E3C) y 2,65 en «Media» de sostenibilidad (#F57F17). rellenoConTinta
+ * conserva el color si una de las dos tintas llega a 4,5:1 y, si no, lo ajusta lo justo (C0645)
+ */
+function rellenoYTinta(color: string): { backgroundColor: string; color: string } {
+  const { relleno, tinta } = rellenoConTinta(color);
+  return { backgroundColor: relleno, color: tinta };
+}
+
 const TIPOS: TipoMadera[] = ['Frondosa', 'Conífera', 'Tropical', 'Exótica', 'Reconst.'];
 const DIFICULTADES: DificultadTrabajo[] = ['Fácil', 'Media', 'Difícil'];
 const SOSTENIBILIDADES = ['Alta', 'Media', 'Baja'] as const;
@@ -880,7 +891,7 @@ export default function GuiaMaderasPage() {
               {/* Cabecera con chip de color */}
               <div
                 className={styles.tarjetaHeader}
-                style={{ backgroundColor: m.colorHex }}
+                style={rellenoYTinta(m.colorHex)}
               >
                 <div className={styles.tarjetaHeaderContent}>
                   <div>
@@ -889,7 +900,7 @@ export default function GuiaMaderasPage() {
                   </div>
                   <span
                     className={styles.badgeTipo}
-                    style={{ backgroundColor: TIPO_COLORES[m.tipo] }}
+                    style={rellenoYTinta(TIPO_COLORES[m.tipo])}
                   >
                     {m.tipo}
                   </span>
@@ -931,13 +942,13 @@ export default function GuiaMaderasPage() {
                 <div className={styles.badgesRow}>
                   <span
                     className={styles.badge}
-                    style={{ backgroundColor: DIFICULTAD_COLORES[m.dificultad] }}
+                    style={rellenoYTinta(DIFICULTAD_COLORES[m.dificultad])}
                   >
                     {m.dificultad}
                   </span>
                   <span
                     className={styles.badge}
-                    style={{ backgroundColor: SOSTENIBILIDAD_COLORES[m.sostenibilidad] }}
+                    style={rellenoYTinta(SOSTENIBILIDAD_COLORES[m.sostenibilidad])}
                   >
                     <span aria-hidden="true">🌱</span> {m.sostenibilidad}
                   </span>
