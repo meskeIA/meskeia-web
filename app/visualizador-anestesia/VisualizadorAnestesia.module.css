@@ -135,10 +135,12 @@
   outline-offset: 2px;
 }
 
+/* El tono del tipo lo calcula page.tsx (--tono-claro / --tono-oscuro, cabo C0645) */
 .tipoBtnActivo {
   background: rgba(46, 134, 171, 0.07);
   box-shadow: 0 2px 10px rgba(46, 134, 171, 0.2);
   font-weight: 700;
+  color: var(--tono-claro, var(--primary-texto));
 }
 
 /* ─── Panel de tipo ──────────────────────────── */
@@ -179,6 +181,7 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   margin: 0;
+  color: var(--tono-claro, var(--primary-texto));
 }
 
 .tipoPanelTexto {
@@ -412,6 +415,7 @@
   font-size: 0.82rem;
   font-weight: 700;
   align-self: flex-start;
+  color: var(--tono-claro, var(--text-primary));
 }
 
 /* ─── Warning box (marcador v2.0) ──────────────── */
@@ -462,12 +466,23 @@
 
 [data-theme='dark'] .tipoBtnActivo {
   background: rgba(46, 134, 171, 0.15);
-  color: #E5E5E5;
+  color: var(--tono-oscuro, #E5E5E5);
 }
 
 [data-theme='dark'] .tipoPanel {
   background: #2A2A2A;
   border-color: #3A3A3A;
+}
+
+[data-theme='dark'] .tipoPanelSubtitulo,
+[data-theme='dark'] .monitorValor {
+  color: var(--tono-oscuro, #E5E5E5);
+}
+
+/* --primary-texto sobre el tinte de marca de estas cajas en oscuro daba 4,33-4,50:1 */
+[data-theme='dark'] .insightBox strong,
+[data-theme='dark'] .warningBox strong {
+  color: #6CB8DC;
 }
 
 [data-theme='dark'] .tipoPanelTexto {
@@ -513,8 +528,9 @@
   color: #D0D0D0;
 }
 
+/* #888 sobre la tarjeta oscura daba 4,05:1 */
 [data-theme='dark'] .teoriaAutor {
-  color: #888888;
+  color: #A0A0A0;
 }
 
 [data-theme='dark'] .monitorCard {

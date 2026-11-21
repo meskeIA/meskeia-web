@@ -329,6 +329,11 @@ const APPS: App[] = [
   { slug: 'visualizador-digestion-nutrientes', todo: true, secciones: "nav[aria-label='Secciones del explicador'] button" },
   { slug: 'comparador-voces-narrativas', todo: true, secciones: "[class*='autorBotones'] button" },
   { slug: 'visualizador-como-funciona-el-dolor', todo: true, secciones: "nav[aria-label='Fases de la nocicepción'] button, [role='tablist'][aria-label='Tipos de dolor'] [role='tab']" },
+  // 21/11/2026 (C0645): la pestaña activa y los subtítulos del panel en el color de cada tipo con style
+  // (la marca 4,11:1, el teal 2,80 y el acento 2,26 en claro), el blanco sobre el número de cada paso
+  // en ese color (2,26-4,11) y el valor de referencia de cada monitor en su color sobre su tinte (rojo,
+  // teal y ámbar, 1,90-3,07 en claro); en oscuro, el autor de cada teoría en #888 (4,05). Los tres tipos
+  { slug: 'visualizador-anestesia', todo: true, secciones: "[role='tablist'][aria-label='Tipos de anestesia'] [role='tab']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

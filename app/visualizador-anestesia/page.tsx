@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import styles from './VisualizadorAnestesia.module.css';
+import { rellenoConTinta, rgbDeHex, tonoSobre } from '@/lib/tintaLegible';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import LegalNotice from '@/components/LegalNotice';
@@ -233,10 +234,42 @@ const MONITORES: MonitorIntraoperatorio[] = [
     nombre: 'SpO₂ (Pulsioximetría)',
     descripcion:
       'Saturación de oxígeno en sangre arterial medida de forma no invasiva. Alarma inmediata si el paciente sufre hipoxia.',
-    valorRef: '>95% (ideal >99%)',
+    valorRef: '>95 % (ideal >99 %)',
     colorAccent: '#F5A623',
   },
 ];
+
+// ─────────────────────────────────────────────
+// Texto en el color de cada dato (cabo C0645)
+// ─────────────────────────────────────────────
+// La pestaña activa, los subtítulos del panel y el valor de cada monitor se pintaban en el color
+// puro del dato con style: la marca a 4,11:1, el teal a 2,80 y el acento a 2,26 sobre blanco, y el
+// ámbar del SpO₂ a 1,90 sobre su tinte. Cada texto toma el tono de su color que llega a 4,5:1 sobre
+// el fondo MÁS desfavorable donde aparece, en cada tema; el color puro se queda en bordes y tintes.
+
+// Pestaña activa (tinte de marca al 7 % sobre la página) y panel blanco, en claro;
+// pestaña activa sobre la página oscura y panel #2A2A2A, en oscuro
+const FONDO_PEOR_CLARO = '#EBF1F4';
+const FONDO_PEOR_OSCURO = '#2A2A2A';
+const TARJETA_CLARO = '#FFFFFF';
+const TARJETA_OSCURO = '#2A2A2A';
+/** Opacidad del tinte del valor de referencia (el sufijo 18 en hexadecimal) */
+const ALFA_TINTE = 0x18 / 255;
+
+/** El color `color` al `alfa` sobre `base`, en hexadecimal */
+function tinte(color: string, base: string, alfa: number): string {
+  const c = rgbDeHex(color);
+  const b = rgbDeHex(base);
+  if (!c || !b) return base;
+  return '#' + c.map((v, i) => Math.round(v * alfa + b[i] * (1 - alfa)).toString(16).padStart(2, '0')).join('');
+}
+
+function tonos(color: string, claro = FONDO_PEOR_CLARO, oscuro = FONDO_PEOR_OSCURO): CSSProperties {
+  return {
+    '--tono-claro': tonoSobre(color, claro),
+    '--tono-oscuro': tonoSobre(color, oscuro),
+  } as CSSProperties;
+}
 
 // ─────────────────────────────────────────────
 // Bloque 1: Tipos de anestesia — selector
@@ -262,7 +295,7 @@ function BloqueTiposAnestesia() {
             aria-selected={tipoActivo === t.id}
             className={`${styles.tipoBtn} ${tipoActivo === t.id ? styles.tipoBtnActivo : ''}`}
             onClick={() => setTipoActivo(t.id)}
-            style={tipoActivo === t.id ? { borderColor: t.colorAccent, color: t.colorAccent } : {}}
+            style={tipoActivo === t.id ? { borderColor: t.colorAccent, ...tonos(t.colorAccent) } : {}}
           >
             <span aria-hidden="true">{t.icono}</span>
             {t.titulo}
@@ -274,17 +307,18 @@ function BloqueTiposAnestesia() {
         className={styles.tipoPanel}
         role="tabpanel"
         aria-label={`Información sobre ${datos.titulo}`}
+        style={tonos(datos.colorAccent)}
       >
         <div className={styles.tipoPanelGrid}>
           <div className={styles.tipoPanelCol}>
             <div className={styles.tipoPanelBloque}>
-              <h3 className={styles.tipoPanelSubtitulo} style={{ color: datos.colorAccent }}>
+              <h3 className={styles.tipoPanelSubtitulo}>
                 Mecanismo de acción
               </h3>
               <p className={styles.tipoPanelTexto}>{datos.mecanismo}</p>
             </div>
             <div className={styles.tipoPanelBloque}>
-              <h3 className={styles.tipoPanelSubtitulo} style={{ color: datos.colorAccent }}>
+              <h3 className={styles.tipoPanelSubtitulo}>
                 Fármacos principales
               </h3>
               <ul className={styles.tipoPanelLista}>
@@ -297,13 +331,13 @@ function BloqueTiposAnestesia() {
 
           <div className={styles.tipoPanelCol}>
             <div className={styles.tipoPanelBloque}>
-              <h3 className={styles.tipoPanelSubtitulo} style={{ color: datos.colorAccent }}>
+              <h3 className={styles.tipoPanelSubtitulo}>
                 Duración
               </h3>
               <p className={styles.tipoPanelTexto}>{datos.duracion}</p>
             </div>
             <div className={styles.tipoPanelBloque}>
-              <h3 className={styles.tipoPanelSubtitulo} style={{ color: datos.colorAccent }}>
+              <h3 className={styles.tipoPanelSubtitulo}>
                 Usos típicos
               </h3>
               <ul className={styles.tipoPanelLista}>
@@ -364,7 +398,10 @@ function BloqueMecanismoMolecular() {
         Cada paso tiene un fármaco, un receptor y un efecto fisiológico específico.
       </p>
       <div className={styles.pasosGrid}>
-        {PASOS_MOLECULARES.map(paso => (
+        {PASOS_MOLECULARES.map(paso => {
+          // Blanco sobre el color del paso daba 2,26-4,11:1: relleno y tinta que llegan a 4,5
+          const { relleno, tinta } = rellenoConTinta(paso.colorAccent);
+          return (
           <div
             key={paso.numero}
             className={styles.pasoCard}
@@ -372,14 +409,15 @@ function BloqueMecanismoMolecular() {
           >
             <div
               className={styles.pasoNumero}
-              style={{ backgroundColor: paso.colorAccent }}
+              style={{ backgroundColor: relleno, color: tinta }}
             >
               {paso.numero}
             </div>
             <h3 className={styles.pasoTitulo}>{paso.titulo}</h3>
             <p className={styles.pasoDesc}>{paso.descripcion}</p>
           </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
@@ -451,7 +489,14 @@ function BloqueMonitorizacion() {
             <p className={styles.monitorDesc}>{m.descripcion}</p>
             <div
               className={styles.monitorValor}
-              style={{ backgroundColor: `${m.colorAccent}18`, color: m.colorAccent }}
+              style={{
+                backgroundColor: `${m.colorAccent}18`,
+                ...tonos(
+                  m.colorAccent,
+                  tinte(m.colorAccent, TARJETA_CLARO, ALFA_TINTE),
+                  tinte(m.colorAccent, TARJETA_OSCURO, ALFA_TINTE),
+                ),
+              }}
             >
               {m.valorRef}
             </div>
